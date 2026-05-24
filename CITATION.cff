@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+title: GaugeGap Foundry
+message: If you use this software or generated benchmark data, cite this repository.
+type: software
+authors:
+  - family-names: Xio AI Solutions
+repository-code: https://github.com/XioAISolutions/gaugegap-foundry
+license: Apache-2.0
+date-released: 2026-05-24

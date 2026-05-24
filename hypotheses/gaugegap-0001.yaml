@@ -1,0 +1,29 @@
+id: gaugegap-0001
+track: GaugeGap
+model: z2_dual_chain
+scope: finite transverse-field Ising chain used as a Z2 dual-chain sanity benchmark
+claim: The finite-chain mass gap remains positive over the coupling sweep in this registered range.
+prediction:
+  observable: mass_gap
+  expected_shape: smooth_positive_curve
+controls:
+  lattice_sizes: [4, 6, 8, 10]
+  transverse_field_range: [0.2, 2.0]
+  transverse_field_points: 10
+  exchange_coupling: 1.0
+  boundary: open
+validation:
+  required:
+    - exact_diagonalization
+  future:
+    - independent_hamiltonian_builder
+    - noiseless_circuit_simulator
+    - noisy_simulator
+kill_criteria:
+  - gap trend changes sign under size refinement
+  - observable changes materially under equivalent Hamiltonian encoding
+  - no reproducible signal after two independent implementation paths
+status: active
+notes:
+  - This is not continuum Yang-Mills.
+  - This benchmark exists to validate the registry, ledger, and exact-diagonalization pipeline.

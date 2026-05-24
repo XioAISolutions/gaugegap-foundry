@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gaugegap-foundry"
+version = "0.1.0"
+description = "Verification-first finite lattice gauge benchmark infrastructure."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [
+  { name = "Xio AI Solutions" }
+]
+dependencies = [
+  "numpy>=1.26"
+]
+
+[project.optional-dependencies]
+quantum = [
+  "qiskit>=1.4",
+  "qiskit-aer>=0.15",
+  "qiskit-ibm-runtime>=0.34"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
