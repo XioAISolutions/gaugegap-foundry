@@ -46,7 +46,7 @@ The near-term backend order is:
 
 1. local exact diagonalization;
 2. IBM/Qiskit local Pauli-operator validation;
-3. IBM/Qiskit local statevector and noisy simulation;
+3. IBM/Qiskit local statevector and shot-based Aer simulation;
 4. optional IBM Runtime hardware;
 5. Quantinuum and AWS Braket/QuEra adapters once the local interface is stable.
 
@@ -55,6 +55,8 @@ Install optional IBM/Qiskit dependencies with:
 ```bash
 python -m pip install -e '.[quantum]'
 python scripts/run_gap_sweep.py --method qiskit-pauli --sizes 4,6 --field-points 3
+python scripts/run_dynamics.py --backend statevector --n-sites 4 --times 0,0.5
+python scripts/run_dynamics.py --backend aer-sampler --n-sites 4 --times 0,0.5 --shots 512
 ```
 
 ## Repository layout

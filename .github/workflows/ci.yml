@@ -41,4 +41,8 @@ jobs:
       - name: Qiskit Pauli smoke
         run: |
           python -m unittest tests.test_qiskit_backend
+          python -m unittest tests.test_qiskit_dynamics
           python scripts/run_gap_sweep.py --method qiskit-pauli --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-qiskit-smoke
+          python scripts/run_dynamics.py --backend statevector --n-sites 4 --times 0,0.5 --output-dir /tmp/gaugegap-statevector-smoke
+          python scripts/run_dynamics.py --backend aer-sampler --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/gaugegap-aer-smoke
+          python scripts/run_dynamics.py --backend aer-sampler --noise depolarizing --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/gaugegap-aer-depol-smoke

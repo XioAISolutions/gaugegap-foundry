@@ -27,10 +27,10 @@ def z2_dual_chain_sparse_pauli(
     last_bond = n_sites if periodic else n_sites - 1
 
     for site in range(last_bond):
-        terms.append((_pauli_label(n_sites, {site: "Z", (site + 1) % n_sites: "Z"}), -exchange_coupling))
+        terms.append((pauli_label(n_sites, {site: "Z", (site + 1) % n_sites: "Z"}), -exchange_coupling))
 
     for site in range(n_sites):
-        terms.append((_pauli_label(n_sites, {site: "X"}), -transverse_field))
+        terms.append((pauli_label(n_sites, {site: "X"}), -transverse_field))
 
     return SparsePauliOp.from_list(terms)
 
@@ -68,7 +68,7 @@ def qiskit_mass_gap(
     return first - ground, ground, first
 
 
-def _pauli_label(n_sites: int, site_ops: dict[int, str]) -> str:
+def pauli_label(n_sites: int, site_ops: dict[int, str]) -> str:
     label = ["I"] * n_sites
     for site, op in site_ops.items():
         label[n_sites - 1 - site] = op

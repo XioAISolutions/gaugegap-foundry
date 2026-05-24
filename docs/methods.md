@@ -23,6 +23,11 @@ The first provider-shaped path is `qiskit-pauli`, which constructs the same
 finite Hamiltonian as a Qiskit `SparsePauliOp` and diagonalizes its dense matrix
 as an independent representation check.
 
+The first circuit-dynamics path is `run_dynamics.py`, which builds a first-order
+Trotter circuit for the same finite Hamiltonian and records Z-site and nearest
+neighbor ZZ observables through either Qiskit statevector simulation or an Aer
+shot sampler.
+
 ## Current model
 
 The current `z2_dual_chain` implementation uses a dense transverse-field Ising
