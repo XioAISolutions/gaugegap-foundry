@@ -119,6 +119,7 @@ def write_csv(path: Path, records: list[dict[str, object]]) -> None:
                 "value",
                 "circuit_hash",
             ],
+            lineterminator="\n",
         )
         writer.writeheader()
         for record in records:
@@ -159,7 +160,8 @@ def main() -> int:
     args = parser.parse_args()
 
     records = records_for_observables(args)
-    stem = f"{args.hypothesis_id}-{args.backend}-dynamics"
+    backend_slug = args.backend if args.backend == "statevector" else f"{args.backend}-{args.noise}"
+    stem = f"{args.hypothesis_id}-{backend_slug}-dynamics"
     jsonl_path = args.output_dir / f"{stem}.jsonl"
     csv_path = args.output_dir / f"{stem}.csv"
     write_jsonl(jsonl_path, records)

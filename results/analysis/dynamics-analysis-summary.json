@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "backends": [
+      "local_statevector",
+      "shot_sampler:depolarizing",
+      "shot_sampler:none"
+    ],
+    "clean_aer_backend": "shot_sampler:none",
+    "hypotheses": [
+      "gaugegap-0001"
+    ],
+    "noisy_aer_backend": "shot_sampler:depolarizing",
+    "overall_verdict": "pass",
+    "record_count": 84,
+    "reference_backend": "local_statevector",
+    "summary_count": 6,
+    "thresholds": {
+      "noise_fail": 0.28,
+      "noise_warning": 0.12,
+      "shot_fail": 0.18,
+      "shot_warning": 0.08
+    }
+  },
+  "summaries": [
+    {
+      "comparison": "shot_sampler:depolarizing_vs_local_statevector",
+      "hypothesis_id": "gaugegap-0001",
+      "max_abs_error": 0.06716517953400003,
+      "mean_abs_error": 0.030193103897875013,
+      "observable": "z_expectation",
+      "records": 16,
+      "verdict": "pass"
+    },
+    {
+      "comparison": "shot_sampler:depolarizing_vs_local_statevector",
+      "hypothesis_id": "gaugegap-0001",
+      "max_abs_error": 0.068545533015,
+      "mean_abs_error": 0.026844843207916663,
+      "observable": "zz_correlator",
+      "records": 12,
+      "verdict": "pass"
+    },
+    {
+      "comparison": "shot_sampler:depolarizing_vs_shot_sampler:none",
+      "hypothesis_id": "gaugegap-0001",
+      "max_abs_error": 0.0546875,
+      "mean_abs_error": 0.0181884765625,
+      "observable": "z_expectation",
+      "records": 16,
+      "verdict": "pass"
+    },
+    {
+      "comparison": "shot_sampler:depolarizing_vs_shot_sampler:none",
+      "hypothesis_id": "gaugegap-0001",
+      "max_abs_error": 0.060546875,
+      "mean_abs_error": 0.021647135416666668,
+      "observable": "zz_correlator",
+      "records": 12,
+      "verdict": "pass"
+    },
+    {
+      "comparison": "shot_sampler:none_vs_local_statevector",
+      "hypothesis_id": "gaugegap-0001",
+      "max_abs_error": 0.048303398573000006,
+      "mean_abs_error": 0.01791768537812501,
+      "observable": "z_expectation",
+      "records": 16,
+      "verdict": "pass"
+    },
+    {
+      "comparison": "shot_sampler:none_vs_local_statevector",
+      "hypothesis_id": "gaugegap-0001",
+      "max_abs_error": 0.0375679720692,
+      "mean_abs_error": 0.01138606024425,
+      "observable": "zz_correlator",
+      "records": 12,
+      "verdict": "pass"
+    }
+  ]
+}

@@ -28,6 +28,10 @@ Trotter circuit for the same finite Hamiltonian and records Z-site and nearest
 neighbor ZZ observables through either Qiskit statevector simulation or an Aer
 shot sampler.
 
+`analyze_dynamics.py` is the first acceptance-gate layer. It treats statevector
+results as the local reference, compares clean Aer shot drift and depolarizing
+noise drift, then emits details, summaries, verdicts, and an SVG plot.
+
 ## Current model
 
 The current `z2_dual_chain` implementation uses a dense transverse-field Ising

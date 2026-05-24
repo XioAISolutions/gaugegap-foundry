@@ -57,6 +57,8 @@ python -m pip install -e '.[quantum]'
 python scripts/run_gap_sweep.py --method qiskit-pauli --sizes 4,6 --field-points 3
 python scripts/run_dynamics.py --backend statevector --n-sites 4 --times 0,0.5
 python scripts/run_dynamics.py --backend aer-sampler --n-sites 4 --times 0,0.5 --shots 512
+python scripts/run_dynamics.py --backend aer-sampler --noise depolarizing --n-sites 4 --times 0,0.5 --shots 512
+python scripts/analyze_dynamics.py
 ```
 
 ## Repository layout
@@ -69,6 +71,10 @@ src/gaugegap/   package code
 tests/          unit tests and smoke coverage
 results/        small checked-in baseline artifacts
 ```
+
+`scripts/analyze_dynamics.py` compares statevector, clean Aer, and noisy Aer
+dynamics outputs, assigns `pass` / `warning` / `fail` verdicts from fixed
+tolerances, and writes summary CSV/JSON plus an SVG observable plot.
 
 ## Claim boundary
 
