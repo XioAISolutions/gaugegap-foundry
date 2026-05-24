@@ -15,6 +15,7 @@ if str(SRC) not in sys.path:
 
 from gaugegap.ledger import git_state, object_hash, utc_run_id, write_jsonl
 from gaugegap.plot_svg import write_gap_svg
+from gaugegap.qiskit_backend import qiskit_mass_gap
 from gaugegap.z2_chain import mass_gap
 
 
@@ -38,6 +39,7 @@ def build_records(
     fields: list[float],
     exchange: float,
     periodic: bool,
+    method: str,
 ) -> list[dict[str, object]]:
     run_id = utc_run_id()
     git = git_state(ROOT)
@@ -52,12 +54,26 @@ def build_records(
                 "transverse_field": field,
                 "boundary": "periodic" if periodic else "open",
             }
-            gap, e0, e1 = mass_gap(
-                n_sites=size,
-                exchange_coupling=exchange,
-                transverse_field=field,
-                periodic=periodic,
-            )
+            if method == "exact":
+                gap, e0, e1 = mass_gap(
+                    n_sites=size,
+                    exchange_coupling=exchange,
+                    transverse_field=field,
+                    periodic=periodic,
+                )
+                method_name = "dense_exact_diagonalization"
+                backend = {"provider": "local", "name": "numpy.linalg.eigvalsh", "mode": "exact_dense", "shots": None}
+            elif method == "qiskit-pauli":
+                gap, e0, e1 = qiskit_mass_gap(
+                    n_sites=size,
+                    exchange_coupling=exchange,
+                    transverse_field=field,
+                    periodic=periodic,
+                )
+                method_name = "qiskit_sparse_pauli_dense_diagonalization"
+                backend = {"provider": "ibm-qiskit", "name": "SparsePauliOp.to_matrix", "mode": "local_pauli_matrix", "shots": None}
+            else:
+                raise ValueError(f"unsupported method: {method}")
             records.append(
                 {
                     "run_id": run_id,
@@ -70,7 +86,8 @@ def build_records(
                     "value": gap,
                     "ground_energy": e0,
                     "first_excited_energy": e1,
-                    "method": "dense_exact_diagonalization",
+                    "method": method_name,
+                    "backend": backend,
                     "git": git,
                 }
             )
@@ -126,6 +143,7 @@ def main() -> int:
     parser.add_argument("--field-points", type=int, default=10)
     parser.add_argument("--exchange", type=float, default=1.0)
     parser.add_argument("--periodic", action="store_true")
+    parser.add_argument("--method", choices=["exact", "qiskit-pauli"], default="exact")
     parser.add_argument("--output-dir", type=Path, default=ROOT / "results" / "baselines")
     args = parser.parse_args()
 
@@ -141,6 +159,7 @@ def main() -> int:
         fields=fields,
         exchange=args.exchange,
         periodic=args.periodic,
+        method=args.method,
     )
 
     stem = f"{args.hypothesis_id}-gap-sweep"

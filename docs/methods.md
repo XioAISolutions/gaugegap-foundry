@@ -19,6 +19,9 @@ Every run records:
 - result values.
 
 Provider-specific metadata will be added when simulator and QPU backends land.
+The first provider-shaped path is `qiskit-pauli`, which constructs the same
+finite Hamiltonian as a Qiskit `SparsePauliOp` and diagonalizes its dense matrix
+as an independent representation check.
 
 ## Current model
 
