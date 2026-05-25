@@ -59,6 +59,7 @@ python scripts/run_dynamics.py --backend statevector --n-sites 4 --times 0,0.5
 python scripts/run_dynamics.py --backend aer-sampler --n-sites 4 --times 0,0.5 --shots 512
 python scripts/run_dynamics.py --backend aer-sampler --noise depolarizing --n-sites 4 --times 0,0.5 --shots 512
 python scripts/analyze_dynamics.py
+python scripts/quantum_status.py
 ```
 
 ## Repository layout
@@ -75,6 +76,10 @@ results/        small checked-in baseline artifacts
 `scripts/analyze_dynamics.py` compares statevector, clean Aer, and noisy Aer
 dynamics outputs, assigns `pass` / `warning` / `fail` verdicts from fixed
 tolerances, and writes summary CSV/JSON plus an SVG observable plot.
+
+`scripts/quantum_status.py` answers the key boundary question: the repository
+currently uses quantum operators, quantum circuits, and quantum simulators, but
+it has not yet submitted a circuit to real QPU hardware.
 
 ## Claim boundary
 

@@ -26,6 +26,8 @@ jobs:
         run: python -m unittest discover -s tests
       - name: Smoke sweep
         run: python scripts/run_gap_sweep.py --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-smoke
+      - name: Quantum boundary status
+        run: python scripts/quantum_status.py --output-dir /tmp/gaugegap-quantum-status
       - name: FlowGap smoke
         run: python scripts/run_flowgap_burgers.py --sizes 16,32 --nu-points 3 --n-steps 20 --output-dir /tmp/flowgap-smoke
       - name: U(1) gauge smoke

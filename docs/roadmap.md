@@ -49,6 +49,13 @@ and grant-aligned, not simply larger.
 6. finite-size, truncation, ansatz, and backend stability checks;
 7. public dataset with negative results retained.
 
+## Quantum boundary
+
+The project currently reaches Qiskit quantum simulation, not real QPU execution.
+Real hardware begins only when a validated circuit is submitted to a provider
+runtime and the ledger records provider job id, backend, shots, and calibration
+context. See `docs/quantum-boundary.md`.
+
 ## First ten experiments
 
 1. Z2 minimal finite chain, gap vs coupling, exact diagonalization.

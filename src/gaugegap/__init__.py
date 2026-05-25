@@ -9,6 +9,7 @@ __all__ = [
     "gaugegap_u1",
     "ledger",
     "plot_svg",
+    "quantum_boundary",
     "qiskit_backend",
     "qiskit_dynamics",
     "z2_chain",

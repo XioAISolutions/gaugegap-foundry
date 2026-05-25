@@ -96,6 +96,7 @@ python scripts/run_dynamics.py --backend statevector --n-sites 4 --times 0,0.5 -
 python scripts/run_dynamics.py --backend aer-sampler --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/gaugegap-aer-smoke
 python scripts/run_dynamics.py --backend aer-sampler --noise depolarizing --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/gaugegap-aer-depol-smoke
 python scripts/analyze_dynamics.py --input-dir results/dynamics --output-dir /tmp/gaugegap-analysis-smoke
+python scripts/quantum_status.py --output-dir /tmp/gaugegap-quantum-status
 ```
 
 If dependencies are not installed, use:

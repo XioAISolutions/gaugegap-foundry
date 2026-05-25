@@ -1,0 +1,128 @@
+{
+  "ibm_runtime": {
+    "backends": [],
+    "can_attempt_runtime": false,
+    "dependency_present": false,
+    "env_instance_present": false,
+    "env_token_present": false,
+    "next_step": "Run `python scripts/quantum_status.py --probe-ibm` after configuring IBM Quantum credentials.",
+    "probe_requested": false,
+    "status": "not_probed"
+  },
+  "summary": {
+    "active_surface_count": 5,
+    "actual_hardware_runs_present": false,
+    "hardware_run_count": 0,
+    "max_active_level": 2,
+    "max_active_level_name": "quantum_circuit_simulation",
+    "plain_english": "The project currently uses quantum representations and quantum simulators, but it has not yet submitted a circuit to real quantum hardware."
+  },
+  "surfaces": [
+    {
+      "actual_quantum_hardware": false,
+      "command": "python scripts/run_gap_sweep.py",
+      "files": [
+        "scripts/run_gap_sweep.py",
+        "scripts/run_gaugegap_u1.py",
+        "scripts/run_flowgap_burgers.py",
+        "scripts/run_curverank_screen.py"
+      ],
+      "id": "exact_dense_baselines",
+      "level": 0,
+      "level_name": "classical_reference",
+      "meaning": "Classical baselines define the finite systems and acceptance references.",
+      "next_gate": "Keep these as the source of truth before any simulator or QPU claim.",
+      "status": "active",
+      "track": "GaugeGap / FlowGap / CurveRank"
+    },
+    {
+      "actual_quantum_hardware": false,
+      "command": "python scripts/run_gap_sweep.py --method qiskit-pauli",
+      "files": [
+        "src/gaugegap/qiskit_backend.py",
+        "scripts/run_gap_sweep.py"
+      ],
+      "id": "qiskit_pauli_operator",
+      "level": 1,
+      "level_name": "quantum_operator_representation",
+      "meaning": "Builds the finite Hamiltonian as a Qiskit SparsePauliOp and checks it against dense exact diagonalization.",
+      "next_gate": "Use this before turning a Hamiltonian into circuits or IBM Runtime observables.",
+      "status": "active",
+      "track": "GaugeGap"
+    },
+    {
+      "actual_quantum_hardware": false,
+      "command": "python scripts/run_dynamics.py --backend statevector",
+      "files": [
+        "src/gaugegap/qiskit_dynamics.py",
+        "scripts/run_dynamics.py"
+      ],
+      "id": "qiskit_statevector_dynamics",
+      "level": 2,
+      "level_name": "quantum_circuit_simulation",
+      "meaning": "Builds a Trotter circuit and evaluates exact simulated quantum-state observables.",
+      "next_gate": "Compare with shot sampling and noisy simulation before hardware.",
+      "status": "active",
+      "track": "GaugeGap"
+    },
+    {
+      "actual_quantum_hardware": false,
+      "command": "python scripts/run_dynamics.py --backend aer-sampler --noise depolarizing",
+      "files": [
+        "src/gaugegap/qiskit_dynamics.py",
+        "scripts/run_dynamics.py",
+        "scripts/analyze_dynamics.py"
+      ],
+      "id": "qiskit_aer_sampler",
+      "level": 2,
+      "level_name": "shot_based_quantum_simulation",
+      "meaning": "Samples Trotter circuits through Aer, including a simple depolarizing noise model.",
+      "next_gate": "Only move to hardware when analysis gates pass under shot/noise drift.",
+      "status": "active",
+      "track": "GaugeGap"
+    },
+    {
+      "actual_quantum_hardware": false,
+      "command": "python scripts/run_flowgap_burgers.py --quantum",
+      "files": [
+        "src/gaugegap/flowgap_qsubroutine.py",
+        "scripts/run_flowgap_burgers.py"
+      ],
+      "id": "flowgap_vqls_statevector",
+      "level": 2,
+      "level_name": "quantum_algorithm_simulation",
+      "meaning": "Runs a tiny VQLS-style pressure-Poisson subroutine through statevector simulation.",
+      "next_gate": "Treat as a quantum-algorithm benchmark, not a Navier-Stokes theorem route.",
+      "status": "active",
+      "track": "FlowGap"
+    },
+    {
+      "actual_quantum_hardware": false,
+      "command": "python scripts/quantum_status.py --probe-ibm",
+      "files": [
+        "src/gaugegap/qiskit_dynamics.py"
+      ],
+      "id": "ibm_runtime_sampler",
+      "level": 3,
+      "level_name": "hardware_ready_boundary",
+      "meaning": "This is where real quantum begins: submitting validated circuits to IBM Runtime Sampler/Estimator on a physical backend.",
+      "next_gate": "Add a guarded IBM Runtime runner only after credentials and backend availability are confirmed.",
+      "status": "planned",
+      "track": "GaugeGap"
+    },
+    {
+      "actual_quantum_hardware": false,
+      "command": "not implemented",
+      "files": [
+        "docs/roadmap.md"
+      ],
+      "id": "future_quantinuum_braket",
+      "level": 3,
+      "level_name": "future_provider_boundary",
+      "meaning": "Future backends for trapped-ion and analogue gauge-style experiments.",
+      "next_gate": "Do not implement until IBM/local simulator artifacts are stable and reproducible.",
+      "status": "planned",
+      "track": "GaugeGap"
+    }
+  ]
+}
