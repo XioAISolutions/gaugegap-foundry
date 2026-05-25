@@ -1,0 +1,29 @@
+id: curverank-0001
+track: CurveRank
+model: berry_keating_xp
+scope: spectral screening of truncated Berry-Keating xp-type operators against known Riemann zeta zeros
+claim: >
+  The truncated Berry-Keating xp operator produces positive eigenvalues whose
+  spectral mismatch against known Riemann zeros decreases or stabilises as
+  truncation size increases, and spacing statistics trend toward GUE.
+prediction:
+  observable: spectral_mismatch
+  expected_shape: decreasing_or_stable
+controls:
+  n_basis_range: [10, 20, 30, 40, 50]
+  L: 1.0
+  k_zeros: 20
+validation:
+  required:
+    - exact_diagonalization
+  future:
+    - qpe_on_truncated_unitary
+    - floquet_scan
+kill_criteria:
+  - spectral mismatch increases monotonically with truncation size
+  - spacing statistics diverge from GUE toward Poisson with larger basis
+  - eigenvalues become numerically unstable under truncation refinement
+status: active
+notes:
+  - This is spectral screening of toy operators, not a proof of the Riemann Hypothesis.
+  - Spectral mimicry at finite truncation does not constitute proof-relevant structure.

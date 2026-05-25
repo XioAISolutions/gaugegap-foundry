@@ -1,0 +1,11 @@
+run_id,hypothesis_id,observable,value,family,k_tracked,k_zeros,n_basis
+20260525T012259Z,curverank-0001,spectral_mismatch,27.39132244924091,xp,,20,10
+20260525T012259Z,curverank-0001,spectral_mismatch,35.53568994244663,xp,,20,20
+20260525T012259Z,curverank-0001,spectral_mismatch,40.00965971015601,xp,,20,30
+20260525T012259Z,curverank-0001,spectral_mismatch,41.74916921307265,xp,,20,40
+20260525T012259Z,curverank-0001,spectral_mismatch,42.75723612262508,xp,,20,50
+20260525T012259Z,curverank-0001,truncation_drift,nan,xp,5,,10
+20260525T012259Z,curverank-0001,truncation_drift,7.710521991776229,xp,10,,20
+20260525T012259Z,curverank-0001,truncation_drift,18.72884689314834,xp,10,,30
+20260525T012259Z,curverank-0001,truncation_drift,6.352275688571157,xp,10,,40
+20260525T012259Z,curverank-0001,truncation_drift,3.564312671188189,xp,10,,50
