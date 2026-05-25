@@ -10,8 +10,8 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 try:
+    import qiskit_ibm_runtime  # noqa: F401
     from gaugegap.ibm_runtime_runner import _check_runtime
-    _check_runtime()
     IBM_AVAILABLE = True
 except ImportError:
     IBM_AVAILABLE = False

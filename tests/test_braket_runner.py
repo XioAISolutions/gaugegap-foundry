@@ -10,6 +10,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 try:
+    import braket.circuits  # noqa: F401
     from gaugegap.braket_runner import (
         braket_counts_to_z_observables,
         braket_readiness,
