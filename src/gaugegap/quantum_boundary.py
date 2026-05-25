@@ -82,19 +82,43 @@ SURFACES: tuple[QuantumSurface, ...] = (
         next_gate="Treat as a quantum-algorithm benchmark, not a Navier-Stokes theorem route.",
     ),
     QuantumSurface(
+        id="braket_local_simulator",
+        track="GaugeGap",
+        level=2,
+        level_name="braket_local_simulation",
+        status="active",
+        actual_quantum_hardware=False,
+        files=("src/gaugegap/braket_runner.py", "scripts/run_hardware.py"),
+        command="python scripts/run_hardware.py --provider braket-local",
+        meaning="Runs Trotter circuits on Braket local StateVectorSimulator for cross-platform validation.",
+        next_gate="Compare Braket local results with Qiskit statevector before cloud submission.",
+    ),
+    QuantumSurface(
         id="ibm_runtime_sampler",
         track="GaugeGap",
         level=3,
         level_name="hardware_ready_boundary",
-        status="planned",
-        actual_quantum_hardware=False,
-        files=("src/gaugegap/qiskit_dynamics.py",),
-        command="python scripts/quantum_status.py --probe-ibm",
-        meaning="This is where real quantum begins: submitting validated circuits to IBM Runtime Sampler/Estimator on a physical backend.",
-        next_gate="Add a guarded IBM Runtime runner only after credentials and backend availability are confirmed.",
+        status="ready",
+        actual_quantum_hardware=True,
+        files=("src/gaugegap/ibm_runtime_runner.py", "scripts/run_hardware.py"),
+        command="python scripts/run_hardware.py --provider ibm",
+        meaning="Submits validated circuits to IBM Runtime SamplerV2/EstimatorV2 on a physical backend. Requires QISKIT_IBM_TOKEN.",
+        next_gate="Run only after statevector and Aer analysis gates pass. Ledger must record job_id, backend, shots.",
     ),
     QuantumSurface(
-        id="future_quantinuum_braket",
+        id="braket_cloud_devices",
+        track="GaugeGap",
+        level=3,
+        level_name="braket_cloud_boundary",
+        status="ready",
+        actual_quantum_hardware=True,
+        files=("src/gaugegap/braket_runner.py", "scripts/run_hardware.py"),
+        command="python scripts/run_hardware.py --provider braket-cloud --device-name ionq-aria1",
+        meaning="Submits circuits to IonQ, Rigetti, or managed Braket simulators via AWS. Requires AWS credentials.",
+        next_gate="Run only after Braket local simulator results match Qiskit statevector. Ledger must record task_id, device_arn, shots.",
+    ),
+    QuantumSurface(
+        id="future_quantinuum",
         track="GaugeGap",
         level=3,
         level_name="future_provider_boundary",
@@ -102,8 +126,8 @@ SURFACES: tuple[QuantumSurface, ...] = (
         actual_quantum_hardware=False,
         files=("docs/roadmap.md",),
         command="not implemented",
-        meaning="Future backends for trapped-ion and analogue gauge-style experiments.",
-        next_gate="Do not implement until IBM/local simulator artifacts are stable and reproducible.",
+        meaning="Future pytket/Quantinuum backend for trapped-ion SU(2) gauge experiments.",
+        next_gate="Do not implement until IBM and Braket artifacts are stable and reproducible.",
     ),
 )
 
@@ -114,17 +138,23 @@ def quantum_usage_map() -> list[dict[str, Any]]:
 
 def quantum_summary() -> dict[str, Any]:
     active = [surface for surface in SURFACES if surface.status == "active"]
-    hardware = [surface for surface in SURFACES if surface.actual_quantum_hardware]
-    max_level = max(surface.level for surface in active)
+    ready = [surface for surface in SURFACES if surface.status == "ready"]
+    hardware_ready = [surface for surface in SURFACES if surface.actual_quantum_hardware and surface.status == "ready"]
+    max_active = max(surface.level for surface in active) if active else 0
+    max_ready = max(surface.level for surface in ready) if ready else max_active
     return {
         "active_surface_count": len(active),
-        "max_active_level": max_level,
-        "max_active_level_name": _level_name(max_level),
-        "actual_hardware_runs_present": bool(hardware),
-        "hardware_run_count": len(hardware),
+        "ready_surface_count": len(ready),
+        "max_active_level": max_active,
+        "max_active_level_name": _level_name(max_active),
+        "max_ready_level": max_ready,
+        "max_ready_level_name": _level_name(max_ready) if ready else "none",
+        "actual_hardware_runs_present": False,
+        "hardware_ready_count": len(hardware_ready),
         "plain_english": (
-            "The project currently uses quantum representations and quantum simulators, "
-            "but it has not yet submitted a circuit to real quantum hardware."
+            "The project uses quantum simulators (Qiskit + Braket local) and has "
+            "hardware runners ready for IBM Runtime and AWS Braket cloud devices. "
+            "Real QPU execution requires provider credentials."
         ),
     }
 
@@ -177,6 +207,7 @@ def render_quantum_usage_markdown(payload: dict[str, Any]) -> str:
         "# Quantum Usage Map",
         "",
         f"Current maximum active level: **{summary['max_active_level']} ({summary['max_active_level_name']})**.",
+        f"Hardware-ready level: **{summary.get('max_ready_level', 'none')} ({summary.get('max_ready_level_name', 'none')})**.",
         "",
         summary["plain_english"],
         "",

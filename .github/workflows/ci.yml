@@ -50,6 +50,25 @@ jobs:
       - name: CurveRank smoke
         run: python scripts/run_curverank_screen.py --family xp --n-basis 10,20 --k-zeros 10 --output-dir /tmp/curverank-smoke
 
+  braket-smoke:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install braket extras
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[braket]'
+      - name: Braket unit tests
+        run: python -m unittest tests.test_braket_runner
+      - name: Braket local simulator smoke
+        run: python scripts/run_hardware.py --provider braket-local --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/braket-smoke
+
   quantum-smoke:
     runs-on: ubuntu-latest
     steps:
@@ -65,6 +84,7 @@ jobs:
         run: |
           python -m unittest tests.test_qiskit_backend
           python -m unittest tests.test_qiskit_dynamics
+          python -m unittest tests.test_ibm_runtime_runner
           python scripts/run_gap_sweep.py --method qiskit-pauli --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-qiskit-smoke
           python scripts/run_dynamics.py --backend statevector --n-sites 4 --times 0,0.5 --output-dir /tmp/gaugegap-statevector-smoke
           python scripts/run_dynamics.py --backend aer-sampler --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/gaugegap-aer-smoke

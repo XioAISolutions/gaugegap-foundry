@@ -89,6 +89,12 @@ For U(1) gauge changes:
 python scripts/run_gaugegap_u1.py --n-links 2 --truncation 1,2 --g-mag-points 3 --output-dir /tmp/u1-smoke
 ```
 
+For Braket changes:
+
+```bash
+python scripts/run_hardware.py --provider braket-local --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/braket-smoke
+```
+
 For Qiskit changes, also run:
 
 ```bash
@@ -99,8 +105,15 @@ python scripts/analyze_dynamics.py --input-dir results/dynamics --output-dir /tm
 python scripts/quantum_status.py --output-dir /tmp/gaugegap-quantum-status
 ```
 
+For hardware runs (requires provider credentials):
+
+```bash
+python scripts/run_hardware.py --provider ibm --n-sites 4 --times 0,0.5 --shots 1024 --output-dir /tmp/ibm-hardware
+python scripts/run_hardware.py --provider braket-cloud --device-name sv1 --n-sites 4 --times 0,0.5 --shots 1024 --output-dir /tmp/braket-cloud
+```
+
 If dependencies are not installed, use:
 
 ```bash
-python -m pip install -e .
+python -m pip install -e '.[all]'
 ```

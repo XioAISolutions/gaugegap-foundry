@@ -1,12 +1,14 @@
 """GaugeGap finite-system benchmark helpers."""
 
 __all__ = [
+    "braket_runner",
     "curverank_operators",
     "curverank_spectral",
     "dynamics_analysis",
     "flowgap_burgers",
     "flowgap_qsubroutine",
     "gaugegap_u1",
+    "ibm_runtime_runner",
     "ledger",
     "plot_svg",
     "quantum_boundary",

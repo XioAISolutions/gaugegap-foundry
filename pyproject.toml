@@ -28,8 +28,11 @@ flow = [
 spectral = [
   "scipy>=1.11",
 ]
+braket = [
+  "amazon-braket-sdk>=1.80",
+]
 all = [
-  "gaugegap-foundry[quantum,flow,spectral]",
+  "gaugegap-foundry[quantum,flow,spectral,braket]",
 ]
 
 [tool.setuptools.packages.find]
