@@ -20,7 +20,16 @@ dependencies = [
 quantum = [
   "qiskit>=1.4",
   "qiskit-aer>=0.15",
-  "qiskit-ibm-runtime>=0.34"
+  "qiskit-ibm-runtime>=0.34",
+]
+flow = [
+  "scipy>=1.11",
+]
+spectral = [
+  "scipy>=1.11",
+]
+all = [
+  "gaugegap-foundry[quantum,flow,spectral]",
 ]
 
 [tool.setuptools.packages.find]

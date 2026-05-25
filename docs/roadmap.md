@@ -12,9 +12,17 @@ credible target is a grant-worthy, publication-grade discovery engine that can:
 - generate benchmark-quality datasets that other researchers can reproduce;
 - build the verification infrastructure needed if a real theorem route appears.
 
-The flagship is **GaugeGap**: AI-guided, verification-first finite-lattice
-gauge-theory experiments around mass gaps, confinement-adjacent observables, and
-string-breaking dynamics.
+Three tracks share the same verification infrastructure:
+
+- **GaugeGap** (Yang-Mills mass gap): AI-guided, verification-first
+  finite-lattice gauge-theory experiments around mass gaps,
+  confinement-adjacent observables, and string-breaking dynamics.
+- **FlowGap** (Navier-Stokes): finite reduced-model benchmarks using viscous
+  Burgers surrogates and pressure-Poisson subroutines, with hybrid
+  quantum-classical comparison on tiny grids.
+- **CurveRank** (Riemann hypothesis): spectral screening of truncated
+  Hilbert-Polya candidate operators against known Riemann zeta zeros, with
+  GUE spacing statistics and truncation stability analysis.
 
 ## Glasswing lesson
 
@@ -56,7 +64,9 @@ and grant-aligned, not simply larger.
 
 ## Claim boundary
 
-Acceptable first results are finite-system results, not Clay-prize claims:
+Acceptable first results are finite-system results, not Clay-prize claims.
+
+### GaugeGap
 
 - gap estimates: `Delta(L, g, truncation) = E1 - E0`;
 - stable trends across lattice size or truncation;
@@ -65,9 +75,23 @@ Acceptable first results are finite-system results, not Clay-prize claims:
 - string-breaking or domain-wall dynamics;
 - entanglement/Renyi proxies.
 
-Avoid:
+### FlowGap
 
-- "we will solve Yang-Mills";
-- "AI discovered the mass gap";
-- "quantum computer proves the theorem";
+- kinetic energy decay under viscous dissipation;
+- pressure-Poisson residuals, classical vs quantum;
+- divergence reduction after projection;
+- grid convergence and noise sensitivity.
+
+### CurveRank
+
+- spectral mismatch trends vs truncation;
+- GUE spacing statistics (mean ratio, stability);
+- truncation drift and eigenvalue stability;
+- ranked candidate operator families.
+
+### Avoid across all tracks
+
+- "we will solve [Millennium problem]";
+- "AI discovered [fundamental result]";
+- "quantum computer proves [theorem]";
 - theorem-adjacent claims without precise finite-system definitions.

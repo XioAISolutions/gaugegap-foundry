@@ -26,6 +26,27 @@ jobs:
         run: python -m unittest discover -s tests
       - name: Smoke sweep
         run: python scripts/run_gap_sweep.py --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-smoke
+      - name: FlowGap smoke
+        run: python scripts/run_flowgap_burgers.py --sizes 16,32 --nu-points 3 --n-steps 20 --output-dir /tmp/flowgap-smoke
+      - name: U(1) gauge smoke
+        run: python scripts/run_gaugegap_u1.py --n-links 2 --truncation 1,2 --g-mag-points 3 --output-dir /tmp/u1-smoke
+
+  spectral-smoke:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install spectral extras
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[spectral]'
+      - name: CurveRank smoke
+        run: python scripts/run_curverank_screen.py --family xp --n-basis 10,20 --k-zeros 10 --output-dir /tmp/curverank-smoke
 
   quantum-smoke:
     runs-on: ubuntu-latest

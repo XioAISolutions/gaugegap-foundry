@@ -3,13 +3,16 @@
 ## Claim boundary
 
 Never describe this repository as solving, proving, or experimentally resolving
-the Yang-Mills mass gap problem. Current work is finite-system benchmarking and
-verification infrastructure.
+any Millennium Prize problem. Current work is finite-system benchmarking and
+verification infrastructure across three tracks.
+
+### GaugeGap (Yang-Mills mass gap)
 
 Use precise language:
 
 - finite-system mass-gap benchmark
 - Z2 dual-chain sanity benchmark
+- U(1) compact lattice gauge benchmark
 - exact diagonalization baseline
 - simulator or backend comparison
 - hypothesis pruning
@@ -19,6 +22,36 @@ Avoid:
 - proof of Yang-Mills
 - AI discovered the mass gap
 - quantum computer proves the theorem
+
+### FlowGap (Navier-Stokes)
+
+Use precise language:
+
+- finite reduced-model benchmark
+- viscous Burgers surrogate
+- pressure-Poisson subroutine benchmark
+- hybrid quantum-classical PDE comparison
+
+Avoid:
+
+- proof of Navier-Stokes regularity
+- AI resolved the blow-up question
+- quantum solver for turbulence
+
+### CurveRank (Riemann hypothesis)
+
+Use precise language:
+
+- spectral screening of toy operators
+- truncated Hilbert-Polya candidate
+- spacing statistics comparison
+- finite-truncation spectral mismatch
+
+Avoid:
+
+- proof of the Riemann Hypothesis
+- AI found the Hilbert-Polya operator
+- quantum computer verifies RH
 
 ## Development flow
 
@@ -36,6 +69,24 @@ Before committing code changes, run:
 ```bash
 python -m unittest discover -s tests
 python scripts/run_gap_sweep.py --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-smoke
+```
+
+For FlowGap changes:
+
+```bash
+python scripts/run_flowgap_burgers.py --sizes 16,32 --nu-points 3 --n-steps 20 --output-dir /tmp/flowgap-smoke
+```
+
+For CurveRank changes:
+
+```bash
+python scripts/run_curverank_screen.py --family xp --n-basis 10,20 --k-zeros 10 --output-dir /tmp/curverank-smoke
+```
+
+For U(1) gauge changes:
+
+```bash
+python scripts/run_gaugegap_u1.py --n-links 2 --truncation 1,2 --g-mag-points 3 --output-dir /tmp/u1-smoke
 ```
 
 For Qiskit changes, also run:

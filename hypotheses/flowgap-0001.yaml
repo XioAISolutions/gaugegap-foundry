@@ -1,0 +1,34 @@
+id: flowgap-0001
+track: FlowGap
+model: burgers_viscous_1d
+scope: finite viscous Burgers equation as a reduced Navier-Stokes surrogate benchmark
+claim: >
+  The classical viscous Burgers solver produces a monotonically decreasing
+  kinetic energy over time for smooth initial data at moderate viscosity,
+  and the quantum VQLS pressure-Poisson subroutine converges to within
+  measurable L2 error of the classical reference on a tiny grid.
+prediction:
+  observable: kinetic_energy_decay
+  expected_shape: monotone_decreasing
+controls:
+  grid_sizes: [16, 32, 64]
+  viscosity_range: [0.001, 0.1]
+  viscosity_points: 5
+  dt: 0.0001
+  n_steps: 100
+  boundary: periodic
+validation:
+  required:
+    - classical_finite_difference
+  future:
+    - vqls_pressure_poisson
+    - noiseless_circuit_simulator
+    - noisy_simulator
+kill_criteria:
+  - kinetic energy increases under smooth initial data at stated viscosity
+  - quantum subroutine residual diverges with increasing optimizer steps
+  - grid refinement changes qualitative behavior
+status: active
+notes:
+  - This is not a Navier-Stokes regularity claim.
+  - This benchmark validates the FlowGap pipeline on a 1D reduced model.
