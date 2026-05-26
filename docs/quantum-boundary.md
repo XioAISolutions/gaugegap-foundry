@@ -19,6 +19,8 @@ criteria.
 This is where the repo currently uses quantum tooling:
 
 - `qiskit-pauli` builds Hamiltonians as Qiskit `SparsePauliOp` objects;
+- `run_quantum_gap_replica.py` checks the Z2 plaquette Pauli export against the
+  direct dense Hamiltonian;
 - `run_dynamics.py --backend statevector` builds Trotter circuits and evaluates
   exact quantum-state observables;
 - `run_dynamics.py --backend aer-sampler` samples those circuits through Qiskit

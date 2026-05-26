@@ -67,8 +67,11 @@ Avoid:
 Before committing code changes, run:
 
 ```bash
-python -m unittest discover -s tests
+python -m pytest
 python scripts/run_gap_sweep.py --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-smoke
+python scripts/run_z2_plaquette.py --output-dir /tmp/gaugegap-0002-exact
+python scripts/run_quantum_gap_replica.py --output-dir /tmp/gaugegap-0002-replica
+python scripts/run_vqe_gap.py --output-dir /tmp/gaugegap-0002-vqe --samples 64
 ```
 
 For FlowGap changes:

@@ -158,7 +158,7 @@ def write_u1_gap_svg(path: Path, records: list[dict[str, object]]) -> None:
         grid.append(f'<line x1="{left}" y1="{py:.2f}" x2="{left+plot_w}" y2="{py:.2f}" stroke="#e5e7eb" />')
         grid.append(f'<text x="{left-12}" y="{py+4:.2f}" font-size="12" text-anchor="end">{y:.3g}</text>')
 
-    title = escape("GaugeGap gaugegap-0002: U(1) mass gap vs magnetic coupling")
+    title = escape("GaugeGap gaugegap-u1-0001: U(1) mass gap vs magnetic coupling")
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
   <rect width="100%" height="100%" fill="#ffffff" />
   <text x="{left}" y="28" font-size="20" font-family="Arial, sans-serif" font-weight="700">{title}</text>
@@ -178,7 +178,7 @@ def write_u1_gap_svg(path: Path, records: list[dict[str, object]]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="GaugeGap U(1) mass gap sweep")
-    parser.add_argument("--hypothesis", default="gaugegap-0002")
+    parser.add_argument("--hypothesis", default="gaugegap-u1-0001")
     parser.add_argument("--n-links", type=parse_int_list, default=[2, 3])
     parser.add_argument("--g-electric", type=float, default=1.0)
     parser.add_argument("--g-mag-range", type=float, nargs=2, default=[0.1, 3.0])

@@ -23,6 +23,7 @@
       "command": "python scripts/run_gap_sweep.py",
       "files": [
         "scripts/run_gap_sweep.py",
+        "scripts/run_z2_plaquette.py",
         "scripts/run_gaugegap_u1.py",
         "scripts/run_flowgap_burgers.py",
         "scripts/run_curverank_screen.py"
@@ -37,15 +38,17 @@
     },
     {
       "actual_quantum_hardware": false,
-      "command": "python scripts/run_gap_sweep.py --method qiskit-pauli",
+      "command": "python scripts/run_quantum_gap_replica.py",
       "files": [
         "src/gaugegap/qiskit_backend.py",
-        "scripts/run_gap_sweep.py"
+        "src/gaugegap/quantum/pauli_export.py",
+        "scripts/run_gap_sweep.py",
+        "scripts/run_quantum_gap_replica.py"
       ],
       "id": "qiskit_pauli_operator",
       "level": 1,
       "level_name": "quantum_operator_representation",
-      "meaning": "Builds the finite Hamiltonian as a Qiskit SparsePauliOp and checks it against dense exact diagonalization.",
+      "meaning": "Builds finite Hamiltonians as Pauli/Qiskit-compatible operators and checks them against dense exact diagonalization.",
       "next_gate": "Use this before turning a Hamiltonian into circuits or IBM Runtime observables.",
       "status": "active",
       "track": "GaugeGap"

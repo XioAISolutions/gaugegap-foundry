@@ -21,11 +21,16 @@ jobs:
       - name: Install
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e .
+          python -m pip install -e '.[dev]'
       - name: Unit tests
-        run: python -m unittest discover -s tests
+        run: python -m pytest
       - name: Smoke sweep
         run: python scripts/run_gap_sweep.py --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-smoke
+      - name: Z2 plaquette smoke
+        run: |
+          python scripts/run_z2_plaquette.py --output-dir /tmp/gaugegap-0002-exact
+          python scripts/run_quantum_gap_replica.py --output-dir /tmp/gaugegap-0002-replica
+          python scripts/run_vqe_gap.py --output-dir /tmp/gaugegap-0002-vqe --samples 64
       - name: Quantum boundary status
         run: python scripts/quantum_status.py --output-dir /tmp/gaugegap-quantum-status
       - name: FlowGap smoke
@@ -65,7 +70,9 @@ jobs:
         run: |
           python -m unittest tests.test_qiskit_backend
           python -m unittest tests.test_qiskit_dynamics
+          python -m unittest tests.test_pauli_export
           python scripts/run_gap_sweep.py --method qiskit-pauli --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-qiskit-smoke
+          python scripts/run_quantum_gap_replica.py --output-dir /tmp/gaugegap-0002-replica-qiskit
           python scripts/run_dynamics.py --backend statevector --n-sites 4 --times 0,0.5 --output-dir /tmp/gaugegap-statevector-smoke
           python scripts/run_dynamics.py --backend aer-sampler --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/gaugegap-aer-smoke
           python scripts/run_dynamics.py --backend aer-sampler --noise depolarizing --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/gaugegap-aer-depol-smoke

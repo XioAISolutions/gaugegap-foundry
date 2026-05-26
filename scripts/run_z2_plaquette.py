@@ -27,9 +27,12 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, default=ROOT / "results" / "gaugegap-0002")
     args = parser.parse_args()
 
-    metadata = model_metadata(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
-    matrix = hamiltonian_dense(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
-    result = exact_gap(matrix)
+    try:
+        metadata = model_metadata(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
+        matrix = hamiltonian_dense(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
+        result = exact_gap(matrix)
+    except ValueError as exc:
+        parser.error(str(exc))
 
     record = {
         "hypothesis_id": args.hypothesis_id,
@@ -87,7 +90,18 @@ def main() -> int:
     )
     write_gap_certificate(args.output_dir / "z2_plaquette_gap_certificate.json", cert)
 
-    print(json.dumps({"status": result.status, "gap": result.gap, "output_dir": str(args.output_dir)}, indent=2))
+    print(
+        json.dumps(
+            {
+                "claim_boundary": str(metadata["claim_boundary"]),
+                "gap": result.gap,
+                "output_dir": str(args.output_dir),
+                "status": result.status,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
     return 0
 
 

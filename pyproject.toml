@@ -28,8 +28,11 @@ flow = [
 spectral = [
   "scipy>=1.11",
 ]
+dev = [
+  "pytest>=8",
+]
 all = [
-  "gaugegap-foundry[quantum,flow,spectral]",
+  "gaugegap-foundry[quantum,flow,spectral,dev]",
 ]
 
 [tool.setuptools.packages.find]

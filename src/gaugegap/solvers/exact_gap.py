@@ -25,10 +25,22 @@ def exact_gap(matrix: np.ndarray, *, degeneracy_tol: float = 1e-10) -> GapResult
     """Compute the finite-system spectral gap with dense exact diagonalization."""
 
     arr = np.asarray(matrix)
+    try:
+        tol = float(degeneracy_tol)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("degeneracy_tol must be a non-negative finite number") from exc
+    if not math.isfinite(tol) or tol < 0.0:
+        raise ValueError("degeneracy_tol must be a non-negative finite number")
     if arr.ndim != 2 or arr.shape[0] != arr.shape[1]:
         raise ValueError("matrix must be square")
     if arr.shape[0] < 2:
         raise ValueError("matrix must have dimension at least 2")
+    try:
+        finite_entries = bool(np.all(np.isfinite(arr)))
+    except TypeError as exc:
+        raise ValueError("matrix entries must be numeric and finite") from exc
+    if not finite_entries:
+        raise ValueError("matrix entries must be finite")
     if not np.allclose(arr, arr.conj().T, atol=1e-10):
         raise ValueError("matrix must be Hermitian")
 
@@ -44,7 +56,7 @@ def exact_gap(matrix: np.ndarray, *, degeneracy_tol: float = 1e-10) -> GapResult
         residuals.append(float(np.linalg.norm(arr @ vec - eigenvalues[index] * vec)))
     residual_norm = max(residuals) if residuals else math.nan
 
-    degeneracy_warning = bool(abs(first - ground) <= degeneracy_tol)
+    degeneracy_warning = bool(abs(first - ground) <= tol)
     status = "finite_system_verified" if residual_norm <= 1e-8 else "warning_high_residual"
 
     return GapResult(

@@ -1,0 +1,32 @@
+id: gaugegap-u1-0001
+track: GaugeGap
+model: u1_compact_lattice
+scope: finite compact U(1) lattice gauge theory on a small link ring
+claim: >
+  The mass gap of the truncated compact U(1) Hamiltonian on a ring of links
+  remains positive across the electric-to-magnetic coupling sweep, with the
+  gap closing in the expected weak-coupling (large g_magnetic) regime.
+prediction:
+  observable: mass_gap
+  expected_shape: positive_with_crossover
+controls:
+  n_links: [2, 3, 4]
+  g_electric: 1.0
+  g_magnetic_range: [0.1, 3.0]
+  g_magnetic_points: 10
+  truncation: [1, 2, 3]
+validation:
+  required:
+    - exact_diagonalization
+  future:
+    - independent_hamiltonian_builder
+    - noiseless_circuit_simulator
+    - noisy_simulator
+kill_criteria:
+  - gap trend changes sign under truncation refinement at fixed coupling
+  - spectrum changes qualitatively under equivalent Hamiltonian encoding
+  - Wilson loop expectation inconsistent with known U(1) lattice results
+status: active
+notes:
+  - This is not continuum Yang-Mills.
+  - U(1) in 1+1D is a stepping stone; the benchmark validates the U(1) pipeline.

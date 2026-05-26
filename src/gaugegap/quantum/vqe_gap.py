@@ -45,12 +45,24 @@ def estimate_gap_statevector(
     """
 
     arr = np.asarray(matrix, dtype=np.complex128)
+    if isinstance(n_qubits, bool) or not isinstance(n_qubits, int) or n_qubits < 1:
+        raise ValueError("n_qubits must be a positive integer")
     if arr.shape != (1 << n_qubits, 1 << n_qubits):
         raise ValueError("matrix shape must match n_qubits")
-    if layers < 1:
-        raise ValueError("layers must be positive")
-    if samples < 4:
-        raise ValueError("samples must be at least 4")
+    try:
+        finite_entries = bool(np.all(np.isfinite(arr)))
+    except TypeError as exc:
+        raise ValueError("matrix entries must be numeric and finite") from exc
+    if not finite_entries:
+        raise ValueError("matrix entries must be finite")
+    if not np.allclose(arr, arr.conj().T, atol=1e-10):
+        raise ValueError("matrix must be Hermitian")
+    if isinstance(layers, bool) or not isinstance(layers, int) or layers < 1:
+        raise ValueError("layers must be a positive integer")
+    if isinstance(samples, bool) or not isinstance(samples, int) or samples < 4:
+        raise ValueError("samples must be an integer of at least 4")
+    if not math.isfinite(float(penalty)) or penalty <= 0.0:
+        raise ValueError("penalty must be positive and finite")
 
     exact = np.linalg.eigvalsh(arr)
     exact_ground = float(np.real(exact[0]))
@@ -148,6 +160,10 @@ def _energy(matrix: np.ndarray, state: np.ndarray) -> float:
 
 
 def ansatz_state(theta: np.ndarray, *, n_qubits: int, layers: int) -> np.ndarray:
+    if isinstance(n_qubits, bool) or not isinstance(n_qubits, int) or n_qubits < 1:
+        raise ValueError("n_qubits must be a positive integer")
+    if isinstance(layers, bool) or not isinstance(layers, int) or layers < 1:
+        raise ValueError("layers must be a positive integer")
     if theta.size != n_qubits * layers:
         raise ValueError("theta size must equal n_qubits * layers")
     state = np.zeros(1 << n_qubits, dtype=np.complex128)

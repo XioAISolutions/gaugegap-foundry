@@ -9,6 +9,7 @@ CLAIM_BOUNDARY = (
     "Finite Z2 lattice gauge toy benchmark only; no continuum Yang-Mills "
     "mass-gap claim."
 )
+MAX_EXACT_QUBITS = 12
 
 
 @dataclass(frozen=True)
@@ -32,7 +33,7 @@ class Z2PlaquetteLayout:
 
 
 def open_plaquette_chain_layout(n_plaquettes: int = 1) -> Z2PlaquetteLayout:
-    if not isinstance(n_plaquettes, int) or n_plaquettes < 1:
+    if isinstance(n_plaquettes, bool) or not isinstance(n_plaquettes, int) or n_plaquettes < 1:
         raise ValueError("n_plaquettes must be a positive integer")
     plaquettes = tuple(
         (3 * index, 3 * index + 1, 3 * index + 2, 3 * index + 3)
@@ -45,19 +46,19 @@ def open_plaquette_chain_layout(n_plaquettes: int = 1) -> Z2PlaquetteLayout:
     )
 
 
-def validate_parameters(plaquette_coupling: float, transverse_field: float) -> None:
-    if not math.isfinite(float(plaquette_coupling)):
-        raise ValueError("plaquette_coupling must be finite")
-    if not math.isfinite(float(transverse_field)):
-        raise ValueError("transverse_field must be finite")
+def validate_parameters(plaquette_coupling: float, transverse_field: float) -> tuple[float, float]:
+    return (
+        _finite_float("plaquette_coupling", plaquette_coupling),
+        _finite_float("transverse_field", transverse_field),
+    )
 
 
 def pauli_label(n_qubits: int, site_ops: dict[int, str]) -> str:
-    if n_qubits <= 0:
+    if isinstance(n_qubits, bool) or not isinstance(n_qubits, int) or n_qubits <= 0:
         raise ValueError("n_qubits must be positive")
     label = ["I"] * n_qubits
     for site, op in site_ops.items():
-        if site < 0 or site >= n_qubits:
+        if isinstance(site, bool) or not isinstance(site, int) or site < 0 or site >= n_qubits:
             raise ValueError(f"site {site} is outside 0..{n_qubits - 1}")
         if op not in {"I", "X", "Y", "Z"}:
             raise ValueError(f"unsupported Pauli operator: {op}")
@@ -72,13 +73,13 @@ def pauli_terms(
 ) -> list[tuple[str, float]]:
     """Return Pauli-label terms for H = -J sum_p prod Z_l - h sum_l X_l."""
 
-    validate_parameters(plaquette_coupling, transverse_field)
+    coupling, field = validate_parameters(plaquette_coupling, transverse_field)
     layout = open_plaquette_chain_layout(n_plaquettes)
     terms: list[tuple[str, float]] = []
     for plaquette in layout.plaquettes:
-        terms.append((pauli_label(layout.n_qubits, {link: "Z" for link in plaquette}), -float(plaquette_coupling)))
+        terms.append((pauli_label(layout.n_qubits, {link: "Z" for link in plaquette}), -coupling))
     for link in range(layout.n_qubits):
-        terms.append((pauli_label(layout.n_qubits, {link: "X"}), -float(transverse_field)))
+        terms.append((pauli_label(layout.n_qubits, {link: "X"}), -field))
     return terms
 
 
@@ -86,11 +87,14 @@ def hamiltonian_dense(
     n_plaquettes: int = 1,
     plaquette_coupling: float = 1.0,
     transverse_field: float = 0.2,
+    *,
+    max_qubits: int | None = MAX_EXACT_QUBITS,
 ) -> np.ndarray:
     """Build the finite Z2 plaquette Hamiltonian as a dense matrix."""
 
-    validate_parameters(plaquette_coupling, transverse_field)
+    coupling, field = validate_parameters(plaquette_coupling, transverse_field)
     layout = open_plaquette_chain_layout(n_plaquettes)
+    _validate_exact_size(layout, max_qubits)
     dim = 1 << layout.n_qubits
     matrix = np.zeros((dim, dim), dtype=np.float64)
 
@@ -100,12 +104,12 @@ def hamiltonian_dense(
             parity = 1
             for link in plaquette:
                 parity *= _spin_z(state, link)
-            diagonal += -float(plaquette_coupling) * parity
+            diagonal += -coupling * parity
         matrix[state, state] = diagonal
 
         for link in range(layout.n_qubits):
             flipped = state ^ (1 << link)
-            matrix[flipped, state] += -float(transverse_field)
+            matrix[flipped, state] += -field
 
     return matrix
 
@@ -146,6 +150,7 @@ def model_metadata(
     plaquette_coupling: float = 1.0,
     transverse_field: float = 0.2,
 ) -> dict[str, object]:
+    coupling, field = validate_parameters(plaquette_coupling, transverse_field)
     layout = open_plaquette_chain_layout(n_plaquettes)
     return {
         "model": "z2_open_plaquette_chain",
@@ -154,11 +159,33 @@ def model_metadata(
         "n_qubits": layout.n_qubits,
         "plaquettes": [list(item) for item in layout.plaquettes],
         "boundary": layout.boundary,
-        "plaquette_coupling": float(plaquette_coupling),
-        "transverse_field": float(transverse_field),
+        "plaquette_coupling": coupling,
+        "transverse_field": field,
         "claim_boundary": CLAIM_BOUNDARY,
     }
 
 
 def _spin_z(state: int, site: int) -> int:
     return -1 if state & (1 << site) else 1
+
+
+def _finite_float(name: str, value: float) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{name} must be a finite real number") from exc
+    if not math.isfinite(number):
+        raise ValueError(f"{name} must be finite")
+    return number
+
+
+def _validate_exact_size(layout: Z2PlaquetteLayout, max_qubits: int | None) -> None:
+    if max_qubits is None:
+        return
+    if isinstance(max_qubits, bool) or not isinstance(max_qubits, int) or max_qubits < 1:
+        raise ValueError("max_qubits must be a positive integer or None")
+    if layout.n_qubits > max_qubits:
+        raise ValueError(
+            "dense exact Hamiltonian would require "
+            f"{layout.n_qubits} qubits; max_qubits is {max_qubits}"
+        )

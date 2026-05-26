@@ -30,8 +30,8 @@ The project currently uses quantum representations and quantum simulators, but i
 - Level: `1 quantum_operator_representation`
 - Status: `active`
 - Real hardware: `False`
-- Command: `python scripts/run_gap_sweep.py --method qiskit-pauli`
-- Meaning: Builds the finite Hamiltonian as a Qiskit SparsePauliOp and checks it against dense exact diagonalization.
+- Command: `python scripts/run_quantum_gap_replica.py`
+- Meaning: Builds finite Hamiltonians as Pauli/Qiskit-compatible operators and checks them against dense exact diagonalization.
 - Next gate: Use this before turning a Hamiltonian into circuits or IBM Runtime observables.
 
 ### qiskit_statevector_dynamics

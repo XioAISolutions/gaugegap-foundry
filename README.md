@@ -9,20 +9,39 @@ finite-system benchmarks, retain negative results, and create the measurement
 and verification rails needed before any serious theorem-adjacent claim can be
 made.
 
-## Current benchmark
+## Current benchmarks
 
 `gaugegap-0001` is a finite transverse-field Ising chain used as a Z2 dual-chain
 sanity benchmark. It validates the hypothesis registry, exact diagonalization
 path, run ledger, CSV/JSONL export, and plot generation.
+
+`gaugegap-0002` is a finite Z2 lattice gauge toy benchmark on an open chain of
+plaquettes. Its Hamiltonian is:
+
+```text
+H = -J sum_p prod_{l in p} Z_l - h sum_l X_l
+```
+
+It has three local paths:
+
+- dense exact diagonalization with `numpy.linalg.eigh`;
+- Pauli/Qiskit-compatible operator export checked against the dense matrix;
+- a local statevector VQE-style prototype for simulator-loop development.
+
+Boundary: **Finite Z2 lattice gauge toy benchmark only; no continuum
+Yang-Mills mass-gap claim.**
 
 ## Quick start
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -e .
+python -m pip install -e '.[dev]'
 python scripts/run_gap_sweep.py
-python -m unittest discover -s tests
+python scripts/run_z2_plaquette.py --output-dir /tmp/gaugegap-0002-exact
+python scripts/run_quantum_gap_replica.py --output-dir /tmp/gaugegap-0002-replica
+python scripts/run_vqe_gap.py --output-dir /tmp/gaugegap-0002-vqe --samples 64
+python -m pytest
 ```
 
 Outputs land in `results/baselines/` by default:
@@ -55,6 +74,7 @@ Install optional IBM/Qiskit dependencies with:
 ```bash
 python -m pip install -e '.[quantum]'
 python scripts/run_gap_sweep.py --method qiskit-pauli --sizes 4,6 --field-points 3
+python scripts/run_quantum_gap_replica.py --output-dir /tmp/gaugegap-0002-replica-qiskit
 python scripts/run_dynamics.py --backend statevector --n-sites 4 --times 0,0.5
 python scripts/run_dynamics.py --backend aer-sampler --n-sites 4 --times 0,0.5 --shots 512
 python scripts/run_dynamics.py --backend aer-sampler --noise depolarizing --n-sites 4 --times 0,0.5 --shots 512
@@ -80,6 +100,8 @@ tolerances, and writes summary CSV/JSON plus an SVG observable plot.
 `scripts/quantum_status.py` answers the key boundary question: the repository
 currently uses quantum operators, quantum circuits, and quantum simulators, but
 it has not yet submitted a circuit to real QPU hardware.
+
+See `docs/gaugegap-0002.md` for the finite Z2 plaquette benchmark details.
 
 ## Claim boundary
 

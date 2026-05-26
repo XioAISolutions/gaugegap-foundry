@@ -30,16 +30,21 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, default=ROOT / "results" / "gaugegap-0002")
     args = parser.parse_args()
 
-    metadata = model_metadata(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
-    exact_matrix = hamiltonian_dense(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
-    exact_result = exact_gap(exact_matrix)
+    try:
+        metadata = model_metadata(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
+        exact_matrix = hamiltonian_dense(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
+        exact_result = exact_gap(exact_matrix)
 
-    local_pauli_matrix = pauli_terms_to_dense(pauli_terms(args.n_plaquettes, args.plaquette_coupling, args.transverse_field))
-    local_pauli_result = exact_gap(local_pauli_matrix)
+        terms = pauli_terms(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
+        local_pauli_matrix = pauli_terms_to_dense(terms)
+        local_pauli_result = exact_gap(local_pauli_matrix)
+    except ValueError as exc:
+        parser.error(str(exc))
     qiskit_result = None
     qiskit_error = None
+    has_qiskit = qiskit_available()
 
-    if qiskit_available():
+    if has_qiskit:
         try:
             qiskit_result = exact_gap(qiskit_matrix(args.n_plaquettes, args.plaquette_coupling, args.transverse_field))
         except Exception as exc:  # pragma: no cover - defensive external dependency guard
@@ -53,7 +58,7 @@ def main() -> int:
         "hypothesis_id": args.hypothesis_id,
         "metadata": metadata,
         "hamiltonian_hash": object_hash(metadata),
-        "pauli_terms": pauli_terms(args.n_plaquettes, args.plaquette_coupling, args.transverse_field),
+        "pauli_terms": terms,
         "exact": exact_result.to_dict(),
         "local_pauli": local_pauli_result.to_dict(),
         "qiskit": None if qiskit_result is None else qiskit_result.to_dict(),
@@ -65,14 +70,16 @@ def main() -> int:
     }
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    (args.output_dir / "z2_plaquette_quantum_replica.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (args.output_dir / "z2_plaquette_quantum_replica.json").write_text(
+        json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     with (args.output_dir / "z2_plaquette_quantum_replica.csv").open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["path", "gap", "ground_energy", "first_excited_energy", "status"])
         writer.writeheader()
-        writer.writerow({"path": "exact_dense", "gap": exact_result.gap, "ground_energy": exact_result.ground_energy, "first_excited_energy": exact_result.first_excited_energy, "status": exact_result.status})
-        writer.writerow({"path": "local_pauli_dense", "gap": local_pauli_result.gap, "ground_energy": local_pauli_result.ground_energy, "first_excited_energy": local_pauli_result.first_excited_energy, "status": local_pauli_result.status})
+        writer.writerow(_replica_csv_row("exact_dense", exact_result))
+        writer.writerow(_replica_csv_row("local_pauli_dense", local_pauli_result))
         if qiskit_result is not None:
-            writer.writerow({"path": "qiskit_sparse_pauli", "gap": qiskit_result.gap, "ground_energy": qiskit_result.ground_energy, "first_excited_energy": qiskit_result.first_excited_energy, "status": qiskit_result.status})
+            writer.writerow(_replica_csv_row("qiskit_sparse_pauli", qiskit_result))
 
     cert = make_gap_certificate(
         hypothesis_id=args.hypothesis_id,
@@ -90,8 +97,31 @@ def main() -> int:
     )
     write_gap_certificate(args.output_dir / "z2_plaquette_quantum_replica_certificate.json", cert)
 
-    print(json.dumps({"status": status, "matrix_delta": matrix_delta, "gap_delta": gap_delta, "qiskit_available": qiskit_available(), "output_dir": str(args.output_dir)}, indent=2))
+    print(
+        json.dumps(
+            {
+                "claim_boundary": str(metadata["claim_boundary"]),
+                "gap_delta": gap_delta,
+                "matrix_delta": matrix_delta,
+                "output_dir": str(args.output_dir),
+                "qiskit_available": has_qiskit,
+                "status": status,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
     return 0 if status == "pass" else 1
+
+
+def _replica_csv_row(path: str, result) -> dict[str, str]:
+    return {
+        "path": path,
+        "gap": f"{result.gap:.12g}",
+        "ground_energy": f"{result.ground_energy:.12g}",
+        "first_excited_energy": f"{result.first_excited_energy:.12g}",
+        "status": result.status,
+    }
 
 
 if __name__ == "__main__":

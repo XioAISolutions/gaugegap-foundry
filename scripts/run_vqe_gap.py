@@ -29,15 +29,18 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, default=ROOT / "results" / "gaugegap-0002")
     args = parser.parse_args()
 
-    metadata = model_metadata(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
-    matrix = hamiltonian_dense(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
-    result = estimate_gap_statevector(
-        matrix,
-        n_qubits=int(metadata["n_qubits"]),
-        layers=args.layers,
-        samples=args.samples,
-        seed=args.seed,
-    )
+    try:
+        metadata = model_metadata(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
+        matrix = hamiltonian_dense(args.n_plaquettes, args.plaquette_coupling, args.transverse_field)
+        result = estimate_gap_statevector(
+            matrix,
+            n_qubits=int(metadata["n_qubits"]),
+            layers=args.layers,
+            samples=args.samples,
+            seed=args.seed,
+        )
+    except ValueError as exc:
+        parser.error(str(exc))
 
     record = {
         "hypothesis_id": args.hypothesis_id,
@@ -76,8 +79,10 @@ def main() -> int:
                 "exact_gap": result.exact_gap,
                 "gap_error": result.gap_error,
                 "output_dir": str(args.output_dir),
+                "claim_boundary": str(metadata["claim_boundary"]),
             },
             indent=2,
+            sort_keys=True,
         )
     )
     return 0

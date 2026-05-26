@@ -32,9 +32,9 @@ shot sampler.
 results as the local reference, compares clean Aer shot drift and depolarizing
 noise drift, then emits details, summaries, verdicts, and an SVG plot.
 
-## Current model
+## Current models
 
-The current `z2_dual_chain` implementation uses a dense transverse-field Ising
+The `z2_dual_chain` implementation uses a dense transverse-field Ising
 Hamiltonian:
 
 ```text
@@ -43,3 +43,20 @@ H = -J sum_i Z_i Z_{i+1} - h sum_i X_i
 
 This is a finite-system sanity benchmark for the foundry pipeline. It is not
 continuum Yang-Mills.
+
+The `gaugegap-0002` implementation uses a finite Z2 open-plaquette-chain toy
+Hamiltonian:
+
+```text
+H = -J sum_p prod_{l in p} Z_l - h sum_l X_l
+```
+
+The direct dense path enumerates computational basis states, applies diagonal
+plaquette products in the Z basis, and flips individual link bits for the X
+field. The Pauli replica path exports Qiskit-compatible labels, interprets the
+rightmost Pauli character as qubit 0, reconstructs the dense matrix, and checks
+it against the direct dense Hamiltonian. The local VQE-style path is a
+statevector simulator prototype only; it is not QPU hardware evidence.
+
+Claim boundary for `gaugegap-0002`: finite Z2 lattice gauge toy benchmark only;
+no continuum Yang-Mills mass-gap claim.

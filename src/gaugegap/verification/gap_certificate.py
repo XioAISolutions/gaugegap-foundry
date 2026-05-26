@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import json
+import math
+from numbers import Real
 from pathlib import Path
 from typing import Any
 
@@ -23,8 +25,23 @@ def make_gap_certificate(
     git: dict[str, Any] | None = None,
     claim_boundary: str = CLAIM_BOUNDARY,
 ) -> dict[str, Any]:
+    if not hypothesis_id:
+        raise ValueError("hypothesis_id must not be empty")
+    if not model:
+        raise ValueError("model must not be empty")
     if n_qubits <= 0:
         raise ValueError("n_qubits must be positive")
+    for name, value in (
+        ("ground_energy", ground_energy),
+        ("first_excited_energy", first_excited_energy),
+        ("gap", gap),
+    ):
+        if not isinstance(value, Real) or not math.isfinite(float(value)):
+            raise ValueError(f"{name} must be finite")
+    if gap < 0.0:
+        raise ValueError("gap must be non-negative")
+    if not claim_boundary:
+        raise ValueError("claim_boundary must not be empty")
     return {
         "schema": "gaugegap.gap_certificate.v1",
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
