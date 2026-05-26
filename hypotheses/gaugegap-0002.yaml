@@ -19,6 +19,7 @@ validation:
   required:
     - dense_exact_diagonalization
     - pauli_dense_replica
+    - finite_parameter_sweep
     - claim_boundary_certificate
   optional:
     - qiskit_sparse_pauli_export

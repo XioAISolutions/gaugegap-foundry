@@ -42,6 +42,27 @@ class Z2PlaquetteScriptTests(unittest.TestCase):
             self.assertEqual(stdout["claim_boundary"], CLAIM_BOUNDARY)
             self.assertTrue((output / "z2_plaquette_vqe_gap_certificate.json").exists())
 
+    def test_sweep_script_smoke(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            stdout = _run_script(
+                "run_z2_plaquette_sweep.py",
+                output,
+                "--n-plaquettes",
+                "1,2",
+                "--fields",
+                "0.1,0.2",
+                "--run-id",
+                "test",
+            )
+            self.assertEqual(stdout["status"], "pass")
+            self.assertEqual(stdout["records"], 4)
+            rows = (output / "gaugegap-0002-z2-plaquette-sweep.jsonl").read_text(encoding="utf-8").splitlines()
+            self.assertEqual(len(rows), 4)
+            first = json.loads(rows[0])
+            self.assertEqual(first["claim_boundary"], CLAIM_BOUNDARY)
+            self.assertEqual(first["pauli_replica"]["matrix_delta"], 0.0)
+
 
 def _run_script(script_name: str, output_dir: Path, *extra: str) -> dict[str, object]:
     proc = subprocess.run(

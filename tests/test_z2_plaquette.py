@@ -6,11 +6,13 @@ import numpy as np
 
 from gaugegap.models.z2_plaquette import (
     CLAIM_BOUNDARY,
+    ground_state_observables,
     hamiltonian_dense,
     model_metadata,
     open_plaquette_chain_layout,
     pauli_label,
     pauli_terms,
+    state_observables,
 )
 from gaugegap.quantum.pauli_export import pauli_terms_to_dense
 
@@ -39,6 +41,20 @@ class Z2PlaquetteTests(unittest.TestCase):
         direct = hamiltonian_dense(n_plaquettes=2, plaquette_coupling=0.7, transverse_field=0.3)
         replica = pauli_terms_to_dense(pauli_terms(n_plaquettes=2, plaquette_coupling=0.7, transverse_field=0.3))
         self.assertTrue(np.allclose(direct, replica, atol=1e-12))
+
+    def test_state_observables_for_basis_state(self) -> None:
+        layout = open_plaquette_chain_layout(1)
+        state = np.zeros(1 << layout.n_qubits)
+        state[0] = 1.0
+        observables = state_observables(state, layout)
+        self.assertEqual(observables["plaquette_z"], [1.0])
+        self.assertEqual(observables["mean_plaquette_z"], 1.0)
+        self.assertEqual(observables["mean_link_x"], 0.0)
+
+    def test_ground_state_observables_are_finite(self) -> None:
+        observables = ground_state_observables(n_plaquettes=1, plaquette_coupling=1.0, transverse_field=0.2)
+        self.assertTrue(np.isfinite(observables["mean_plaquette_z"]))
+        self.assertTrue(np.isfinite(observables["mean_link_x"]))
 
     def test_metadata_claim_boundary(self) -> None:
         metadata = model_metadata()

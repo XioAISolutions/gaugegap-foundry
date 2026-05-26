@@ -145,6 +145,75 @@ def mass_gap(
     return first - ground, ground, first
 
 
+def ground_state(
+    n_plaquettes: int = 1,
+    plaquette_coupling: float = 1.0,
+    transverse_field: float = 0.2,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return eigenvalues and a normalized ground-state vector."""
+
+    matrix = hamiltonian_dense(
+        n_plaquettes=n_plaquettes,
+        plaquette_coupling=plaquette_coupling,
+        transverse_field=transverse_field,
+    )
+    eigenvalues, eigenvectors = np.linalg.eigh(matrix)
+    return eigenvalues, eigenvectors[:, 0]
+
+
+def state_observables(state: np.ndarray, layout: Z2PlaquetteLayout) -> dict[str, object]:
+    """Measure plaquette-Z and link-X expectations on a statevector."""
+
+    vector = np.asarray(state, dtype=np.complex128)
+    dim = 1 << layout.n_qubits
+    if vector.shape != (dim,):
+        raise ValueError("state shape must match layout dimension")
+    norm = float(np.linalg.norm(vector))
+    if not math.isfinite(norm) or norm <= 0.0:
+        raise ValueError("state must have positive finite norm")
+    vector = vector / norm
+    probabilities = np.abs(vector) ** 2
+
+    plaquette_z: list[float] = []
+    for plaquette in layout.plaquettes:
+        value = 0.0
+        for basis, probability in enumerate(probabilities):
+            parity = 1
+            for link in plaquette:
+                parity *= _spin_z(basis, link)
+            value += float(probability) * parity
+        plaquette_z.append(float(value))
+
+    link_x: list[float] = []
+    for link in range(layout.n_qubits):
+        bit = 1 << link
+        value = 0.0 + 0.0j
+        for basis, amplitude in enumerate(vector):
+            value += np.conj(vector[basis ^ bit]) * amplitude
+        link_x.append(float(np.real_if_close(value)))
+
+    return {
+        "plaquette_z": plaquette_z,
+        "mean_plaquette_z": float(np.mean(plaquette_z)) if plaquette_z else math.nan,
+        "link_x": link_x,
+        "mean_link_x": float(np.mean(link_x)) if link_x else math.nan,
+    }
+
+
+def ground_state_observables(
+    n_plaquettes: int = 1,
+    plaquette_coupling: float = 1.0,
+    transverse_field: float = 0.2,
+) -> dict[str, object]:
+    _, state = ground_state(
+        n_plaquettes=n_plaquettes,
+        plaquette_coupling=plaquette_coupling,
+        transverse_field=transverse_field,
+    )
+    layout = open_plaquette_chain_layout(n_plaquettes)
+    return state_observables(state, layout)
+
+
 def model_metadata(
     n_plaquettes: int = 1,
     plaquette_coupling: float = 1.0,

@@ -30,6 +30,7 @@ jobs:
         run: |
           python scripts/run_z2_plaquette.py --output-dir /tmp/gaugegap-0002-exact
           python scripts/run_quantum_gap_replica.py --output-dir /tmp/gaugegap-0002-replica
+          python scripts/run_z2_plaquette_sweep.py --output-dir /tmp/gaugegap-0002-sweep --run-id ci
           python scripts/run_vqe_gap.py --output-dir /tmp/gaugegap-0002-vqe --samples 64
       - name: Quantum boundary status
         run: python scripts/quantum_status.py --output-dir /tmp/gaugegap-quantum-status

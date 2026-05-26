@@ -35,6 +35,15 @@ that repeats the claim boundary.
 python scripts/run_z2_plaquette.py --output-dir /tmp/gaugegap-0002-exact
 ```
 
+`scripts/run_z2_plaquette_sweep.py` extends this into a small reproducible
+grid over transverse field and plaquette count. It records the exact gap,
+Pauli-replica deltas, mean plaquette-Z expectation, and mean link-X
+expectation.
+
+```bash
+python scripts/run_z2_plaquette_sweep.py --output-dir /tmp/gaugegap-0002-sweep --run-id smoke
+```
+
 ## Pauli/Qiskit Export
 
 `scripts/run_quantum_gap_replica.py` exports Pauli labels for the same finite
@@ -77,6 +86,7 @@ described as physics evidence.
 python -m pytest
 python scripts/run_z2_plaquette.py --output-dir /tmp/gaugegap-0002-exact
 python scripts/run_quantum_gap_replica.py --output-dir /tmp/gaugegap-0002-replica
+python scripts/run_z2_plaquette_sweep.py --output-dir /tmp/gaugegap-0002-sweep --run-id smoke
 python scripts/run_vqe_gap.py --output-dir /tmp/gaugegap-0002-vqe --samples 64
 ```
 

@@ -55,7 +55,9 @@ The direct dense path enumerates computational basis states, applies diagonal
 plaquette products in the Z basis, and flips individual link bits for the X
 field. The Pauli replica path exports Qiskit-compatible labels, interprets the
 rightmost Pauli character as qubit 0, reconstructs the dense matrix, and checks
-it against the direct dense Hamiltonian. The local VQE-style path is a
+it against the direct dense Hamiltonian. The sweep path also records ground-state
+mean plaquette-Z and mean link-X expectations as small finite-system diagnostics.
+The local VQE-style path is a
 statevector simulator prototype only; it is not QPU hardware evidence.
 
 Claim boundary for `gaugegap-0002`: finite Z2 lattice gauge toy benchmark only;
