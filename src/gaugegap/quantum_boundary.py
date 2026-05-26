@@ -94,6 +94,18 @@ SURFACES: tuple[QuantumSurface, ...] = (
         next_gate="Compare Braket local results with Qiskit statevector before cloud submission.",
     ),
     QuantumSurface(
+        id="originq_cpuqvm",
+        track="GaugeGap",
+        level=2,
+        level_name="originq_local_simulation",
+        status="active",
+        actual_quantum_hardware=False,
+        files=("src/gaugegap/originq_runner.py", "scripts/run_hardware.py"),
+        command="python scripts/run_hardware.py --provider originq-local",
+        meaning="Runs Trotter circuits on OriginQ pyQPanda CPUQVM for cross-platform validation.",
+        next_gate="Compare OriginQ local results with Qiskit statevector before Wuyuan cloud submission.",
+    ),
+    QuantumSurface(
         id="ibm_runtime_sampler",
         track="GaugeGap",
         level=3,

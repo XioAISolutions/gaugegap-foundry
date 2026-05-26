@@ -10,7 +10,7 @@
     "status": "not_probed"
   },
   "summary": {
-    "active_surface_count": 6,
+    "active_surface_count": 7,
     "actual_hardware_runs_present": false,
     "hardware_ready_count": 2,
     "max_active_level": 2,
@@ -111,6 +111,21 @@
       "level_name": "braket_local_simulation",
       "meaning": "Runs Trotter circuits on Braket local StateVectorSimulator for cross-platform validation.",
       "next_gate": "Compare Braket local results with Qiskit statevector before cloud submission.",
+      "status": "active",
+      "track": "GaugeGap"
+    },
+    {
+      "actual_quantum_hardware": false,
+      "command": "python scripts/run_hardware.py --provider originq-local",
+      "files": [
+        "src/gaugegap/originq_runner.py",
+        "scripts/run_hardware.py"
+      ],
+      "id": "originq_cpuqvm",
+      "level": 2,
+      "level_name": "originq_local_simulation",
+      "meaning": "Runs Trotter circuits on OriginQ pyQPanda CPUQVM for cross-platform validation.",
+      "next_gate": "Compare OriginQ local results with Qiskit statevector before Wuyuan cloud submission.",
       "status": "active",
       "track": "GaugeGap"
     },

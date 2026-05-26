@@ -10,6 +10,7 @@ __all__ = [
     "gaugegap_u1",
     "ibm_runtime_runner",
     "ledger",
+    "originq_runner",
     "plot_svg",
     "quantum_boundary",
     "qiskit_backend",

@@ -95,6 +95,18 @@ For Braket changes:
 python scripts/run_hardware.py --provider braket-local --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/braket-smoke
 ```
 
+For OriginQ changes:
+
+```bash
+python scripts/run_hardware.py --provider originq-local --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/originq-smoke
+```
+
+For cross-platform validation:
+
+```bash
+python scripts/validate_cross_platform.py --n-sites 4 --shots 512 --output-dir /tmp/xplatform
+```
+
 For Qiskit changes, also run:
 
 ```bash

@@ -75,6 +75,16 @@ The project uses quantum simulators (Qiskit + Braket local) and has hardware run
 - Meaning: Runs Trotter circuits on Braket local StateVectorSimulator for cross-platform validation.
 - Next gate: Compare Braket local results with Qiskit statevector before cloud submission.
 
+### originq_cpuqvm
+
+- Track: `GaugeGap`
+- Level: `2 originq_local_simulation`
+- Status: `active`
+- Real hardware: `False`
+- Command: `python scripts/run_hardware.py --provider originq-local`
+- Meaning: Runs Trotter circuits on OriginQ pyQPanda CPUQVM for cross-platform validation.
+- Next gate: Compare OriginQ local results with Qiskit statevector before Wuyuan cloud submission.
+
 ### ibm_runtime_sampler
 
 - Track: `GaugeGap`

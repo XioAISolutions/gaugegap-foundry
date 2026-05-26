@@ -31,8 +31,11 @@ spectral = [
 braket = [
   "amazon-braket-sdk>=1.80",
 ]
+originq = [
+  "pyqpanda>=3.8",
+]
 all = [
-  "gaugegap-foundry[quantum,flow,spectral,braket]",
+  "gaugegap-foundry[quantum,flow,spectral,braket,originq]",
 ]
 
 [tool.setuptools.packages.find]

@@ -201,6 +201,53 @@ def run_braket_cloud(args: argparse.Namespace) -> list[dict[str, object]]:
     return records
 
 
+def run_originq_local(args: argparse.Namespace) -> list[dict[str, object]]:
+    from gaugegap.originq_runner import originq_counts_to_z_observables, run_local_cpuqvm
+
+    run_id = utc_run_id()
+    git = git_state(ROOT)
+    records: list[dict[str, object]] = []
+
+    for time in args.times:
+        result = run_local_cpuqvm(
+            n_sites=args.n_sites,
+            exchange_coupling=args.exchange,
+            transverse_field=args.field,
+            time=time,
+            steps=args.steps,
+            initial_state=args.initial_state,
+            shots=args.shots,
+        )
+        observables = originq_counts_to_z_observables(result["counts"], n_sites=args.n_sites)
+
+        params = {
+            "model": "z2_dual_chain",
+            "lattice_size": args.n_sites,
+            "exchange_coupling": args.exchange,
+            "transverse_field": args.field,
+            "time": time,
+            "trotter_steps": args.steps,
+            "initial_state": args.initial_state,
+        }
+
+        backend_info = {
+            "provider": result["provider"],
+            "name": result["device"],
+            "mode": "local_simulator",
+            "shots": result["shots"],
+            "device_id": result["device_id"],
+        }
+
+        circuit_hash = object_hash({"params": params, "backend": "originq-local"})
+
+        for site, val in enumerate(observables["z"]):
+            records.append(_record(run_id, git, args.hypothesis_id, params, circuit_hash, backend_info, "z_expectation", site, None, val, time))
+        for bond, val in enumerate(observables["zz"]):
+            records.append(_record(run_id, git, args.hypothesis_id, params, circuit_hash, backend_info, "zz_correlator", None, bond, val, time))
+
+    return records
+
+
 def _record(
     run_id, git, hypothesis_id, params, circuit_hash, backend, observable, site, bond, value, time,
 ) -> dict[str, object]:
@@ -251,7 +298,7 @@ def write_csv(path: Path, records: list[dict[str, object]]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run TFIM dynamics on quantum hardware or cloud simulators.")
-    parser.add_argument("--provider", required=True, choices=["ibm", "braket-local", "braket-cloud"])
+    parser.add_argument("--provider", required=True, choices=["ibm", "braket-local", "braket-cloud", "originq-local"])
     parser.add_argument("--hypothesis-id", default="gaugegap-0001")
     parser.add_argument("--n-sites", type=int, default=4)
     parser.add_argument("--exchange", type=float, default=1.0)
@@ -279,6 +326,8 @@ def main() -> int:
         records = run_braket_local(args)
     elif args.provider == "braket-cloud":
         records = run_braket_cloud(args)
+    elif args.provider == "originq-local":
+        records = run_originq_local(args)
     else:
         raise ValueError(f"unknown provider: {args.provider}")
 

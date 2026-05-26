@@ -50,6 +50,36 @@ jobs:
       - name: CurveRank smoke
         run: python scripts/run_curverank_screen.py --family xp --n-basis 10,20 --k-zeros 10 --output-dir /tmp/curverank-smoke
 
+  originq-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install originq extras
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[originq]'
+      - name: OriginQ unit tests
+        run: python -m unittest tests.test_originq_runner
+      - name: OriginQ local simulator smoke
+        run: python scripts/run_hardware.py --provider originq-local --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/originq-smoke
+
+  cross-platform-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install all extras
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[quantum,braket,originq]'
+      - name: Cross-platform validation
+        run: python scripts/validate_cross_platform.py --n-sites 4 --shots 512 --output-dir /tmp/xplatform-smoke
+
   braket-smoke:
     runs-on: ubuntu-latest
     strategy:
