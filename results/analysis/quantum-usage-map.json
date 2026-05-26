@@ -2,7 +2,7 @@
   "ibm_runtime": {
     "backends": [],
     "can_attempt_runtime": false,
-    "dependency_present": false,
+    "dependency_present": true,
     "env_instance_present": false,
     "env_token_present": false,
     "next_step": "Run `python scripts/quantum_status.py --probe-ibm` after configuring IBM Quantum credentials.",
@@ -10,12 +10,15 @@
     "status": "not_probed"
   },
   "summary": {
-    "active_surface_count": 5,
+    "active_surface_count": 7,
     "actual_hardware_runs_present": false,
-    "hardware_run_count": 0,
+    "hardware_ready_count": 2,
     "max_active_level": 2,
     "max_active_level_name": "quantum_circuit_simulation",
-    "plain_english": "The project currently uses quantum representations and quantum simulators, but it has not yet submitted a circuit to real quantum hardware."
+    "max_ready_level": 3,
+    "max_ready_level_name": "hardware_ready_boundary",
+    "plain_english": "The project uses quantum simulators (Qiskit + Braket local) and has hardware runners ready for IBM Runtime and AWS Braket cloud devices. Real QPU execution requires provider credentials.",
+    "ready_surface_count": 2
   },
   "surfaces": [
     {
@@ -98,16 +101,62 @@
     },
     {
       "actual_quantum_hardware": false,
-      "command": "python scripts/quantum_status.py --probe-ibm",
+      "command": "python scripts/run_hardware.py --provider braket-local",
       "files": [
-        "src/gaugegap/qiskit_dynamics.py"
+        "src/gaugegap/braket_runner.py",
+        "scripts/run_hardware.py"
+      ],
+      "id": "braket_local_simulator",
+      "level": 2,
+      "level_name": "braket_local_simulation",
+      "meaning": "Runs Trotter circuits on Braket local StateVectorSimulator for cross-platform validation.",
+      "next_gate": "Compare Braket local results with Qiskit statevector before cloud submission.",
+      "status": "active",
+      "track": "GaugeGap"
+    },
+    {
+      "actual_quantum_hardware": false,
+      "command": "python scripts/run_hardware.py --provider originq-local",
+      "files": [
+        "src/gaugegap/originq_runner.py",
+        "scripts/run_hardware.py"
+      ],
+      "id": "originq_cpuqvm",
+      "level": 2,
+      "level_name": "originq_local_simulation",
+      "meaning": "Runs Trotter circuits on OriginQ pyQPanda CPUQVM for cross-platform validation.",
+      "next_gate": "Compare OriginQ local results with Qiskit statevector before Wuyuan cloud submission.",
+      "status": "active",
+      "track": "GaugeGap"
+    },
+    {
+      "actual_quantum_hardware": true,
+      "command": "python scripts/run_hardware.py --provider ibm",
+      "files": [
+        "src/gaugegap/ibm_runtime_runner.py",
+        "scripts/run_hardware.py"
       ],
       "id": "ibm_runtime_sampler",
       "level": 3,
       "level_name": "hardware_ready_boundary",
-      "meaning": "This is where real quantum begins: submitting validated circuits to IBM Runtime Sampler/Estimator on a physical backend.",
-      "next_gate": "Add a guarded IBM Runtime runner only after credentials and backend availability are confirmed.",
-      "status": "planned",
+      "meaning": "Submits validated circuits to IBM Runtime SamplerV2/EstimatorV2 on a physical backend. Requires QISKIT_IBM_TOKEN.",
+      "next_gate": "Run only after statevector and Aer analysis gates pass. Ledger must record job_id, backend, shots.",
+      "status": "ready",
+      "track": "GaugeGap"
+    },
+    {
+      "actual_quantum_hardware": true,
+      "command": "python scripts/run_hardware.py --provider braket-cloud --device-name ionq-aria1",
+      "files": [
+        "src/gaugegap/braket_runner.py",
+        "scripts/run_hardware.py"
+      ],
+      "id": "braket_cloud_devices",
+      "level": 3,
+      "level_name": "braket_cloud_boundary",
+      "meaning": "Submits circuits to IonQ, Rigetti, or managed Braket simulators via AWS. Requires AWS credentials.",
+      "next_gate": "Run only after Braket local simulator results match Qiskit statevector. Ledger must record task_id, device_arn, shots.",
+      "status": "ready",
       "track": "GaugeGap"
     },
     {
@@ -116,11 +165,11 @@
       "files": [
         "docs/roadmap.md"
       ],
-      "id": "future_quantinuum_braket",
+      "id": "future_quantinuum",
       "level": 3,
       "level_name": "future_provider_boundary",
-      "meaning": "Future backends for trapped-ion and analogue gauge-style experiments.",
-      "next_gate": "Do not implement until IBM/local simulator artifacts are stable and reproducible.",
+      "meaning": "Future pytket/Quantinuum backend for trapped-ion SU(2) gauge experiments.",
+      "next_gate": "Do not implement until IBM and Braket artifacts are stable and reproducible.",
       "status": "planned",
       "track": "GaugeGap"
     }

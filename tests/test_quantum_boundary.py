@@ -23,25 +23,33 @@ class QuantumBoundaryTests(unittest.TestCase):
         self.assertEqual(summary["max_active_level"], 2)
         self.assertFalse(summary["actual_hardware_runs_present"])
 
+    def test_summary_reports_hardware_ready(self) -> None:
+        summary = quantum_summary()
+        self.assertEqual(summary["max_ready_level"], 3)
+        self.assertGreater(summary["hardware_ready_count"], 0)
+
     def test_usage_map_contains_runtime_boundary(self) -> None:
         surfaces = quantum_usage_map()
         ids = {surface["id"] for surface in surfaces}
         self.assertIn("qiskit_statevector_dynamics", ids)
         self.assertIn("ibm_runtime_sampler", ids)
+        self.assertIn("braket_local_simulator", ids)
+        self.assertIn("braket_cloud_devices", ids)
 
     def test_ibm_readiness_without_probe_is_non_failing(self) -> None:
         readiness = ibm_runtime_readiness(probe=False)
         self.assertIn("dependency_present", readiness)
         self.assertEqual(readiness["status"], "not_probed")
 
-    def test_markdown_renderer_mentions_no_hardware_yet(self) -> None:
+    def test_markdown_renderer_produces_output(self) -> None:
         payload = {
             "summary": quantum_summary(),
             "surfaces": quantum_usage_map(),
             "ibm_runtime": ibm_runtime_readiness(probe=False),
         }
         rendered = render_quantum_usage_markdown(payload)
-        self.assertIn("has not yet submitted a circuit to real quantum hardware", rendered)
+        self.assertIn("Quantum Usage Map", rendered)
+        self.assertIn("braket_local_simulator", rendered)
 
 
 if __name__ == "__main__":

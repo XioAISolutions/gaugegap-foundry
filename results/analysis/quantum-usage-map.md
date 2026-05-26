@@ -1,8 +1,9 @@
 # Quantum Usage Map
 
 Current maximum active level: **2 (quantum_circuit_simulation)**.
+Hardware-ready level: **3 (hardware_ready_boundary)**.
 
-The project currently uses quantum representations and quantum simulators, but it has not yet submitted a circuit to real quantum hardware.
+The project uses quantum simulators (Qiskit + Braket local) and has hardware runners ready for IBM Runtime and AWS Braket cloud devices. Real QPU execution requires provider credentials.
 
 ## Levels
 
@@ -64,29 +65,59 @@ The project currently uses quantum representations and quantum simulators, but i
 - Meaning: Runs a tiny VQLS-style pressure-Poisson subroutine through statevector simulation.
 - Next gate: Treat as a quantum-algorithm benchmark, not a Navier-Stokes theorem route.
 
+### braket_local_simulator
+
+- Track: `GaugeGap`
+- Level: `2 braket_local_simulation`
+- Status: `active`
+- Real hardware: `False`
+- Command: `python scripts/run_hardware.py --provider braket-local`
+- Meaning: Runs Trotter circuits on Braket local StateVectorSimulator for cross-platform validation.
+- Next gate: Compare Braket local results with Qiskit statevector before cloud submission.
+
+### originq_cpuqvm
+
+- Track: `GaugeGap`
+- Level: `2 originq_local_simulation`
+- Status: `active`
+- Real hardware: `False`
+- Command: `python scripts/run_hardware.py --provider originq-local`
+- Meaning: Runs Trotter circuits on OriginQ pyQPanda CPUQVM for cross-platform validation.
+- Next gate: Compare OriginQ local results with Qiskit statevector before Wuyuan cloud submission.
+
 ### ibm_runtime_sampler
 
 - Track: `GaugeGap`
 - Level: `3 hardware_ready_boundary`
-- Status: `planned`
-- Real hardware: `False`
-- Command: `python scripts/quantum_status.py --probe-ibm`
-- Meaning: This is where real quantum begins: submitting validated circuits to IBM Runtime Sampler/Estimator on a physical backend.
-- Next gate: Add a guarded IBM Runtime runner only after credentials and backend availability are confirmed.
+- Status: `ready`
+- Real hardware: `True`
+- Command: `python scripts/run_hardware.py --provider ibm`
+- Meaning: Submits validated circuits to IBM Runtime SamplerV2/EstimatorV2 on a physical backend. Requires QISKIT_IBM_TOKEN.
+- Next gate: Run only after statevector and Aer analysis gates pass. Ledger must record job_id, backend, shots.
 
-### future_quantinuum_braket
+### braket_cloud_devices
+
+- Track: `GaugeGap`
+- Level: `3 braket_cloud_boundary`
+- Status: `ready`
+- Real hardware: `True`
+- Command: `python scripts/run_hardware.py --provider braket-cloud --device-name ionq-aria1`
+- Meaning: Submits circuits to IonQ, Rigetti, or managed Braket simulators via AWS. Requires AWS credentials.
+- Next gate: Run only after Braket local simulator results match Qiskit statevector. Ledger must record task_id, device_arn, shots.
+
+### future_quantinuum
 
 - Track: `GaugeGap`
 - Level: `3 future_provider_boundary`
 - Status: `planned`
 - Real hardware: `False`
 - Command: `not implemented`
-- Meaning: Future backends for trapped-ion and analogue gauge-style experiments.
-- Next gate: Do not implement until IBM/local simulator artifacts are stable and reproducible.
+- Meaning: Future pytket/Quantinuum backend for trapped-ion SU(2) gauge experiments.
+- Next gate: Do not implement until IBM and Braket artifacts are stable and reproducible.
 
 ## IBM Runtime Readiness
 
-- Dependency present: `False`
+- Dependency present: `True`
 - Token env present: `False`
 - Instance env present: `False`
 - Status: `not_probed`
