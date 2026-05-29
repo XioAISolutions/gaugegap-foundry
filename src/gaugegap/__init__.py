@@ -1,6 +1,8 @@
 """GaugeGap finite-system benchmark helpers."""
 
 __all__ = [
+    "analysis",
+    "classical",
     "curverank_operators",
     "curverank_spectral",
     "dynamics_analysis",
@@ -8,13 +10,17 @@ __all__ = [
     "flowgap_qsubroutine",
     "gaugegap_u1",
     "ledger",
+    "mitigation",
     "models",
     "plot_svg",
+    "providers",
     "quantum",
     "quantum_boundary",
     "qiskit_backend",
     "qiskit_dynamics",
     "solvers",
     "verification",
+    "visualization",
+    "workflows",
     "z2_chain",
 ]

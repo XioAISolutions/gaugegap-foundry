@@ -1,0 +1,7 @@
+run_id,hypothesis_id,observable,value,family,k_tracked,k_zeros,n_basis
+20260529T020140Z,curverank-0001,spectral_mismatch,27.391322449240914,xp,,20,10
+20260529T020140Z,curverank-0001,spectral_mismatch,31.884970126092618,xp,,20,15
+20260529T020140Z,curverank-0001,spectral_mismatch,35.53568994244663,xp,,20,20
+20260529T020140Z,curverank-0001,truncation_drift,nan,xp,5,,10
+20260529T020140Z,curverank-0001,truncation_drift,2.968885173038474,xp,7,,15
+20260529T020140Z,curverank-0001,truncation_drift,13.260378945272212,xp,10,,20

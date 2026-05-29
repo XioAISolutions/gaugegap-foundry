@@ -1,0 +1,697 @@
+{
+  "hypothesis_id": "gaugegap-0002",
+  "run_id": "20260529T194113Z",
+  "timestamp": "2026-05-29T19:41:13.070446",
+  "claim_boundary": "Finite Z2 lattice gauge toy benchmark only; no continuum Yang-Mills mass-gap claim.",
+  "git": {
+    "commit": "d7a056ae64412115cf55a3c0426019533e93c4a0",
+    "dirty": true
+  },
+  "classical_results": [
+    {
+      "n_plaquettes": 1,
+      "n_qubits": 4,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 0.1,
+      "method": "exact_diagonalization",
+      "ground_energy": -1.0770329614269012,
+      "first_excited_energy": -1.0198039027185568,
+      "mass_gap": 0.05722905870834438,
+      "residual_norm": 6.183363159888247e-16,
+      "observables": {
+        "plaquette_z": [
+          0.9284766908852594
+        ],
+        "mean_plaquette_z": 0.9284766908852594,
+        "link_x": [
+          0.3713906763541039,
+          0.371390676354104,
+          0.371390676354104,
+          0.371390676354104
+        ],
+        "mean_link_x": 0.37139067635410394
+      },
+      "status": "finite_system_verified"
+    },
+    {
+      "n_plaquettes": 1,
+      "n_qubits": 4,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 0.55,
+      "method": "exact_diagonalization",
+      "ground_energy": -2.416609194718915,
+      "first_excited_energy": -1.4866068747318517,
+      "mass_gap": 0.9300023199870633,
+      "residual_norm": 1.36357651657692e-15,
+      "observables": {
+        "plaquette_z": [
+          0.4138029443011838
+        ],
+        "mean_plaquette_z": 0.4138029443011838,
+        "link_x": [
+          0.9103664774626047,
+          0.9103664774626047,
+          0.9103664774626047,
+          0.9103664774626046
+        ],
+        "mean_link_x": 0.9103664774626046
+      },
+      "status": "finite_system_verified"
+    },
+    {
+      "n_plaquettes": 1,
+      "n_qubits": 4,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 1.0,
+      "method": "exact_diagonalization",
+      "ground_energy": -4.12310562561766,
+      "first_excited_energy": -2.2360679774997907,
+      "mass_gap": 1.887037648117869,
+      "residual_norm": 1.3414875847488985e-15,
+      "observables": {
+        "plaquette_z": [
+          0.24253562503633308
+        ],
+        "mean_plaquette_z": 0.24253562503633308,
+        "link_x": [
+          0.9701425001453322,
+          0.9701425001453322,
+          0.9701425001453322,
+          0.9701425001453322
+        ],
+        "mean_link_x": 0.9701425001453322
+      },
+      "status": "finite_system_verified"
+    },
+    {
+      "n_plaquettes": 2,
+      "n_qubits": 7,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 0.1,
+      "method": "exact_diagonalization",
+      "ground_energy": -2.099051471881364,
+      "first_excited_energy": -2.0825491716929156,
+      "mass_gap": 0.016502300188448338,
+      "residual_norm": 2.4969390612118324e-15,
+      "observables": {
+        "plaquette_z": [
+          0.948739592821275,
+          0.9487395928212753
+        ],
+        "mean_plaquette_z": 0.9487395928212752,
+        "link_x": [
+          0.3130975706286715,
+          0.31309757062867144,
+          0.3130975706286715,
+          0.13713743861611785,
+          0.31309757062867144,
+          0.3130975706286715,
+          0.3130975706286715
+        ],
+        "mean_link_x": 0.28796040891259234
+      },
+      "status": "finite_system_verified",
+      "dmrg": {
+        "ground_state_energy": -2.099051471881357,
+        "energy_error": 1e-08,
+        "bond_dimension": 8,
+        "truncation_error": 1e-10,
+        "entanglement_entropy": [
+          0.6432981524228265,
+          0.6432981524228263,
+          0.6432981524228265,
+          0.6432981524228263,
+          0.6432981524228265,
+          0.6432981524228265
+        ],
+        "observables": {
+          "energy": -2.0990514718813658,
+          "norm": 0.9999999999999998
+        },
+        "method": "DMRG",
+        "system_size": 7,
+        "converged": true
+      }
+    },
+    {
+      "n_plaquettes": 2,
+      "n_qubits": 7,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 0.55,
+      "method": "exact_diagonalization",
+      "ground_energy": -4.289082333146766,
+      "first_excited_energy": -3.497562111227223,
+      "mass_gap": 0.791520221919543,
+      "residual_norm": 4.020177398363705e-15,
+      "observables": {
+        "plaquette_z": [
+          0.4239539731900011,
+          0.4239539731900011
+        ],
+        "mean_plaquette_z": 0.4239539731900011,
+        "link_x": [
+          0.9053169195682071,
+          0.9053169195682071,
+          0.9053169195682071,
+          0.8247791858030613,
+          0.9053169195682071,
+          0.9053169195682071,
+          0.9053169195682071
+        ],
+        "mean_link_x": 0.8938115290303292
+      },
+      "status": "finite_system_verified",
+      "dmrg": {
+        "ground_state_energy": -4.289082333146765,
+        "energy_error": 1e-08,
+        "bond_dimension": 8,
+        "truncation_error": 1e-10,
+        "entanglement_entropy": [
+          0.1906118934633117,
+          0.1906118934633117,
+          0.19061189346331125,
+          0.19061189346331212,
+          0.19061189346331137,
+          0.19061189346331164
+        ],
+        "observables": {
+          "energy": -4.289082333146766,
+          "norm": 1.0
+        },
+        "method": "DMRG",
+        "system_size": 7,
+        "converged": true
+      }
+    },
+    {
+      "n_plaquettes": 2,
+      "n_qubits": 7,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 1.0,
+      "method": "exact_diagonalization",
+      "ground_energy": -7.247399238315777,
+      "first_excited_energy": -5.464661564492073,
+      "mass_gap": 1.7827376738237035,
+      "residual_norm": 7.270689452420647e-15,
+      "observables": {
+        "plaquette_z": [
+          0.24480503179841218,
+          0.24480503179841223
+        ],
+        "mean_plaquette_z": 0.2448050317984122,
+        "link_x": [
+          0.9695257606112552,
+          0.9695257606112552,
+          0.9695257606112552,
+          0.9406346110514213,
+          0.9695257606112551,
+          0.9695257606112551,
+          0.9695257606112551
+        ],
+        "mean_link_x": 0.9653984535312787
+      },
+      "status": "finite_system_verified",
+      "dmrg": {
+        "ground_state_energy": -7.2473992383157695,
+        "energy_error": 1e-08,
+        "bond_dimension": 8,
+        "truncation_error": 1e-10,
+        "entanglement_entropy": [
+          0.0788728655179133,
+          0.07887286551791295,
+          0.07887286551791302,
+          0.07887286551791343,
+          0.07887286551791249,
+          0.07887286551791299
+        ],
+        "observables": {
+          "energy": -7.247399238315776,
+          "norm": 0.9999999999999996
+        },
+        "method": "DMRG",
+        "system_size": 7,
+        "converged": true
+      }
+    },
+    {
+      "n_plaquettes": 3,
+      "n_qubits": 10,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 0.1,
+      "method": "exact_diagonalization",
+      "ground_energy": -3.1253198522096484,
+      "first_excited_energy": -3.112479362806022,
+      "mass_gap": 0.012840489403626254,
+      "residual_norm": 5.2958797995637906e-14,
+      "observables": {
+        "plaquette_z": [
+          0.9504485740551671,
+          0.9660339073074018,
+          0.9504485740551671
+        ],
+        "mean_plaquette_z": 0.9556436851392455,
+        "link_x": [
+          0.30767791448194604,
+          0.30767791448194626,
+          0.3076779144819463,
+          0.1182610051309853,
+          0.25064923538275163,
+          0.25064923538275163,
+          0.11826100513098649,
+          0.3076779144819465,
+          0.3076779144819467,
+          0.3076779144819466
+        ],
+        "mean_link_x": 0.2583887967919153
+      },
+      "status": "finite_system_verified",
+      "dmrg": {
+        "ground_state_energy": -3.1253198522096493,
+        "energy_error": 1e-08,
+        "bond_dimension": 32,
+        "truncation_error": 1e-10,
+        "entanglement_entropy": [
+          0.645037728521675,
+          0.6450377285216742,
+          0.6450377285216747,
+          0.6614011705744622,
+          0.6614011705744626,
+          0.6614011705744623,
+          0.6450377285216748,
+          0.6450377285216753,
+          0.6450377285216751
+        ],
+        "observables": {
+          "energy": -3.125319852209633,
+          "norm": 0.9999999999999951
+        },
+        "method": "DMRG",
+        "system_size": 10,
+        "converged": true
+      }
+    },
+    {
+      "n_plaquettes": 3,
+      "n_qubits": 10,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 0.55,
+      "method": "exact_diagonalization",
+      "ground_energy": -6.161920322076455,
+      "first_excited_energy": -5.380848754457008,
+      "mass_gap": 0.7810715676194464,
+      "residual_norm": 3.984732913129473e-14,
+      "observables": {
+        "plaquette_z": [
+          0.42458495981650674,
+          0.43464469794006316,
+          0.42458495981650723
+        ],
+        "mean_plaquette_z": 0.4279382058576924,
+        "link_x": [
+          0.9049852953602823,
+          0.9049852953602817,
+          0.9049852953602826,
+          0.8198902641058521,
+          0.8997953993618377,
+          0.8997953993618378,
+          0.8198902641058513,
+          0.9049852953602827,
+          0.9049852953602823,
+          0.9049852953602829
+        ],
+        "mean_link_x": 0.8869283099097073
+      },
+      "status": "finite_system_verified",
+      "dmrg": {
+        "ground_state_energy": -6.161920322076456,
+        "energy_error": 1e-08,
+        "bond_dimension": 32,
+        "truncation_error": 1e-10,
+        "entanglement_entropy": [
+          0.19110933509670835,
+          0.19110933509670405,
+          0.1911093350967055,
+          0.19881861542430135,
+          0.1988186154243015,
+          0.19881861542430088,
+          0.19110933509670544,
+          0.19110933509670616,
+          0.19110933509670563
+        ],
+        "observables": {
+          "energy": -6.161920322076492,
+          "norm": 1.0000000000000058
+        },
+        "method": "DMRG",
+        "system_size": 10,
+        "converged": true
+      }
+    },
+    {
+      "n_plaquettes": 3,
+      "n_qubits": 10,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 1.0,
+      "method": "exact_diagonalization",
+      "ground_energy": -10.371719848325732,
+      "first_excited_energy": -8.592203083043485,
+      "mass_gap": 1.7795167652822474,
+      "residual_norm": 4.713928878927563e-14,
+      "observables": {
+        "plaquette_z": [
+          0.24485664895856987,
+          0.2471238055509055,
+          0.24485664895857037
+        ],
+        "mean_plaquette_z": 0.24561236782268192,
+        "link_x": [
+          0.9695110150011099,
+          0.9695110150011099,
+          0.9695110150011099,
+          0.9400208630808093,
+          0.9688874643446856,
+          0.9688874643446856,
+          0.9400208630808088,
+          0.9695110150011097,
+          0.9695110150011097,
+          0.9695110150011097
+        ],
+        "mean_link_x": 0.963488274485765
+      },
+      "status": "finite_system_verified",
+      "dmrg": {
+        "ground_state_energy": -10.371719848325737,
+        "energy_error": 1e-08,
+        "bond_dimension": 32,
+        "truncation_error": 1e-10,
+        "entanglement_entropy": [
+          0.07890359847122758,
+          0.07890359847122384,
+          0.07890359847122556,
+          0.08020005171870431,
+          0.08020005171870426,
+          0.08020005171870408,
+          0.07890359847122658,
+          0.07890359847122717,
+          0.07890359847122516
+        ],
+        "observables": {
+          "energy": -10.37171984832575,
+          "norm": 1.0000000000000013
+        },
+        "method": "DMRG",
+        "system_size": 10,
+        "converged": true
+      }
+    }
+  ],
+  "quantum_results": [
+    {
+      "n_plaquettes": 1,
+      "n_qubits": 4,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 0.1,
+      "method": "vqe_statevector",
+      "vqe": {
+        "ground_energy": -1.011586517272155,
+        "first_excited_energy": -1.049001102986761,
+        "gap": 0.0,
+        "exact_ground_energy": -1.0770329614269003,
+        "exact_first_excited_energy": -1.019803902718557,
+        "exact_gap": 0.05722905870834327,
+        "ground_error": 0.06544644415474532,
+        "first_error": 0.029197200268203938,
+        "gap_error": 0.05722905870834327,
+        "backend": "local_numpy_statevector_vqe_style",
+        "n_qubits": 4,
+        "layers": 3,
+        "samples": 256,
+        "status": "warning_variational_gap_error"
+      },
+      "status": "warning_variational_gap_error"
+    },
+    {
+      "n_plaquettes": 1,
+      "n_qubits": 4,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 0.55,
+      "method": "vqe_statevector",
+      "vqe": {
+        "ground_energy": -2.320469443527032,
+        "first_excited_energy": -1.481028985420678,
+        "gap": 0.8394404581063541,
+        "exact_ground_energy": -2.4166091947189146,
+        "exact_first_excited_energy": -1.4866068747318506,
+        "exact_gap": 0.930002319987064,
+        "ground_error": 0.09613975119188245,
+        "first_error": 0.005577889311172646,
+        "gap_error": 0.0905618618807098,
+        "backend": "local_numpy_statevector_vqe_style",
+        "n_qubits": 4,
+        "layers": 3,
+        "samples": 256,
+        "status": "pass"
+      },
+      "status": "pass"
+    },
+    {
+      "n_plaquettes": 1,
+      "n_qubits": 4,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 1.0,
+      "method": "vqe_statevector",
+      "vqe": {
+        "ground_energy": -4.057812323671056,
+        "first_excited_energy": -2.228511923471718,
+        "gap": 1.8293004001993385,
+        "exact_ground_energy": -4.1231056256176615,
+        "exact_first_excited_energy": -2.2360679774997902,
+        "exact_gap": 1.8870376481178712,
+        "ground_error": 0.0652933019466051,
+        "first_error": 0.0075560540280723565,
+        "gap_error": 0.05773724791853274,
+        "backend": "local_numpy_statevector_vqe_style",
+        "n_qubits": 4,
+        "layers": 3,
+        "samples": 256,
+        "status": "pass"
+      },
+      "status": "pass"
+    },
+    {
+      "n_plaquettes": 2,
+      "n_qubits": 7,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 0.1,
+      "method": "vqe_statevector",
+      "vqe": {
+        "ground_energy": -1.9920412019274887,
+        "first_excited_energy": -1.984880068827881,
+        "gap": 0.007161133099607753,
+        "exact_ground_energy": -2.0990514718813653,
+        "exact_first_excited_energy": -2.082549171692917,
+        "exact_gap": 0.016502300188448338,
+        "ground_error": 0.10701026995387664,
+        "first_error": 0.09766910286503605,
+        "gap_error": 0.009341167088840585,
+        "backend": "local_numpy_statevector_vqe_style",
+        "n_qubits": 7,
+        "layers": 3,
+        "samples": 256,
+        "status": "pass"
+      },
+      "status": "pass"
+    },
+    {
+      "n_plaquettes": 2,
+      "n_qubits": 7,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 0.55,
+      "method": "vqe_statevector",
+      "vqe": {
+        "ground_energy": -3.1630531964645705,
+        "first_excited_energy": -3.318038670626567,
+        "gap": 0.0,
+        "exact_ground_energy": -4.2890823331467605,
+        "exact_first_excited_energy": -3.4975621112272206,
+        "exact_gap": 0.7915202219195399,
+        "ground_error": 1.12602913668219,
+        "first_error": 0.1795234406006534,
+        "gap_error": 0.7915202219195399,
+        "backend": "local_numpy_statevector_vqe_style",
+        "n_qubits": 7,
+        "layers": 3,
+        "samples": 256,
+        "status": "warning_variational_gap_error"
+      },
+      "status": "warning_variational_gap_error"
+    },
+    {
+      "n_plaquettes": 2,
+      "n_qubits": 7,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 1.0,
+      "method": "vqe_statevector",
+      "vqe": {
+        "ground_energy": -6.7675382685787975,
+        "first_excited_energy": -5.27148481593621,
+        "gap": 1.4960534526425873,
+        "exact_ground_energy": -7.247399238315781,
+        "exact_first_excited_energy": -5.464661564492069,
+        "exact_gap": 1.7827376738237124,
+        "ground_error": 0.47986096973698356,
+        "first_error": 0.19317674855585842,
+        "gap_error": 0.28668422118112513,
+        "backend": "local_numpy_statevector_vqe_style",
+        "n_qubits": 7,
+        "layers": 3,
+        "samples": 256,
+        "status": "pass"
+      },
+      "status": "pass"
+    },
+    {
+      "n_plaquettes": 3,
+      "n_qubits": 10,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 0.1,
+      "method": "vqe_statevector",
+      "vqe": {
+        "ground_energy": -3.055874610387023,
+        "first_excited_energy": -2.9562030064679363,
+        "gap": 0.09967160391908658,
+        "exact_ground_energy": -3.1253198522096346,
+        "exact_first_excited_energy": -3.112479362806025,
+        "exact_gap": 0.012840489403609379,
+        "ground_error": 0.06944524182261169,
+        "first_error": 0.1562763563380889,
+        "gap_error": 0.0868311145154772,
+        "backend": "local_numpy_statevector_vqe_style",
+        "n_qubits": 10,
+        "layers": 3,
+        "samples": 256,
+        "status": "warning_variational_gap_error"
+      },
+      "status": "warning_variational_gap_error"
+    },
+    {
+      "n_plaquettes": 3,
+      "n_qubits": 10,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 0.55,
+      "method": "vqe_statevector",
+      "vqe": {
+        "ground_energy": -4.708727972755488,
+        "first_excited_energy": -5.081046443218744,
+        "gap": 0.0,
+        "exact_ground_energy": -6.161920322076444,
+        "exact_first_excited_energy": -5.380848754457025,
+        "exact_gap": 0.7810715676194189,
+        "ground_error": 1.4531923493209558,
+        "first_error": 0.29980231123828105,
+        "gap_error": 0.7810715676194189,
+        "backend": "local_numpy_statevector_vqe_style",
+        "n_qubits": 10,
+        "layers": 3,
+        "samples": 256,
+        "status": "warning_variational_gap_error"
+      },
+      "status": "warning_variational_gap_error"
+    },
+    {
+      "n_plaquettes": 3,
+      "n_qubits": 10,
+      "plaquette_coupling": 1.0,
+      "transverse_field": 1.0,
+      "method": "vqe_statevector",
+      "vqe": {
+        "ground_energy": -9.954263606783744,
+        "first_excited_energy": -6.517723647485247,
+        "gap": 3.4365399592984973,
+        "exact_ground_energy": -10.371719848325718,
+        "exact_first_excited_energy": -8.592203083043461,
+        "exact_gap": 1.7795167652822563,
+        "ground_error": 0.4174562415419736,
+        "first_error": 2.0744794355582146,
+        "gap_error": 1.657023194016241,
+        "backend": "local_numpy_statevector_vqe_style",
+        "n_qubits": 10,
+        "layers": 3,
+        "samples": 256,
+        "status": "warning_variational_gap_error"
+      },
+      "status": "warning_variational_gap_error"
+    }
+  ],
+  "scaling_analysis": {
+    "transverse_field": 0.55,
+    "error": "The number of func parameters=4 must not exceed the number of data points=3",
+    "status": "failed"
+  },
+  "continuum_extrapolation": {
+    "transverse_field": 0.55,
+    "continuum_result": {
+      "continuum_value": 0.9410487381269261,
+      "continuum_error": 0.039189395231575774,
+      "systematic_error": 0.07998858525373986,
+      "total_error": 0.08907290536134692,
+      "convergence_order": 4,
+      "improvement_type": "richardson",
+      "chi_squared": 1.0,
+      "coefficients": {
+        "order": 4.0
+      },
+      "n_spacings": 3,
+      "spacing_range": [
+        0.3333333333333333,
+        1.0
+      ]
+    },
+    "status": "success"
+  },
+  "hypothesis_pruning": {
+    "status_summary": {
+      "total": 2,
+      "active": 2,
+      "falsified": 0,
+      "survived": 0,
+      "hypotheses": {
+        "gaugegap-massless": {
+          "id": "gaugegap-massless",
+          "description": "Mass gap vanishes in continuum limit",
+          "track": "gaugegap",
+          "n_parameters": 0,
+          "prior_probability": 1.0,
+          "log_evidence": -5.0,
+          "status": "active",
+          "evidence_history": [
+            [
+              "2026-05-29T15:41:36.826612",
+              -5.0
+            ]
+          ],
+          "metadata": {}
+        },
+        "gaugegap-massive": {
+          "id": "gaugegap-massive",
+          "description": "Mass gap remains finite in continuum limit",
+          "track": "gaugegap",
+          "n_parameters": 1,
+          "prior_probability": 1.0,
+          "log_evidence": 5.0,
+          "status": "active",
+          "evidence_history": [
+            [
+              "2026-05-29T15:41:36.826631",
+              5.0
+            ]
+          ],
+          "metadata": {}
+        }
+      }
+    },
+    "falsified": [],
+    "survivors": []
+  },
+  "status": "running"
+}

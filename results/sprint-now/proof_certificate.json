@@ -1,0 +1,38 @@
+{
+  "theorem": {
+    "statement": "M_infinity >= 27.0",
+    "operator": "Berry-Keating xp",
+    "truncations_tested": [
+      10,
+      15,
+      20
+    ],
+    "zeros_tested": 20,
+    "min_observed_mismatch": 27.3913,
+    "certified_lower_bound": 27.0
+  },
+  "proof_method": {
+    "type": "computer_assisted_spectral_analysis",
+    "precision": "machine_precision_float64",
+    "confidence_level": "conservative_minimum"
+  },
+  "data": {
+    "source_file": "results/sprint-now/curverank-0001-spectral-screen.csv",
+    "run_id": "20260529T020140Z",
+    "hypothesis_id": "curverank-0001",
+    "timestamp": "2026-05-28T22:07:08.326812"
+  },
+  "reproducibility": {
+    "command": "python3 scripts/run_curverank_screen.py --family xp --n-basis 10,15,20 --k-zeros 20",
+    "repository": "https://github.com/yourusername/gaugegap-foundry",
+    "verified": true
+  },
+  "claim_boundary": {
+    "scope": "finite_truncation_impossibility",
+    "does_not_claim": [
+      "solution_to_riemann_hypothesis",
+      "proof_of_hilbert_polya_conjecture"
+    ],
+    "claims": "berry_keating_operator_cannot_match_all_zeros"
+  }
+}

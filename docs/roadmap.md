@@ -1,6 +1,6 @@
 # GaugeGap Foundry Roadmap
 
-Date: 2026-05-24
+Date: 2026-05-28 (Updated with Quantum MVP Plan)
 
 ## Position
 
@@ -56,6 +56,10 @@ Real hardware begins only when a validated circuit is submitted to a provider
 runtime and the ledger records provider job id, backend, shots, and calibration
 context. See `docs/quantum-boundary.md`.
 
+**NEW:** Provider adapters and hardware-ready workflows are now implemented.
+See `docs/quantum-mvp-plan.md` for the complete quantum MVP implementation plan
+covering Quantinuum H2/Helios, IBM Runtime, AWS Braket/QuEra, and IonQ platforms.
+
 ## First ten experiments
 
 1. Z2 minimal finite chain, gap vs coupling, exact diagonalization.
@@ -102,3 +106,58 @@ Acceptable first results are finite-system results, not Clay-prize claims.
 - "AI discovered [fundamental result]";
 - "quantum computer proves [theorem]";
 - theorem-adjacent claims without precise finite-system definitions.
+
+## Quantum MVP Implementation (2026-05-28)
+
+### Provider Architecture
+
+The repository now includes a unified provider adapter architecture supporting:
+
+- **Quantinuum H2/Helios**: Trapped-ion systems with all-to-all connectivity
+  - Primary target for GaugeGap (SU(2) lattice gauge theory)
+  - Emulator support with realistic noise models
+  - State-vector emulation up to 32 qubits
+
+- **IBM Qiskit Runtime**: Superconducting systems with error mitigation
+  - Primary target for FlowGap (Burgers/Poisson benchmarks)
+  - Local Aer simulators with noise models
+  - Runtime Sampler/Estimator with resilience controls
+
+- **AWS Braket/QuEra Aquila**: Neutral-atom analog simulation
+  - Secondary target for GaugeGap (string-breaking dynamics)
+  - 256-qubit programmable array
+  - Local AHS simulator for protocol validation
+
+- **IonQ Forte/Aria**: Trapped-ion systems with built-in debiasing
+  - Secondary target for CurveRank (QPE experiments)
+  - All-to-all connectivity up to 36 qubits
+  - Automatic debiasing for jobs with ≥500 shots
+
+### Hardware-Ready Workflow
+
+The standard emulator-to-hardware workflow is now implemented:
+
+1. **Classical baseline**: Exact diagonalization or PDE solver
+2. **Noiseless emulator**: Ideal quantum simulation
+3. **Noisy emulator**: Hardware-calibrated noise model
+4. **Validation**: Compare emulator vs classical within tolerance
+5. **Readiness checks**: Credentials, calibration, circuit constraints
+6. **Hardware submission**: Submit to QPU with full metadata capture
+7. **Ledger recording**: Record job ID, backend, calibration context
+
+See `src/gaugegap/workflows/emulator_to_hardware.py` for implementation.
+
+### Priority Order
+
+1. **GaugeGap** (4-8 weeks): Finite-lattice gap extraction on Quantinuum H2
+2. **FlowGap** (2-6 weeks): Pressure-Poisson hybrid benchmark on IBM Runtime
+3. **CurveRank** (2-6 weeks): AI-ranked spectral search with QPE validation
+
+### Next Steps
+
+- Week 1-2: Implement Quantinuum H2 emulator integration for Z2 plaquette
+- Week 3-4: Run GaugeGap emulator validation and hardware submission
+- Week 5-6: Add IBM Runtime integration for FlowGap Poisson benchmark
+- Week 7-8: Implement QuEra Aquila AHS protocol for string-breaking
+
+See `docs/quantum-mvp-plan.md` for complete implementation details.

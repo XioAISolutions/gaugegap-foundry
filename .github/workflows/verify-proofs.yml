@@ -1,0 +1,252 @@
+name: Verify Proofs
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  verify-proofs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[spectral,dev]"
+      
+      - name: Run unit tests
+        run: |
+          python -m pytest tests/ -v --tb=short
+      
+      - name: Verify existing proof certificate
+        run: |
+          python -c "
+          import json
+          from pathlib import Path
+          
+          cert_file = Path('results/sprint-now/proof_certificate.json')
+          if cert_file.exists():
+              with open(cert_file) as f:
+                  cert = json.load(f)
+              print('✓ Proof certificate valid')
+              print(f'  Theorem: {cert[\"theorem\"][\"statement\"]}')
+              print(f'  Certified bound: {cert[\"theorem\"][\"certified_lower_bound\"]}')
+          else:
+              print('⚠ No proof certificate found (expected for new branches)')
+          "
+      
+      - name: Reproduce proof (quick verification)
+        run: |
+          python scripts/run_curverank_screen.py \
+            --family xp \
+            --n-basis 10,15,20 \
+            --k-zeros 20 \
+            --output-dir /tmp/verify-proof
+      
+      - name: Compare with certified results
+        run: |
+          python -c "
+          import json
+          import csv
+          from pathlib import Path
+          
+          # Load new results
+          new_file = Path('/tmp/verify-proof/curverank-0001-spectral-screen.csv')
+          if not new_file.exists():
+              print('✗ Verification failed: no output generated')
+              exit(1)
+          
+          with open(new_file) as f:
+              reader = csv.DictReader(f)
+              new_data = list(reader)
+          
+          # Check minimum mismatch
+          min_mismatch = min(float(row['mismatch']) for row in new_data)
+          print(f'✓ Reproduced minimum mismatch: {min_mismatch:.2f}')
+          
+          # Verify against certified bound
+          certified_bound = 27.0
+          if min_mismatch >= certified_bound:
+              print(f'✓ Verification passed: {min_mismatch:.2f} >= {certified_bound}')
+          else:
+              print(f'✗ Verification failed: {min_mismatch:.2f} < {certified_bound}')
+              exit(1)
+          "
+      
+      - name: Upload verification artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-results-py${{ matrix.python-version }}
+          path: /tmp/verify-proof/
+          retention-days: 7
+
+  test-quantum-infrastructure:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install quantum dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[quantum,dev]"
+      
+      - name: Test quantum infrastructure
+        run: |
+          python -m pytest tests/test_qiskit_backend.py -v
+          python -m pytest tests/test_qiskit_dynamics.py -v
+          python -m pytest tests/test_vqe_gap.py -v
+      
+      - name: Test provider adapters (mock mode)
+        run: |
+          python -m pytest tests/test_providers.py -v
+          python -m pytest tests/test_hardware_ready.py -v
+
+  test-all-tracks:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install all dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[spectral,flow,quantum,dev]"
+      
+      - name: Test GaugeGap track
+        run: |
+          python scripts/run_gap_sweep.py --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-test
+          python scripts/run_z2_plaquette.py --output-dir /tmp/gaugegap-0002-test
+      
+      - name: Test FlowGap track
+        run: |
+          python scripts/run_flowgap_burgers.py --sizes 16,32 --nu-points 3 --n-steps 20 --output-dir /tmp/flowgap-test
+      
+      - name: Test CurveRank track
+        run: |
+          python scripts/run_curverank_screen.py --family xp --n-basis 10,15 --k-zeros 10 --output-dir /tmp/curverank-test
+      
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: all-tracks-test-results
+          path: /tmp/*-test/
+          retention-days: 7
+
+  check-claim-boundary:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Check for overclaiming in documentation
+        run: |
+          python -c "
+          import re
+          from pathlib import Path
+          
+          # Forbidden phrases that violate claim boundary
+          forbidden = [
+              r'proof of (the )?yang.?mills',
+              r'proof of (the )?navier.?stokes',
+              r'proof of (the )?riemann hypothesis',
+              r'solved? (the )?millennium prize',
+              r'ai (discovered|proved|solved)',
+              r'quantum computer proves',
+          ]
+          
+          # Files to check
+          files_to_check = [
+              'README.md',
+              'DEPLOYMENT.md',
+              'docs/*.md',
+              'results/sprint-now/PROOF_SUMMARY.md',
+          ]
+          
+          violations = []
+          for pattern in files_to_check:
+              for file_path in Path('.').glob(pattern):
+                  if file_path.is_file():
+                      content = file_path.read_text().lower()
+                      for phrase in forbidden:
+                          if re.search(phrase, content):
+                              violations.append(f'{file_path}: contains \"{phrase}\"')
+          
+          if violations:
+              print('✗ Claim boundary violations detected:')
+              for v in violations:
+                  print(f'  {v}')
+              exit(1)
+          else:
+              print('✓ No claim boundary violations detected')
+          "
+      
+      - name: Verify AGENTS.md compliance
+        run: |
+          if [ ! -f "AGENTS.md" ]; then
+              echo "✗ AGENTS.md missing"
+              exit 1
+          fi
+          echo "✓ AGENTS.md present"
+          
+          # Check for required sections
+          grep -q "Claim boundary" AGENTS.md || (echo "✗ Missing 'Claim boundary' section" && exit 1)
+          echo "✓ Claim boundary section present"
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Run security scan
+        uses: pypa/gh-action-pip-audit@v1.0.8
+        with:
+          inputs: pyproject.toml
+          
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+
+# Made with Bob

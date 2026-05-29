@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  # Main GaugeGap Foundry service
+  gaugegap-foundry:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gaugegap-foundry:latest
+    container_name: gaugegap-foundry
+    volumes:
+      # Mount results directory for persistent storage
+      - ./results:/app/results
+      # Mount scripts for development
+      - ./scripts:/app/scripts:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: >
+      python scripts/run_curverank_screen.py
+      --family xp
+      --n-basis 10,15,20
+      --k-zeros 20
+      --output-dir results/docker-run
+
+  # GaugeGap track service
+  gaugegap-track:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gaugegap-foundry:latest
+    container_name: gaugegap-track
+    volumes:
+      - ./results:/app/results
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: >
+      python scripts/run_z2_plaquette_sweep.py
+      --output-dir results/gaugegap-docker
+      --run-id docker-sweep
+    profiles:
+      - gaugegap
+
+  # FlowGap track service
+  flowgap-track:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gaugegap-foundry:latest
+    container_name: flowgap-track
+    volumes:
+      - ./results:/app/results
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: >
+      python scripts/run_flowgap_burgers.py
+      --sizes 16,32,64
+      --nu-points 5
+      --n-steps 50
+      --output-dir results/flowgap-docker
+    profiles:
+      - flowgap
+
+  # CurveRank track service (extended screening)
+  curverank-track:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gaugegap-foundry:latest
+    container_name: curverank-track
+    volumes:
+      - ./results:/app/results
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: >
+      python scripts/run_curverank_screen.py
+      --family xp
+      --n-basis 10,15,20,25,30,35,40
+      --k-zeros 50
+      --output-dir results/curverank-docker
+    profiles:
+      - curverank
+
+  # Development environment with Jupyter
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gaugegap-foundry:latest
+    container_name: gaugegap-dev
+    volumes:
+      - .:/app
+    ports:
+      - "8888:8888"
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: >
+      bash -c "pip install jupyter &&
+      jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root"
+    profiles:
+      - dev
+
+# Usage examples:
+#
+# 1. Run default (CurveRank proof reproduction):
+#    docker-compose up
+#
+# 2. Run specific track:
+#    docker-compose --profile gaugegap up gaugegap-track
+#    docker-compose --profile flowgap up flowgap-track
+#    docker-compose --profile curverank up curverank-track
+#
+# 3. Run all tracks in parallel:
+#    docker-compose --profile gaugegap --profile flowgap --profile curverank up
+#
+# 4. Development environment with Jupyter:
+#    docker-compose --profile dev up dev
+#    # Then open http://localhost:8888 in browser
+#
+# 5. Build and run:
+#    docker-compose build
+#    docker-compose up
+#
+# 6. Run in background:
+#    docker-compose up -d
+#    docker-compose logs -f
+#
+# 7. Clean up:
+#    docker-compose down
+#    docker-compose down -v  # Also remove volumes
+
+# Made with Bob
