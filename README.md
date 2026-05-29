@@ -28,6 +28,12 @@ It has three local paths:
 - Pauli/Qiskit-compatible operator export checked against the dense matrix;
 - a local statevector VQE-style prototype for simulator-loop development.
 
+`gaugegap-0003` is a finite spectral-gap candidate search layer. It ranks small
+Z2 plaquette families by finite gap size, finite-size survival, perturbation
+stability, Pauli dense replica agreement, residual norms, and claim-boundary
+compliance. It writes JSON/JSONL/CSV/Markdown rankings plus per-candidate
+dossiers.
+
 Boundary: **Finite Z2 lattice gauge toy benchmark only; no continuum
 Yang-Mills mass-gap claim.**
 
@@ -40,15 +46,25 @@ python -m pip install -e '.[dev]'
 python scripts/run_gap_sweep.py
 python scripts/run_z2_plaquette.py --output-dir /tmp/gaugegap-0002-exact
 python scripts/run_quantum_gap_replica.py --output-dir /tmp/gaugegap-0002-replica
+python scripts/run_z2_plaquette_sweep.py --output-dir /tmp/gaugegap-0002-sweep --run-id smoke
 python scripts/run_vqe_gap.py --output-dir /tmp/gaugegap-0002-vqe --samples 64
+python scripts/search_gap_candidates.py --output-dir /tmp/gaugegap-0003 --max-candidates 10
 python -m pytest
 ```
 
-Outputs land in `results/baselines/` by default:
+A small `gaugegap-0003` smoke run:
 
-- `gaugegap-0001-gap-sweep.jsonl`
-- `gaugegap-0001-gap-sweep.csv`
-- `gaugegap-0001-gap-sweep.svg`
+```bash
+python scripts/search_gap_candidates.py \
+  --output-dir /tmp/gaugegap-0003-smoke \
+  --n-plaquettes 1 \
+  --plaquette-couplings 1.0 \
+  --field-points 2 \
+  --max-candidates 1
+```
+
+Outputs land in `results/baselines/` by default for `gaugegap-0001`, and in the
+selected output directory for later milestones.
 
 ## Program direction
 
@@ -102,6 +118,7 @@ currently uses quantum operators, quantum circuits, and quantum simulators, but
 it has not yet submitted a circuit to real QPU hardware.
 
 See `docs/gaugegap-0002.md` for the finite Z2 plaquette benchmark details.
+See `docs/gaugegap-0003-ai-gap-search.md` for the candidate search layer.
 
 ## Claim boundary
 
