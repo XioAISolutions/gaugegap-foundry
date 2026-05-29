@@ -1,0 +1,49 @@
+id: gaugegap-0003
+track: GaugeGap
+model: su2_pure_gauge_2plus1d
+scope: finite SU(2) pure gauge theory on a small 2+1D lattice
+claim: >
+  The finite-lattice SU(2) pure gauge Hamiltonian exhibits a non-negative mass gap
+  and confinement signatures (linear string tension) in the strong-coupling regime,
+  with Wilson loop area-law behavior and stable gap trends under truncation refinement.
+prediction:
+  observable: mass_gap
+  expected_shape: positive_with_confinement_scaling
+controls:
+  lattice_size: [2x2, 3x3]
+  plaquette_coupling: 1.0
+  electric_coupling_range: [0.1, 2.0]
+  electric_coupling_points: 10
+  truncation: [0.5, 1.0, 1.5]
+  boundary: periodic
+hamiltonian: H = g^2/2 sum_l E_l^2 - 1/g^2 sum_p Tr(U_p + U_p^dag)
+validation:
+  required:
+    - exact_diagonalization_small_lattice
+    - wilson_loop_area_law_check
+    - string_tension_extraction
+    - truncation_stability_analysis
+    - claim_boundary_certificate
+  optional:
+    - tensor_network_dmrg_baseline
+    - vqe_ground_state_prototype
+  future:
+    - quantinuum_h2_hardware_submission
+    - trapped_ion_all_to_all_connectivity
+    - polyakov_loop_temporal_correlators
+kill_criteria:
+  - mass gap becomes negative in strong-coupling regime
+  - Wilson loop violates area-law behavior at expected coupling
+  - string tension extraction fails numerical stability checks
+  - truncation refinement shows non-convergent gap behavior
+  - gauge invariance violated beyond numerical tolerance
+  - any certificate omits finite-system SU(2) claim boundary
+status: active
+notes:
+  - This is finite-lattice SU(2) pure gauge theory, NOT continuum Yang-Mills.
+  - Truncation j_max limits link Hilbert space dimension.
+  - Confinement signatures are finite-volume proxies, not rigorous proofs.
+  - String tension is extracted from Wilson loop fits, subject to finite-size effects.
+  - This benchmark validates SU(2) non-abelian gauge infrastructure.
+
+# Made with Bob

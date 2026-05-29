@@ -1,0 +1,55 @@
+id: gaugegap-0005
+track: GaugeGap
+model: su3_qcd_like_2plus1d
+scope: finite SU(3) gauge theory (QCD-like) on a minimal 2+1D lattice
+claim: >
+  The finite-lattice SU(3) gauge Hamiltonian exhibits QCD-like features including
+  confinement, asymptotic freedom signatures, and stable mass gap behavior under
+  truncation refinement, representing the closest finite-system analog to continuum
+  Yang-Mills theory in this benchmark series.
+prediction:
+  observable: mass_gap
+  expected_shape: positive_with_qcd_scaling
+controls:
+  lattice_size: [2x2, 3x3]
+  gauge_coupling_range: [0.5, 3.0]
+  gauge_coupling_points: 10
+  truncation: [0.5, 1.0]
+  color_representation: fundamental
+  boundary: periodic
+hamiltonian: H = g^2/2 sum_l E_l^a E_l^a - 1/g^2 sum_p Tr(U_p + U_p^dag)
+validation:
+  required:
+    - exact_diagonalization_minimal_lattice
+    - confinement_signature_verification
+    - asymptotic_freedom_coupling_flow
+    - truncation_stability_analysis
+    - claim_boundary_certificate
+  optional:
+    - tensor_network_dmrg_baseline
+    - vqe_ground_state_prototype
+    - polyakov_loop_deconfinement_check
+  future:
+    - quantinuum_helios_hardware_submission
+    - trapped_ion_su3_encoding
+    - finite_temperature_phase_transition
+    - quark_gluon_plasma_signatures
+kill_criteria:
+  - mass gap becomes negative in strong-coupling regime
+  - confinement signatures absent at expected coupling
+  - asymptotic freedom violated in weak-coupling limit
+  - truncation refinement shows divergent behavior
+  - SU(3) gauge invariance violated beyond tolerance
+  - color representation mixing beyond numerical precision
+  - any certificate omits finite-system SU(3) claim boundary
+status: active
+notes:
+  - This is finite-lattice SU(3) gauge theory, NOT continuum QCD or Yang-Mills.
+  - SU(3) is the gauge group of QCD (quantum chromodynamics).
+  - Truncation limits the link Hilbert space to manageable dimensions.
+  - Confinement and asymptotic freedom are finite-volume proxies.
+  - This benchmark validates SU(3) non-abelian gauge infrastructure.
+  - Represents the closest analog to Yang-Mills in this finite-system series.
+  - No claim of Millennium Prize resolution - finite-system benchmark only.
+
+# Made with Bob

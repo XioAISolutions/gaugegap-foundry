@@ -1,0 +1,55 @@
+id: gaugegap-0004
+track: GaugeGap
+model: su2_gauge_matter_2plus1d
+scope: finite SU(2) gauge theory coupled to matter fields on a small 2+1D lattice
+claim: >
+  The finite-lattice SU(2) gauge-matter Hamiltonian exhibits string-breaking dynamics,
+  with meson formation reducing string tension compared to pure gauge theory, and
+  stable mass gap behavior under truncation and lattice size refinement.
+prediction:
+  observable: mass_gap
+  expected_shape: positive_with_string_breaking
+controls:
+  lattice_size: [2x2, 3x3]
+  gauge_coupling: 1.0
+  matter_mass_range: [0.1, 2.0]
+  matter_mass_points: 10
+  truncation: [0.5, 1.0, 1.5]
+  matter_type: staggered_fermion
+  boundary: periodic
+hamiltonian: H = H_gauge + H_matter + H_interaction
+validation:
+  required:
+    - exact_diagonalization_small_lattice
+    - string_breaking_observable_extraction
+    - meson_spectrum_analysis
+    - gauge_matter_coupling_verification
+    - truncation_stability_analysis
+    - claim_boundary_certificate
+  optional:
+    - tensor_network_peps_baseline
+    - vqe_excited_state_prototype
+    - chiral_condensate_measurement
+  future:
+    - quera_aquila_analog_simulation
+    - rydberg_atom_gauge_matter_encoding
+    - finite_temperature_phase_transition
+kill_criteria:
+  - string-breaking signature absent in expected parameter regime
+  - meson spectrum extraction fails convergence checks
+  - gauge-matter coupling violates unitarity or gauge invariance
+  - mass gap becomes negative in physical parameter range
+  - truncation refinement shows divergent behavior
+  - matter field normalization violates fermion/boson statistics
+  - any certificate omits finite-system gauge-matter claim boundary
+status: active
+notes:
+  - This is finite-lattice SU(2) gauge-matter theory, NOT continuum QCD.
+  - Staggered fermions are used to reduce fermion doubling on the lattice.
+  - String-breaking is a finite-volume effect; interpretation requires care.
+  - Meson spectrum is extracted from two-point correlators with finite-size corrections.
+  - Chiral condensate (if measured) is a finite-volume proxy for chiral symmetry breaking.
+  - This benchmark validates SU(2) gauge-matter interaction infrastructure.
+  - Matter mass parameter controls screening length and string-breaking scale.
+
+# Made with Bob
