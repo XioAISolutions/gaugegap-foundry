@@ -25,6 +25,8 @@ jobs:
           python -m pip install -e '.[dev]'
       - name: Unit tests
         run: python -m pytest
+      - name: Claim boundary audit
+        run: python scripts/claim_boundary_audit.py --output-dir /tmp/gaugegap-claim-audit
       - name: Smoke sweep
         run: python scripts/run_gap_sweep.py --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-smoke
       - name: Z2 plaquette smoke
@@ -33,6 +35,8 @@ jobs:
           python scripts/run_quantum_gap_replica.py --output-dir /tmp/gaugegap-0002-replica
           python scripts/run_z2_plaquette_sweep.py --output-dir /tmp/gaugegap-0002-sweep --run-id ci
           python scripts/run_vqe_gap.py --output-dir /tmp/gaugegap-0002-vqe --samples 64
+      - name: Reproducibility proofpack smoke
+        run: python scripts/generate_reproducibility_proofpack.py --output-dir /tmp/gaugegap-proofpack --skip-commands
       - name: Quantum boundary status
         run: python scripts/quantum_status.py --output-dir /tmp/gaugegap-quantum-status
       - name: FlowGap smoke
