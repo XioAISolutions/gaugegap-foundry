@@ -36,9 +36,9 @@ The current CurveRank work includes a **computer-assisted spectral screening res
    - finite-lattice SU(2) pure gauge theory in 2+1D
    - first non-abelian finite benchmark in the series
 
-5. **`gaugegap-0004`**: SU(2) gauge-matter
-   - SU(2) gauge + matter fields
-   - string-breaking dynamics and meson-spectrum benchmarks
+5. **`gaugegap-0004`**: SU(2) gauge-matter / hardware-readiness validation lane
+   - SU(2) gauge + matter fields, string-breaking dynamics, and meson-spectrum benchmarks
+   - current implementation adds a finite Z₂ candidate hardware-readiness validator before any provider submission
 
 6. **`gaugegap-0005`**: SU(3) QCD-like finite benchmark
    - finite-lattice SU(3) pure gauge theory
@@ -63,6 +63,27 @@ The current CurveRank work includes a **computer-assisted spectral screening res
   - candidate operator screening against zeta-zero-inspired targets
   - Berry-Keating-style negative-result artifact
   - quantum phase-estimation path is exploratory
+
+## Qiskit 2.4 / IBM Runtime Findings Applied
+
+The hardware-readiness lane follows IBM's current Qiskit pattern:
+
+```text
+map finite operator/circuit
+→ inspect/transpile resources
+→ execute only after local checks pass
+→ analyze deviations
+```
+
+The Qiskit 2.4 release is relevant because it strengthens Pauli-centric workflows, faster QPY serialization, transpilation infrastructure, and compiled-extension paths. For this repo that means:
+
+- keep Pauli terms as first-class artifacts;
+- record resource estimates before any backend call;
+- avoid hardware submission until exact and Pauli dense replicas agree;
+- serialize and hash validation outputs as proofpack material;
+- keep Qiskit/IBM Runtime optional because finite exact baselines must run without provider credentials.
+
+The first implementation of this is `gaugegap-0004`, a local hardware-readiness validator for finite Z₂ candidates. It does not submit to hardware by default.
 
 ## Quick Start
 
@@ -95,6 +116,7 @@ python scripts/run_gaugegap_u1.py
 python scripts/run_gaugegap_su2_pure.py
 python scripts/run_gaugegap_su3_pure.py
 python scripts/search_gap_candidates.py --output-dir /tmp/gaugegap-search-0001 --max-candidates 10
+python scripts/run_candidate_validation.py --output-dir /tmp/gaugegap-0004 --disable-qiskit-probe
 
 # FlowGap
 python scripts/run_flowgap_burgers.py
