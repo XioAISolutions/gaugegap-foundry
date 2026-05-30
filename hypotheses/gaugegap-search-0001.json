@@ -1,0 +1,27 @@
+{
+  "hypothesis_id": "gaugegap-search-0001",
+  "title": "Finite Z2 plaquette spectral-gap candidate search",
+  "track": "GaugeGap",
+  "scope": "finite-system exploratory benchmark",
+  "claim_boundary": "Finite Z2 lattice gauge toy benchmark only; no continuum Yang-Mills mass-gap claim.",
+  "question": "Can a deterministic search over finite Z2 plaquette families identify gap profiles that remain stable across small finite-size and transverse-field perturbation checks?",
+  "success_criteria": [
+    "Generate ranked finite candidates with reproducible exact diagonalization records.",
+    "Preserve Pauli dense replica agreement within numerical tolerance for every ranked record.",
+    "Write JSON, JSONL, CSV, Markdown summary, and per-candidate dossiers.",
+    "Keep every output clearly bounded to finite-system exploration."
+  ],
+  "kill_criteria": [
+    "Pauli dense replica does not match direct dense Hamiltonian within tolerance.",
+    "Exact diagonalization residuals are not small enough for a finite benchmark.",
+    "Candidate rankings depend on missing or non-deterministic metadata.",
+    "Any generated dossier implies a continuum Yang-Mills proof or Clay-prize claim."
+  ],
+  "required_outputs": [
+    "results/gaugegap-search-0001/gaugegap-search-0001-candidates.jsonl",
+    "results/gaugegap-search-0001/gaugegap-search-0001-ranking.csv",
+    "results/gaugegap-search-0001/gaugegap-search-0001-ranking.md",
+    "results/gaugegap-search-0001/dossiers/"
+  ],
+  "next_milestone": "hardware-readiness pipeline for top finite candidates"
+}
