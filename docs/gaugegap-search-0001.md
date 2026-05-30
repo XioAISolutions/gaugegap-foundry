@@ -1,0 +1,80 @@
+# gaugegap-search-0001: Finite Z2 Plaquette Candidate Search
+
+`gaugegap-search-0001` is a candidate-mining layer for the finite Z2 plaquette benchmark.
+
+Boundary: **Finite Z2 lattice gauge toy benchmark only; no continuum Yang-Mills mass-gap claim.**
+
+## Purpose
+
+The goal is to search finite Z2 plaquette families for gap profiles that are worth deeper validation. A candidate is not a theorem. It is a reproducible finite-system artifact that survives the current checks:
+
+1. exact dense diagonalization;
+2. Pauli dense replica agreement;
+3. low residual norms;
+4. perturbation checks over transverse field;
+5. finite-size checks across plaquette counts;
+6. explicit claim-boundary preservation.
+
+## Search space
+
+The default search evaluates:
+
+```text
+n_plaquettes = 1,2,3
+plaquette_coupling J = 0.5,1.0,1.5
+transverse_field h = linspace(0.05,2.0,6)
+```
+
+Each fixed `J` becomes one candidate family evaluated over the finite sizes and fields. Optional seeded random local perturbations can be added with `--random-samples`.
+
+## Scoring
+
+The candidate score rewards:
+
+- larger mean finite gaps;
+- larger minimum finite gap;
+- stable behavior under nearby `h` perturbations;
+- survival as finite size increases;
+- clean Pauli/dense agreement;
+- low exact-diagonalization residuals.
+
+It penalizes:
+
+- gap collapse with size;
+- high variance over perturbations;
+- Pauli replica mismatch;
+- high residuals;
+- unnecessary parameter complexity;
+- missing claim-boundary language.
+
+## Run
+
+```bash
+python scripts/search_gap_candidates.py --output-dir /tmp/gaugegap-search-0001 --max-candidates 10
+```
+
+A tiny smoke run:
+
+```bash
+python scripts/search_gap_candidates.py \
+  --output-dir /tmp/gaugegap-search-0001-smoke \
+  --n-plaquettes 1 \
+  --plaquette-couplings 1.0 \
+  --field-points 2 \
+  --max-candidates 1
+```
+
+## Outputs
+
+The search writes:
+
+- `gaugegap-search-0001-candidates.jsonl`
+- `gaugegap-search-0001-candidates.json`
+- `gaugegap-search-0001-ranking.csv`
+- `gaugegap-search-0001-ranking.md`
+- `dossiers/*.json`
+- `dossiers/*.md`
+
+## Next step
+
+Feed top ranked finite candidates into the hardware-readiness pipeline: noiseless statevector, shot-based Aer, noisy Aer, then optional provider execution after local checks pass.
