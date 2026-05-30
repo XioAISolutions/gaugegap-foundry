@@ -45,6 +45,10 @@ The current CurveRank work includes a **computer-assisted spectral screening res
    - closest current finite-system analog in this repo to Yang-Mills-style gauge dynamics
    - quantum-provider adapters are optional and require credentials
 
+7. **`gaugegap-search-0001`**: Z₂ finite gap candidate search
+   - ranks finite Z₂ plaquette candidates by gap size, finite-size survival, perturbation stability, replica agreement, and residuals
+   - writes JSON/JSONL/CSV/Markdown rankings plus candidate dossiers
+
 **Boundary**: all GaugeGap items above are finite-system benchmarks only; no continuum Yang-Mills mass-gap claim.
 
 ### FlowGap Track: Navier-Stokes-adjacent finite PDE systems
@@ -90,6 +94,7 @@ python scripts/run_z2_plaquette_sweep.py
 python scripts/run_gaugegap_u1.py
 python scripts/run_gaugegap_su2_pure.py
 python scripts/run_gaugegap_su3_pure.py
+python scripts/search_gap_candidates.py --output-dir /tmp/gaugegap-search-0001 --max-candidates 10
 
 # FlowGap
 python scripts/run_flowgap_burgers.py
