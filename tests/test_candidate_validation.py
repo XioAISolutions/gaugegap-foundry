@@ -22,6 +22,10 @@ class CandidateValidationTests(unittest.TestCase):
         self.assertIn("workflow_mapping", report)
         self.assertIn("no continuum Yang-Mills mass-gap claim", report["claim_boundary"])
         self.assertEqual(report["pauli_replica"]["status"], "pass")
+        self.assertIn("qpy_export_available", report["qiskit_probe"])
+        self.assertIn("aer_available", report["qiskit_probe"])
+        self.assertIn("ibm_runtime_available", report["qiskit_probe"])
+        self.assertFalse(report["qiskit_probe"]["credentials_checked"])
 
     def test_invalid_noise_strength_rejected(self) -> None:
         with self.assertRaises(ValueError):

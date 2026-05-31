@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
+import importlib.util
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -25,10 +27,17 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, default=ROOT / "results" / "proofpack")
     parser.add_argument("--strict-claims", action="store_true", help="Run claim-boundary audit in strict mode")
     parser.add_argument("--skip-commands", action="store_true", help="Only hash existing outputs and write manifest")
+    parser.add_argument("--include-search", action="store_true", help="Include gaugegap-search-0001 candidate-search smoke")
+    parser.add_argument("--include-validation", action="store_true", help="Include gaugegap-0004 hardware-readiness smoke")
+    parser.add_argument("--include-qiskit", action="store_true", help="Include optional Qiskit/Aer/QPY validation smoke")
+    parser.add_argument("--allow-qiskit-skip", action="store_true", help="Allow --include-qiskit to write a skipped report when Qiskit is missing")
     parser.add_argument("--command", action="append", default=None, help="Extra command to run; repeatable; simple whitespace splitting only")
     args = parser.parse_args()
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
+    if args.include_qiskit and not _module_available("qiskit") and not args.allow_qiskit_skip:
+        print(json.dumps({"status": "fail", "reason": "Qiskit is not installed; use --allow-qiskit-skip to record a skipped optional validation"}, indent=2))
+        return 2
     commands = _commands(args)
     run_records: list[dict[str, object]] = []
     if not args.skip_commands:
@@ -46,6 +55,7 @@ def main() -> int:
             "dirty": bool(_git("status", "--porcelain")),
         },
         "python": sys.version,
+        "dependencies": _dependency_versions(),
         "commands": run_records,
         "files": [_file_record(path, args.output_dir) for path in files],
     }
@@ -63,8 +73,51 @@ def _commands(args: argparse.Namespace) -> list[list[str]]:
     commands = [[part.format(output_dir=str(args.output_dir)) for part in command] for command in DEFAULT_COMMANDS]
     if args.strict_claims:
         commands[0].append("--strict")
+    if args.include_search:
+        commands.append(
+            [
+                sys.executable,
+                "scripts/search_gap_candidates.py",
+                "--output-dir",
+                "{output_dir}/gaugegap-search-0001",
+                "--n-plaquettes",
+                "1",
+                "--plaquette-couplings",
+                "1.0",
+                "--field-points",
+                "2",
+                "--max-candidates",
+                "1",
+            ]
+        )
+    if args.include_validation:
+        commands.append(
+            [
+                sys.executable,
+                "scripts/run_candidate_validation.py",
+                "--output-dir",
+                "{output_dir}/gaugegap-0004",
+                "--n-plaquettes",
+                "1",
+                "--disable-qiskit-probe",
+            ]
+        )
+    if args.include_qiskit:
+        commands.append(
+            [
+                sys.executable,
+                "scripts/run_qiskit_candidate_validation.py",
+                "--output-dir",
+                "{output_dir}/gaugegap-qiskit",
+                "--n-plaquettes",
+                "1",
+                "--shots",
+                "128",
+            ]
+        )
     if args.command:
         commands.extend(_split_command(item.format(output_dir=str(args.output_dir))) for item in args.command)
+    commands = [[part.format(output_dir=str(args.output_dir)) for part in command] for command in commands]
     return commands
 
 
@@ -111,6 +164,7 @@ def _markdown(manifest: dict[str, object]) -> str:
         f"Created: `{manifest['created_at_utc']}`",
         f"Git commit: `{manifest['git']['commit']}`",
         f"Dirty tree: `{manifest['git']['dirty']}`",
+        f"Python: `{manifest['python'].split()[0]}`",
         "",
         "## Commands",
         "",
@@ -128,6 +182,33 @@ def _markdown(manifest: dict[str, object]) -> str:
         lines.append(f"| `{item['path']}` | {item['bytes']} | `{item['sha256']}` |")
     lines.append("")
     return "\n".join(lines)
+
+
+def _dependency_versions() -> dict[str, str | None]:
+    packages = [
+        "numpy",
+        "scipy",
+        "mpmath",
+        "PyYAML",
+        "pytest",
+        "qiskit",
+        "qiskit-aer",
+        "qiskit-ibm-runtime",
+    ]
+    versions: dict[str, str | None] = {}
+    for package in packages:
+        try:
+            versions[package] = importlib.metadata.version(package)
+        except importlib.metadata.PackageNotFoundError:
+            versions[package] = None
+    return versions
+
+
+def _module_available(name: str) -> bool:
+    try:
+        return importlib.util.find_spec(name) is not None
+    except (ImportError, AttributeError, ValueError):
+        return False
 
 
 def _git(*args: str) -> str | None:

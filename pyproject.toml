@@ -20,9 +20,9 @@ dependencies = [
 
 [project.optional-dependencies]
 quantum = [
-  "qiskit>=1.4",
-  "qiskit-aer>=0.15",
-  "qiskit-ibm-runtime>=0.34",
+  "qiskit>=2.4,<3",
+  "qiskit-aer>=0.17",
+  "qiskit-ibm-runtime>=0.46",
 ]
 quantinuum = [
   "pytket>=1.30",
@@ -43,6 +43,7 @@ spectral = [
 ]
 dev = [
   "pytest>=8",
+  "scipy>=1.11",
 ]
 all = [
   "gaugegap-foundry[quantum,quantinuum,braket,ionq,flow,spectral,dev]",

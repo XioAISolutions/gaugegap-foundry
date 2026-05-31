@@ -85,6 +85,8 @@ The Qiskit 2.4 release is relevant because it strengthens Pauli-centric workflow
 
 The first implementation of this is `gaugegap-0004`, a local hardware-readiness validator for finite Z₂ candidates. It does not submit to hardware by default.
 
+Hardware results are noisy experimental artifacts and do not constitute mathematical proof.
+
 ## Quick Start
 
 ### Reproduce the local spectral screening artifact
@@ -117,6 +119,8 @@ python scripts/run_gaugegap_su2_pure.py
 python scripts/run_gaugegap_su3_pure.py
 python scripts/search_gap_candidates.py --output-dir /tmp/gaugegap-search-0001 --max-candidates 10
 python scripts/run_candidate_validation.py --output-dir /tmp/gaugegap-0004 --disable-qiskit-probe
+python scripts/run_qiskit_candidate_validation.py --output-dir /tmp/gaugegap-qiskit-validation
+python scripts/submit_ibm_runtime_candidate.py --dry-run --output-dir /tmp/gaugegap-runtime-dryrun
 
 # FlowGap
 python scripts/run_flowgap_burgers.py
@@ -132,7 +136,10 @@ python -m pytest
 
 ```bash
 python scripts/claim_boundary_audit.py --strict
-python scripts/generate_reproducibility_proofpack.py --output-dir results/proofpack
+python scripts/generate_reproducibility_proofpack.py \
+  --output-dir results/proofpack \
+  --include-search \
+  --include-validation
 ```
 
 The proofpack writes a JSON manifest, a Markdown summary, command logs, output hashes, and the claim boundary used for the run.
@@ -152,6 +159,12 @@ cat results/baselines/gaugegap-0005-su3-pure-sweep.csv
 ```
 
 Optional hardware submission commands require provider credentials and should be treated as exploratory finite-system runs, not proof artifacts.
+
+See also:
+
+- `docs/gaugegap-0004-hardware-readiness.md`
+- `docs/qiskit-2-4-validation.md`
+- `docs/ibm-runtime-submission.md`
 
 ### Docker Deployment
 
@@ -204,12 +217,12 @@ Use language like:
 
 > candidate negative result requiring independent review
 
-Do not use language like:
+Avoid unbounded claim language such as:
 
-> proof of the Yang-Mills mass gap
+> continuum Yang-Mills mass-gap proof
 
-> solution to a Millennium Prize problem
+> Millennium Prize resolution
 
-> prize-ready theorem
+> theorem ready for a prize claim
 
 That boundary is intentional. The project earns credibility by making every small claim reproducible before expanding scope.

@@ -389,7 +389,7 @@ class HypothesisPruner:
         """
         falsified = []
         for h_id, h in self.hypotheses.items():
-            if h.status == "active" and h.log_evidence < self.falsification_threshold:
+            if h.log_evidence < self.falsification_threshold and h.status in {"active", "falsified"}:
                 h.status = "falsified"
                 falsified.append(h_id)
         
@@ -611,7 +611,7 @@ def likelihood_ratio_test(
     """
     lr_statistic = -2 * (log_likelihood_reduced - log_likelihood_full)
     p_value = 1 - chi2.cdf(lr_statistic, df_diff)
-    reject_reduced = p_value < alpha
+    reject_reduced = bool(p_value < alpha)
     
     return float(lr_statistic), float(p_value), reject_reduced
 

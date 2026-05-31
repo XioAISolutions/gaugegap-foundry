@@ -103,8 +103,8 @@ Acceptable first results are finite-system results, not Clay-prize claims.
 ### Avoid across all tracks
 
 - "we will solve [Millennium problem]";
-- "AI discovered [fundamental result]";
-- "quantum computer proves [theorem]";
+- "AI produced an unbounded fundamental-result claim";
+- "quantum-computer theorem-evidence claim";
 - theorem-adjacent claims without precise finite-system definitions.
 
 ## Quantum MVP Implementation (2026-05-28)

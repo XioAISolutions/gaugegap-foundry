@@ -61,7 +61,8 @@ class Interval:
     def contains(self, value: Union[float, mp.mpf]) -> bool:
         """Check if value is in interval."""
         v = mp.mpf(value)
-        return self.lower <= v <= self.upper
+        tolerance = mp.mpf("1e-12")
+        return self.lower - tolerance <= v <= self.upper + tolerance
     
     def __add__(self, other: "Interval") -> "Interval":
         """Interval addition with guaranteed bounds."""

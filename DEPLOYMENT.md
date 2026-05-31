@@ -1,37 +1,37 @@
 # GaugeGap Foundry Deployment Guide
 
-## 🚀 Repository Status: Production-Ready
+## Repository Status: Finite-System Research Infrastructure
 
-This repository contains **real mathematical results** and is ready for:
-- ✅ Public GitHub deployment
-- ✅ arXiv preprint submission
-- ✅ Peer review submission
-- ✅ Collaboration and extension
+This repository contains reproducible finite-system artifacts and is ready for:
+- Public GitHub review
+- preprint draft preparation after independent review
+- peer-review discussion after claim-boundary checks
+- collaboration and extension
 
 ---
 
 ## What This Repository Delivers
 
-### 1. Computer-Assisted Proof (COMPLETED)
-**Berry-Keating Impossibility Theorem**: M_∞ ≥ 27.0
+### 1. Computer-Assisted Screening Artifact
+**Berry-Keating finite-truncation screening certificate**: M_∞ ≥ 27.0 within the checked finite setup
 
 - **Location**: `results/sprint-now/`
 - **Files**: 
-  - `proof_certificate.json` - Formal certificate
-  - `PROOF_SUMMARY.md` - Human-readable proof
+  - `proof_certificate.json` - Machine-readable certificate
+  - `PROOF_SUMMARY.md` - Human-readable finite-screening summary
   - `curverank-0001-spectral-screen.csv` - Raw data
-- **Status**: Ready for publication
+- **Status**: Ready for independent review
 - **Cost**: $0 (local computation)
 - **Time**: ~10 seconds
 
-### 2. Quantum Hardware Infrastructure (READY)
+### 2. Quantum Hardware Infrastructure
 Complete provider adapters for:
 - **Quantinuum H2/Helios** (GaugeGap primary)
 - **IBM Qiskit Runtime** (FlowGap primary)
 - **AWS Braket/QuEra Aquila** (GaugeGap analogue)
 - **IonQ Forte/Aria** (CurveRank secondary)
 
-**Status**: Tested with emulators, ready for hardware
+**Status**: Tested with local/emulator paths; hardware remains gated behind explicit flags
 
 ### 3. Three Research Tracks (ACTIVE)
 - **GaugeGap**: Yang-Mills mass gap finite-lattice benchmarks
@@ -44,17 +44,17 @@ Complete provider adapters for:
 
 ### Immediate (Today)
 
-- [x] Generate computer-assisted proof
-- [x] Create proof certificate
-- [x] Write proof summary
-- [ ] **Update README with proof results**
+- [x] Generate computer-assisted finite-screening artifact
+- [x] Create machine-readable certificate
+- [x] Write finite-screening summary
+- [ ] **Update README with bounded finite-system results**
 - [ ] **Add GitHub repository URL to proof certificate**
 - [ ] **Create release tag v0.1.0**
 - [ ] **Generate publication figures**
 
 ### This Week
 
-- [ ] Submit arXiv preprint
+- [ ] Prepare arXiv preprint draft after independent review
 - [ ] Create DOI via Zenodo
 - [ ] Add CITATION.cff with DOI
 - [ ] Write blog post announcement
@@ -62,7 +62,7 @@ Complete provider adapters for:
 
 ### This Month
 
-- [ ] Submit to peer-reviewed journal
+- [ ] Prepare journal submission only after independent review
 - [ ] Create interactive visualization dashboard
 - [ ] Add Jupyter notebook tutorials
 - [ ] Record video walkthrough

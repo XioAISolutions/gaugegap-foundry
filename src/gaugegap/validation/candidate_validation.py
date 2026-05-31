@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import importlib.metadata
+import importlib.util
 from pathlib import Path
 import math
 
@@ -8,7 +10,7 @@ import numpy as np
 
 from gaugegap.ledger import git_state, object_hash, utc_run_id
 from gaugegap.models.z2_plaquette import CLAIM_BOUNDARY, hamiltonian_dense, model_metadata, pauli_terms
-from gaugegap.quantum.pauli_export import pauli_terms_to_dense, qiskit_available
+from gaugegap.quantum.pauli_export import pauli_terms_to_dense
 from gaugegap.solvers.exact_gap import exact_gap
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -135,18 +137,31 @@ def _resource_estimate(metadata: dict[str, object]) -> dict[str, object]:
         "n_qubits": n_qubits,
         "n_pauli_terms": n_terms,
         "estimated_min_observable_groups": n_terms,
+        "approximate_observable_groups": n_terms,
         "toy_ansatz_depth_proxy": max(1, 2 * n_qubits - 1),
+        "depth_proxy": max(1, 2 * n_qubits - 1),
         "hardware_scale": "tiny" if n_qubits <= 5 else "small" if n_qubits <= 12 else "too_large_for_default_exact_path",
     }
 
 
 def _qiskit_probe(enabled: bool) -> dict[str, object]:
-    available = qiskit_available() if enabled else False
+    qiskit_available = _module_available("qiskit") if enabled else False
+    qpy_available = _module_available("qiskit.qpy") if enabled and qiskit_available else False
+    aer_available = _module_available("qiskit_aer") if enabled else False
+    runtime_available = _module_available("qiskit_ibm_runtime") if enabled else False
     return {
         "enabled": bool(enabled),
-        "qiskit_available": bool(available),
+        "qiskit_available": bool(qiskit_available),
+        "qiskit_version": _package_version("qiskit") if qiskit_available else None,
+        "qpy_export_available": bool(qpy_available),
+        "aer_available": bool(aer_available),
+        "qiskit_aer_version": _package_version("qiskit-aer") if aer_available else None,
+        "ibm_runtime_available": bool(runtime_available),
+        "qiskit_ibm_runtime_version": _package_version("qiskit-ibm-runtime") if runtime_available else None,
+        "credentials_checked": False,
+        "credential_policy": "IBM Runtime credentials are not inspected unless an explicit runtime submission command opts in.",
         "runtime_submission_ready": False,
-        "status": "operator_export_ready" if available else "qiskit_optional_dependency_missing_or_disabled",
+        "status": "qiskit_probe_ready" if qiskit_available else "qiskit_optional_dependency_missing_or_disabled",
     }
 
 
@@ -189,6 +204,12 @@ def _hardware_readiness_score(
     if not bool(qiskit_probe.get("qiskit_available")):
         score -= 5.0
         reasons.append("Qiskit optional dependency not available in this environment")
+    if not bool(qiskit_probe.get("qpy_export_available")):
+        score -= 5.0
+        reasons.append("QPY export is unavailable for reproducible circuit artifacts")
+    if not bool(qiskit_probe.get("aer_available")):
+        score -= 5.0
+        reasons.append("Aer simulator path is unavailable for local shot validation")
     score = max(0.0, min(100.0, score))
     if score >= 85.0:
         verdict = "ready_for_simulator_and_tiny_qpu_trial"
@@ -207,3 +228,17 @@ def _next_action(verdict: str) -> str:
     if verdict == "ready_for_simulator_not_hardware":
         return "run local simulator validation and improve score before provider submission"
     return "fix exact/replica/noise/resource issues before quantum execution"
+
+
+def _module_available(name: str) -> bool:
+    try:
+        return importlib.util.find_spec(name) is not None
+    except (ImportError, AttributeError, ValueError):
+        return False
+
+
+def _package_version(name: str) -> str | None:
+    try:
+        return importlib.metadata.version(name)
+    except importlib.metadata.PackageNotFoundError:
+        return None

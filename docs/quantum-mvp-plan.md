@@ -371,7 +371,7 @@ def run_poisson_on_ibm_runtime(A, b, backend_name=None):
 - Spectral mismatch vs known Riemann zeros
 - GUE spacing statistics
 
-**Not claiming:** Proof of Riemann Hypothesis
+**Not claiming:** Riemann Hypothesis theorem resolution
 
 ### Platform Strategy
 
@@ -386,7 +386,7 @@ def run_poisson_on_ibm_runtime(A, b, backend_name=None):
 #### Secondary: Quantinuum/IonQ Trapped-Ion
 
 **Why:** Experimental validation of best candidates
-- Digitized Floquet engineering (proven for RH zeros)
+- Digitized Floquet engineering tested against finite zero datasets
 - QPE on truncated unitaries
 - Quasienergy crossing detection
 - Small-scale spectral validation

@@ -34,7 +34,7 @@ finite candidate
 → exact dense baseline
 → Pauli dense replica
 → resource estimate
-→ Qiskit availability probe
+→ Qiskit/QPY/Aer/Runtime import probe
 → shot/noise proxy
 → hardware-readiness score
 → optional Qiskit statevector/Aer
@@ -49,13 +49,36 @@ python scripts/run_candidate_validation.py \
   --plaquette-coupling 1.0 \
   --transverse-field 0.2 \
   --shots 1024 \
-  --output-dir /tmp/gaugegap-0004
+  --output-dir /tmp/gaugegap-0004 \
+  --disable-qiskit-probe
+```
+
+With the optional quantum dependencies installed:
+
+```bash
+python scripts/run_candidate_validation.py \
+  --output-dir /tmp/gaugegap-0004-qiskit
 ```
 
 ## Outputs
 
 - `hardware_readiness.json`
 - `VALIDATION_SUMMARY.md`
+
+The Qiskit probe reports whether Qiskit, QPY export, Aer, and IBM Runtime imports are available. It does not check credentials, does not print credentials, and does not submit jobs.
+
+## Next optional validation layer
+
+```bash
+python scripts/run_qiskit_candidate_validation.py \
+  --n-plaquettes 1 \
+  --plaquette-coupling 1.0 \
+  --transverse-field 0.2 \
+  --shots 1024 \
+  --output-dir /tmp/gaugegap-qiskit-validation
+```
+
+This writes `qiskit_validation.json`, `qpy_manifest.json`, `QISKIT_VALIDATION_SUMMARY.md`, and `candidate_circuit.qpy` when QPY is available.
 
 ## Score interpretation
 
@@ -70,6 +93,6 @@ This milestone does not:
 - claim quantum advantage;
 - claim a continuum mass gap;
 - submit hardware jobs automatically;
-- turn finite Z2 toy behavior into a Yang-Mills proof.
+- turn finite Z2 toy behavior into continuum theorem evidence.
 
 The purpose is to make the handoff from finite exact benchmarks to Qiskit/IBM execution disciplined, reproducible, and non-hype.

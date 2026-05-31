@@ -87,9 +87,9 @@ class SU3PureGaugeLattice:
         if self.config.boundary == "periodic":
             return 2 * self.nx * self.ny
         else:
-            # Open boundary: fewer links at edges
-            n_x_links = self.nx * (self.ny - 1) + (self.nx - 1) * self.ny
-            n_y_links = self.nx * (self.ny - 1) + (self.nx - 1) * self.ny
+            # Open boundary: horizontal links plus vertical links.
+            n_x_links = (self.nx - 1) * self.ny
+            n_y_links = self.nx * (self.ny - 1)
             return n_x_links + n_y_links
     
     def _count_plaquettes(self) -> int:

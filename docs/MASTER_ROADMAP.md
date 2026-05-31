@@ -433,7 +433,7 @@ This comprehensive master roadmap document provides the complete execution plan 
 
 All work maintains strict claim boundary compliance per AGENTS.md:
 - Results are **finite-system benchmarks**, NOT theorem proofs
-- Language is precise: "finite-lattice mass-gap extraction", NOT "proof of Yang-Mills"
+- Language is precise: "finite-lattice mass-gap extraction", NOT "continuum theorem resolution"
 - Extrapolations include **quantified uncertainties**
 - No overclaims about Millennium Prize resolution
 

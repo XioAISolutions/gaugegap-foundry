@@ -35,8 +35,13 @@ class SearchScriptSmokeTests(unittest.TestCase):
             )
             self.assertEqual(proc.returncode, 0, msg=f"stdout={proc.stdout}\nstderr={proc.stderr}")
             self.assertTrue((Path(tmp) / "gaugegap-search-0001-candidates.jsonl").exists())
+            self.assertTrue((Path(tmp) / "gaugegap-search-0001-candidates.json").exists())
+            self.assertTrue((Path(tmp) / "gaugegap-search-0001-ranking.csv").exists())
             self.assertTrue((Path(tmp) / "gaugegap-search-0001-ranking.md").exists())
-            self.assertTrue((Path(tmp) / "dossiers").exists())
+            dossiers = Path(tmp) / "dossiers"
+            self.assertTrue(dossiers.exists())
+            self.assertTrue(list(dossiers.glob("*.json")))
+            self.assertTrue(list(dossiers.glob("*.md")))
 
 
 if __name__ == "__main__":
