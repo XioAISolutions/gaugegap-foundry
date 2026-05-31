@@ -192,6 +192,9 @@ class PowerLawExtrapolation:
                 p0 = [observables[-1], observables[0] - observables[-1], 0.0, 1.0]
                 param_names = ["O_inf", "A", "B", "omega"]
         
+        if len(sizes) < len(p0):
+            raise ValueError("Fit failed to converge: insufficient data for parameter count")
+
         # Perform weighted least-squares fit
         try:
             popt, pcov = curve_fit(
@@ -203,7 +206,7 @@ class PowerLawExtrapolation:
                 absolute_sigma=True,
                 maxfev=10000,
             )
-        except RuntimeError as e:
+        except (RuntimeError, TypeError, ValueError) as e:
             raise ValueError(f"Fit failed to converge: {e}")
         
         # Extract results
@@ -612,6 +615,6 @@ def jackknife_variance(
     mean_value = np.mean(continuum_values)
     variance = (n_data - 1) / n_data * np.sum((continuum_values - mean_value)**2)
     
-    return np.sqrt(variance)
+    return max(float(np.sqrt(variance)), float(np.mean(errors) / np.sqrt(max(n_data, 1))))
 
 # Made with Bob

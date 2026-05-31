@@ -15,7 +15,7 @@
     "Pauli dense replica does not match direct dense Hamiltonian within tolerance.",
     "Exact diagonalization residuals are not small enough for a finite benchmark.",
     "Candidate rankings depend on missing or non-deterministic metadata.",
-    "Any generated dossier implies a continuum Yang-Mills proof or Clay-prize claim."
+    "Any generated dossier implies a continuum theorem or prize claim."
   ],
   "required_outputs": [
     "results/gaugegap-search-0001/gaugegap-search-0001-candidates.jsonl",

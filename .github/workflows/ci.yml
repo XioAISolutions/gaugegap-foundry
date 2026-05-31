@@ -26,7 +26,21 @@ jobs:
       - name: Unit tests
         run: python -m pytest
       - name: Claim boundary audit
-        run: python scripts/claim_boundary_audit.py --output-dir /tmp/gaugegap-claim-audit
+        run: python scripts/claim_boundary_audit.py --strict --output-dir /tmp/gaugegap-claim-audit
+      - name: gaugegap-search-0001 smoke
+        run: |
+          python scripts/search_gap_candidates.py \
+            --output-dir /tmp/gaugegap-search-0001-smoke \
+            --n-plaquettes 1 \
+            --plaquette-couplings 1.0 \
+            --field-points 2 \
+            --max-candidates 1
+      - name: gaugegap-0004 hardware-readiness smoke
+        run: |
+          python scripts/run_candidate_validation.py \
+            --output-dir /tmp/gaugegap-0004-smoke \
+            --n-plaquettes 1 \
+            --disable-qiskit-probe
       - name: Smoke sweep
         run: python scripts/run_gap_sweep.py --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-smoke
       - name: Z2 plaquette smoke
@@ -36,7 +50,11 @@ jobs:
           python scripts/run_z2_plaquette_sweep.py --output-dir /tmp/gaugegap-0002-sweep --run-id ci
           python scripts/run_vqe_gap.py --output-dir /tmp/gaugegap-0002-vqe --samples 64
       - name: Reproducibility proofpack smoke
-        run: python scripts/generate_reproducibility_proofpack.py --output-dir /tmp/gaugegap-proofpack --skip-commands
+        run: |
+          python scripts/generate_reproducibility_proofpack.py \
+            --output-dir /tmp/gaugegap-proofpack \
+            --include-search \
+            --include-validation
       - name: Quantum boundary status
         run: python scripts/quantum_status.py --output-dir /tmp/gaugegap-quantum-status
       - name: FlowGap smoke
@@ -77,8 +95,10 @@ jobs:
           python -m unittest tests.test_qiskit_backend
           python -m unittest tests.test_qiskit_dynamics
           python -m unittest tests.test_pauli_export
+          python -m unittest tests.test_qiskit_validation_optional
           python scripts/run_gap_sweep.py --method qiskit-pauli --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-qiskit-smoke
           python scripts/run_quantum_gap_replica.py --output-dir /tmp/gaugegap-0002-replica-qiskit
+          python scripts/run_qiskit_candidate_validation.py --output-dir /tmp/gaugegap-qiskit-smoke-candidate --n-plaquettes 1 --shots 128
           python scripts/run_dynamics.py --backend statevector --n-sites 4 --times 0,0.5 --output-dir /tmp/gaugegap-statevector-smoke
           python scripts/run_dynamics.py --backend aer-sampler --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/gaugegap-aer-smoke
           python scripts/run_dynamics.py --backend aer-sampler --noise depolarizing --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/gaugegap-aer-depol-smoke

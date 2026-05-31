@@ -159,7 +159,7 @@ def richardson_extrapolation(
     for j in range(1, n):
         for i in range(n - j):
             r = spacings[i + j] / spacings[i]
-            table[i, j] = (r**order * table[i + 1, j - 1] - table[i, j - 1]) / (r**order - 1)
+            table[i, j] = (r**order * table[i, j - 1] - table[i + 1, j - 1]) / (r**order - 1)
     
     # Best estimate is top-right corner
     continuum_value = table[0, n - 1]

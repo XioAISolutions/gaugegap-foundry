@@ -234,7 +234,8 @@ class CoqExporter:
                 conclusion_parts.append(
                     f"{self._sanitize_name(name)}_lower <= {self._sanitize_name(name)}_upper"
                 )
-            lines.append(f"  {' /\\ '.join(conclusion_parts)}.")
+            conclusion = " /\\ ".join(conclusion_parts)
+            lines.append(f"  {conclusion}.")
         else:
             lines.append("  True.")
         

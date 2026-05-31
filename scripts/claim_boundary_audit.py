@@ -13,7 +13,8 @@ DEFAULT_INCLUDE = ("README.md", "DEPLOYMENT.md", "docs", "hypotheses", "results"
 DEFAULT_EXCLUDE_PARTS = (".git", ".venv", "__pycache__", ".pytest_cache", "node_modules")
 
 RISK_PATTERNS = [
-    ("millennium_solution", re.compile(r"\b(solved|solution to|proof of)\s+(a\s+)?(millennium|yang[- ]mills|navier[- ]stokes|riemann)\b", re.I)),
+    ("millennium_solution", re.compile(r"\b(solved|solution to|proof of)\s+(a\s+|the\s+)?(millennium|yang[- ]mills|navier[- ]stokes|riemann)\b", re.I)),
+    ("named_problem_proof", re.compile(r"\b((yang[- ]mills|navier[- ]stokes|riemann)\s+.*proof|proof\s+.*(yang[- ]mills|navier[- ]stokes|riemann))\b", re.I)),
     ("prize_claim", re.compile(r"\b(clay prize|million[- ]dollar prize|\$1m|\$1 million)\b", re.I)),
     ("proof_complete", re.compile(r"\b(proof complete|complete proof|fully proven|rigorous proof complete)\b", re.I)),
     ("publication_ready", re.compile(r"\b(ready for publication|publication ready|publishable proof)\b", re.I)),
@@ -22,6 +23,7 @@ RISK_PATTERNS = [
 
 SAFE_CONTEXT_PATTERNS = [
     re.compile(r"\bnot\s+claiming\b", re.I),
+    re.compile(r"\bdoes\s+not\s+claim\b", re.I),
     re.compile(r"\bnot\s+a\s+.*proof\b", re.I),
     re.compile(r"\bno\s+continuum\s+.*claim\b", re.I),
     re.compile(r"\bfinite[- ]system\b", re.I),

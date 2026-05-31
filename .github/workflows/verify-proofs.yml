@@ -82,8 +82,21 @@ jobs:
               reader = csv.DictReader(f)
               new_data = list(reader)
           
-          # Check minimum mismatch
-          min_mismatch = min(float(row['mismatch']) for row in new_data)
+          # Check minimum mismatch. Current CurveRank CSVs use ledger-style
+          # rows with observable/value columns; keep the old mismatch-column
+          # path as a compatibility fallback for older artifacts.
+          mismatch_values = []
+          for row in new_data:
+              if 'mismatch' in row and row['mismatch']:
+                  mismatch_values.append(float(row['mismatch']))
+              elif row.get('observable') == 'spectral_mismatch':
+                  mismatch_values.append(float(row['value']))
+
+          if not mismatch_values:
+              print('✗ Verification failed: no spectral mismatch rows found')
+              exit(1)
+
+          min_mismatch = min(mismatch_values)
           print(f'✓ Reproduced minimum mismatch: {min_mismatch:.2f}')
           
           # Verify against certified bound
@@ -236,11 +249,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Run security scan
-        uses: pypa/gh-action-pip-audit@v1.0.8
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          inputs: pyproject.toml
+          python-version: '3.12'
+
+      - name: Run security scan
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          python -m pip install pip-audit
+          pip-audit --progress-spinner off --skip-editable
           
       - name: Check for secrets
         uses: trufflesecurity/trufflehog@main

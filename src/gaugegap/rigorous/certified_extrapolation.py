@@ -105,46 +105,30 @@ class CertifiedExtrapolation:
         if len(system_sizes) < 3:
             raise ValueError("Need at least 3 data points for power law fit")
         
-        # Convert to log-log space for linear fit
-        # log(value) = log(a) + exponent * log(L) + log(1 + b*L^exponent/a)
-        # For large L, approximately: log(value) ≈ log(a) + exponent * log(L)
-        
-        # Use midpoints for initial fit
+        # Use a direct linearized fit with the requested exponent:
+        # value(L) = a + b * L^exponent_guess. This keeps the constant
+        # continuum term visible; a log-log fit would bias data with a
+        # non-zero asymptote.
         L_array = np.array(system_sizes, dtype=float)
         v_midpoints = np.array([float(v.midpoint()) for v in values])
-        
-        # Fit in log-log space
-        log_L = np.log(L_array)
-        log_v = np.log(v_midpoints)
-        
-        # Linear regression: log_v = intercept + slope * log_L
-        A = np.vstack([np.ones_like(log_L), log_L]).T
-        coeffs, residuals, rank, s = np.linalg.lstsq(A, log_v, rcond=None)
-        intercept, slope = coeffs
+        x = L_array ** exponent_guess
+        A = np.vstack([np.ones_like(x), x]).T
+        coeffs, residuals, rank, s = np.linalg.lstsq(A, v_midpoints, rcond=None)
+        a_estimate, b_estimate = coeffs
         
         # Estimate error bounds from residuals and interval widths
         if len(residuals) > 0:
             fit_error = np.sqrt(residuals[0] / len(system_sizes))
         else:
-            fit_error = 0.1  # Conservative default
+            fit_error = 0.0
         
         # Add uncertainty from interval widths
         max_width = max(v.width() for v in values)
         total_error = fit_error + float(max_width)
         
-        # Convert back from log space with error bounds
-        a = Interval.from_float(np.exp(intercept), np.exp(intercept) * total_error)
-        exponent = Interval.from_float(slope, abs(slope) * 0.1 + 0.01)
-        
-        # Estimate b from residuals
-        b_estimate = 0.0
-        for i, L in enumerate(system_sizes):
-            predicted = float(a.midpoint()) * (L ** float(exponent.midpoint()))
-            residual = float(values[i].midpoint()) - predicted
-            b_estimate += residual / (L ** float(exponent.midpoint()))
-        b_estimate /= len(system_sizes)
-        
+        a = Interval.from_float(a_estimate, total_error + 1e-12)
         b = Interval.from_float(b_estimate, abs(b_estimate) * 0.5 + total_error)
+        exponent = Interval.from_float(exponent_guess, abs(exponent_guess) * 0.1 + 0.01)
         
         # Record proof step
         step = ProofStep(

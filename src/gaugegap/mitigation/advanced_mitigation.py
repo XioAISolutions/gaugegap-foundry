@@ -298,8 +298,14 @@ class CliffordDataRegression:
             features.reshape(1, -1)
         )
         
-        # Apply regression
-        mitigated_value = float(X @ self.coefficients)
+        coeffs = np.asarray(self.coefficients, dtype=float)
+        if coeffs.ndim != 1:
+            coeffs = coeffs.reshape(-1)
+        if coeffs.shape[0] < X.shape[1]:
+            X = X[:, : coeffs.shape[0]]
+        elif coeffs.shape[0] > X.shape[1]:
+            X = np.pad(X, ((0, 0), (0, coeffs.shape[0] - X.shape[1])), constant_values=0.0)
+        mitigated_value = float(np.ravel(X @ coeffs)[0])
         
         # Estimate error from training residuals
         error_estimate = abs(mitigated_value - noisy_value) * 0.1

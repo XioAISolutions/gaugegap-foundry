@@ -297,7 +297,7 @@ Using interval arithmetic:
 from mpmath import mp, iv  # Interval arithmetic
 
 class CertifiedContinuumExtrapolation:
-    """Rigorous continuum extrapolation with guaranteed bounds."""
+    """Finite-system extrapolation study with explicit interval bounds."""
     
     def extrapolate_with_certificate(
         self,
@@ -471,8 +471,8 @@ class OperatorImpossibilityProver:
         Prove Berry-Keating xp operator cannot match Riemann zeros.
         
         Returns:
-            impossible: Whether impossibility is proven
-            certificate: Mathematical proof
+            impossible: Whether the finite-screening criterion rules out this candidate
+            certificate: Reproducible finite-screening certificate
         """
 ```
 
@@ -522,7 +522,7 @@ class OperatorImpossibilityProver:
 from mpmath import mp, iv
 
 class IntervalComputation:
-    """Interval arithmetic for guaranteed numerical bounds."""
+    """Interval arithmetic for explicit numerical bounds."""
     
     def eigenvalue_bounds(self, matrix, k=1) -> tuple:
         """Compute certified bounds on k-th eigenvalue."""
@@ -717,7 +717,7 @@ def export_to_lean(proof: ComputerAssistedProof) -> str:
 **Deliverables**:
 1. GaugeGap: Certified continuum extrapolation
 2. FlowGap: 2 blow-up scenarios ruled out
-3. CurveRank: Berry-Keating impossibility proven
+3. CurveRank: Berry-Keating finite-screening obstruction documented
 
 **Success criteria**:
 - 3 computer-assisted proofs completed
@@ -796,7 +796,7 @@ The Berry-Keating operator H = xp + px cannot be the Hilbert-Pólya operator: li
 **Theorem 8 (Necessary growth condition)**:
 Any Hilbert-Pólya operator must have eigenvalues satisfying λₙ ~ n log n + O(log n).
 
-*Proof strategy*: Comparison with known Riemann zero asymptotics
+*Screening strategy*: Comparison with known Riemann zero asymptotics
 
 **Theorem 9 (GUE statistics verification)**:
 Riemann zero spacings follow GUE distribution with Kolmogorov-Smirnov statistic D_KS < 0.01 at 99.99% confidence.
@@ -868,7 +868,7 @@ Riemann zero spacings follow GUE distribution with Kolmogorov-Smirnov statistic 
 ### Proof-Relevant Results
 - [ ] 1+ rigorous lower bound established (GaugeGap)
 - [ ] 2+ blow-up scenarios ruled out (FlowGap)
-- [ ] 1+ impossibility theorem proven (CurveRank)
+- [ ] 1+ finite-screening obstruction documented (CurveRank)
 - [ ] Convergence rates certified
 
 ### Community Impact

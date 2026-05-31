@@ -36,9 +36,9 @@ The current CurveRank work includes a **computer-assisted spectral screening res
    - finite-lattice SU(2) pure gauge theory in 2+1D
    - first non-abelian finite benchmark in the series
 
-5. **`gaugegap-0004`**: SU(2) gauge-matter
-   - SU(2) gauge + matter fields
-   - string-breaking dynamics and meson-spectrum benchmarks
+5. **`gaugegap-0004`**: SU(2) gauge-matter / hardware-readiness validation lane
+   - SU(2) gauge + matter fields, string-breaking dynamics, and meson-spectrum benchmarks
+   - current implementation adds a finite Z₂ candidate hardware-readiness validator before any provider submission
 
 6. **`gaugegap-0005`**: SU(3) QCD-like finite benchmark
    - finite-lattice SU(3) pure gauge theory
@@ -63,6 +63,29 @@ The current CurveRank work includes a **computer-assisted spectral screening res
   - candidate operator screening against zeta-zero-inspired targets
   - Berry-Keating-style negative-result artifact
   - quantum phase-estimation path is exploratory
+
+## Qiskit 2.4 / IBM Runtime Findings Applied
+
+The hardware-readiness lane follows IBM's current Qiskit pattern:
+
+```text
+map finite operator/circuit
+→ inspect/transpile resources
+→ execute only after local checks pass
+→ analyze deviations
+```
+
+The Qiskit 2.4 release is relevant because it strengthens Pauli-centric workflows, faster QPY serialization, transpilation infrastructure, and compiled-extension paths. For this repo that means:
+
+- keep Pauli terms as first-class artifacts;
+- record resource estimates before any backend call;
+- avoid hardware submission until exact and Pauli dense replicas agree;
+- serialize and hash validation outputs as proofpack material;
+- keep Qiskit/IBM Runtime optional because finite exact baselines must run without provider credentials.
+
+The first implementation of this is `gaugegap-0004`, a local hardware-readiness validator for finite Z₂ candidates. It does not submit to hardware by default.
+
+Hardware results are noisy experimental artifacts and do not constitute mathematical proof.
 
 ## Quick Start
 
@@ -95,6 +118,9 @@ python scripts/run_gaugegap_u1.py
 python scripts/run_gaugegap_su2_pure.py
 python scripts/run_gaugegap_su3_pure.py
 python scripts/search_gap_candidates.py --output-dir /tmp/gaugegap-search-0001 --max-candidates 10
+python scripts/run_candidate_validation.py --output-dir /tmp/gaugegap-0004 --disable-qiskit-probe
+python scripts/run_qiskit_candidate_validation.py --output-dir /tmp/gaugegap-qiskit-validation
+python scripts/submit_ibm_runtime_candidate.py --dry-run --output-dir /tmp/gaugegap-runtime-dryrun
 
 # FlowGap
 python scripts/run_flowgap_burgers.py
@@ -110,7 +136,10 @@ python -m pytest
 
 ```bash
 python scripts/claim_boundary_audit.py --strict
-python scripts/generate_reproducibility_proofpack.py --output-dir results/proofpack
+python scripts/generate_reproducibility_proofpack.py \
+  --output-dir results/proofpack \
+  --include-search \
+  --include-validation
 ```
 
 The proofpack writes a JSON manifest, a Markdown summary, command logs, output hashes, and the claim boundary used for the run.
@@ -130,6 +159,12 @@ cat results/baselines/gaugegap-0005-su3-pure-sweep.csv
 ```
 
 Optional hardware submission commands require provider credentials and should be treated as exploratory finite-system runs, not proof artifacts.
+
+See also:
+
+- `docs/gaugegap-0004-hardware-readiness.md`
+- `docs/qiskit-2-4-validation.md`
+- `docs/ibm-runtime-submission.md`
 
 ### Docker Deployment
 
@@ -182,12 +217,12 @@ Use language like:
 
 > candidate negative result requiring independent review
 
-Do not use language like:
+Avoid unbounded claim language such as:
 
-> proof of the Yang-Mills mass gap
+> continuum Yang-Mills mass-gap proof
 
-> solution to a Millennium Prize problem
+> Millennium Prize resolution
 
-> prize-ready theorem
+> theorem ready for a prize claim
 
 That boundary is intentional. The project earns credibility by making every small claim reproducible before expanding scope.

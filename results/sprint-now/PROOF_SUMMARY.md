@@ -135,7 +135,7 @@ If you use this work, please cite:
   title={Computer-Assisted Proof: Berry-Keating Impossibility},
   author={GaugeGap Foundry Team},
   year={2026},
-  note={Computational proof that Berry-Keating xp operator cannot match Riemann zeros},
+note={Finite-screening artifact for Berry-Keating xp operator mismatch against Riemann zeros},
   url={https://github.com/yourusername/gaugegap-foundry}
 }
 ```
