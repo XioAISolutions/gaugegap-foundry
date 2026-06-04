@@ -34,9 +34,10 @@ CERT_FILE = Path("results/sprint-now/proof_certificate.json")
 SUMMARY_FILE = Path("results/sprint-now/PROOF_SUMMARY.md")
 
 CLAIM_BOUNDARY = (
-    "Certified finite-truncation spectral-screening bound only; "
-    "no Riemann Hypothesis or Hilbert-Polya proof is claimed, and no "
-    "certified n->infinity (continuum) bound is asserted."
+    "Finite-system, finite-truncation spectral-screening bound only. "
+    "Does not claim to resolve the Riemann Hypothesis or the Hilbert-Polya "
+    "conjecture, and asserts no certified continuum (n to infinity) limit. "
+    "Finite-system benchmark; independent review required."
 )
 
 

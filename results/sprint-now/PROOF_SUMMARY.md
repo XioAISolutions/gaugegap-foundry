@@ -33,7 +33,7 @@ screening that can rule out candidate Hilbert-Polya operators at finite size.
 
 ## Claim boundary
 
-Certified finite-truncation spectral-screening bound only; no Riemann Hypothesis or Hilbert-Polya proof is claimed, and no certified n->infinity (continuum) bound is asserted.
+Finite-system, finite-truncation spectral-screening bound only. Does not claim to resolve the Riemann Hypothesis or the Hilbert-Polya conjecture, and asserts no certified continuum (n to infinity) limit. Finite-system benchmark; independent review required.
 
 ## Reproducibility
 

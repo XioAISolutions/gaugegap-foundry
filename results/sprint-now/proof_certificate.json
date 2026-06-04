@@ -1,6 +1,6 @@
 {
   "schema": "gaugegap.curverank_certificate.v2",
-  "timestamp_utc": "2026-06-04T15:28:51.277998+00:00",
+  "timestamp_utc": "2026-06-04T15:38:30.209313+00:00",
   "operator": "Berry-Keating xp",
   "hypothesis_id": "curverank-0001",
   "run_id": "20260529T020140Z",
@@ -54,5 +54,5 @@
     "command": "python3 scripts/run_curverank_screen.py --family xp --n-basis 10,15,20 --k-zeros 20 && python3 scripts/analyze_sprint_results.py",
     "repository": "https://github.com/XioAISolutions/gaugegap-foundry"
   },
-  "claim_boundary": "Certified finite-truncation spectral-screening bound only; no Riemann Hypothesis or Hilbert-Polya proof is claimed, and no certified n->infinity (continuum) bound is asserted."
+  "claim_boundary": "Finite-system, finite-truncation spectral-screening bound only. Does not claim to resolve the Riemann Hypothesis or the Hilbert-Polya conjecture, and asserts no certified continuum (n to infinity) limit. Finite-system benchmark; independent review required."
 }
