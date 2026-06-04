@@ -119,30 +119,48 @@ def certified_spectral_mismatch(eig_intervals, zero_intervals):
     quantity that certifies how far the operator spectrum is from the zeros);
     it is conservative whenever an eigenvalue enclosure overlaps a zero
     enclosure (that pair contributes 0).
+
+    Rigour under overlapping enclosures: the metric pairs the i-th smallest
+    ``|eig|`` with the i-th zero, but if two ``|eig|`` enclosures overlap the
+    true sort order is ambiguous, so pairing whole enclosures sorted by
+    midpoint would not be a valid certificate. We instead use *order-statistic
+    enclosures*: for interval data, the k-th smallest true value provably lies
+    in ``[k-th smallest lower endpoint, k-th smallest upper endpoint]``. Pairing
+    those per-rank enclosures yields a rigorous lower bound for every ordering
+    consistent with the intervals, and reduces to the naive pairing when the
+    enclosures are disjoint.
     """
     import mpmath as mp
     from gaugegap.rigorous.interval_arithmetic import Interval
 
-    abs_eigs = sorted((abs(e) for e in eig_intervals), key=lambda iv: iv.midpoint())
-    zeros = sorted(zero_intervals, key=lambda iv: iv.midpoint())
-    n = min(len(abs_eigs), len(zeros))
+    abs_eigs = [abs(e) for e in eig_intervals]
+    n = min(len(abs_eigs), len(zero_intervals))
     if n == 0:
         return Interval(mp.inf, mp.inf)
+
+    # Order-statistic enclosures: sort lower and upper endpoints independently.
+    # The k-th smallest true value lies in [e_lowers[k], e_uppers[k]] (and
+    # likewise for the zeros), regardless of how the enclosures overlap.
+    e_lowers = sorted(e.lower for e in abs_eigs)
+    e_uppers = sorted(e.upper for e in abs_eigs)
+    z_lowers = sorted(z.lower for z in zero_intervals)
+    z_uppers = sorted(z.upper for z in zero_intervals)
 
     sum_lo = mp.mpf(0)
     sum_hi = mp.mpf(0)
     for i in range(n):
-        a = abs_eigs[i]
-        z = zeros[i]
-        # Lower bound on |a - z| over the two enclosures (0 if they overlap).
-        if a.upper < z.lower:
-            d_lo = z.lower - a.upper
-        elif a.lower > z.upper:
-            d_lo = a.lower - z.upper
+        a_lo, a_hi = e_lowers[i], e_uppers[i]
+        z_lo, z_hi = z_lowers[i], z_uppers[i]
+        # Lower bound on |a - z| over the two order-statistic enclosures
+        # (0 if they overlap).
+        if a_hi < z_lo:
+            d_lo = z_lo - a_hi
+        elif a_lo > z_hi:
+            d_lo = a_lo - z_hi
         else:
             d_lo = mp.mpf(0)
         # Upper bound on |a - z| over the two enclosures.
-        d_hi = max(abs(a.upper - z.lower), abs(a.lower - z.upper))
+        d_hi = max(abs(a_hi - z_lo), abs(a_lo - z_hi))
         sum_lo += d_lo * d_lo
         sum_hi += d_hi * d_hi
 

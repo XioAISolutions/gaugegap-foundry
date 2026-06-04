@@ -89,6 +89,24 @@ class TestCertifiedMismatch(unittest.TestCase):
         enclosure = certified_spectral_mismatch(zeros, zeros)
         self.assertLess(float(enclosure.lower), 1e-30)
 
+    def test_overlapping_enclosures_stay_a_valid_lower_bound(self):
+        # Regression for the order-statistic fix: with overlapping eigenvalue
+        # enclosures the naive midpoint pairing would OVERSTATE the lower bound
+        # (claiming ~1.06 here), which is not a valid certificate. The true
+        # minimum mismatch achievable by some configuration consistent with the
+        # intervals is sqrt(1/2); the certified lower bound must not exceed it.
+        import mpmath as mp
+        from gaugegap.rigorous.interval_arithmetic import Interval
+
+        eigs = [Interval(mp.mpf(0), mp.mpf(10)), Interval(mp.mpf(6), mp.mpf(7))]
+        zeros = [Interval(mp.mpf(8), mp.mpf(8)), Interval(mp.mpf("8.5"), mp.mpf("8.5"))]
+        enclosure = certified_spectral_mismatch(eigs, zeros)
+
+        true_min = mp.sqrt(mp.mpf(1) / 2)  # config A=8.5, B=7 -> sort [7, 8.5]
+        self.assertLessEqual(enclosure.lower, true_min + mp.mpf("1e-30"))
+        # And it should be tight (equal to the true achievable minimum here).
+        self.assertAlmostEqual(float(enclosure.lower), float(true_min), places=12)
+
 
 if __name__ == "__main__":
     unittest.main()
