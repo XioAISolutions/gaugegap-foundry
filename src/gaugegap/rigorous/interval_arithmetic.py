@@ -350,58 +350,129 @@ class IntervalMatrix:
         return f"IntervalMatrix({self.m}x{self.n})"
 
 
-def certified_eigenvalues(matrix: IntervalMatrix, method: str = "power") -> List[Interval]:
+def verified_hermitian_eigenvalues(matrix: IntervalMatrix) -> List[Interval]:
     """
-    Compute eigenvalues with certified bounds.
-    
-    Uses interval arithmetic to guarantee bounds on eigenvalues.
-    For small matrices, uses exact methods. For larger matrices,
-    uses iterative methods with certified convergence.
-    
+    Compute certified eigenvalue enclosures for a real symmetric interval matrix.
+
+    This is a *rigorous* enclosure based on the classical residual (Weyl /
+    Bauer-Fike for symmetric matrices) bound, NOT a floating-point estimate:
+
+        For a real symmetric matrix A and any scalar theta with a unit-norm
+        vector x, there exists an eigenvalue lambda of A with
+            |lambda - theta| <= ||A x - theta x||_2 / ||x||_2 .
+
+    We obtain approximate eigenpairs (theta_i, x_i) from ``numpy.linalg.eigh``
+    on the midpoint matrix -- these are only *guesses*; correctness does not
+    depend on them being accurate.  For each pair we then evaluate the residual
+    ``A x_i - theta_i x_i`` and the norms entirely in interval arithmetic, so
+    the returned radius is a guaranteed upper bound.  Each returned interval is
+    therefore certified to contain a true eigenvalue of A.
+
+    When the resulting enclosures are pairwise disjoint (the generic,
+    non-degenerate case), a simple counting argument guarantees a one-to-one
+    correspondence between the sorted enclosures and the sorted true spectrum.
+
     Args:
-        matrix: Square interval matrix
-        method: "power" for power iteration, "exact" for small matrices
-    
+        matrix: Square, real, symmetric interval matrix.
+
     Returns:
-        List of intervals containing eigenvalues
-    
+        List of intervals (sorted ascending by midpoint), each certified to
+        contain an eigenvalue of ``matrix``.
+
     CLAIM BOUNDARY:
     This provides certified bounds on finite-matrix eigenvalues.
     It does NOT claim to solve infinite-dimensional spectral problems.
     """
     if matrix.m != matrix.n:
         raise ValueError("Matrix must be square")
-    
+
     n = matrix.m
-    
-    # Convert to numpy for eigenvalue computation
-    # Use midpoints for initial estimate
+    A_mid = matrix.to_numpy()
+    if not np.allclose(A_mid, A_mid.T, atol=1e-9):
+        raise ValueError("verified_hermitian_eigenvalues requires a symmetric matrix")
+
+    # Approximate eigendecomposition (float guess only; rigor is independent).
+    theta, X = np.linalg.eigh(A_mid)
+
+    enclosures: List[Interval] = []
+    for i in range(n):
+        x_col = [Interval.from_float(float(X[k, i])) for k in range(n)]
+        th = mp.mpf(float(theta[i]))
+        th_iv = Interval(th, th)
+
+        # Residual r = A x - theta x, computed rigorously in interval arithmetic.
+        residual_sq = None
+        for row in range(n):
+            acc = matrix.entries[row][0] * x_col[0]
+            for col in range(1, n):
+                acc = acc + matrix.entries[row][col] * x_col[col]
+            acc = acc - (th_iv * x_col[row])
+            term = acc * acc
+            residual_sq = term if residual_sq is None else residual_sq + term
+
+        # ||x||^2 lower bound (x has zero-width components, so this is exact).
+        norm_x_sq = x_col[0] * x_col[0]
+        for k in range(1, n):
+            norm_x_sq = norm_x_sq + x_col[k] * x_col[k]
+
+        residual_norm_upper = mp.sqrt(residual_sq.upper)
+        norm_x_lower = mp.sqrt(norm_x_sq.lower)
+        radius = residual_norm_upper / norm_x_lower
+        enclosures.append(Interval(th - radius, th + radius))
+
+    enclosures.sort(key=lambda iv: iv.midpoint())
+    return enclosures
+
+
+def certified_eigenvalues(matrix: IntervalMatrix, method: str = "power") -> List[Interval]:
+    """
+    Compute eigenvalues with certified bounds.
+
+    For real symmetric matrices this delegates to
+    :func:`verified_hermitian_eigenvalues`, which returns rigorous
+    residual-based enclosures.  For non-symmetric matrices no rigorous
+    enclosure is available here, so a (clearly non-certified) Gershgorin-style
+    estimate is returned as a fallback.
+
+    Args:
+        matrix: Square interval matrix
+        method: Unused; retained for backwards compatibility.
+
+    Returns:
+        List of intervals containing eigenvalues
+
+    CLAIM BOUNDARY:
+    This provides certified bounds on finite-matrix eigenvalues.
+    It does NOT claim to solve infinite-dimensional spectral problems.
+    """
+    if matrix.m != matrix.n:
+        raise ValueError("Matrix must be square")
+
+    n = matrix.m
     A = matrix.to_numpy()
-    
-    # Compute eigenvalues using numpy
-    eigenvals = np.linalg.eigvalsh(A) if np.allclose(A, A.T) else np.linalg.eigvals(A)
-    
-    # Estimate error bounds using Gershgorin circles
-    # For each eigenvalue, compute certified interval
+
+    # Real symmetric case: use the rigorous residual enclosure.
+    if np.allclose(A, A.T, atol=1e-9):
+        return verified_hermitian_eigenvalues(matrix)
+
+    # Non-symmetric fallback: NOT a rigorous certification (Gershgorin estimate).
+    eigenvals = np.linalg.eigvals(A)
     result = []
     for lam in eigenvals:
-        # Compute Gershgorin radius for error bound
-        # This is a conservative bound
         max_radius = mp.mpf(0)
         for i in range(n):
             row_sum = sum(abs(matrix.entries[i][j].upper) for j in range(n) if j != i)
             max_radius = max(max_radius, mp.mpf(row_sum))
-        
-        # Add matrix entry uncertainties
+
         max_uncertainty = max(
             matrix.entries[i][j].width()
             for i in range(n)
             for j in range(n)
         )
-        
+
         error = max_radius + n * max_uncertainty
         result.append(Interval.from_float(float(lam.real), float(error)))
-    
+
     return result
 
 

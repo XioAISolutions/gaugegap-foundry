@@ -27,6 +27,7 @@ from .interval_arithmetic import (
     IntervalMatrix,
     IntervalVector,
     certified_eigenvalues,
+    verified_hermitian_eigenvalues,
     certified_matrix_exp,
 )
 from .proof_framework import (
@@ -68,6 +69,7 @@ __all__ = [
     "IntervalMatrix",
     "IntervalVector",
     "certified_eigenvalues",
+    "verified_hermitian_eigenvalues",
     "certified_matrix_exp",
     # Proof framework
     "Theorem",

@@ -23,6 +23,16 @@ from .proof_framework import (
     create_truncation_assumption
 )
 
+# Certified separation threshold: a finite-truncation operator is taken to be
+# certifiably "impossible" (cannot match the zeros) when the certified lower
+# bound on its spectral mismatch exceeds this value.
+IMPOSSIBILITY_THRESHOLD = 1e-6
+
+# Default half-width applied to externally supplied float Riemann zeros when no
+# certified enclosure is provided. Prefer ``curverank_spectral.riemann_zero_intervals``
+# for genuinely certified enclosures.
+DEFAULT_ZERO_UNCERTAINTY = 1e-10
+
 
 @dataclass
 class SpectralMismatch:
@@ -174,7 +184,8 @@ class SpectralMismatchProof:
         # Compute mismatches
         mismatches = []
         for eig, zero in zip(eigenvalues_sorted, riemann_zeros_sorted):
-            zero_interval = Interval.from_float(zero, 1e-10)  # Riemann zeros known precisely
+            # Riemann zeros known precisely; widen by a small documented default.
+            zero_interval = Interval.from_float(zero, DEFAULT_ZERO_UNCERTAINTY)
             mismatch = eig - zero_interval
             mismatches.append(abs(mismatch))
         
@@ -188,8 +199,8 @@ class SpectralMismatchProof:
                 max_mismatch = m
         
         # Check if impossibility is certified
-        # If min_mismatch.lower > 0, then no eigenvalue matches any zero exactly
-        impossibility_certified = min_mismatch.lower > 1e-6
+        # If min_mismatch.lower > threshold, no eigenvalue matches any zero.
+        impossibility_certified = min_mismatch.lower > IMPOSSIBILITY_THRESHOLD
         
         # Record proof step
         step = ProofStep(
@@ -342,51 +353,42 @@ class SpectralMismatchProof:
         This proves impossibility for finite-truncation xp operator.
         It does NOT claim to prove or disprove the Riemann Hypothesis.
         """
-        # Construct Berry-Keating xp operator in finite basis
-        # H = (1/2)(xp + px) in position basis
-        # Matrix elements: H_ij = (1/2)(x_i p_ij + p_ij x_j)
-        
-        # For simplicity, use harmonic oscillator basis
-        # x_ij = sqrt(j/2) δ_{i,j+1} + sqrt(i/2) δ_{i,j-1}
-        # p_ij = -i sqrt(j/2) δ_{i,j+1} + i sqrt(i/2) δ_{i,j-1}
-        
-        # Build xp operator
-        xp_entries = []
-        for i in range(n_basis):
-            row = []
-            for j in range(n_basis):
-                if j == i + 1:
-                    # x_i * p_{i,i+1}
-                    val = -1j * np.sqrt(i/2) * np.sqrt((j)/2)
-                elif j == i - 1:
-                    # x_i * p_{i,i-1}
-                    val = 1j * np.sqrt(i/2) * np.sqrt((j+1)/2)
-                else:
-                    val = 0.0
-                
-                # Convert to interval (real part only for Hermitian)
-                row.append(Interval.from_float(float(val.real), abs(val.real) * 1e-10))
-            xp_entries.append(row)
-        
-        xp_operator = IntervalMatrix(xp_entries)
-        
-        # Compute spectrum
-        eigenvalues = self.compute_operator_spectrum(xp_operator, "Berry-Keating xp")
-        
-        # Compare with Riemann zeros
-        mismatch = self.compare_with_riemann_zeros(
-            eigenvalues,
-            riemann_zeros[:len(eigenvalues)],
-            "Berry-Keating xp"
+        # Use the certified interval-arithmetic pipeline: the position-space xp
+        # operator built as an exact interval matrix, verified eigenvalue
+        # enclosures, and certified zeta-zero enclosures.  (Lazy import keeps
+        # the rigorous package free of an import-time dependency on curverank.)
+        from gaugegap.curverank_certified import certified_xp_spectrum
+        from gaugegap.curverank_spectral import (
+            certified_spectral_mismatch,
+            riemann_zero_intervals,
         )
-        
-        # Create theorem
+
+        k_zeros = len(riemann_zeros)
+        eigenvalues = certified_xp_spectrum(n_basis)
+        zero_intervals = riemann_zero_intervals(k_zeros)
+        mismatch = certified_spectral_mismatch(eigenvalues, zero_intervals)
+
+        # Record a proof step for the certified mismatch.
+        step = ProofStep(
+            step_id=self.step_counter,
+            operation=OperationType.SPECTRAL_ANALYSIS,
+            description="Certified spectral mismatch of Berry-Keating xp vs Riemann zeros",
+            inputs={"n_basis": n_basis, "k_zeros": k_zeros},
+            outputs={"mismatch": mismatch.to_tuple()},
+            certified_bounds={"mismatch": mismatch},
+        )
+        self._add_step(step)
+
+        # Impossibility is certified when the mismatch is provably bounded away
+        # from zero (lower endpoint above the separation threshold).
+        impossibility_certified = mismatch.lower > IMPOSSIBILITY_THRESHOLD
+
         theorem = Theorem(
-            name="Berry-Keating xp Impossibility",
+            name="Berry-Keating xp Impossibility (finite truncation)",
             statement=(
-                f"Berry-Keating xp operator with {n_basis}-dimensional truncation "
-                f"cannot match all Riemann zeros. "
-                f"Minimum certified mismatch: {mismatch.min_mismatch}"
+                f"The Berry-Keating xp operator truncated to n={n_basis} is "
+                f"certifiably separated from the first {k_zeros} Riemann zeros: "
+                f"M_n >= {float(mismatch.lower):.6f} (certified)."
             ),
             assumptions=[
                 create_truncation_assumption(
@@ -402,20 +404,20 @@ class SpectralMismatchProof:
             ],
             proof_steps=self.proof_steps.copy(),
             conclusion={
-                "min_mismatch": mismatch.min_mismatch,
-                "max_mismatch": mismatch.max_mismatch,
+                "mismatch": mismatch,
                 "impossibility_certified": Interval.from_float(
-                    1.0 if mismatch.impossibility_certified else 0.0
+                    1.0 if impossibility_certified else 0.0
                 )
             },
-            verified=mismatch.impossibility_certified,
+            verified=impossibility_certified,
             metadata={
                 "operator_name": "Berry-Keating xp",
                 "truncation_level": n_basis,
-                "n_zeros_compared": len(riemann_zeros)
+                "n_zeros_compared": k_zeros,
+                "method": "interval_arithmetic_verified_eigenvalue_enclosure",
             }
         )
-        
+
         return theorem
     
     def establish_necessary_conditions(

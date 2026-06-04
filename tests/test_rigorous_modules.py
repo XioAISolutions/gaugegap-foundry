@@ -16,6 +16,7 @@ from gaugegap.rigorous.interval_arithmetic import (
     IntervalVector,
     IntervalMatrix,
     certified_eigenvalues,
+    verified_hermitian_eigenvalues,
     certified_matrix_exp,
 )
 from gaugegap.rigorous.proof_framework import (
@@ -142,18 +143,38 @@ class TestIntervalArithmetic:
         assert m_t[0, 1].contains(3.0)
     
     def test_certified_eigenvalues(self):
-        """Test certified eigenvalue computation."""
-        # Create symmetric matrix with known eigenvalues
-        # [[2, 1], [1, 2]] has eigenvalues 1 and 3
+        """Certified enclosures must rigorously contain the true eigenvalues."""
+        # [[2, 1], [1, 2]] has eigenvalues exactly 1 and 3.
         m = IntervalMatrix.from_floats([[2.0, 1.0], [1.0, 2.0]])
-        
+
         eigenvalues = certified_eigenvalues(m)
         assert len(eigenvalues) == 2
-        
-        # Check eigenvalues are in correct range
-        eig_values = sorted([e.midpoint() for e in eigenvalues])
-        assert abs(float(eig_values[0]) - 1.0) < 0.1
-        assert abs(float(eig_values[1]) - 3.0) < 0.1
+
+        eigenvalues = sorted(eigenvalues, key=lambda e: e.midpoint())
+        # The true eigenvalues must lie inside the certified enclosures...
+        assert eigenvalues[0].contains(1.0)
+        assert eigenvalues[1].contains(3.0)
+        # ...and the enclosures must be TIGHT (not the old Gershgorin ±radius).
+        assert float(eigenvalues[0].width()) < 1e-9
+        assert float(eigenvalues[1].width()) < 1e-9
+
+    def test_verified_hermitian_eigenvalues_tight(self):
+        """Verified enclosures on a larger random symmetric matrix are tight."""
+        import numpy as np
+
+        rng = np.random.default_rng(0)
+        A = rng.standard_normal((6, 6))
+        A = (A + A.T) / 2
+        true_eigs = np.sort(np.linalg.eigvalsh(A))
+
+        m = IntervalMatrix.from_numpy(A)
+        enclosures = verified_hermitian_eigenvalues(m)
+        mids = sorted(float(e.midpoint()) for e in enclosures)
+
+        assert len(enclosures) == 6
+        for got, expected in zip(mids, true_eigs):
+            assert abs(got - expected) < 1e-9
+        assert max(float(e.width()) for e in enclosures) < 1e-6
 
 
 class TestProofFramework:

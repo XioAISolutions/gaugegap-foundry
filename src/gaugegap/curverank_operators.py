@@ -45,6 +45,61 @@ def _sinc_derivative_element(i: int, j: int, n: int, dx: float) -> float:
     return ((-1.0) ** (i - j)) / ((i - j) * dx)
 
 
+def berry_keating_xp_interval(n_basis: int, L: float = 1.0):
+    """Certified interval-matrix form of the Berry-Keating xp operator.
+
+    Builds the *same* symmetrized operator as :func:`berry_keating_xp`, but in
+    exact (mpmath) interval arithmetic so that downstream certified eigenvalue
+    enclosures are rigorous rather than floating-point estimates.
+
+    After symmetrization the operator is purely imaginary Hermitian with
+    entries ``H_ij = i * M_ij`` where ``M`` is the real antisymmetric matrix
+    ``M_ij = -0.5 * s_ij * (x_i + x_j)`` (and ``M_ii = 0``), with
+    ``s_ij = (-1)^(i-j) / ((i-j) * dx)``.  A complex Hermitian matrix
+    ``H = i*M`` has the same spectrum (each eigenvalue doubled) as the real
+    symmetric ``2n x 2n`` matrix ``[[0, -M], [M, 0]]``; we return that real
+    embedding so it can be fed to
+    :func:`gaugegap.rigorous.interval_arithmetic.verified_hermitian_eigenvalues`.
+
+    Use :func:`gaugegap.curverank_certified.certified_xp_spectrum` to recover
+    the ``n`` (un-doubled) certified eigenvalue enclosures of the operator.
+
+    Returns
+    -------
+    IntervalMatrix
+        A real symmetric ``2*n_basis x 2*n_basis`` interval matrix.
+    """
+    if n_basis < 2:
+        raise ValueError("n_basis must be at least 2")
+
+    import mpmath as mp  # local import: keeps the float-only API dependency-free
+    from gaugegap.rigorous.interval_arithmetic import Interval, IntervalMatrix
+
+    n = n_basis
+    dx = mp.mpf(L) / (n + 1)
+    x = [dx * (k + 1) for k in range(n)]
+
+    # Real antisymmetric coefficient matrix M (imaginary part of H), exact.
+    M = [[mp.mpf(0) for _ in range(n)] for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                continue
+            s_ij = mp.mpf((-1) ** (i - j)) / ((i - j) * dx)
+            M[i][j] = mp.mpf("-0.5") * s_ij * (x[i] + x[j])
+
+    dim = 2 * n
+    zero = Interval(mp.mpf(0), mp.mpf(0))
+    entries = [[zero for _ in range(dim)] for _ in range(dim)]
+    for i in range(n):
+        for j in range(n):
+            # Top-right block = -M, bottom-left block = +M.
+            neg = -M[i][j]
+            entries[i][j + n] = Interval(neg, neg)
+            entries[i + n][j] = Interval(M[i][j], M[i][j])
+    return IntervalMatrix(entries)
+
+
 def quantum_graph_laplacian(
     edges: list[tuple[int, int]],
     lengths: list[float],

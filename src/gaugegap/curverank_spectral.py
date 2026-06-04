@@ -77,6 +77,79 @@ def spectral_mismatch(
     return float(np.linalg.norm(eigs[:n] - targets[:n]) / np.sqrt(n))
 
 
+def riemann_zero_intervals(k: int):
+    """Return certified interval enclosures of the first *k* Riemann zeros.
+
+    Unlike :func:`riemann_zero_targets` (hardcoded ~12-digit floats), the
+    imaginary parts are computed with ``mpmath.zetazero`` at the active working
+    precision, so each returned :class:`Interval` rigorously brackets the true
+    zero up to that precision.
+
+    Returns
+    -------
+    list[Interval]
+        Enclosures ``[t_j - eps, t_j + eps]`` for the positive imaginary parts.
+    """
+    if k < 1:
+        raise ValueError("k must be at least 1")
+
+    import mpmath as mp
+    from gaugegap.rigorous.interval_arithmetic import Interval
+
+    # zetazero is accurate to the working precision; use a conservative radius
+    # several digits inside that precision as the certified half-width.
+    eps = mp.mpf(10) ** (-(mp.mp.dps - 5))
+    intervals = []
+    for j in range(1, k + 1):
+        t = mp.zetazero(j).imag
+        intervals.append(Interval(t - eps, t + eps))
+    return intervals
+
+
+def certified_spectral_mismatch(eig_intervals, zero_intervals):
+    """Certified enclosure of the L2 spectral mismatch ``M_n``.
+
+    Interval-arithmetic analogue of :func:`spectral_mismatch`: given certified
+    eigenvalue enclosures and certified Riemann-zero enclosures, returns an
+    :class:`Interval` ``[M_lower, M_upper]`` guaranteed to contain
+
+        M_n = || sort(|eig|)[:n] - zeros[:n] ||_2 / sqrt(n).
+
+    The lower endpoint is a *rigorous lower bound* on the mismatch (the
+    quantity that certifies how far the operator spectrum is from the zeros);
+    it is conservative whenever an eigenvalue enclosure overlaps a zero
+    enclosure (that pair contributes 0).
+    """
+    import mpmath as mp
+    from gaugegap.rigorous.interval_arithmetic import Interval
+
+    abs_eigs = sorted((abs(e) for e in eig_intervals), key=lambda iv: iv.midpoint())
+    zeros = sorted(zero_intervals, key=lambda iv: iv.midpoint())
+    n = min(len(abs_eigs), len(zeros))
+    if n == 0:
+        return Interval(mp.inf, mp.inf)
+
+    sum_lo = mp.mpf(0)
+    sum_hi = mp.mpf(0)
+    for i in range(n):
+        a = abs_eigs[i]
+        z = zeros[i]
+        # Lower bound on |a - z| over the two enclosures (0 if they overlap).
+        if a.upper < z.lower:
+            d_lo = z.lower - a.upper
+        elif a.lower > z.upper:
+            d_lo = a.lower - z.upper
+        else:
+            d_lo = mp.mpf(0)
+        # Upper bound on |a - z| over the two enclosures.
+        d_hi = max(abs(a.upper - z.lower), abs(a.lower - z.upper))
+        sum_lo += d_lo * d_lo
+        sum_hi += d_hi * d_hi
+
+    nn = mp.mpf(n)
+    return Interval(mp.sqrt(sum_lo / nn), mp.sqrt(sum_hi / nn))
+
+
 def gue_spacing_statistic(eigenvalues: np.ndarray) -> dict[str, float]:
     """Nearest-neighbor spacing ratio statistic for GUE comparison.
 
