@@ -50,9 +50,10 @@ jobs:
           if cert_file.exists():
               with open(cert_file) as f:
                   cert = json.load(f)
+              tier1 = cert['tier1_certified']
               print('✓ Proof certificate valid')
-              print(f'  Theorem: {cert[\"theorem\"][\"statement\"]}')
-              print(f'  Certified bound: {cert[\"theorem\"][\"certified_lower_bound\"]}')
+              print(f'  Statement: {tier1[\"statement\"]}')
+              print(f'  Certified bound: {tier1[\"certified_min_lower_bound\"]}')
           else:
               print('⚠ No proof certificate found (expected for new branches)')
           "
