@@ -107,6 +107,34 @@ class TestIntervalArithmetic:
         i_log = i.log()
         assert i_log.contains(0.0)
     
+    def test_directed_outward_rounding(self):
+        """Elementary ops must round *outward*, yielding guaranteed enclosures.
+
+        For a point interval whose true result is irrational (not representable
+        at the working precision), round-to-nearest would return a degenerate
+        zero-width interval that may not actually contain the true value.
+        Directed (outward) rounding must instead return a non-degenerate
+        interval that strictly brackets it.
+        """
+        import mpmath as mp
+
+        # sqrt(2): the enclosure must straddle the true value with positive width.
+        s = Interval.from_bounds(2, 2).sqrt()
+        true_sqrt2 = mp.sqrt(mp.mpf(2))
+        assert s.lower <= true_sqrt2 <= s.upper
+        assert s.width() > 0  # would be 0 under round-to-nearest
+
+        # 1/3: likewise non-representable; enclosure must bracket it outward.
+        q = Interval.from_bounds(1, 1) / Interval.from_bounds(3, 3)
+        true_third = mp.mpf(1) / mp.mpf(3)
+        assert q.lower <= true_third <= q.upper
+        assert q.width() > 0
+
+        # exp(1): enclosure must contain e with positive width.
+        e_iv = Interval.from_bounds(1, 1).exp()
+        assert e_iv.lower <= mp.e <= e_iv.upper
+        assert e_iv.width() > 0
+
     def test_interval_vector(self):
         """Test interval vector operations."""
         v1 = IntervalVector.from_floats([1.0, 2.0, 3.0])

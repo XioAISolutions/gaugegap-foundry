@@ -62,7 +62,9 @@ infinite dimension, or about the Riemann Hypothesis itself.
 ## 2. Methods
 
 All interval arithmetic is carried out with `mpmath` at 50 decimal digits of
-working precision.
+working precision, using the directed-rounding interval context (`mpmath.iv`) so
+that every elementary operation (`+, −, ×, ÷, √, exp`) rounds strictly outward
+and each endpoint is a certified outward bound rather than a round-to-nearest estimate.
 
 ### 2.1 Candidate operators
 
@@ -159,10 +161,15 @@ unchanged across candidate families.
 
 ```bash
 pip install -e ".[dev]"
-python3 scripts/run_curverank_screen.py --family xp --n-basis 10,15,20 --k-zeros 20
-python3 scripts/analyze_sprint_results.py
+python3 scripts/certify_screening.py            # regenerates the certified table (§3)
 pytest tests/test_curverank_certified.py -q
 ```
+
+The single command `scripts/certify_screening.py` reproduces every certified
+number above from scratch (reading no pre-recorded result file) and additionally
+reports the diagnostics the certificate depends on. For the full trust chain,
+the rigorous-vs-trusted breakdown, and the reviewer checklist, see
+[`docs/independent-review-packet.md`](independent-review-packet.md).
 
 Implementation: `gaugegap.rigorous.interval_arithmetic.verified_hermitian_eigenvalues`,
 `gaugegap.curverank_spectral.{riemann_zero_intervals, certified_spectral_mismatch}`,

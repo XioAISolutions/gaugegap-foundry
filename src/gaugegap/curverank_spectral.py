@@ -154,26 +154,35 @@ def certified_spectral_mismatch(eig_intervals, zero_intervals):
     z_lowers = sorted(z.lower for z in zero_intervals)
     z_uppers = sorted(z.upper for z in zero_intervals)
 
-    sum_lo = mp.mpf(0)
-    sum_hi = mp.mpf(0)
+    # Accumulate in the directed-rounding iv context so M_lower is rounded
+    # strictly down and M_upper strictly up: the returned interval is a
+    # guaranteed enclosure of M_n, not a round-to-nearest estimate.
+    sum_lo = mp.iv.mpf(0)
+    sum_hi = mp.iv.mpf(0)
     for i in range(n):
         a_lo, a_hi = e_lowers[i], e_uppers[i]
         z_lo, z_hi = z_lowers[i], z_uppers[i]
         # Lower bound on |a - z| over the two order-statistic enclosures
-        # (0 if they overlap).
+        # (0 if they overlap); rounded down so it stays a lower bound.
         if a_hi < z_lo:
-            d_lo = z_lo - a_hi
+            d_lo = (mp.iv.mpf([z_lo, z_lo]) - mp.iv.mpf([a_hi, a_hi])).a
         elif a_lo > z_hi:
-            d_lo = a_lo - z_hi
+            d_lo = (mp.iv.mpf([a_lo, a_lo]) - mp.iv.mpf([z_hi, z_hi])).a
         else:
             d_lo = mp.mpf(0)
-        # Upper bound on |a - z| over the two enclosures.
-        d_hi = max(abs(a_hi - z_lo), abs(a_lo - z_hi))
-        sum_lo += d_lo * d_lo
-        sum_hi += d_hi * d_hi
+        # Upper bound on |a - z| over the two enclosures, rounded up.
+        diff1 = mp.iv.mpf([a_hi, a_hi]) - mp.iv.mpf([z_lo, z_lo])
+        diff2 = mp.iv.mpf([a_lo, a_lo]) - mp.iv.mpf([z_hi, z_hi])
+        d_hi = max(abs(diff1.a), abs(diff1.b), abs(diff2.a), abs(diff2.b))
+        d_lo_iv = mp.iv.mpf([d_lo, d_lo])
+        d_hi_iv = mp.iv.mpf([d_hi, d_hi])
+        sum_lo = sum_lo + d_lo_iv * d_lo_iv
+        sum_hi = sum_hi + d_hi_iv * d_hi_iv
 
-    nn = mp.mpf(n)
-    return Interval(mp.sqrt(sum_lo / nn), mp.sqrt(sum_hi / nn))
+    nn = mp.iv.mpf(n)
+    m_lower = mp.iv.sqrt(sum_lo / nn).a
+    m_upper = mp.iv.sqrt(sum_hi / nn).b
+    return Interval(mp.mpf(m_lower), mp.mpf(m_upper))
 
 
 def gue_spacing_statistic(eigenvalues: np.ndarray) -> dict[str, float]:
