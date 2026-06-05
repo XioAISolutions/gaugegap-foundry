@@ -71,6 +71,14 @@ The test suite independently checks the same machinery:
 pytest tests/test_curverank_certified.py -q
 ```
 
+Optionally, corroborate the `mpmath.iv` arithmetic against a fully independent
+rigorous backend (Arb):
+
+```bash
+pip install python-flint            # or: pip install -e ".[crosscheck]"
+python3 scripts/cross_check_arb.py  # recomputes every radius in Arb, 256-bit
+```
+
 Relevant regression tests, by obligation:
 - `test_embedding_eigenvalues_enclosed` — every true eigenvalue lands in an enclosure.
 - `test_lower_bound_is_valid_lower_bound` — `M_lower` never exceeds the float mismatch.
@@ -139,6 +147,12 @@ paired with the first zeta zero.
   width). See §5.1.
 - **Disjointness diagnostic.** The regenerator measures it rather than assuming
   it, and all current rows satisfy it by a 12-orders-of-magnitude margin.
+- **Independent second-source corroboration.** `scripts/cross_check_arb.py`
+  recomputes every certified radius with Arb (`python-flint`) ball arithmetic at
+  256 bits — a completely separate rigorous backend — and confirms the two
+  libraries agree to ≈ 35 decimal digits, with the `mpmath.iv` radius rigorously
+  lower-bounded by Arb (so it never under-rounds). This corroborates §5.1's
+  remaining trust assumption rather than merely asserting it.
 
 ---
 
@@ -159,9 +173,14 @@ interval context (`mp.iv.dps = 50`), which rounds outward by construction. The
 enclosures are therefore unconditionally valid (modulo the standard trust in
 `mpmath.iv`'s own correctness). The reported headline numbers are unchanged: the
 former round-to-nearest slack was `O(10⁻⁵⁰)`, ~37 orders below the `~10⁻¹³`
-residual widths. *Residual obligation: trust `mpmath.iv`'s directed rounding, a
-standard, widely-used component — or cross-check a sample enclosure in an
-independent interval package (e.g. Arb).*
+residual widths. *Residual obligation — now corroborated:*
+`scripts/cross_check_arb.py` recomputes every certified radius with a fully
+independent rigorous backend (Arb, via `python-flint`, at 256 bits) and confirms
+agreement to ≈ 35 decimal digits, with the `mpmath.iv` radius rigorously
+lower-bounded by Arb. So the trust in `mpmath.iv`'s directed rounding is checked
+against a second implementation, not merely assumed. (The optional regression
+test `tests/test_arb_cross_check.py` runs the same check when `python-flint` is
+installed and skips otherwise.)
 
 ### 5.2 One-to-one spectral correspondence
 The residual bound certifies each enclosure contains *some* eigenvalue; it does
@@ -196,7 +215,7 @@ helper, never part of a certificate.
 - [ ] `pytest tests/test_curverank_certified.py -q` passes.
 - [ ] Read `verified_hermitian_eigenvalues` and agree the residual bound is correctly applied (§3.2).
 - [ ] Read `certified_spectral_mismatch` and agree the order-statistic pairing is a valid lower bound under overlap (§3.3).
-- [ ] Confirm the trusted path uses `mpmath.iv` directed rounding (§5.1, done) — optionally cross-check one enclosure against an independent interval library.
+- [ ] Confirm the trusted path uses `mpmath.iv` directed rounding (§5.1, done), and run `scripts/cross_check_arb.py` to see Arb independently corroborate the radii (≈ 35-digit agreement).
 - [ ] Confirm the `disjoint` flag is `True` for every row you rely on (§5.2).
 - [ ] Accept or replace the `mpmath.zetazero` trust assumption (§5.3).
 
@@ -207,6 +226,7 @@ helper, never part of a certificate.
 | component | path |
 |-----------|------|
 | Regenerator (entry point) | `scripts/certify_screening.py` |
+| Independent Arb cross-check | `scripts/cross_check_arb.py`, `tests/test_arb_cross_check.py` |
 | Verified eigenvalue enclosures | `src/gaugegap/rigorous/interval_arithmetic.py` |
 | Mismatch + zero enclosures | `src/gaugegap/curverank_spectral.py` |
 | Pipeline orchestration | `src/gaugegap/curverank_certified.py` |

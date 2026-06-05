@@ -41,12 +41,17 @@ flow = [
 spectral = [
   "scipy>=1.11",
 ]
+# Optional independent rigorous-arithmetic backend (Arb) used only to
+# cross-check the mpmath.iv certified enclosures during independent review.
+crosscheck = [
+  "python-flint>=0.6",
+]
 dev = [
   "pytest>=8",
   "scipy>=1.11",
 ]
 all = [
-  "gaugegap-foundry[quantum,quantinuum,braket,ionq,flow,spectral,dev]",
+  "gaugegap-foundry[quantum,quantinuum,braket,ionq,flow,spectral,crosscheck,dev]",
 ]
 
 [tool.setuptools.packages.find]

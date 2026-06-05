@@ -36,17 +36,17 @@ def _from_iv(z) -> "Interval":
 
 def _sqrt_up(x: mp.mpf) -> mp.mpf:
     """Smallest representable upper bound on sqrt(x) (x >= 0)."""
-    return mp.iv.sqrt(mp.iv.mpf([x, x])).b
+    return mp.mpf(mp.iv.sqrt(mp.iv.mpf([x, x])).b)
 
 
 def _sqrt_down(x: mp.mpf) -> mp.mpf:
     """Largest representable lower bound on sqrt(x) (x >= 0)."""
-    return mp.iv.sqrt(mp.iv.mpf([x, x])).a
+    return mp.mpf(mp.iv.sqrt(mp.iv.mpf([x, x])).a)
 
 
 def _div_up(a: mp.mpf, b: mp.mpf) -> mp.mpf:
     """Upper bound on a / b (b > 0)."""
-    return (mp.iv.mpf([a, a]) / mp.iv.mpf([b, b])).b
+    return mp.mpf((mp.iv.mpf([a, a]) / mp.iv.mpf([b, b])).b)
 
 
 @dataclass
@@ -408,37 +408,55 @@ def verified_hermitian_eigenvalues(matrix: IntervalMatrix) -> List[Interval]:
 
     enclosures: List[Interval] = []
     for i in range(n):
-        x_col = [Interval.from_float(float(X[k, i])) for k in range(n)]
         th = mp.mpf(float(theta[i]))
-        th_iv = Interval(th, th)
-
-        # Residual r = A x - theta x, computed rigorously in interval arithmetic.
-        residual_sq = None
-        for row in range(n):
-            acc = matrix.entries[row][0] * x_col[0]
-            for col in range(1, n):
-                acc = acc + matrix.entries[row][col] * x_col[col]
-            acc = acc - (th_iv * x_col[row])
-            term = acc * acc
-            residual_sq = term if residual_sq is None else residual_sq + term
-
-        # ||x||^2 lower bound (x has zero-width components, so this is exact).
-        norm_x_sq = x_col[0] * x_col[0]
-        for k in range(1, n):
-            norm_x_sq = norm_x_sq + x_col[k] * x_col[k]
-
-        # Final radius, with directed (outward) rounding so the enclosure is a
-        # guaranteed bound rather than a round-to-nearest estimate:
-        #   radius >= ||r||_upper / ||x||_lower  (round the quotient up).
-        residual_norm_upper = _sqrt_up(residual_sq.upper)
-        norm_x_lower = _sqrt_down(norm_x_sq.lower)
-        radius = _div_up(residual_norm_upper, norm_x_lower)
+        radius = certified_residual_radius(matrix, float(theta[i]), X[:, i])
         lo = (mp.iv.mpf([th, th]) - mp.iv.mpf([radius, radius])).a
         hi = (mp.iv.mpf([th, th]) + mp.iv.mpf([radius, radius])).b
         enclosures.append(Interval(mp.mpf(lo), mp.mpf(hi)))
 
     enclosures.sort(key=lambda iv: iv.midpoint())
     return enclosures
+
+
+def certified_residual_radius(matrix: "IntervalMatrix", theta: float, x_col) -> mp.mpf:
+    """Certified (outward-rounded) residual radius for one approximate eigenpair.
+
+    Given a real symmetric interval matrix ``A``, an approximate eigenvalue
+    ``theta`` and approximate eigenvector ``x_col`` (any vector; rigor does not
+    depend on its accuracy), returns an ``mpf`` ``rho`` with the guarantee that
+    some eigenvalue ``lambda`` of ``A`` satisfies ``|lambda - theta| <= rho``:
+
+        rho = ceil_round( ||A x - theta x||_2 / ||x||_2 ),
+
+    every step evaluated in directed-rounding interval arithmetic so ``rho`` is a
+    true upper bound. Exposed separately so an independent backend (see
+    ``scripts/cross_check_arb.py``) can be fed the *same* eigenpair and compared.
+    """
+    n = matrix.m
+    x_iv = [Interval.from_float(float(x_col[k])) for k in range(n)]
+    th_iv = Interval(mp.mpf(float(theta)), mp.mpf(float(theta)))
+
+    # Residual r = A x - theta x, computed rigorously in interval arithmetic.
+    residual_sq = None
+    for row in range(n):
+        acc = matrix.entries[row][0] * x_iv[0]
+        for col in range(1, n):
+            acc = acc + matrix.entries[row][col] * x_iv[col]
+        acc = acc - (th_iv * x_iv[row])
+        term = acc * acc
+        residual_sq = term if residual_sq is None else residual_sq + term
+
+    # ||x||^2 lower bound (x has zero-width components, so this is exact).
+    norm_x_sq = x_iv[0] * x_iv[0]
+    for k in range(1, n):
+        norm_x_sq = norm_x_sq + x_iv[k] * x_iv[k]
+
+    # Final radius, with directed (outward) rounding so the enclosure is a
+    # guaranteed bound rather than a round-to-nearest estimate:
+    #   radius >= ||r||_upper / ||x||_lower  (round the quotient up).
+    residual_norm_upper = _sqrt_up(residual_sq.upper)
+    norm_x_lower = _sqrt_down(norm_x_sq.lower)
+    return _div_up(residual_norm_upper, norm_x_lower)
 
 
 def certified_eigenvalues(matrix: IntervalMatrix, method: str = "power") -> List[Interval]:
