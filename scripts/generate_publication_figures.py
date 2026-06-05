@@ -70,13 +70,14 @@ def plot_spectral_mismatch_scaling(data, output_file, certified_bound=27.0):
     ax.plot(n_values, mismatch_values, 'o-', color='#2E86AB', 
             linewidth=2, markersize=10, label='Computed $M_n$', zorder=3)
     
-    # Add certified bound
-    ax.axhline(certified_bound, color='#A23B72', linestyle='--', 
-               linewidth=2, label=f'Certified bound $M_∞ ≥ {certified_bound}$', zorder=2)
-    
-    # Shade region below bound (impossible region)
-    ax.fill_between([n_values[0], n_values[-1]], 0, certified_bound, 
-                     alpha=0.1, color='#A23B72', label='Ruled out region')
+    # Add certified bound (minimum certified finite-n mismatch over tested n).
+    ax.axhline(certified_bound, color='#A23B72', linestyle='--',
+               linewidth=2,
+               label=f'Certified finite-$n$ bound $M_n ≥ {certified_bound}$', zorder=2)
+
+    # Shade the certified separation region below the bound.
+    ax.fill_between([n_values[0], n_values[-1]], 0, certified_bound,
+                     alpha=0.1, color='#A23B72', label='Certified separation')
     
     # Try power-law extrapolation if we have enough points
     if len(n_values) >= 3:
@@ -94,8 +95,9 @@ def plot_spectral_mismatch_scaling(data, output_file, certified_bound=27.0):
             n_extrap = np.linspace(n_values[0], n_values[-1] * 2, 100)
             m_extrap = power_law(n_extrap, *popt)
             
-            ax.plot(n_extrap, m_extrap, ':', color='#2E86AB', 
-                   linewidth=1.5, alpha=0.7, label=f'Extrapolation: $M_∞ ≈ {popt[0]:.1f}$')
+            ax.plot(n_extrap, m_extrap, ':', color='#2E86AB',
+                   linewidth=1.5, alpha=0.7,
+                   label=f'Extrapolation (evidence only, not certified): $M_∞ ≈ {popt[0]:.1f}$')
             
             # Mark continuum limit
             ax.axhline(popt[0], color='#2E86AB', linestyle=':', 
@@ -105,7 +107,8 @@ def plot_spectral_mismatch_scaling(data, output_file, certified_bound=27.0):
     
     ax.set_xlabel('Truncation size $n$', fontsize=13)
     ax.set_ylabel('Spectral mismatch $M_n$', fontsize=13)
-    ax.set_title('Berry–Keating Operator: Impossibility Proof', fontsize=14, fontweight='bold')
+    ax.set_title('Berry–Keating Operator: Certified Finite-Truncation Screening',
+                 fontsize=14, fontweight='bold')
     ax.legend(loc='best', framealpha=0.95)
     ax.grid(True, alpha=0.3, linestyle='--')
     ax.set_xlim(left=n_values[0] - 1)
@@ -128,84 +131,77 @@ def plot_proof_certificate_visual(cert_file, output_file):
     with open(cert_file, 'r') as f:
         cert = json.load(f)
     
+    tier1 = cert['tier1_certified']
+    bounds = tier1['per_truncation_bounds']
+    ns = [b['n_basis'] for b in bounds]
+
     fig = plt.figure(figsize=(10, 8))
     gs = GridSpec(3, 2, figure=fig, hspace=0.4, wspace=0.3)
-    
+
     # Title
-    fig.suptitle('Computer-Assisted Impossibility Proof Certificate', 
+    fig.suptitle('Certified Finite-Truncation Screening Certificate',
                  fontsize=16, fontweight='bold', y=0.98)
-    
-    # Theorem statement (top, spanning both columns)
+
+    # Certified statement (top, spanning both columns)
     ax_theorem = fig.add_subplot(gs[0, :])
     ax_theorem.axis('off')
     theorem_text = f"""
-    THEOREM: {cert['theorem']['statement']}
-    
-    The {cert['theorem']['operator']} operator cannot match all Riemann zeros.
-    Minimum observed mismatch: {cert['theorem']['min_observed_mismatch']:.2f}
-    Certified lower bound: {cert['theorem']['certified_lower_bound']:.1f}
+    TIER 1 (CERTIFIED): {tier1['statement']}
+
+    The {cert['operator']} operator is provably separated from the low-lying
+    Riemann zeros at every tested finite truncation.
+    Certified minimum bound: M_n ≥ {tier1['certified_min_lower_bound']:.4f} (at n={tier1['attained_at_n']})
     """
     ax_theorem.text(0.5, 0.5, theorem_text, ha='center', va='center',
-                   fontsize=12, bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
-    
-    # Proof method (middle left)
+                   fontsize=11, bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+
+    # Method (middle left)
     ax_method = fig.add_subplot(gs[1, 0])
     ax_method.axis('off')
     method_text = f"""
-    PROOF METHOD
-    
-    Type: {cert['proof_method']['type'].replace('_', ' ').title()}
-    Precision: {cert['proof_method']['precision'].replace('_', ' ')}
-    Confidence: {cert['proof_method']['confidence_level'].replace('_', ' ')}
+    METHOD (TIER 1)
+
+    Type: {tier1['method'].replace('_', ' ').title()}
+    Precision: {tier1['precision'].replace('_', ' ')}
+
+    TIER 2 (evidence only, NOT certified):
+    finite-n trend / extrapolation
     """
     ax_method.text(0.1, 0.5, method_text, ha='left', va='center',
                   fontsize=10, family='monospace')
-    
+
     # Data summary (middle right)
     ax_data = fig.add_subplot(gs[1, 1])
     ax_data.axis('off')
     data_text = f"""
     DATA SUMMARY
-    
-    Truncations tested: {cert['theorem']['truncations_tested']}
-    Riemann zeros tested: {cert['theorem']['zeros_tested']}
-    Run ID: {cert['data']['run_id']}
-    Timestamp: {cert['data']['timestamp'][:19]}
+
+    Truncations tested: {ns}
+    Riemann zeros tested: {cert['zeros_tested']}
+    Run ID: {cert['run_id']}
+    Timestamp: {cert['timestamp_utc'][:19]}
     """
     ax_data.text(0.1, 0.5, data_text, ha='left', va='center',
                 fontsize=10, family='monospace')
-    
+
     # Claim boundary (bottom left)
     ax_boundary = fig.add_subplot(gs[2, 0])
     ax_boundary.axis('off')
-    boundary_text = f"""
-    CLAIM BOUNDARY
-    
-    Scope: {cert['claim_boundary']['scope'].replace('_', ' ').title()}
-    
-    ✓ Claims: {cert['claim_boundary']['claims'].replace('_', ' ')}
-    
-    ✗ Does NOT claim:
-    """
-    for claim in cert['claim_boundary']['does_not_claim']:
-        boundary_text += f"\n  • {claim.replace('_', ' ')}"
-    
-    ax_boundary.text(0.1, 0.5, boundary_text, ha='left', va='center',
+    boundary_text = "    CLAIM BOUNDARY\n\n    " + cert['claim_boundary']
+    ax_boundary.text(0.1, 0.5, boundary_text, ha='left', va='top', wrap=True,
                     fontsize=9, family='monospace')
-    
+
     # Reproducibility (bottom right)
     ax_repro = fig.add_subplot(gs[2, 1])
     ax_repro.axis('off')
     repro_text = f"""
     REPRODUCIBILITY
-    
+
     Command:
     {cert['reproducibility']['command']}
-    
+
     Repository:
     {cert['reproducibility']['repository']}
-    
-    Verified: {'✓ Yes' if cert['reproducibility']['verified'] else '✗ No'}
     """
     ax_repro.text(0.1, 0.5, repro_text, ha='left', va='center',
                  fontsize=9, family='monospace')
@@ -287,8 +283,10 @@ Examples:
                        choices=['mismatch', 'certificate', 'comparison', 'all'],
                        default=['all'],
                        help='Which plots to generate (default: all)')
-    parser.add_argument('--certified-bound', type=float, default=27.0,
-                       help='Certified lower bound for M_infinity (default: 27.0)')
+    parser.add_argument('--certified-bound', type=float, default=None,
+                       help='Certified minimum finite-n mismatch bound to draw. '
+                            'If omitted, it is read from the certificate file '
+                            '(tier1_certified.certified_min_lower_bound).')
     
     args = parser.parse_args()
     
@@ -305,16 +303,27 @@ Examples:
         print(f"✗ Error loading data: {e}")
         return 1
     
+    # Resolve the certified finite-n bound: prefer the certificate, else CLI/default.
+    certified_bound = args.certified_bound
+    if certified_bound is None and args.certificate:
+        try:
+            with open(args.certificate) as f:
+                certified_bound = json.load(f)['tier1_certified']['certified_min_lower_bound']
+        except Exception:
+            certified_bound = None
+    if certified_bound is None:
+        certified_bound = 27.0  # last-resort fallback
+
     # Generate requested plots
     plots_to_generate = args.plots if 'all' not in args.plots else ['mismatch', 'certificate', 'comparison']
-    
+
     if 'mismatch' in plots_to_generate:
         print("\nGenerating spectral mismatch scaling plot...")
         try:
             plot_spectral_mismatch_scaling(
-                data, 
+                data,
                 output_dir / 'spectral_mismatch_scaling.pdf',
-                args.certified_bound
+                certified_bound
             )
         except Exception as e:
             print(f"✗ Error: {e}")

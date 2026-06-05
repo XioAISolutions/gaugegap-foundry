@@ -64,17 +64,116 @@ def riemann_zero_targets(k: int) -> np.ndarray:
 def spectral_mismatch(
     eigenvalues: np.ndarray,
     targets: np.ndarray,
+    zero_tol: float = 1e-9,
 ) -> float:
     """L2 distance between sorted positive eigenvalues and target zero list.
 
-    Only compares up to min(len(eigenvalues), len(targets)) values.
+    Structural zero modes (``|eig| <= zero_tol``) are dropped before sorting, so
+    a symmetric spectrum's spurious zero eigenvalue is not paired with the first
+    Riemann zero. Only compares up to ``min(#nonzero eigenvalues, #targets)``
+    values.
     """
     eigs = np.sort(np.abs(eigenvalues))
-    eigs = eigs[eigs > 0]
+    eigs = eigs[eigs > zero_tol]
     n = min(len(eigs), len(targets))
     if n == 0:
         return float("inf")
     return float(np.linalg.norm(eigs[:n] - targets[:n]) / np.sqrt(n))
+
+
+def riemann_zero_intervals(k: int):
+    """Return certified interval enclosures of the first *k* Riemann zeros.
+
+    Unlike :func:`riemann_zero_targets` (hardcoded ~12-digit floats), the
+    imaginary parts are computed with ``mpmath.zetazero`` at the active working
+    precision, so each returned :class:`Interval` rigorously brackets the true
+    zero up to that precision.
+
+    Returns
+    -------
+    list[Interval]
+        Enclosures ``[t_j - eps, t_j + eps]`` for the positive imaginary parts.
+    """
+    if k < 1:
+        raise ValueError("k must be at least 1")
+
+    import mpmath as mp
+    from gaugegap.rigorous.interval_arithmetic import Interval
+
+    # zetazero is accurate to the working precision; use a conservative radius
+    # several digits inside that precision as the certified half-width.
+    eps = mp.mpf(10) ** (-(mp.mp.dps - 5))
+    intervals = []
+    for j in range(1, k + 1):
+        t = mp.zetazero(j).imag
+        intervals.append(Interval(t - eps, t + eps))
+    return intervals
+
+
+def certified_spectral_mismatch(eig_intervals, zero_intervals):
+    """Certified enclosure of the L2 spectral mismatch ``M_n``.
+
+    Interval-arithmetic analogue of :func:`spectral_mismatch`: given certified
+    eigenvalue enclosures and certified Riemann-zero enclosures, returns an
+    :class:`Interval` ``[M_lower, M_upper]`` guaranteed to contain
+
+        M_n = || sort(|eig|)[:n] - zeros[:n] ||_2 / sqrt(n).
+
+    The lower endpoint is a *rigorous lower bound* on the mismatch (the
+    quantity that certifies how far the operator spectrum is from the zeros);
+    it is conservative whenever an eigenvalue enclosure overlaps a zero
+    enclosure (that pair contributes 0).
+
+    Rigour under overlapping enclosures: the metric pairs the i-th smallest
+    ``|eig|`` with the i-th zero, but if two ``|eig|`` enclosures overlap the
+    true sort order is ambiguous, so pairing whole enclosures sorted by
+    midpoint would not be a valid certificate. We instead use *order-statistic
+    enclosures*: for interval data, the k-th smallest true value provably lies
+    in ``[k-th smallest lower endpoint, k-th smallest upper endpoint]``. Pairing
+    those per-rank enclosures yields a rigorous lower bound for every ordering
+    consistent with the intervals, and reduces to the naive pairing when the
+    enclosures are disjoint.
+    """
+    import mpmath as mp
+    from gaugegap.rigorous.interval_arithmetic import Interval
+
+    # Drop structural zero modes (enclosures that contain 0, i.e. not certifiably
+    # nonzero) so a symmetric spectrum's zero eigenvalue is not paired with the
+    # first Riemann zero. This mirrors the zero-mode filtering in
+    # :func:`spectral_mismatch`.
+    abs_eigs = [abs(e) for e in eig_intervals if not (e.lower <= 0 <= e.upper)]
+    n = min(len(abs_eigs), len(zero_intervals))
+    if n == 0:
+        return Interval(mp.inf, mp.inf)
+
+    # Order-statistic enclosures: sort lower and upper endpoints independently.
+    # The k-th smallest true value lies in [e_lowers[k], e_uppers[k]] (and
+    # likewise for the zeros), regardless of how the enclosures overlap.
+    e_lowers = sorted(e.lower for e in abs_eigs)
+    e_uppers = sorted(e.upper for e in abs_eigs)
+    z_lowers = sorted(z.lower for z in zero_intervals)
+    z_uppers = sorted(z.upper for z in zero_intervals)
+
+    sum_lo = mp.mpf(0)
+    sum_hi = mp.mpf(0)
+    for i in range(n):
+        a_lo, a_hi = e_lowers[i], e_uppers[i]
+        z_lo, z_hi = z_lowers[i], z_uppers[i]
+        # Lower bound on |a - z| over the two order-statistic enclosures
+        # (0 if they overlap).
+        if a_hi < z_lo:
+            d_lo = z_lo - a_hi
+        elif a_lo > z_hi:
+            d_lo = a_lo - z_hi
+        else:
+            d_lo = mp.mpf(0)
+        # Upper bound on |a - z| over the two enclosures.
+        d_hi = max(abs(a_hi - z_lo), abs(a_lo - z_hi))
+        sum_lo += d_lo * d_lo
+        sum_hi += d_hi * d_hi
+
+    nn = mp.mpf(n)
+    return Interval(mp.sqrt(sum_lo / nn), mp.sqrt(sum_hi / nn))
 
 
 def gue_spacing_statistic(eigenvalues: np.ndarray) -> dict[str, float]:

@@ -93,10 +93,19 @@ class CertifiedExtrapolation:
             exponent_guess: Initial guess for exponent
         
         Returns:
-            (a, b, exponent) as intervals with certified bounds
-        
+            (a, b, exponent) as intervals
+
+        NOTE ON RIGOR:
+        The returned interval *widths* are HEURISTIC fit-error estimates
+        (least-squares residual plus input interval widths), NOT rigorously
+        certified enclosures of the true power-law parameters. The midpoints
+        come from an ordinary ``numpy.linalg.lstsq`` fit on interval midpoints.
+        Treat these as estimates with uncertainty, not as machine-checked
+        bounds. For genuinely certified eigenvalue/quantity enclosures see
+        ``interval_arithmetic.verified_hermitian_eigenvalues``.
+
         CLAIM BOUNDARY:
-        This provides certified bounds on finite-system power law fits.
+        This provides finite-system power law fit estimates.
         It does NOT prove asymptotic scaling laws.
         """
         if len(system_sizes) != len(values):

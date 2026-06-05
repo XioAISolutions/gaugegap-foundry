@@ -1,38 +1,58 @@
 {
-  "theorem": {
-    "statement": "M_infinity >= 27.0",
-    "operator": "Berry-Keating xp",
-    "truncations_tested": [
-      10,
-      15,
-      20
+  "schema": "gaugegap.curverank_certificate.v2",
+  "timestamp_utc": "2026-06-05T11:13:03.193111+00:00",
+  "operator": "Berry-Keating xp",
+  "hypothesis_id": "curverank-0001",
+  "run_id": "20260605T111300Z",
+  "zeros_tested": 20,
+  "tier1_certified": {
+    "method": "interval_arithmetic_verified_eigenvalue_enclosure",
+    "precision": "mpmath_50_dps",
+    "per_truncation_bounds": [
+      {
+        "n_basis": 10,
+        "lower": 27.391322449240906,
+        "upper": 27.391322449240935
+      },
+      {
+        "n_basis": 15,
+        "lower": 29.390824646996478,
+        "upper": 29.390824646996514
+      },
+      {
+        "n_basis": 20,
+        "lower": 35.5356899424466,
+        "upper": 35.535689942446666
+      }
     ],
-    "zeros_tested": 20,
-    "min_observed_mismatch": 27.3913,
-    "certified_lower_bound": 27.0
+    "certified_min_lower_bound": 27.391322449240906,
+    "attained_at_n": 10,
+    "statement": "For every tested truncation n in [10, 15, 20], the spectral mismatch of the Berry-Keating xp operator to the first 20 Riemann zeros satisfies M_n >= 27.391322 (certified)."
   },
-  "proof_method": {
-    "type": "computer_assisted_spectral_analysis",
-    "precision": "machine_precision_float64",
-    "confidence_level": "conservative_minimum"
+  "tier2_evidence_not_certified": {
+    "method": "finite_n_trend",
+    "mismatch_midpoints_by_n": [
+      {
+        "n_basis": 10,
+        "midpoint": 27.39132244924092
+      },
+      {
+        "n_basis": 15,
+        "midpoint": 29.390824646996496
+      },
+      {
+        "n_basis": 20,
+        "midpoint": 35.53568994244664
+      }
+    ],
+    "note": "Supporting evidence only. NOT a certified n->infinity bound; extrapolation of a few finite truncations is not rigorous."
   },
   "data": {
-    "source_file": "results/sprint-now/curverank-0001-spectral-screen.csv",
-    "run_id": "20260529T020140Z",
-    "hypothesis_id": "curverank-0001",
-    "timestamp": "2026-05-28T22:07:08.326812"
+    "source_file": "results/sprint-now/curverank-0001-spectral-screen.csv"
   },
   "reproducibility": {
-    "command": "python3 scripts/run_curverank_screen.py --family xp --n-basis 10,15,20 --k-zeros 20",
-    "repository": "https://github.com/yourusername/gaugegap-foundry",
-    "verified": true
+    "command": "python3 scripts/run_curverank_screen.py --family xp --n-basis 10,15,20 --k-zeros 20 && python3 scripts/analyze_sprint_results.py",
+    "repository": "https://github.com/XioAISolutions/gaugegap-foundry"
   },
-  "claim_boundary": {
-    "scope": "finite_truncation_impossibility",
-    "does_not_claim": [
-      "solution_to_riemann_hypothesis",
-      "proof_of_hilbert_polya_conjecture"
-    ],
-    "claims": "berry_keating_operator_cannot_match_all_zeros"
-  }
+  "claim_boundary": "Finite-system, finite-truncation spectral-screening bound only. Does not claim to resolve the Riemann Hypothesis or the Hilbert-Polya conjecture, and asserts no certified continuum (n to infinity) limit. Finite-system benchmark; independent review required."
 }

@@ -2,7 +2,7 @@
 
 **Date**: May 28-29, 2026  
 **Status**: Production-Ready with Real Mathematical Results  
-**Achievement**: First Computer-Assisted Impossibility Proof Complete
+**Achievement**: Certified Finite-Truncation Spectral Screening
 
 ---
 
@@ -10,7 +10,7 @@
 
 This repository has evolved from concept to **production-ready research infrastructure** with **real mathematical results**. We have successfully:
 
-1. ✅ **Generated a computer-assisted impossibility proof** (Berry-Keating operator)
+1. ✅ **Certified a finite-truncation impossibility result** (Berry-Keating operator)
 2. ✅ **Built complete quantum hardware integration** (4 major providers)
 3. ✅ **Created deployment-ready infrastructure** (Docker, CI/CD, documentation)
 4. ✅ **Established rigorous verification framework** (claim boundaries, reproducibility)
@@ -92,8 +92,10 @@ This repository has evolved from concept to **production-ready research infrastr
 ### Phase 5: Real Results (COMPLETED!)
 **Duration**: Immediate execution  
 **Deliverables**:
-- **Berry-Keating impossibility proof**: M_∞ ≥ 27.0
-- Formal proof certificate
+- **Berry-Keating certified finite-truncation screening**: for every tested
+  truncation n ∈ {10, 15, 20}, certified M_n ≥ 27.39 (machine-checked interval
+  arithmetic). No certified n→∞ bound is claimed.
+- Formal certificate (two-tier: certified bound + non-certified trend evidence)
 - Reproducible computational data
 - Publication-ready summary
 
@@ -107,13 +109,16 @@ This repository has evolved from concept to **production-ready research infrastr
 
 ## 🏆 Key Achievements
 
-### 1. First Computer-Assisted Impossibility Proof
-**Theorem**: The Berry-Keating operator H = xp cannot match all Riemann zeros.  
-**Certified Bound**: M_∞ ≥ 27.0  
-**Method**: Spectral mismatch analysis with machine-precision computation  
+### 1. Certified Finite-Truncation Spectral Screening
+**Result**: At every tested truncation n ∈ {10, 15, 20}, the Berry-Keating
+operator H = xp is provably separated from the first 20 Riemann zeros.  
+**Certified Bound**: M_n ≥ 27.39 (minimum over tested n, attained at n=10)  
+**Method**: Verified eigenvalue enclosures + certified zeta-zero enclosures
+(interval arithmetic, mpmath 50 dps) — not a floating-point estimate  
+**Scope**: finite-truncation only; **no** certified n→∞ (continuum) bound and
+**no** claim about the Riemann Hypothesis or Hilbert-Pólya conjecture  
 **Cost**: $0 (100% local)  
-**Time**: ~10 seconds  
-**Status**: Ready for arXiv submission
+**Status**: certified finite-system benchmark
 
 ### 2. Complete Quantum Hardware Stack
 **Providers Integrated**:
@@ -138,7 +143,7 @@ This repository has evolved from concept to **production-ready research infrastr
 - IBM Runtime primary target
 
 **CurveRank** (Riemann Hypothesis):
-- **First impossibility proof complete!**
+- **Certified finite-truncation screening complete!**
 - Spectral operator screening
 - AI-guided hypothesis pruning
 - Trapped-ion QPE ready
@@ -231,10 +236,10 @@ This repository has evolved from concept to **production-ready research infrastr
 ## 🎓 Scientific Impact
 
 ### Publications Ready
-1. **Berry-Keating Impossibility Proof** (immediate)
+1. **Berry-Keating Certified Finite-Truncation Result** (immediate)
    - Target: arXiv → peer-reviewed journal
    - Timeline: 1-2 weeks to submission
-   - Impact: First AI-guided impossibility proof for RH
+   - Impact: AI-guided certified finite-truncation screening of Hilbert-Pólya candidates
 
 2. **Quantum Hardware Integration** (1-2 months)
    - Target: Quantum computing journal
@@ -263,7 +268,7 @@ This repository has evolved from concept to **production-ready research infrastr
 ## 🔬 Technical Highlights
 
 ### Novel Contributions
-1. **Computer-assisted impossibility proofs** for Hilbert-Pólya operators
+1. **Certified finite-truncation impossibility results** for Hilbert-Pólya operators
 2. **Unified quantum provider interface** across 4 major platforms
 3. **Claim boundary enforcement** in AI-for-science
 4. **Reproducible verification ladder** from classical to quantum
@@ -389,7 +394,7 @@ We don't hide failures. Impossibility proofs are valuable contributions.
 - ✅ Production-ready deployment
 - ✅ **Real mathematical results**
 
-**The Berry-Keating impossibility proof is ready for publication.**
+**The Berry-Keating certified finite-truncation screening result is ready for write-up.**
 
 **The infrastructure is ready for collaboration.**
 
@@ -423,7 +428,7 @@ We don't hide failures. Impossibility proofs are valuable contributions.
 **Repository**: https://github.com/YOUR_USERNAME/gaugegap-foundry  
 **License**: Apache 2.0  
 **Status**: Production-Ready ✅  
-**Achievement**: First Computer-Assisted Impossibility Proof Complete 🏆
+**Achievement**: Certified Finite-Truncation Spectral Screening 🏆
 
 **Let's change how AI-for-science is done.**
 
@@ -433,4 +438,4 @@ We don't hide failures. Impossibility proofs are valuable contributions.
 **Version**: 0.1.0  
 **Total Implementation Time**: ~48 hours of focused development  
 **Lines of Code**: 30,000+  
-**Mathematical Results**: 1 impossibility proof (more coming)
+**Mathematical Results**: 1 certified finite-truncation result (more coming)
