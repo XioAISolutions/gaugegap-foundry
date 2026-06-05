@@ -62,7 +62,9 @@ infinite dimension, or about the Riemann Hypothesis itself.
 ## 2. Methods
 
 All interval arithmetic is carried out with `mpmath` at 50 decimal digits of
-working precision.
+working precision, using the directed-rounding interval context (`mpmath.iv`) so
+that every elementary operation (`+, −, ×, ÷, √, exp`) rounds strictly outward
+and each endpoint is a certified outward bound rather than a round-to-nearest estimate.
 
 ### 2.1 Candidate operators
 

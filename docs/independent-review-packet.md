@@ -128,6 +128,15 @@ paired with the first zeta zero.
   validity is independent of the float eigensolver's accuracy.
 - **The order-statistic mismatch (§3.3).** Valid for any interval ordering;
   guarded by a dedicated regression test.
+- **Directed (outward) rounding.** The entire trusted path — the `Interval`
+  operations (`+,−,×,÷,√,exp,log`), the final residual-radius computation in
+  `verified_hermitian_eigenvalues`, and the mismatch reduction in
+  `certified_spectral_mismatch` — routes through `mpmath.iv`, which rounds every
+  elementary operation strictly outward. Endpoints are therefore certified
+  outward enclosures, not round-to-nearest estimates. Verified by
+  `test_directed_outward_rounding` (a `sqrt`/`÷`/`exp` whose round-to-nearest
+  result would be degenerate is shown to bracket the true value with positive
+  width). See §5.1.
 - **Disjointness diagnostic.** The regenerator measures it rather than assuming
   it, and all current rows satisfy it by a 12-orders-of-magnitude margin.
 
@@ -138,17 +147,21 @@ paired with the first zeta zero.
 These are the load-bearing assumptions. None is hidden; each is something an
 external auditor should independently confirm before endorsing the certificate.
 
-### 5.1 Directed rounding (the most important caveat)
-The `Interval` class (`interval_arithmetic.py:21`) implements `+,−,×,÷,√,exp`
-using `mpmath`'s **round-to-nearest** `mpf` operations at 50 digits, **not**
-outward-directed rounding. Consequently an enclosure endpoint can be wrong in
-its last ~ulp at 50 digits, i.e. by `O(10⁻⁵⁰)`. This is ~37 orders of magnitude
-below the residual widths (`~10⁻¹³`) that dominate every reported number, so it
-does not affect any digit shown — **but it means the enclosures are rigorous "up
-to last-digit rounding at 50 dps," not unconditionally.** A fully rigorous
-implementation should switch the trusted path to `mpmath.iv` (directed-rounding
-interval type) or add explicit outward rounding. *Obligation: confirm this slack
-is acceptable for the intended use, or request the `mpmath.iv` hardening.*
+### 5.1 Directed rounding — RESOLVED
+*Previously the most important caveat; now closed.* The `Interval` class
+(`interval_arithmetic.py:21`) originally implemented `+,−,×,÷,√,exp` with
+`mpmath`'s round-to-nearest `mpf` ops, so endpoints were rigorous only "up to
+last-digit rounding at 50 dps." The trusted path now routes every elementary
+operation — including the final residual-radius step in
+`verified_hermitian_eigenvalues` and the reduction in
+`certified_spectral_mismatch` — through `mpmath.iv`, the directed-rounding
+interval context (`mp.iv.dps = 50`), which rounds outward by construction. The
+enclosures are therefore unconditionally valid (modulo the standard trust in
+`mpmath.iv`'s own correctness). The reported headline numbers are unchanged: the
+former round-to-nearest slack was `O(10⁻⁵⁰)`, ~37 orders below the `~10⁻¹³`
+residual widths. *Residual obligation: trust `mpmath.iv`'s directed rounding, a
+standard, widely-used component — or cross-check a sample enclosure in an
+independent interval package (e.g. Arb).*
 
 ### 5.2 One-to-one spectral correspondence
 The residual bound certifies each enclosure contains *some* eigenvalue; it does
@@ -183,7 +196,7 @@ helper, never part of a certificate.
 - [ ] `pytest tests/test_curverank_certified.py -q` passes.
 - [ ] Read `verified_hermitian_eigenvalues` and agree the residual bound is correctly applied (§3.2).
 - [ ] Read `certified_spectral_mismatch` and agree the order-statistic pairing is a valid lower bound under overlap (§3.3).
-- [ ] Decide whether the round-to-nearest slack of §5.1 is acceptable, or require `mpmath.iv` hardening.
+- [ ] Confirm the trusted path uses `mpmath.iv` directed rounding (§5.1, done) — optionally cross-check one enclosure against an independent interval library.
 - [ ] Confirm the `disjoint` flag is `True` for every row you rely on (§5.2).
 - [ ] Accept or replace the `mpmath.zetazero` trust assumption (§5.3).
 

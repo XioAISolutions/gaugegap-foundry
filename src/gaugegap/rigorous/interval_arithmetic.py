@@ -16,6 +16,37 @@ import mpmath as mp
 
 # Set high precision for interval arithmetic
 mp.mp.dps = 50  # 50 decimal places
+# The iv context performs *directed (outward) rounding*, so every elementary
+# operation routed through it returns a guaranteed enclosure rather than a
+# round-to-nearest estimate. Keep its precision in lockstep with the scalar
+# context above.
+mp.iv.dps = 50
+
+
+def _to_iv(interval: "Interval"):
+    """View an :class:`Interval` as an mpmath directed-rounding iv number."""
+    return mp.iv.mpf([interval.lower, interval.upper])
+
+
+def _from_iv(z) -> "Interval":
+    """Read an iv result back into an :class:`Interval` (endpoints are already
+    outward-rounded by the iv context)."""
+    return Interval(mp.mpf(z.a), mp.mpf(z.b))
+
+
+def _sqrt_up(x: mp.mpf) -> mp.mpf:
+    """Smallest representable upper bound on sqrt(x) (x >= 0)."""
+    return mp.iv.sqrt(mp.iv.mpf([x, x])).b
+
+
+def _sqrt_down(x: mp.mpf) -> mp.mpf:
+    """Largest representable lower bound on sqrt(x) (x >= 0)."""
+    return mp.iv.sqrt(mp.iv.mpf([x, x])).a
+
+
+def _div_up(a: mp.mpf, b: mp.mpf) -> mp.mpf:
+    """Upper bound on a / b (b > 0)."""
+    return (mp.iv.mpf([a, a]) / mp.iv.mpf([b, b])).b
 
 
 @dataclass
@@ -65,41 +96,22 @@ class Interval:
         return self.lower - tolerance <= v <= self.upper + tolerance
     
     def __add__(self, other: "Interval") -> "Interval":
-        """Interval addition with guaranteed bounds."""
-        return Interval(
-            lower=self.lower + other.lower,
-            upper=self.upper + other.upper
-        )
-    
+        """Interval addition with guaranteed (outward-rounded) bounds."""
+        return _from_iv(_to_iv(self) + _to_iv(other))
+
     def __sub__(self, other: "Interval") -> "Interval":
-        """Interval subtraction with guaranteed bounds."""
-        return Interval(
-            lower=self.lower - other.upper,
-            upper=self.upper - other.lower
-        )
-    
+        """Interval subtraction with guaranteed (outward-rounded) bounds."""
+        return _from_iv(_to_iv(self) - _to_iv(other))
+
     def __mul__(self, other: "Interval") -> "Interval":
-        """Interval multiplication with guaranteed bounds."""
-        products = [
-            self.lower * other.lower,
-            self.lower * other.upper,
-            self.upper * other.lower,
-            self.upper * other.upper
-        ]
-        return Interval(lower=min(products), upper=max(products))
-    
+        """Interval multiplication with guaranteed (outward-rounded) bounds."""
+        return _from_iv(_to_iv(self) * _to_iv(other))
+
     def __truediv__(self, other: "Interval") -> "Interval":
-        """Interval division with guaranteed bounds."""
+        """Interval division with guaranteed (outward-rounded) bounds."""
         if other.lower <= 0 <= other.upper:
             raise ValueError("Division by interval containing zero")
-        
-        quotients = [
-            self.lower / other.lower,
-            self.lower / other.upper,
-            self.upper / other.lower,
-            self.upper / other.upper
-        ]
-        return Interval(lower=min(quotients), upper=max(quotients))
+        return _from_iv(_to_iv(self) / _to_iv(other))
     
     def __neg__(self) -> "Interval":
         """Interval negation."""
@@ -115,20 +127,20 @@ class Interval:
             return Interval(lower=mp.mpf(0), upper=max(-self.lower, self.upper))
     
     def sqrt(self) -> "Interval":
-        """Interval square root with guaranteed bounds."""
+        """Interval square root with guaranteed (outward-rounded) bounds."""
         if self.lower < 0:
             raise ValueError("Square root of negative interval")
-        return Interval(lower=mp.sqrt(self.lower), upper=mp.sqrt(self.upper))
-    
+        return _from_iv(mp.iv.sqrt(_to_iv(self)))
+
     def exp(self) -> "Interval":
-        """Interval exponential with guaranteed bounds."""
-        return Interval(lower=mp.exp(self.lower), upper=mp.exp(self.upper))
-    
+        """Interval exponential with guaranteed (outward-rounded) bounds."""
+        return _from_iv(mp.iv.exp(_to_iv(self)))
+
     def log(self) -> "Interval":
-        """Interval logarithm with guaranteed bounds."""
+        """Interval logarithm with guaranteed (outward-rounded) bounds."""
         if self.lower <= 0:
             raise ValueError("Logarithm of non-positive interval")
-        return Interval(lower=mp.log(self.lower), upper=mp.log(self.upper))
+        return _from_iv(mp.iv.log(_to_iv(self)))
     
     def sin(self) -> "Interval":
         """Interval sine with guaranteed bounds."""
@@ -415,10 +427,15 @@ def verified_hermitian_eigenvalues(matrix: IntervalMatrix) -> List[Interval]:
         for k in range(1, n):
             norm_x_sq = norm_x_sq + x_col[k] * x_col[k]
 
-        residual_norm_upper = mp.sqrt(residual_sq.upper)
-        norm_x_lower = mp.sqrt(norm_x_sq.lower)
-        radius = residual_norm_upper / norm_x_lower
-        enclosures.append(Interval(th - radius, th + radius))
+        # Final radius, with directed (outward) rounding so the enclosure is a
+        # guaranteed bound rather than a round-to-nearest estimate:
+        #   radius >= ||r||_upper / ||x||_lower  (round the quotient up).
+        residual_norm_upper = _sqrt_up(residual_sq.upper)
+        norm_x_lower = _sqrt_down(norm_x_sq.lower)
+        radius = _div_up(residual_norm_upper, norm_x_lower)
+        lo = (mp.iv.mpf([th, th]) - mp.iv.mpf([radius, radius])).a
+        hi = (mp.iv.mpf([th, th]) + mp.iv.mpf([radius, radius])).b
+        enclosures.append(Interval(mp.mpf(lo), mp.mpf(hi)))
 
     enclosures.sort(key=lambda iv: iv.midpoint())
     return enclosures
