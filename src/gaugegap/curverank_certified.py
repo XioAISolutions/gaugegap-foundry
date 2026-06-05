@@ -23,7 +23,11 @@ from __future__ import annotations
 
 from typing import List
 
-from gaugegap.curverank_operators import berry_keating_xp_interval
+from gaugegap.curverank_operators import (
+    berry_keating_xp_interval,
+    dirac_rindler_interval,
+    quantum_graph_laplacian_interval,
+)
 from gaugegap.curverank_spectral import (
     certified_spectral_mismatch,
     riemann_zero_intervals,
@@ -65,3 +69,60 @@ def certified_xp_mismatch(n_basis: int, k_zeros: int, L: float = 1.0) -> Interva
     eig_intervals = certified_xp_spectrum(n_basis, L)
     zero_intervals = riemann_zero_intervals(k_zeros)
     return certified_spectral_mismatch(eig_intervals, zero_intervals)
+
+
+def certified_dirac_rindler_spectrum(
+    n_basis: int, acceleration: float = 1.0, mass: float = 0.0
+) -> List[Interval]:
+    """Certified eigenvalue enclosures of the truncated Dirac-Rindler operator."""
+    embedding = dirac_rindler_interval(n_basis, acceleration, mass)
+    doubled = verified_hermitian_eigenvalues(embedding)
+    return _collapse_doubled_spectrum(doubled)
+
+
+def certified_quantum_graph_spectrum(
+    edges, lengths, n_modes: int
+) -> List[Interval]:
+    """Certified eigenvalue enclosures of a quantum-graph Laplacian.
+
+    The operator is real symmetric, so the verified enclosures apply directly
+    (no degenerate-pair collapse).
+    """
+    matrix = quantum_graph_laplacian_interval(edges, lengths, n_modes)
+    return verified_hermitian_eigenvalues(matrix)
+
+
+# Default quantum-graph geometry (star graph with three incommensurate edges).
+_DEFAULT_GRAPH_EDGES = [(0, 1), (0, 2), (0, 3)]
+
+
+def certified_family_mismatch(family: str, n: int, k_zeros: int, **kwargs) -> Interval:
+    """Certified spectral mismatch ``M_n`` for a named candidate operator family.
+
+    Parameters
+    ----------
+    family : {"xp", "dirac_rindler", "quantum_graph"}
+        Candidate operator family.
+    n : int
+        Truncation size (``n_basis`` for xp/dirac, ``n_modes`` for quantum_graph).
+    k_zeros : int
+        Number of Riemann zeros to compare against.
+    """
+    if family == "xp":
+        eigs = certified_xp_spectrum(n, kwargs.get("L", 1.0))
+    elif family == "dirac_rindler":
+        eigs = certified_dirac_rindler_spectrum(
+            n, kwargs.get("acceleration", 1.0), kwargs.get("mass", 0.0)
+        )
+    elif family == "quantum_graph":
+        import numpy as np
+
+        edges = kwargs.get("edges", _DEFAULT_GRAPH_EDGES)
+        lengths = kwargs.get("lengths", [1.0, float(np.sqrt(2)), float(np.sqrt(3))])
+        eigs = certified_quantum_graph_spectrum(edges, lengths, n)
+    else:
+        raise ValueError(
+            f"unknown family {family!r}; choose from "
+            "'xp', 'dirac_rindler', 'quantum_graph'"
+        )
+    return certified_spectral_mismatch(eigs, riemann_zero_intervals(k_zeros))

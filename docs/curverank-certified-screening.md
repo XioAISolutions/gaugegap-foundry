@@ -71,6 +71,24 @@ values exactly, but now with certified interval bounds.
 - **Does not** bear on the truth of the Riemann Hypothesis or the existence of a
   Hilbert–Pólya operator in general.
 
+## Other candidate operator families
+
+The same certified machinery generalizes to the other CurveRank candidate
+families. Real-symmetric operators (quantum-graph Laplacian) use the verified
+enclosures directly; complex-Hermitian operators (Dirac–Rindler) use the same
+real-symmetric embedding as `xp`. Representative certified mismatch bounds
+against the first 20 zeros:
+
+| family | truncation | certified `M_n ≥` |
+|--------|-----------|-------------------|
+| `xp` (Berry–Keating) | n = 10 | 27.39 |
+| `dirac_rindler` | n = 8 | 23.94 |
+| `quantum_graph` (star, 3 edges) | n_modes = 8 | 76.16 |
+
+These are produced by `curverank_certified.certified_family_mismatch(family, n, k_zeros)`.
+As with `xp`, each is a certified finite-truncation separation, not a continuum
+or asymptotic claim.
+
 ## Reproducibility
 
 ```bash
@@ -86,8 +104,9 @@ Tier 2 non-certified trend) and `results/sprint-now/PROOF_SUMMARY.md`.
 ## Limitations and next steps
 
 - The certified separation is established only at the tested finite truncations;
-  scaling to larger `n` and additional operator families is future work.
+  scaling to substantially larger `n` is future work.
 - Independent review of the residual-enclosure certification is the highest-value
   next step before any external write-up.
-- Natural extensions: apply the same certified machinery to the `dirac_rindler`
-  and `quantum_graph` families, and tighten the zero enclosures' provenance.
+- The certified machinery already covers the `xp`, `dirac_rindler`, and
+  `quantum_graph` families; tightening the provenance of the zero enclosures and
+  adding further candidate families are natural extensions.

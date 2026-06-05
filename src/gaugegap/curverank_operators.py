@@ -100,6 +100,129 @@ def berry_keating_xp_interval(n_basis: int, L: float = 1.0):
     return IntervalMatrix(entries)
 
 
+def _hermitian_real_embedding(re, im, eps, Interval, IntervalMatrix):
+    """Real-symmetric embedding ``[[Re, -Im], [Im, Re]]`` of a complex Hermitian
+    matrix ``Re + iIm`` (``Re`` symmetric, ``Im`` antisymmetric).
+
+    Each entry is wrapped as an interval of half-width ``eps`` to account for
+    rounding in the (possibly transcendental) matrix entries; the resulting
+    ``2N x 2N`` real symmetric matrix has the same spectrum as the original,
+    with every eigenvalue doubled.
+    """
+    dim = len(re)
+    out_dim = 2 * dim
+    entries = [[None] * out_dim for _ in range(out_dim)]
+    for i in range(dim):
+        for j in range(dim):
+            entries[i][j] = Interval(re[i][j] - eps, re[i][j] + eps)
+            entries[i + dim][j + dim] = Interval(re[i][j] - eps, re[i][j] + eps)
+            entries[i][j + dim] = Interval(-im[i][j] - eps, -im[i][j] + eps)
+            entries[i + dim][j] = Interval(im[i][j] - eps, im[i][j] + eps)
+    return IntervalMatrix(entries)
+
+
+def quantum_graph_laplacian_interval(
+    edges: list[tuple[int, int]],
+    lengths: list[float],
+    n_modes: int,
+):
+    """Certified interval form of :func:`quantum_graph_laplacian`.
+
+    The operator is real symmetric, so this returns a real symmetric
+    ``IntervalMatrix`` directly (no embedding needed). Diagonal entries
+    ``k^2 = ((m+1) pi / length)^2`` are enclosed at the active mpmath precision;
+    integer coupling entries are exact.
+    """
+    if len(edges) != len(lengths):
+        raise ValueError("edges and lengths must have the same length")
+    if n_modes < 1:
+        raise ValueError("n_modes must be at least 1")
+
+    import mpmath as mp
+    from gaugegap.rigorous.interval_arithmetic import Interval, IntervalMatrix
+
+    n_edges = len(edges)
+    dim = n_edges * n_modes
+    H = [[mp.mpf(0) for _ in range(dim)] for _ in range(dim)]
+
+    for e_idx, length in enumerate(lengths):
+        L = mp.mpf(length)
+        for m in range(n_modes):
+            k = (m + 1) * mp.pi / L
+            row = e_idx * n_modes + m
+            H[row][row] = k * k
+
+    vertices: dict[int, list[int]] = {}
+    for e_idx, (u, v) in enumerate(edges):
+        vertices.setdefault(u, []).append(e_idx)
+        vertices.setdefault(v, []).append(e_idx)
+
+    for edge_list in vertices.values():
+        for i_idx in range(len(edge_list)):
+            for j_idx in range(i_idx + 1, len(edge_list)):
+                e_i = edge_list[i_idx]
+                e_j = edge_list[j_idx]
+                for m in range(n_modes):
+                    row = e_i * n_modes + m
+                    col = e_j * n_modes + m
+                    H[row][col] += mp.mpf(1)
+                    H[col][row] += mp.mpf(1)
+
+    eps = mp.mpf(10) ** (-(mp.mp.dps - 5))
+    entries = [
+        [Interval(H[i][j] - eps, H[i][j] + eps) for j in range(dim)]
+        for i in range(dim)
+    ]
+    return IntervalMatrix(entries)
+
+
+def dirac_rindler_interval(n_basis: int, acceleration: float = 1.0, mass: float = 0.0):
+    """Certified interval form of :func:`dirac_rindler_truncated`.
+
+    The operator is ``2n x 2n`` complex Hermitian; this returns the
+    ``4n x 4n`` real-symmetric embedding (eigenvalues doubled). Transcendental
+    Rindler factors ``exp(acceleration * xi)`` are enclosed at the active
+    mpmath precision.
+    """
+    if n_basis < 2:
+        raise ValueError("n_basis must be at least 2")
+
+    import mpmath as mp
+    from gaugegap.rigorous.interval_arithmetic import Interval, IntervalMatrix
+
+    n = n_basis
+    dx = mp.mpf(1) / (n + 1)
+    xi = [dx * (k + 1) for k in range(n)]
+    accel = mp.mpf(acceleration)
+    mass_mp = mp.mpf(mass)
+
+    dim = 2 * n
+    re = [[mp.mpf(0) for _ in range(dim)] for _ in range(dim)]
+    im = [[mp.mpf(0) for _ in range(dim)] for _ in range(dim)]
+
+    for i in range(n):
+        if mass != 0:
+            re[i][i + n] += mass_mp
+            re[i + n][i] += mass_mp
+
+    for i in range(n):
+        rindler_x = mp.e ** (accel * xi[i])
+        for j in range(n):
+            if i == j:
+                continue
+            deriv = mp.mpf((-1) ** (i - j)) / ((i - j) * dx)
+            im[i][j + n] += -(rindler_x * deriv)
+            im[j + n][i] += rindler_x * deriv
+
+    # Symmetrize: H = 0.5 (H + H^dagger) -> Re symmetric, Im antisymmetric.
+    re_s = [[(re[i][j] + re[j][i]) / 2 for j in range(dim)] for i in range(dim)]
+    im_s = [[(im[i][j] - im[j][i]) / 2 for j in range(dim)] for i in range(dim)]
+
+    eps = mp.mpf(10) ** (-(mp.mp.dps - 5))
+    return _hermitian_real_embedding(re_s, im_s, eps, Interval, IntervalMatrix)
+
+
+
 def quantum_graph_laplacian(
     edges: list[tuple[int, int]],
     lengths: list[float],

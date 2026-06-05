@@ -17,15 +17,29 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from gaugegap.curverank_operators import berry_keating_xp, berry_keating_xp_interval
+from gaugegap.curverank_operators import (
+    berry_keating_xp,
+    berry_keating_xp_interval,
+    dirac_rindler_truncated,
+    quantum_graph_laplacian,
+)
 from gaugegap.curverank_spectral import (
     certified_spectral_mismatch,
     riemann_zero_intervals,
     riemann_zero_targets,
     spectral_mismatch,
 )
-from gaugegap.curverank_certified import certified_xp_mismatch, certified_xp_spectrum
+from gaugegap.curverank_certified import (
+    certified_dirac_rindler_spectrum,
+    certified_family_mismatch,
+    certified_quantum_graph_spectrum,
+    certified_xp_mismatch,
+    certified_xp_spectrum,
+)
 from gaugegap.rigorous.interval_arithmetic import verified_hermitian_eigenvalues
+
+_GRAPH_EDGES = [(0, 1), (0, 2), (0, 3)]
+_GRAPH_LENGTHS = [1.0, float(np.sqrt(2)), float(np.sqrt(3))]
 
 # Recorded floating-point screening values (results/sprint-now), k_zeros=20.
 RECORDED = {10: 27.391322449240914, 15: 31.884970126092618, 20: 35.53568994244663}
@@ -50,6 +64,40 @@ class TestCertifiedXPSpectrum(unittest.TestCase):
             fe = np.sort(np.linalg.eigvalsh(berry_keating_xp(n)))
             np.testing.assert_allclose(mids, fe, atol=1e-9)
             self.assertLess(max(float(iv.width()) for iv in ce), 1e-6)
+
+
+class TestOtherCertifiedFamilies(unittest.TestCase):
+    def test_dirac_rindler_spectrum_matches_float(self):
+        for n in (6, 8):
+            ce = certified_dirac_rindler_spectrum(n, acceleration=1.0, mass=0.1)
+            self.assertEqual(len(ce), 2 * n)
+            mids = np.array(sorted(float(iv.midpoint()) for iv in ce))
+            fe = np.sort(np.linalg.eigvalsh(dirac_rindler_truncated(n, 1.0, 0.1)))
+            np.testing.assert_allclose(mids, fe, atol=1e-9)
+            self.assertLess(max(float(iv.width()) for iv in ce), 1e-6)
+
+    def test_quantum_graph_spectrum_matches_float(self):
+        for nm in (4, 8):
+            ce = certified_quantum_graph_spectrum(_GRAPH_EDGES, _GRAPH_LENGTHS, nm)
+            self.assertEqual(len(ce), 3 * nm)
+            mids = np.array(sorted(float(iv.midpoint()) for iv in ce))
+            fe = np.sort(
+                np.linalg.eigvalsh(
+                    quantum_graph_laplacian(_GRAPH_EDGES, _GRAPH_LENGTHS, nm)
+                )
+            )
+            np.testing.assert_allclose(mids, fe, atol=1e-8)
+            self.assertLess(max(float(iv.width()) for iv in ce), 1e-6)
+
+    def test_family_mismatch_dispatch(self):
+        for family, n in (("xp", 10), ("dirac_rindler", 8), ("quantum_graph", 8)):
+            mm = certified_family_mismatch(family, n, 20)
+            self.assertLessEqual(mm.lower, mm.upper)
+            self.assertGreater(float(mm.lower), 0.0)
+
+    def test_unknown_family_raises(self):
+        with self.assertRaises(ValueError):
+            certified_family_mismatch("nope", 8, 20)
 
 
 class TestRiemannZeroIntervals(unittest.TestCase):
