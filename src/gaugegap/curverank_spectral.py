@@ -64,13 +64,17 @@ def riemann_zero_targets(k: int) -> np.ndarray:
 def spectral_mismatch(
     eigenvalues: np.ndarray,
     targets: np.ndarray,
+    zero_tol: float = 1e-9,
 ) -> float:
     """L2 distance between sorted positive eigenvalues and target zero list.
 
-    Only compares up to min(len(eigenvalues), len(targets)) values.
+    Structural zero modes (``|eig| <= zero_tol``) are dropped before sorting, so
+    a symmetric spectrum's spurious zero eigenvalue is not paired with the first
+    Riemann zero. Only compares up to ``min(#nonzero eigenvalues, #targets)``
+    values.
     """
     eigs = np.sort(np.abs(eigenvalues))
-    eigs = eigs[eigs > 0]
+    eigs = eigs[eigs > zero_tol]
     n = min(len(eigs), len(targets))
     if n == 0:
         return float("inf")
@@ -133,7 +137,11 @@ def certified_spectral_mismatch(eig_intervals, zero_intervals):
     import mpmath as mp
     from gaugegap.rigorous.interval_arithmetic import Interval
 
-    abs_eigs = [abs(e) for e in eig_intervals]
+    # Drop structural zero modes (enclosures that contain 0, i.e. not certifiably
+    # nonzero) so a symmetric spectrum's zero eigenvalue is not paired with the
+    # first Riemann zero. This mirrors the zero-mode filtering in
+    # :func:`spectral_mismatch`.
+    abs_eigs = [abs(e) for e in eig_intervals if not (e.lower <= 0 <= e.upper)]
     n = min(len(abs_eigs), len(zero_intervals))
     if n == 0:
         return Interval(mp.inf, mp.inf)

@@ -12,7 +12,7 @@ with the per-truncation certified enclosures:
 | n | certified M_n enclosure |
 |---|--------------------------|
 | 10 | [27.391322, 27.391322] |
-| 15 | [31.884970, 31.884970] |
+| 15 | [29.390825, 29.390825] |
 | 20 | [35.535690, 35.535690] |
 
 These are rigorous interval-arithmetic bounds (mpmath, 50 decimal places),

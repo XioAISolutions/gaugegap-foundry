@@ -42,7 +42,9 @@ _GRAPH_EDGES = [(0, 1), (0, 2), (0, 3)]
 _GRAPH_LENGTHS = [1.0, float(np.sqrt(2)), float(np.sqrt(3))]
 
 # Recorded floating-point screening values (results/sprint-now), k_zeros=20.
-RECORDED = {10: 27.391322449240914, 15: 31.884970126092618, 20: 35.53568994244663}
+# Zero modes are dropped, so the odd-dimensional n=15 truncation excludes its
+# structural zero eigenvalue.
+RECORDED = {10: 27.391322449240914, 15: 29.39082464699649, 20: 35.53568994244663}
 
 
 class TestCertifiedXPSpectrum(unittest.TestCase):
@@ -131,6 +133,21 @@ class TestCertifiedMismatch(unittest.TestCase):
             float_mismatch = spectral_mismatch(fe, riemann_zero_targets(20))
             self.assertLessEqual(float(enclosure.lower), float_mismatch + 1e-9)
 
+    def test_zero_mode_is_excluded(self):
+        # A structural zero mode must be dropped, not paired with the first zero:
+        # the remaining nonzero eigenvalue matches the single target, so the
+        # mismatch is ~0 (it would be ~14.1 if the zero mode were retained).
+        import mpmath as mp
+        from gaugegap.rigorous.interval_arithmetic import Interval
+
+        eigs = [
+            Interval(mp.mpf("-1e-13"), mp.mpf("1e-13")),  # zero mode
+            Interval(mp.mpf("14.134725"), mp.mpf("14.134725")),
+        ]
+        zeros = [Interval(mp.mpf("14.134725"), mp.mpf("14.134725"))]
+        enclosure = certified_spectral_mismatch(eigs, zeros)
+        self.assertLess(float(enclosure.upper), 1e-6)
+
     def test_perfect_match_is_zero(self):
         # Comparing certified zeros against themselves gives mismatch ~ 0.
         zeros = riemann_zero_intervals(5)
@@ -146,11 +163,12 @@ class TestCertifiedMismatch(unittest.TestCase):
         import mpmath as mp
         from gaugegap.rigorous.interval_arithmetic import Interval
 
-        eigs = [Interval(mp.mpf(0), mp.mpf(10)), Interval(mp.mpf(6), mp.mpf(7))]
-        zeros = [Interval(mp.mpf(8), mp.mpf(8)), Interval(mp.mpf("8.5"), mp.mpf("8.5"))]
+        # Enclosures kept away from 0 so the zero-mode filter does not apply.
+        eigs = [Interval(mp.mpf(2), mp.mpf(12)), Interval(mp.mpf(8), mp.mpf(9))]
+        zeros = [Interval(mp.mpf(10), mp.mpf(10)), Interval(mp.mpf("10.5"), mp.mpf("10.5"))]
         enclosure = certified_spectral_mismatch(eigs, zeros)
 
-        true_min = mp.sqrt(mp.mpf(1) / 2)  # config A=8.5, B=7 -> sort [7, 8.5]
+        true_min = mp.sqrt(mp.mpf(1) / 2)  # config A=10.5, B=9 -> sort [9, 10.5]
         self.assertLessEqual(enclosure.lower, true_min + mp.mpf("1e-30"))
         # And it should be tight (equal to the true achievable minimum here).
         self.assertAlmostEqual(float(enclosure.lower), float(true_min), places=12)

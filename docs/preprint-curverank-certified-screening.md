@@ -111,7 +111,11 @@ construction: for interval data the `k`-th smallest true value lies in
 `[k-th smallest lower endpoint, k-th smallest upper endpoint]` (sort lower and
 upper endpoints independently). Pairing those per-rank enclosures yields a
 mismatch lower bound valid for every ordering consistent with the intervals, and
-it reduces to the naive pairing when the enclosures are disjoint.
+it reduces to the naive pairing when the enclosures are disjoint. Structural
+zero modes — enclosures that contain `0`, e.g. the zero eigenvalue of an
+odd-dimensional symmetric truncation — are dropped before the order statistics,
+consistently with the floating-point screening, so a spurious zero is not paired
+with the first zeta zero.
 
 ## 3. Results
 
@@ -122,7 +126,7 @@ floating-point screening values, now with certified bounds of width ≈ 10⁻¹�
 | family | truncation | certified `M_n ≥` | enclosure width |
 |--------|-----------|-------------------|-----------------|
 | `xp` (Berry–Keating) | n = 10 | 27.39 | ≈ 3 × 10⁻¹⁴ |
-| `xp` (Berry–Keating) | n = 15 | 31.88 | ≈ 4 × 10⁻¹⁴ |
+| `xp` (Berry–Keating) | n = 15 | 29.39 | ≈ 4 × 10⁻¹⁴ |
 | `xp` (Berry–Keating) | n = 20 | 35.54 | ≈ 6 × 10⁻¹⁴ |
 | `dirac_rindler` | n = 8 | 23.94 | ≈ 2 × 10⁻¹³ |
 | `quantum_graph` (star, 3 edges) | n_modes = 8 | 76.16 | ≈ 1 × 10⁻¹² |

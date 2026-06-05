@@ -23,7 +23,7 @@ zeros), the spectrum is certifiably separated from the zeros by
 | n | certified `M_n` enclosure | enclosure width |
 |---|---------------------------|-----------------|
 | 10 | [27.391322, 27.391322] | ≈ 2.8 × 10⁻¹⁴ |
-| 15 | [31.884970, 31.884970] | ≈ 3.5 × 10⁻¹⁴ |
+| 15 | [29.390825, 29.390825] | ≈ 3.5 × 10⁻¹⁴ |
 | 20 | [35.535690, 35.535690] | ≈ 6.4 × 10⁻¹⁴ |
 
 The minimum certified separation over the tested truncations is
@@ -48,7 +48,10 @@ arithmetic at 50 decimal places:
    returned interval is certified to contain a true eigenvalue. Enclosures are
    ~10⁻¹³ wide. (`rigorous.interval_arithmetic.verified_hermitian_eigenvalues`)
 
-3. **Certified zeros and mismatch.** Riemann-zero imaginary parts are enclosed
+3. **Certified zeros and mismatch.** Structural zero modes (enclosures that
+   contain `0`, such as the zero eigenvalue of an odd-dimensional truncation)
+   are dropped first, matching the floating-point screening, so a spurious zero
+   is not paired with the first zeta zero. Riemann-zero imaginary parts are enclosed
    with `mpmath.zetazero` at working precision; the mismatch `M_n` is then
    bounded below by combining the eigenvalue and zero enclosures conservatively
    (overlapping enclosures contribute zero).

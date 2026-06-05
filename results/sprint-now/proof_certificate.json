@@ -1,9 +1,9 @@
 {
   "schema": "gaugegap.curverank_certificate.v2",
-  "timestamp_utc": "2026-06-04T15:38:30.209313+00:00",
+  "timestamp_utc": "2026-06-05T11:13:03.193111+00:00",
   "operator": "Berry-Keating xp",
   "hypothesis_id": "curverank-0001",
-  "run_id": "20260529T020140Z",
+  "run_id": "20260605T111300Z",
   "zeros_tested": 20,
   "tier1_certified": {
     "method": "interval_arithmetic_verified_eigenvalue_enclosure",
@@ -16,8 +16,8 @@
       },
       {
         "n_basis": 15,
-        "lower": 31.884970126092615,
-        "upper": 31.88497012609265
+        "lower": 29.390824646996478,
+        "upper": 29.390824646996514
       },
       {
         "n_basis": 20,
@@ -38,7 +38,7 @@
       },
       {
         "n_basis": 15,
-        "midpoint": 31.884970126092632
+        "midpoint": 29.390824646996496
       },
       {
         "n_basis": 20,
