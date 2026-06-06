@@ -212,3 +212,227 @@ PDG_DECUPLET: Dict[str, Tuple[float, float]] = {
     "Xi_star": (1531.8, 0.4),
     "Omega": (1672.45, 0.29),
 }
+
+# Individual charged-state masses (MeV, PDG), for isospin/EM mass-splitting
+# relations such as Coleman-Glashow.
+PDG_OCTET_STATES: Dict[str, Tuple[float, float]] = {
+    "p": (938.272, 0.0003),
+    "n": (939.565, 0.0005),
+    "Sigma+": (1189.37, 0.07),
+    "Sigma0": (1192.642, 0.024),
+    "Sigma-": (1197.449, 0.030),
+    "Lambda": (1115.683, 0.006),
+    "Xi0": (1314.86, 0.20),
+    "Xi-": (1321.71, 0.07),
+}
+
+# Pseudoscalar meson nonet (MeV). Meson GMO is quadratic in the mass.
+PDG_PSEUDOSCALAR: Dict[str, Tuple[float, float]] = {
+    "pi+": (139.570, 0.0002),
+    "pi0": (134.977, 0.0005),
+    "K+": (493.677, 0.016),
+    "K0": (497.611, 0.013),
+    "eta": (547.862, 0.017),
+    "eta_prime": (957.78, 0.06),
+}
+
+# Vector meson nonet (MeV).
+PDG_VECTOR: Dict[str, Tuple[float, float]] = {
+    "rho": (775.26, 0.23),
+    "K_star": (891.67, 0.26),
+    "omega": (782.66, 0.13),
+    "phi": (1019.461, 0.016),
+}
+
+
+# ===========================================================================
+# Certified relations battery: each standard SU(3)-flavor mass relation as a
+# certified residual interval propagated from the input masses-with-errors.
+# ===========================================================================
+
+@dataclass
+class RelationResult:
+    """Outcome of one certified SU(3) mass relation."""
+
+    name: str
+    residual: Interval     # certified enclosure of the relation's residual
+    scale: float           # characteristic scale (for a relative size)
+    note: str = ""
+
+    @property
+    def encloses_zero(self) -> bool:
+        return bool(self.residual.lower <= 0 <= self.residual.upper)
+
+    @property
+    def rel_percent(self) -> float:
+        if self.scale == 0:
+            return float("nan")
+        return 100.0 * abs(float(self.residual.midpoint())) / self.scale
+
+
+def _sq(mass: Tuple[float, float]) -> Interval:
+    """Certified square of a mass-with-error interval."""
+    m = _iv(*mass)
+    return m * m
+
+
+def certified_decuplet_spacings(
+    delta=PDG_DECUPLET["Delta"],
+    sigma_star=PDG_DECUPLET["Sigma_star"],
+    xi_star=PDG_DECUPLET["Xi_star"],
+    omega=PDG_DECUPLET["Omega"],
+) -> List[RelationResult]:
+    """Certified decuplet equal-spacing residuals (two independent relations).
+
+    Equal spacing in hypercharge: (Sigma*-Delta) = (Xi*-Sigma*) = (Omega-Xi*).
+    """
+    d, s, x, o = _iv(*delta), _iv(*sigma_star), _iv(*xi_star), _iv(*omega)
+    g1, g2, g3 = s - d, x - s, o - x
+    scale = float((s - d).midpoint())
+    return [
+        RelationResult("decuplet spacing (Xi*-Sigma*)-(Sigma*-Delta)", g2 - g1, scale),
+        RelationResult("decuplet spacing (Omega-Xi*)-(Xi*-Sigma*)", g3 - g2, scale),
+    ]
+
+
+def certified_meson_gmo(
+    pi=PDG_PSEUDOSCALAR["pi+"],
+    kaon=PDG_PSEUDOSCALAR["K+"],
+    eta=PDG_PSEUDOSCALAR["eta"],
+) -> RelationResult:
+    """Certified pseudoscalar GMO residual 4*m_K^2 - 3*m_eta^2 - m_pi^2.
+
+    Quadratic in the mass (mesons). The residual is sizeable (~6%) because the
+    physical eta mixes with the singlet eta'; see ``certified_eta_mixing``.
+    """
+    four = Interval.from_float(4.0)
+    three = Interval.from_float(3.0)
+    residual = four * _sq(kaon) - three * _sq(eta) - _sq(pi)
+    scale = float((four * _sq(kaon)).midpoint())
+    return RelationResult(
+        "pseudoscalar GMO 4K^2-3eta^2-pi^2", residual, scale,
+        note="quadratic; nonzero from eta-eta' mixing",
+    )
+
+
+def certified_coleman_glashow(states: Dict[str, Tuple[float, float]] = None) -> RelationResult:
+    """Certified Coleman-Glashow relation among octet EM mass splittings.
+
+    (M_n - M_p) + (M_Xi- - M_Xi0) - (M_Sigma- - M_Sigma+) = 0.
+    """
+    st = states or PDG_OCTET_STATES
+    n, p = _iv(*st["n"]), _iv(*st["p"])
+    xim, xi0 = _iv(*st["Xi-"]), _iv(*st["Xi0"])
+    sm, sp = _iv(*st["Sigma-"]), _iv(*st["Sigma+"])
+    residual = (n - p) + (xim - xi0) - (sm - sp)
+    scale = float((sm - sp).midpoint())
+    return RelationResult(
+        "Coleman-Glashow (n-p)+(Xi--Xi0)-(Sigma--Sigma+)", residual, scale,
+        note="electromagnetic mass splittings",
+    )
+
+
+def certified_constituent_quark_masses(
+    delta=PDG_DECUPLET["Delta"], omega=PDG_DECUPLET["Omega"]
+) -> Dict[str, Interval]:
+    """Certified constituent quark masses from the decuplet (additive model).
+
+    In the decuplet, Delta = qqq and Omega = sss, so m_q = M_Delta/3 and
+    m_s = M_Omega/3; the strange-light splitting m_s - m_q drives the equal
+    spacing.
+    """
+    three = Interval.from_float(3.0)
+    m_q = _iv(*delta) / three
+    m_s = _iv(*omega) / three
+    return {"m_q": m_q, "m_s": m_s, "m_s_minus_m_q": m_s - m_q}
+
+
+def certified_eta_mixing(
+    pi=PDG_PSEUDOSCALAR["pi+"],
+    kaon=PDG_PSEUDOSCALAR["K+"],
+    eta=PDG_PSEUDOSCALAR["eta"],
+    eta_prime=PDG_PSEUDOSCALAR["eta_prime"],
+) -> Dict[str, Interval]:
+    """Certified eta-eta' mixing parameters from a 2x2 mass-squared system.
+
+    The octet member mass-squared is fixed by GMO, m8^2 = (4 m_K^2 - m_pi^2)/3.
+    The physical eta, eta' diagonalize a 2x2 [[m8^2, t],[t, m1^2]] system, so
+    from trace/determinant:
+        m1^2 = (m_eta^2 + m_eta'^2) - m8^2
+        t^2  = m8^2 * m1^2 - m_eta^2 * m_eta'^2
+    Both returned as certified intervals (t^2 >= 0 is the consistency check).
+    """
+    four = Interval.from_float(4.0)
+    three = Interval.from_float(3.0)
+    m8_sq = (four * _sq(kaon) - _sq(pi)) / three
+    eta_sq, etap_sq = _sq(eta), _sq(eta_prime)
+    m1_sq = (eta_sq + etap_sq) - m8_sq
+    t_sq = m8_sq * m1_sq - eta_sq * etap_sq
+    return {"m8_sq": m8_sq, "m1_sq": m1_sq, "t_sq": t_sq}
+
+
+def certified_relations_battery() -> List[RelationResult]:
+    """Run the full battery of certified SU(3)-flavor mass relations."""
+    results: List[RelationResult] = []
+    # Octet GMO (linear).
+    r_oct = gmo_residual_from_masses(
+        PDG_OCTET["N"], PDG_OCTET["Sigma"], PDG_OCTET["Lambda"], PDG_OCTET["Xi"]
+    )
+    scale_oct = 3 * PDG_OCTET["Lambda"][0] + PDG_OCTET["Sigma"][0]
+    results.append(RelationResult("baryon octet GMO 2(N+Xi)-3Lambda-Sigma", r_oct, scale_oct))
+    # Decuplet equal spacing (two relations).
+    results.extend(certified_decuplet_spacings())
+    # Pseudoscalar meson GMO (quadratic).
+    results.append(certified_meson_gmo())
+    # Coleman-Glashow EM relation.
+    results.append(certified_coleman_glashow())
+    return results
+
+
+# ===========================================================================
+# Weight diagrams (I3, Y) -- the geometric patterns of the Eightfold Way.
+# ===========================================================================
+
+# (name, I3, Y) for the decuplet, completing the data already in OCTET.
+DECUPLET_WEIGHTS: Tuple[Tuple[str, float, float], ...] = (
+    ("Delta-", -1.5, 1.0), ("Delta0", -0.5, 1.0), ("Delta+", 0.5, 1.0), ("Delta++", 1.5, 1.0),
+    ("Sigma*-", -1.0, 0.0), ("Sigma*0", 0.0, 0.0), ("Sigma*+", 1.0, 0.0),
+    ("Xi*-", -0.5, -1.0), ("Xi*0", 0.5, -1.0),
+    ("Omega-", 0.0, -2.0),
+)
+
+
+def _weight_diagram_svg(points, title: str, width: int = 460, height: int = 420) -> str:
+    """Render (I3, Y) weight points as a standalone SVG string."""
+    cx, cy, scale = width / 2, height / 2 + 20, 95.0
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}" font-family="sans-serif">',
+        f'<rect width="{width}" height="{height}" fill="white"/>',
+        f'<text x="{width/2}" y="28" text-anchor="middle" font-size="18" '
+        f'font-weight="bold">{title}</text>',
+    ]
+    # Axes.
+    parts.append(
+        f'<line x1="40" y1="{cy}" x2="{width-40}" y2="{cy}" stroke="#bbb"/>'
+        f'<line x1="{cx}" y1="60" x2="{cx}" y2="{height-30}" stroke="#bbb"/>'
+        f'<text x="{width-30}" y="{cy-8}" font-size="13" fill="#888">I&#8323;</text>'
+        f'<text x="{cx+8}" y="72" font-size="13" fill="#888">Y</text>'
+    )
+    for name, i3, y in points:
+        px, py = cx + i3 * scale, cy - y * scale
+        parts.append(
+            f'<circle cx="{px:.1f}" cy="{py:.1f}" r="16" fill="#eef3ff" stroke="#2a4d9b"/>'
+            f'<text x="{px:.1f}" y="{py+4:.1f}" text-anchor="middle" font-size="10">{name}</text>'
+        )
+    parts.append("</svg>")
+    return "\n".join(parts)
+
+
+def octet_weight_diagram_svg() -> str:
+    pts = [(s.name, s.iso3, s.hyper) for s in OCTET]
+    return _weight_diagram_svg(pts, "Baryon octet (J=1/2)")
+
+
+def decuplet_weight_diagram_svg() -> str:
+    return _weight_diagram_svg(list(DECUPLET_WEIGHTS), "Baryon decuplet (J=3/2)")

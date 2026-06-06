@@ -60,26 +60,47 @@ arithmetic on the operator's own levels,
 for every choice of `a, b, c` — because the breaking term transforms as an
 octet.
 
-**(C) Certified empirical checks (PDG masses with uncertainties).**
+**(C) Certified relations battery (PDG masses with uncertainties).** Every
+standard SU(3)-flavor mass relation, evaluated in interval arithmetic so each
+residual is a certified enclosure propagated from the input mass uncertainties:
 
-- **GMO residual.** With the measured isospin-averaged octet masses, the
-  certified residual is `≈ [−25.96, −25.62]` MeV — about `0.56%` of the mass
-  scale. This is the well-known small GMO discrepancy (the breaking is not a
-  pure octet), now reported as a certified interval propagated from the input
-  uncertainties.
-- **The Ω⁻ prediction.** The decuplet equal-spacing rule predicts
-  `M_Ω = 2·M_Ξ* − M_Σ*`. From the measured `Σ*` and `Ξ*`, the certified
-  prediction is `≈ [1678.1, 1681.7]` MeV, vs. the measured `1672.45 ± 0.29` MeV
-  — agreement to `≈ 0.45%`. This is the historic prediction that confirmed the
-  Eightfold Way, here as a certified interval.
+| relation | certified residual | rel. | encloses 0? |
+|----------|--------------------|------|-------------|
+| baryon octet GMO `2(N+Ξ)−3Λ−Σ` | `[−25.96, −25.62]` MeV | 0.57% | no |
+| decuplet spacing `(Ξ*−Σ*)−(Σ*−Δ)` | `[−7.00, −0.20]` MeV | 2.4% | no |
+| decuplet spacing `(Ω−Ξ*)−(Ξ*−Σ*)` | `[−9.54, −5.36]` MeV | 4.9% | no |
+| pseudoscalar GMO `4K²−3η²−π²` (quadratic) | `≈ [5.48, 5.50]×10⁴` MeV² | 5.6% | no |
+| Coleman–Glashow `(n−p)+(Ξ⁻−Ξ⁰)−(Σ⁻−Σ⁺)` | `[−0.31, 0.43]` MeV | 0.8% | **yes** |
+
+The residuals quantify, with certified bounds, exactly how well each symmetry
+relation holds: the octet GMO breaking is `≈ −26` MeV (0.57%), the pseudoscalar
+GMO carries the well-known `≈ 5.6%` shift from η–η′ mixing, and the
+electromagnetic **Coleman–Glashow** relation is certified *consistent with zero*.
+
+**(D) Derived certified quantities.**
+
+- **Constituent quark masses** (decuplet additive model, `Δ=qqq`, `Ω=sss`):
+  `m_q ≈ [410.3, 411.0]`, `m_s ≈ [557.4, 557.6]` MeV, with strange–light
+  splitting `m_s − m_q ≈ [146.4, 147.2]` MeV — the scale that sets the decuplet
+  equal spacing.
+- **The Ω⁻ prediction.** Equal spacing gives `M_Ω = 2·M_Ξ* − M_Σ*`; the certified
+  prediction `≈ [1678.1, 1681.7]` MeV vs. measured `1672.45 ± 0.29` (~0.45%) —
+  the historic confirmation of the Eightfold Way, as a certified interval.
+- **η–η′ mixing.** From a 2×2 mass-squared system (octet `m₈²` fixed by GMO), the
+  off-diagonal `t²` is certified strictly positive — a certified consistency
+  check that a real octet–singlet mixing angle exists.
+
+**(E) Weight diagrams.** The runner emits the Eightfold-Way `(I₃, Y)` weight
+diagrams (the octet hexagon and the decuplet triangle) as SVG to `figures/`.
 
 ## Files
 
 | component | path |
 |-----------|------|
-| Model + certified checks | `src/gaugegap/eightfold.py` |
-| Report runner | `scripts/run_eightfold.py` |
+| Model + full certified battery | `src/gaugegap/eightfold.py` |
+| Report runner + figures | `scripts/run_eightfold.py` |
 | Tests | `tests/test_eightfold.py` |
+| Weight diagrams | `figures/octet_weight_diagram.svg`, `figures/decuplet_weight_diagram.svg` |
 
 ## Relation to the rest of the repo
 

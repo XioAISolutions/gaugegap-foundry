@@ -16,11 +16,19 @@ from gaugegap.eightfold import (
     PDG_DECUPLET,
     PDG_OCTET,
     OctetModel,
+    certified_coleman_glashow,
+    certified_constituent_quark_masses,
+    certified_decuplet_spacings,
     certified_distinct_levels,
+    certified_eta_mixing,
     certified_gmo_residual_model,
+    certified_meson_gmo,
     certified_octet_spectrum,
     certified_omega_prediction,
+    certified_relations_battery,
+    decuplet_weight_diagram_svg,
     gmo_residual_from_masses,
+    octet_weight_diagram_svg,
 )
 
 
@@ -83,3 +91,57 @@ def test_certified_omega_prediction():
     assert abs(float(omega.midpoint()) - measured) / measured < 0.01
     # Certified interval has positive but small width from the input uncertainties.
     assert 0 < float(omega.width()) < 5.0
+
+
+def test_decuplet_spacings_small():
+    rels = certified_decuplet_spacings()
+    assert len(rels) == 2
+    for r in rels:
+        assert r.residual.lower <= r.residual.upper
+        assert r.rel_percent < 10.0  # equal spacing holds to within ~5%
+
+
+def test_meson_gmo_quadratic_residual_sign():
+    r = certified_meson_gmo()
+    # 4K^2 - 3eta^2 - pi^2 is positive (eta-eta' mixing) and a few percent.
+    assert float(r.residual.lower) > 0
+    assert 2.0 < r.rel_percent < 10.0
+
+
+def test_coleman_glashow_encloses_zero():
+    r = certified_coleman_glashow()
+    assert r.encloses_zero
+    assert abs(float(r.residual.midpoint())) < 1.0  # MeV; relation holds tightly
+
+
+def test_constituent_quark_masses():
+    cq = certified_constituent_quark_masses()
+    assert float(cq["m_s"].lower) > float(cq["m_q"].upper)  # strange heavier
+    # strange-light splitting near the decuplet spacing (~140-150 MeV).
+    assert 130.0 < float(cq["m_s_minus_m_q"].midpoint()) < 160.0
+
+
+def test_eta_mixing_is_consistent():
+    mix = certified_eta_mixing()
+    # A real mixing angle requires t^2 >= 0; certify it is strictly positive.
+    assert float(mix["t_sq"].lower) > 0
+    assert float(mix["m1_sq"].lower) > float(mix["m8_sq"].upper)  # singlet heavier
+
+
+def test_relations_battery_shape():
+    battery = certified_relations_battery()
+    assert len(battery) == 5
+    for r in battery:
+        assert r.residual.lower <= r.residual.upper
+        assert isinstance(r.name, str) and r.name
+
+
+def test_weight_diagrams_render():
+    for svg, label in (
+        (octet_weight_diagram_svg(), "octet"),
+        (decuplet_weight_diagram_svg(), "decuplet"),
+    ):
+        assert svg.startswith("<svg")
+        assert svg.rstrip().endswith("</svg>")
+    assert "Omega-" in decuplet_weight_diagram_svg()
+    assert "Lambda" in octet_weight_diagram_svg()
