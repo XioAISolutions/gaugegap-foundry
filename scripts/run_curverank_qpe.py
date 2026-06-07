@@ -55,6 +55,18 @@ from gaugegap.cost_estimation import estimate_job_cost
 from gaugegap.ledger import utc_run_id
 
 
+def _confirm(prompt: str, assume_yes: bool) -> bool:
+    """Ask the user to confirm, auto-proceeding when non-interactive.
+
+    Returns True (proceed) when ``assume_yes`` is set or stdin is not a TTY
+    (e.g. CI, pipes, headless desktop runs); otherwise prompts interactively.
+    """
+    if assume_yes or not sys.stdin.isatty():
+        print(f"{prompt} [auto-yes]")
+        return True
+    return input(prompt).strip().lower() == "y"
+
+
 def run_curverank_qpe(
     family: str,
     n_basis: int,
@@ -63,7 +75,8 @@ def run_curverank_qpe(
     shots: int = 1024,
     n_precision: int = 4,
     use_emulator: bool = False,
-    output_dir: Path = Path("results/curverank")
+    output_dir: Path = Path("results/curverank"),
+    assume_yes: bool = False,
 ) -> Dict[str, Any]:
     """Run CurveRank QPE benchmark.
     
@@ -155,8 +168,7 @@ def run_curverank_qpe(
     
     if n_qubits > 20:
         print(f"\n  Warning: {n_qubits} qubits may exceed hardware limits")
-        response = input("  Continue? (y/n): ")
-        if response.lower() != 'y':
+        if not _confirm("  Continue? (y/n): ", assume_yes):
             return {}
     
     # Step 4: Cost estimation
@@ -188,8 +200,7 @@ def run_curverank_qpe(
             print(f"  Confidence: {cost_est.confidence}")
             
             if cost_est.estimated_cost_usd > 20.0:
-                response = input("\n  Cost exceeds $20. Continue? (y/n): ")
-                if response.lower() != 'y':
+                if not _confirm("\n  Cost exceeds $20. Continue? (y/n): ", assume_yes):
                     print("  Aborted by user.")
                     return {}
     
@@ -403,18 +414,22 @@ Examples:
         default=Path("results/curverank"),
         help="Output directory (default: results/curverank)"
     )
-    
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="Auto-confirm all prompts (non-interactive runs)"
+    )
+
     args = parser.parse_args()
-    
+
     # Validate parameters
     if args.n_basis < 4:
         print("Error: n-basis must be at least 4")
         sys.exit(1)
-    
+
     if args.n_precision > 8:
         print("Warning: n-precision > 8 may be impractical on current hardware")
-        response = input("Continue? (y/n): ")
-        if response.lower() != 'y':
+        if not _confirm("Continue? (y/n): ", args.yes):
             return
     
     # Run benchmark
@@ -427,7 +442,8 @@ Examples:
             shots=args.shots,
             n_precision=args.n_precision,
             use_emulator=args.emulator,
-            output_dir=args.output_dir
+            output_dir=args.output_dir,
+            assume_yes=args.yes,
         )
         
         if results:
