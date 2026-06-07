@@ -43,8 +43,16 @@ _GRAPH_LENGTHS = [1.0, float(np.sqrt(2)), float(np.sqrt(3))]
 
 # Recorded floating-point screening values (results/sprint-now), k_zeros=20.
 # Zero modes are dropped, so the odd-dimensional n=15 truncation excludes its
-# structural zero eigenvalue.
-RECORDED = {10: 27.391322449240914, 15: 29.39082464699649, 20: 35.53568994244663}
+# structural zero eigenvalue. The n=25,30,40 panel extends the certified
+# mismatch sweep to larger truncations (independently corroborated by Arb).
+RECORDED = {
+    10: 27.391322449240914,
+    15: 29.39082464699649,
+    20: 35.53568994244663,
+    25: 36.60341061188705,
+    30: 40.00965971015598,
+    40: 41.74916921307260,
+}
 
 
 class TestCertifiedXPSpectrum(unittest.TestCase):
