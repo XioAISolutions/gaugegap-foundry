@@ -27,16 +27,21 @@ from gaugegap.eightfold import (
     certified_meson_gmo,
     certified_moment_predictions,
     certified_moment_relations,
+    certified_axial_fd,
+    certified_cabibbo_angle,
+    certified_ckm_unitarity,
     certified_octet_spectrum,
     certified_omega_prediction,
     certified_quark_moments,
     certified_relations_battery,
     certified_sigma_lambda_transition,
+    certified_su3_decompositions,
     certified_vector_mixing,
     certified_vector_quark_content,
     decuplet_weight_diagram_svg,
     gmo_residual_from_masses,
     octet_weight_diagram_svg,
+    su3_dim,
 )
 
 
@@ -199,3 +204,35 @@ def test_gell_mann_nishijima_exact():
     r = certified_gell_mann_nishijima()
     # Q = I3 + Y/2 holds exactly across all 17 octet+decuplet states.
     assert float(r.residual.lower) == 0.0 == float(r.residual.upper)
+
+
+def test_su3_dimensions():
+    assert su3_dim(0, 0) == 1
+    assert su3_dim(1, 0) == 3
+    assert su3_dim(1, 1) == 8
+    assert su3_dim(3, 0) == 10
+    assert su3_dim(2, 2) == 27
+
+
+def test_su3_decompositions_exact():
+    decs = certified_su3_decompositions()
+    assert len(decs) == 4
+    for r in decs:
+        # product dimension equals the sum of summand dimensions, exactly.
+        assert float(r.residual.lower) == 0.0 == float(r.residual.upper)
+
+
+def test_ckm_unitarity_and_cabibbo_angle():
+    u = certified_ckm_unitarity()
+    # First-row unitarity holds to better than 1% (residual near zero).
+    assert abs(float(u.residual.midpoint())) < 0.01
+    ang = certified_cabibbo_angle()
+    # Cabibbo angle is ~13 degrees.
+    assert 12.0 < float(ang.midpoint()) < 14.0
+    assert ang.lower <= ang.upper
+
+
+def test_axial_fd_consistency():
+    r = certified_axial_fd()
+    # F + D should reproduce g_A to within the fit uncertainties.
+    assert abs(float(r.residual.midpoint())) < 0.05

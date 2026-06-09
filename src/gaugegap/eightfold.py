@@ -636,3 +636,100 @@ def certified_sigma_lambda_transition() -> RelationResult:
         "Sigma0->Lambda transition moment (pred-meas)", pred - measured,
         1.61, note="SU(6) quark model",
     )
+
+
+# ===========================================================================
+# SU(3) representation theory: irrep dimensions and tensor decompositions.
+# ===========================================================================
+
+def su3_dim(p: int, q: int) -> int:
+    """Dimension of the SU(3) irrep (p, q): (p+1)(q+1)(p+q+2)/2."""
+    return (p + 1) * (q + 1) * (p + q + 2) // 2
+
+
+# Standard SU(3) tensor-product decompositions, as (label, left dim, right dim,
+# [(p, q) summands]).
+_SU3_DECOMPOSITIONS = (
+    ("3 (x) 3bar = 1 + 8", 3, 3, [(0, 0), (1, 1)]),
+    ("3 (x) 3 = 3bar + 6", 3, 3, [(0, 1), (2, 0)]),
+    ("3 (x) 3 (x) 3 = 1 + 8 + 8 + 10", 3, 9, [(0, 0), (1, 1), (1, 1), (3, 0)]),
+    ("8 (x) 8 = 1+8+8+10+10bar+27", 8, 8,
+     [(0, 0), (1, 1), (1, 1), (3, 0), (0, 3), (2, 2)]),
+)
+
+
+def certified_su3_decompositions() -> List[RelationResult]:
+    """Certified SU(3) tensor decompositions: product dim == sum of summand dims.
+
+    Each residual is computed in interval arithmetic and is exactly [0, 0]; the
+    decompositions are exact representation-theory identities (baryons live in
+    3(x)3(x)3, mesons in 3(x)3bar).
+    """
+    out: List[RelationResult] = []
+    for label, left, right, summands in _SU3_DECOMPOSITIONS:
+        product = Interval.from_float(float(left)) * Interval.from_float(float(right))
+        total = Interval.from_float(0.0)
+        for p, q in summands:
+            total = total + Interval.from_float(float(su3_dim(p, q)))
+        out.append(RelationResult(label, product - total, float(left * right),
+                                  note="exact rep-theory identity"))
+    return out
+
+
+# ===========================================================================
+# Weak (Cabibbo) sector: CKM first-row unitarity and the Cabibbo angle.
+# ===========================================================================
+
+CKM_FIRST_ROW: Dict[str, Tuple[float, float]] = {
+    "V_ud": (0.97373, 0.00031),
+    "V_us": (0.2243, 0.0008),
+    "V_ub": (0.00382, 0.00020),
+}
+
+
+def certified_ckm_unitarity(row: Dict[str, Tuple[float, float]] = None) -> RelationResult:
+    """Certified CKM first-row unitarity residual |Vud|^2+|Vus|^2+|Vub|^2 - 1.
+
+    A certified interval around the (small, topical) first-row unitarity test;
+    this is arithmetic on PDG inputs, not a discovery claim.
+    """
+    r = row or CKM_FIRST_ROW
+    total = _sq(r["V_ud"]) + _sq(r["V_us"]) + _sq(r["V_ub"])
+    residual = total - Interval.from_float(1.0)
+    return RelationResult(
+        "CKM first-row unitarity |Vud|^2+|Vus|^2+|Vub|^2-1", residual, 1.0,
+        note="PDG inputs",
+    )
+
+
+def certified_cabibbo_angle(row: Dict[str, Tuple[float, float]] = None) -> Interval:
+    """Certified Cabibbo angle (degrees) from theta_C = atan(|V_us|/|V_ud|).
+
+    atan is monotonic, so applying it to the endpoints of the |V_us|/|V_ud|
+    enclosure yields a certified angle enclosure.
+    """
+    import mpmath as mp
+
+    r = row or CKM_FIRST_ROW
+    ratio = _iv(*r["V_us"]) / _iv(*r["V_ud"])
+    deg = mp.mpf(180) / mp.pi
+    return Interval(mp.atan(ratio.lower) * deg, mp.atan(ratio.upper) * deg)
+
+
+# Representative axial-coupling fit (PDG / SU(3) hyperon semileptonic fit).
+AXIAL: Dict[str, Tuple[float, float]] = {
+    "g_A": (1.2754, 0.0013),
+    "F": (0.463, 0.008),
+    "D": (0.804, 0.008),
+}
+
+
+def certified_axial_fd() -> RelationResult:
+    """Certified nucleon axial-coupling consistency g_A = F + D.
+
+    F, D are the SU(3) axial reduced couplings; the neutron-beta-decay g_A
+    should equal their sum. Reported as a certified residual (F+D) - g_A.
+    """
+    residual = (_iv(*AXIAL["F"]) + _iv(*AXIAL["D"])) - _iv(*AXIAL["g_A"])
+    return RelationResult("axial coupling (F+D) - g_A", residual,
+                          AXIAL["g_A"][0], note="SU(3) hyperon fit")

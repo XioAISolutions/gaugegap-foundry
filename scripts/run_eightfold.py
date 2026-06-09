@@ -37,11 +37,15 @@ from gaugegap.eightfold import (  # noqa: E402
     certified_isospin_ratios,
     certified_moment_predictions,
     certified_moment_relations,
+    certified_axial_fd,
+    certified_cabibbo_angle,
+    certified_ckm_unitarity,
     certified_octet_spectrum,
     certified_omega_prediction,
     certified_quark_moments,
     certified_relations_battery,
     certified_sigma_lambda_transition,
+    certified_su3_decompositions,
     certified_vector_mixing,
     certified_vector_quark_content,
     decuplet_weight_diagram_svg,
@@ -132,12 +136,27 @@ def main() -> int:
     print("(H) Gell-Mann-Nishijima Q = I3 + Y/2")
     print(f"  {gmn.name}: worst-case residual {_fmt(gmn.residual)}\n")
 
-    # (I) weight-diagram figures.
+    # (I) SU(3) representation theory.
+    print("(I) SU(3) tensor decompositions (certified exact)")
+    for r in certified_su3_decompositions():
+        print(f"  {r.name:<34} product-sum residual {_fmt(r.residual)}")
+    print()
+
+    # (J) weak (Cabibbo) sector.
+    print("(J) Weak sector (Cabibbo / CKM, PDG inputs)")
+    u = certified_ckm_unitarity()
+    print(f"  {u.name}\n      = {_fmt(u.residual)}  (encloses 0: {u.encloses_zero})")
+    ang = certified_cabibbo_angle()
+    print(f"  Cabibbo angle theta_C = [{float(ang.lower):.3f}, {float(ang.upper):.3f}] deg")
+    fd = certified_axial_fd()
+    print(f"  {fd.name} = {_fmt(fd.residual)}  (encloses 0: {fd.encloses_zero})\n")
+
+    # (K) weight-diagram figures.
     figs = Path(args.figures_dir)
     figs.mkdir(parents=True, exist_ok=True)
     (figs / "octet_weight_diagram.svg").write_text(octet_weight_diagram_svg())
     (figs / "decuplet_weight_diagram.svg").write_text(decuplet_weight_diagram_svg())
-    print(f"(I) Wrote weight diagrams to {figs}/octet_weight_diagram.svg, "
+    print(f"(K) Wrote weight diagrams to {figs}/octet_weight_diagram.svg, "
           f"decuplet_weight_diagram.svg")
     return 0
 
