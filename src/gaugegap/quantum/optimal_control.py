@@ -163,9 +163,9 @@ def grape_optimization(
         
         for j in range(n_steps):
             # Total Hamiltonian at time step j
-            H_total = H_drift.copy()
+            H_total = H_drift.astype(complex).copy()
             for k in range(n_controls):
-                H_total += controls[k, j] * H_controls[k]
+                H_total = H_total + controls[k, j] * H_controls[k].astype(complex)
             
             # Propagate
             U = expm(-1j * H_total * dt)
@@ -184,9 +184,9 @@ def grape_optimization(
         
         for j in range(n_steps - 1, -1, -1):
             # Total Hamiltonian at time step j
-            H_total = H_drift.copy()
+            H_total = H_drift.astype(complex).copy()
             for k in range(n_controls):
-                H_total += controls[k, j] * H_controls[k]
+                H_total = H_total + controls[k, j] * H_controls[k].astype(complex)
             
             # Propagate backward
             U_dag = expm(1j * H_total * dt)

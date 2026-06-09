@@ -326,6 +326,10 @@ def adaptive_shadow_tomography(
     max_error = max(result.observable_errors.values())
     
     if max_error <= target_error:
+        # Already met target with initial snapshots
+        result.metadata["adaptive"] = True
+        result.metadata["target_error"] = target_error
+        result.metadata["n_initial"] = n_initial
         return result
     
     # Estimate required snapshots: error ~ 1/√N
@@ -342,6 +346,8 @@ def adaptive_shadow_tomography(
     result = classical_shadow_pauli(state, observables, n_required, seed=seed)
     result.metadata["adaptive"] = True
     result.metadata["target_error"] = target_error
+    result.metadata["n_initial"] = n_initial
+    result.metadata["n_required"] = n_required
     
     return result
 
@@ -469,30 +475,42 @@ def _reconstruct_from_snapshot(
     where |bᵢ⟩ is the measurement outcome in basis i.
     """
     dim = 2**n_qubits
-    rho = np.eye(dim, dtype=complex)
     
-    for qubit, basis in enumerate(bases):
-        # Extract bit for this qubit
+    # Start with first qubit
+    bit_value = outcome & 1
+    local_rho = np.zeros((2, 2), dtype=complex)
+    local_rho[bit_value, bit_value] = 3.0
+    local_rho -= np.eye(2)
+    local_rho /= 2.0
+    
+    # Rotate back from measurement basis
+    if bases[0] == 'X':
+        H = np.array([[1, 1], [1, -1]]) / np.sqrt(2)
+        local_rho = H @ local_rho @ H.conj().T
+    elif bases[0] == 'Y':
+        HS = np.array([[1, -1j], [1, 1j]]) / np.sqrt(2)
+        local_rho = HS @ local_rho @ HS.conj().T
+    
+    rho = local_rho
+    
+    # Tensor product with remaining qubits
+    for qubit in range(1, n_qubits):
         bit_value = (outcome >> qubit) & 1
         
-        # Local reconstruction: 3|b⟩⟨b| - I
         local_rho = np.zeros((2, 2), dtype=complex)
         local_rho[bit_value, bit_value] = 3.0
         local_rho -= np.eye(2)
         local_rho /= 2.0
         
         # Rotate back from measurement basis
-        if basis == 'X':
-            # Rotate X → Z
+        if bases[qubit] == 'X':
             H = np.array([[1, 1], [1, -1]]) / np.sqrt(2)
             local_rho = H @ local_rho @ H.conj().T
-        elif basis == 'Y':
-            # Rotate Y → Z
+        elif bases[qubit] == 'Y':
             HS = np.array([[1, -1j], [1, 1j]]) / np.sqrt(2)
             local_rho = HS @ local_rho @ HS.conj().T
         
-        # Tensor product with existing
-        rho = np.kron(rho, local_rho) if qubit == 0 else np.kron(local_rho, rho)
+        rho = np.kron(rho, local_rho)
     
     return rho
 

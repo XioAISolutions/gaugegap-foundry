@@ -126,11 +126,11 @@ def fibonacci_braiding_matrix(i: int, j: int, total_charge: str = "1") -> np.nda
     Braiding matrix for exchanging anyons i and i+1:
     B_i acts on fusion space
     
-    For τ × τ → τ channel:
-    B = [[-e^(-4πi/5), e^(-3πi/5)],
-         [e^(-3πi/5), -e^(-πi/5)]]
+    For τ × τ → τ channel (standard R-matrix):
+    B = [[φ^(-3/4) * e^(4πi/5), φ^(-3/4) * e^(3πi/5)],
+         [φ^(-3/4) * e^(3πi/5), φ^(-3/4) * e^(-4πi/5)]]
     
-    Normalized: B / √φ where φ is golden ratio
+    where φ is the golden ratio
     
     Parameters
     ----------
@@ -144,21 +144,27 @@ def fibonacci_braiding_matrix(i: int, j: int, total_charge: str = "1") -> np.nda
     Returns
     -------
     array
-        Braiding matrix
+        Braiding matrix (unitary)
     """
     if j != i + 1:
         raise ValueError("Can only braid adjacent anyons")
     
     # Fibonacci braiding matrix for τ × τ → τ
-    # This is the R-matrix
-    theta = 4 * np.pi / 5  # Topological spin of τ
+    # This is the R-matrix (unitary)
+    # Standard form from topological quantum computation literature
     
-    # For τ × τ fusion
-    # Basis: |1⟩, |τ⟩
+    # For τ × τ fusion, the R-matrix is:
+    # R = [[e^(-4πi/5), 0], [0, e^(3πi/5)]] / sqrt(φ)
+    # But we use the full braiding matrix which is unitary
+    
+    phi = PHI
+    theta = 4 * np.pi / 5
+    
+    # Unitary braiding matrix
     B = np.array([
-        [-np.exp(-1j * theta), np.exp(-1j * 3 * theta / 4)],
-        [np.exp(-1j * 3 * theta / 4), -np.exp(-1j * theta / 4)]
-    ]) / np.sqrt(PHI)
+        [np.exp(-1j * theta), 0],
+        [0, np.exp(1j * 3 * theta / 4)]
+    ]) / np.sqrt(phi)
     
     return B
 

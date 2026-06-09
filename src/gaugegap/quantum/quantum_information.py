@@ -576,14 +576,15 @@ def quantum_fisher_information_pure(
     """
     # Expectation values
     H_psi = observable @ state
-    exp_H = np.real(state.conj() @ H_psi)
-    exp_H2 = np.real(state.conj() @ observable @ H_psi)
+    exp_H = np.real(np.vdot(state, H_psi))
+    H2_psi = observable @ H_psi
+    exp_H2 = np.real(np.vdot(state, H2_psi))
     
     # Variance
     var_H = exp_H2 - exp_H**2
     
     # Fisher information
-    F_Q = 4 * var_H
+    F_Q = 4 * max(0.0, float(var_H))  # Ensure non-negative
     
     return float(F_Q)
 

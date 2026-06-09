@@ -161,9 +161,18 @@ def quantum_subspace_expansion(
             H_sub[i, j] = np.vdot(state_i, hamiltonian @ state_j)
             S_sub[i, j] = np.vdot(state_i, state_j)
     
+    # Regularize overlap matrix to ensure positive definiteness
+    S_sub = 0.5 * (S_sub + S_sub.conj().T)  # Ensure Hermitian
+    min_eig = np.min(np.linalg.eigvalsh(S_sub))
+    if min_eig < 1e-10:
+        S_sub += (1e-8 - min_eig) * np.eye(subspace_dim)
+    
     # Solve generalized eigenvalue problem: H c = E S c
-    # For orthonormal basis, S ≈ I
-    eigenvalues, eigenvectors = eigh(H_sub, S_sub)
+    try:
+        eigenvalues, eigenvectors = eigh(H_sub, S_sub)
+    except np.linalg.LinAlgError:
+        # Fallback: use standard eigenvalue problem
+        eigenvalues, eigenvectors = np.linalg.eigh(H_sub)
     
     # Sort by energy
     idx = np.argsort(eigenvalues.real)

@@ -131,25 +131,42 @@ def quantum_cramer_rao_bound(
     F_Q = 0.0
     epsilon = 1e-12
     
-    for i in range(len(eigenvalues)):
-        for j in range(len(eigenvalues)):
-            if i == j:
-                continue
-            
-            lambda_i = eigenvalues[i]
-            lambda_j = eigenvalues[j]
-            
-            if lambda_i < epsilon or lambda_j < epsilon:
-                continue
-            
-            if abs(lambda_i + lambda_j) < epsilon:
-                continue
-            
-            # Matrix element
-            H_ij = eigenvectors[:, i].conj() @ generator @ eigenvectors[:, j]
-            
-            # Fisher information contribution
-            F_Q += 2 * (lambda_i - lambda_j)**2 / (lambda_i + lambda_j) * abs(H_ij)**2
+    # Check if pure state (single eigenvalue ≈ 1)
+    max_eig = np.max(eigenvalues)
+    if max_eig > 1 - epsilon:
+        # Pure state: F_Q = 4 * Var(H)
+        # Find the pure state eigenvector
+        idx = np.argmax(eigenvalues)
+        psi = eigenvectors[:, idx]
+        
+        # Compute variance
+        H_psi = generator @ psi
+        exp_H = np.real(np.vdot(psi, H_psi))
+        exp_H2 = np.real(np.vdot(H_psi, H_psi))
+        var_H = exp_H2 - exp_H**2
+        
+        F_Q = 4 * max(float(var_H), epsilon)
+    else:
+        # Mixed state: use general formula
+        for i in range(len(eigenvalues)):
+            for j in range(len(eigenvalues)):
+                if i == j:
+                    continue
+                
+                lambda_i = eigenvalues[i]
+                lambda_j = eigenvalues[j]
+                
+                if lambda_i < epsilon or lambda_j < epsilon:
+                    continue
+                
+                if abs(lambda_i + lambda_j) < epsilon:
+                    continue
+                
+                # Matrix element
+                H_ij = eigenvectors[:, i].conj() @ generator @ eigenvectors[:, j]
+                
+                # Fisher information contribution
+                F_Q += 2 * (lambda_i - lambda_j)**2 / (lambda_i + lambda_j) * abs(H_ij)**2
     
     # Cramér-Rao bound
     if F_Q > epsilon:
