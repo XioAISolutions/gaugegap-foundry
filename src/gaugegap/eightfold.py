@@ -436,3 +436,203 @@ def octet_weight_diagram_svg() -> str:
 
 def decuplet_weight_diagram_svg() -> str:
     return _weight_diagram_svg(list(DECUPLET_WEIGHTS), "Baryon decuplet (J=3/2)")
+
+
+# ===========================================================================
+# Vector-meson nonet and omega-phi mixing.
+# ===========================================================================
+
+def certified_vector_quark_content(
+    rho=PDG_VECTOR["rho"],
+    k_star=PDG_VECTOR["K_star"],
+    omega=PDG_VECTOR["omega"],
+    phi=PDG_VECTOR["phi"],
+) -> List[RelationResult]:
+    """Certified ideal-mixing tests for the vector-meson nonet.
+
+    Vector mesons mix almost ideally: phi is nearly pure s-sbar and omega nearly
+    pure light-quark. The additive constituent picture then predicts (linearly)
+    phi = 2*K* - rho (s-sbar from strange counting) and omega = rho. Each is
+    returned as a certified residual against the measured mass.
+    """
+    r, ks, w, p = _iv(*rho), _iv(*k_star), _iv(*omega), _iv(*phi)
+    two = Interval.from_float(2.0)
+    phi_pred = two * ks - r
+    return [
+        RelationResult("vector phi as s-sbar: (2K*-rho)-phi", phi_pred - p,
+                       float(p.midpoint()), note="ideal mixing"),
+        RelationResult("vector omega as n-nbar: rho-omega", r - w,
+                       float(w.midpoint()), note="ideal mixing"),
+    ]
+
+
+def certified_vector_mixing(
+    rho=PDG_VECTOR["rho"],
+    k_star=PDG_VECTOR["K_star"],
+    omega=PDG_VECTOR["omega"],
+    phi=PDG_VECTOR["phi"],
+) -> Dict[str, Interval]:
+    """Certified octet-singlet mixing parameters for the vector nonet.
+
+    Octet member fixed by the (quadratic) vector GMO m8^2 = (4 K*^2 - rho^2)/3;
+    physical omega, phi diagonalize [[m8^2, t],[t, m1^2]], so by trace/det
+    m1^2 = omega^2 + phi^2 - m8^2 and t^2 = m8^2 m1^2 - omega^2 phi^2.
+    """
+    four = Interval.from_float(4.0)
+    three = Interval.from_float(3.0)
+    m8_sq = (four * _sq(k_star) - _sq(rho)) / three
+    w_sq, p_sq = _sq(omega), _sq(phi)
+    m1_sq = (w_sq + p_sq) - m8_sq
+    t_sq = m8_sq * m1_sq - w_sq * p_sq
+    return {"m8_sq": m8_sq, "m1_sq": m1_sq, "t_sq": t_sq}
+
+
+# ===========================================================================
+# Baryon magnetic moments (quark model / SU(6)), in nuclear magnetons.
+# ===========================================================================
+
+# Measured octet magnetic moments (nuclear magnetons), PDG.
+MOMENTS: Dict[str, Tuple[float, float]] = {
+    "p": (2.792847, 0.000001),
+    "n": (-1.913043, 0.000005),
+    "Lambda": (-0.613, 0.004),
+    "Sigma+": (2.458, 0.010),
+    "Sigma-": (-1.160, 0.025),
+    "Xi0": (-1.250, 0.014),
+    "Xi-": (-0.6507, 0.0025),
+}
+
+
+def certified_quark_moments(
+    p=MOMENTS["p"], n=MOMENTS["n"], lam=MOMENTS["Lambda"]
+) -> Dict[str, Interval]:
+    """Certified constituent-quark magnetic moments from p, n, Lambda.
+
+    Inverting the SU(6) relations mu_p=(4 mu_u-mu_d)/3, mu_n=(4 mu_d-mu_u)/3:
+        mu_u = (4 mu_p + mu_n)/5,  mu_d = (mu_p + 4 mu_n)/5,  mu_s = mu_Lambda.
+    """
+    mp_p, mp_n = _iv(*p), _iv(*n)
+    four, five = Interval.from_float(4.0), Interval.from_float(5.0)
+    mu_u = (four * mp_p + mp_n) / five
+    mu_d = (mp_p + four * mp_n) / five
+    mu_s = _iv(*lam)
+    return {"mu_u": mu_u, "mu_d": mu_d, "mu_s": mu_s}
+
+
+def certified_moment_predictions() -> List[RelationResult]:
+    """Certified quark-model predictions for the remaining octet moments.
+
+    Quark moments are fixed by (p, n, Lambda); the other moments are then
+    parameter-free predictions, each reported as a certified residual
+    (predicted - measured) in nuclear magnetons.
+    """
+    q = certified_quark_moments()
+    mu_u, mu_d, mu_s = q["mu_u"], q["mu_d"], q["mu_s"]
+    three = Interval.from_float(3.0)
+    four = Interval.from_float(4.0)
+    preds = {
+        "Sigma+": (four * mu_u - mu_s) / three,
+        "Sigma-": (four * mu_d - mu_s) / three,
+        "Xi0": (four * mu_s - mu_u) / three,
+        "Xi-": (four * mu_s - mu_d) / three,
+    }
+    out: List[RelationResult] = []
+    for name, pred in preds.items():
+        meas = _iv(*MOMENTS[name])
+        out.append(RelationResult(
+            f"moment {name} (pred-meas)", pred - meas, abs(MOMENTS[name][0]),
+            note="SU(6) quark model",
+        ))
+    return out
+
+
+def certified_moment_relations() -> List[RelationResult]:
+    """Parameter-free SU(6) magnetic-moment relations as certified residuals."""
+    mp_p, mp_n = _iv(*MOMENTS["p"]), _iv(*MOMENTS["n"])
+    half = Interval.from_float(0.5)
+    three_half = Interval.from_float(1.5)
+    # mu_p / mu_n = -3/2 exactly in the model (independent of mu_s).
+    ratio = mp_p / mp_n
+    r_ratio = RelationResult("moment ratio mu_p/mu_n vs -3/2", ratio + three_half, 1.5)
+    # mu_Sigma0 = 1/2 (mu_Sigma+ + mu_Sigma-) exactly in the model (Sigma0 moment
+    # is not directly measured; this is a certified prediction).
+    sig0_pred = half * (_iv(*MOMENTS["Sigma+"]) + _iv(*MOMENTS["Sigma-"]))
+    r_sig0 = RelationResult("predicted mu_Sigma0 = (mu_Sigma+ + mu_Sigma-)/2",
+                            sig0_pred, abs(float(sig0_pred.midpoint())) or 1.0,
+                            note="not directly measured")
+    return [r_ratio, r_sig0]
+
+
+# ===========================================================================
+# Isospin / SU(3) decay-ratio (Clebsch-Gordan) predictions -- exact rationals.
+# ===========================================================================
+
+def certified_isospin_ratios() -> List[Tuple[str, Interval, str]]:
+    """Parameter-free isospin branching ratios from squared Clebsch-Gordans.
+
+    These are exact rationals; in interval arithmetic they are zero-width
+    certified values. They are algebraic predictions of isospin symmetry, not
+    fits to data.
+    """
+    def ratio(num: float, den: float) -> Interval:
+        return Interval.from_float(num) / Interval.from_float(den)
+
+    return [
+        ("Delta+ -> p pi0 : n pi+", ratio(2, 1), "2:1"),
+        ("Delta0 -> n pi0 : p pi-", ratio(2, 1), "2:1"),
+        ("K*+ -> K0 pi+ : K+ pi0", ratio(2, 1), "2:1"),
+        ("Delta++ -> p pi+ (pure)", ratio(1, 1), "1"),
+    ]
+
+
+# ===========================================================================
+# Gell-Mann-Nishijima relation Q = I3 + Y/2 -- exact structural backbone.
+# ===========================================================================
+
+# (name, charge, I3, Y) for octet + decuplet members.
+_GMN_STATES: Tuple[Tuple[str, float, float, float], ...] = (
+    # baryon octet
+    ("p", 1, 0.5, 1), ("n", 0, -0.5, 1),
+    ("Sigma+", 1, 1, 0), ("Sigma0", 0, 0, 0), ("Sigma-", -1, -1, 0),
+    ("Lambda", 0, 0, 0), ("Xi0", 0, 0.5, -1), ("Xi-", -1, -0.5, -1),
+    # baryon decuplet
+    ("Delta++", 2, 1.5, 1), ("Delta+", 1, 0.5, 1), ("Delta0", 0, -0.5, 1),
+    ("Delta-", -1, -1.5, 1), ("Sigma*+", 1, 1, 0), ("Sigma*-", -1, -1, 0),
+    ("Xi*0", 0, 0.5, -1), ("Xi*-", -1, -0.5, -1), ("Omega-", -1, 0, -2),
+)
+
+
+def certified_gell_mann_nishijima() -> RelationResult:
+    """Certified Gell-Mann-Nishijima check Q - (I3 + Y/2) = 0 over all states.
+
+    Evaluated in interval arithmetic across the full octet and decuplet; the
+    returned residual is the worst-case enclosure (exactly [0, 0]).
+    """
+    half = Interval.from_float(0.5)
+    worst = Interval.from_float(0.0)
+    for _name, q, i3, y in _GMN_STATES:
+        resid = _iv(q, 0.0) - (_iv(i3, 0.0) + half * _iv(y, 0.0))
+        if abs(float(resid.upper)) > abs(float(worst.upper)) or abs(
+            float(resid.lower)
+        ) > abs(float(worst.lower)):
+            worst = resid
+    return RelationResult(
+        f"Gell-Mann-Nishijima Q-(I3+Y/2) over {len(_GMN_STATES)} states",
+        worst, 1.0, note="exact structural relation",
+    )
+
+
+def certified_sigma_lambda_transition() -> RelationResult:
+    """Certified Sigma0->Lambda transition magnetic moment (quark model).
+
+    The SU(6) prediction is |mu(Sigma0->Lambda)| = (mu_u - mu_d)/sqrt(3);
+    compared against the measured |mu| = 1.61 +/- 0.08 nuclear magnetons.
+    """
+    q = certified_quark_moments()
+    sqrt3 = Interval.from_float(3.0).sqrt()
+    pred = (q["mu_u"] - q["mu_d"]) / sqrt3
+    measured = _iv(1.61, 0.08)
+    return RelationResult(
+        "Sigma0->Lambda transition moment (pred-meas)", pred - measured,
+        1.61, note="SU(6) quark model",
+    )

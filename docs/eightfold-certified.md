@@ -90,8 +90,39 @@ electromagnetic **Coleman–Glashow** relation is certified *consistent with zer
   off-diagonal `t²` is certified strictly positive — a certified consistency
   check that a real octet–singlet mixing angle exists.
 
-**(E) Weight diagrams.** The runner emits the Eightfold-Way `(I₃, Y)` weight
-diagrams (the octet hexagon and the decuplet triangle) as SVG to `figures/`.
+**(E) Vector-meson nonet & ω–φ mixing.** Vector mesons mix almost ideally, so the
+additive constituent picture predicts (linearly) `φ = 2K* − ρ` (s‑s̄) and
+`ω = ρ` (light quark). Certified residuals: φ ≈ `[−12.1, −10.6]` MeV (1.1%),
+ω ≈ `[−7.8, −7.0]` MeV (0.95%). The octet–singlet mixing strength `t²` (from the
+2×2 mass-squared system) is certified strictly positive.
+
+**(F) Baryon magnetic moments (SU(6) quark model).** Constituent quark moments
+are extracted from `(p, n, Λ)`: `μ_u ≈ 1.852`, `μ_d ≈ −0.972`, `μ_s ≈ −0.613` μ_N.
+The remaining moments are then parameter-free, reported as certified residuals
+(predicted − measured), at the known quark-model accuracy:
+
+| quantity | certified residual | rel. |
+|----------|--------------------|------|
+| μ(Σ⁺) | `[0.204, 0.227]` | 8.8% |
+| μ(Σ⁻) | `[0.042, 0.095]` | 5.9% |
+| μ(Ξ⁰) | `[−0.204, −0.165]` | 14.8% |
+| μ(Ξ⁻) | `[0.150, 0.165]` | 24.2% |
+| μ_p/μ_n vs −3/2 | `[0.040, 0.040]` | — |
+| **μ(Σ⁰→Λ) transition − meas** | `[−0.060, 0.100]` | **encloses 0** |
+
+The parameter-free ratio `μ_p/μ_n = −3/2` is reproduced (measured −1.46), and the
+SU(6) **Σ⁰→Λ transition moment** `(μ_u−μ_d)/√3` is certified *consistent with the
+measured* `1.61 ± 0.08` μ_N. The model also predicts `μ(Σ⁰) = ½(μ(Σ⁺)+μ(Σ⁻))`.
+
+**(G) Isospin decay ratios.** Squared Clebsch–Gordan branching ratios are exact
+rationals — certified zero-width: `Δ⁺→pπ⁰ : nπ⁺ = 2:1`, `Δ⁰→nπ⁰ : pπ⁻ = 2:1`,
+`K*⁺→K⁰π⁺ : K⁺π⁰ = 2:1`. Parameter-free predictions of isospin symmetry.
+
+**(H) Gell-Mann–Nishijima.** `Q = I₃ + Y/2` is certified exact `[0, 0]` across all
+17 octet + decuplet states — the structural backbone of the classification.
+
+**(I) Weight diagrams.** The runner emits the `(I₃, Y)` weight diagrams (the octet
+hexagon and the decuplet triangle) as SVG to `figures/`.
 
 ## Files
 

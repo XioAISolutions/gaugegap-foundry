@@ -21,11 +21,19 @@ from gaugegap.eightfold import (
     certified_decuplet_spacings,
     certified_distinct_levels,
     certified_eta_mixing,
+    certified_gell_mann_nishijima,
     certified_gmo_residual_model,
+    certified_isospin_ratios,
     certified_meson_gmo,
+    certified_moment_predictions,
+    certified_moment_relations,
     certified_octet_spectrum,
     certified_omega_prediction,
+    certified_quark_moments,
     certified_relations_battery,
+    certified_sigma_lambda_transition,
+    certified_vector_mixing,
+    certified_vector_quark_content,
     decuplet_weight_diagram_svg,
     gmo_residual_from_masses,
     octet_weight_diagram_svg,
@@ -145,3 +153,49 @@ def test_weight_diagrams_render():
         assert svg.rstrip().endswith("</svg>")
     assert "Omega-" in decuplet_weight_diagram_svg()
     assert "Lambda" in octet_weight_diagram_svg()
+
+
+def test_vector_ideal_mixing():
+    rels = certified_vector_quark_content()
+    assert len(rels) == 2
+    for r in rels:
+        assert r.rel_percent < 3.0  # ideal mixing holds to ~1%
+    # A real octet-singlet mixing angle requires t^2 > 0.
+    assert float(certified_vector_mixing()["t_sq"].lower) > 0
+
+
+def test_quark_moments_and_predictions():
+    q = certified_quark_moments()
+    assert float(q["mu_u"].midpoint()) > 0 > float(q["mu_d"].midpoint())
+    preds = certified_moment_predictions()
+    assert len(preds) == 4
+    # Quark-model octet moments are right to within ~25%.
+    for r in preds:
+        assert r.rel_percent < 30.0
+
+
+def test_moment_ratio_and_sigma0():
+    rels = certified_moment_relations()
+    ratio = next(r for r in rels if "mu_p/mu_n" in r.name)
+    # Measured ratio is near -1.46, so residual from -3/2 is small and positive.
+    assert 0 < float(ratio.residual.midpoint()) < 0.1
+
+
+def test_sigma_lambda_transition_consistent():
+    r = certified_sigma_lambda_transition()
+    # SU(6) prediction agrees with the measured transition moment.
+    assert r.encloses_zero
+
+
+def test_isospin_ratios_exact():
+    ratios = certified_isospin_ratios()
+    for _name, iv, _exact in ratios:
+        assert float(iv.width()) == 0.0  # exact rationals, zero width
+    two_to_one = ratios[0][1]
+    assert float(two_to_one.lower) == 2.0
+
+
+def test_gell_mann_nishijima_exact():
+    r = certified_gell_mann_nishijima()
+    # Q = I3 + Y/2 holds exactly across all 17 octet+decuplet states.
+    assert float(r.residual.lower) == 0.0 == float(r.residual.upper)

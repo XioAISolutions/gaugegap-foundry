@@ -26,15 +26,24 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from gaugegap.eightfold import (  # noqa: E402
+    MOMENTS,
     PDG_DECUPLET,
     OctetModel,
     certified_constituent_quark_masses,
     certified_distinct_levels,
     certified_eta_mixing,
+    certified_gell_mann_nishijima,
     certified_gmo_residual_model,
+    certified_isospin_ratios,
+    certified_moment_predictions,
+    certified_moment_relations,
     certified_octet_spectrum,
     certified_omega_prediction,
+    certified_quark_moments,
     certified_relations_battery,
+    certified_sigma_lambda_transition,
+    certified_vector_mixing,
+    certified_vector_quark_content,
     decuplet_weight_diagram_svg,
     octet_weight_diagram_svg,
 )
@@ -92,12 +101,43 @@ def main() -> int:
     print(f"  eta-eta' mixing t^2 = {_fmt(t_sq)} MeV^4  "
           f"(t^2 > 0 consistent: {t_sq.lower > 0})\n")
 
-    # (E) weight-diagram figures.
+    # (E) vector-meson nonet + omega-phi ideal mixing.
+    print("(E) Vector-meson nonet -- certified ideal-mixing tests")
+    for r in certified_vector_quark_content():
+        print(f"  {r.name:<40} {_fmt(r.residual):>20} {r.rel_percent:>5.2f}%")
+    vt = certified_vector_mixing()["t_sq"]
+    print(f"  omega-phi mixing t^2 = {_fmt(vt)} MeV^4  (t^2 > 0: {vt.lower > 0})\n")
+
+    # (F) baryon magnetic moments (quark model / SU(6)).
+    print("(F) Baryon magnetic moments (nuclear magnetons)")
+    q = certified_quark_moments()
+    print(f"  quark moments  mu_u={_fmt(q['mu_u'])}  mu_d={_fmt(q['mu_d'])}  "
+          f"mu_s={_fmt(q['mu_s'])}")
+    print(f"  {'prediction / relation':<44} {'certified residual':>20} {'rel%':>7}")
+    print("  " + "-" * 74)
+    for r in certified_moment_predictions() + certified_moment_relations() + [
+        certified_sigma_lambda_transition()
+    ]:
+        print(f"  {r.name:<44} {_fmt(r.residual):>20} {r.rel_percent:>6.1f}%")
+    print()
+
+    # (G) isospin / SU(3) decay ratios (exact rationals).
+    print("(G) Isospin decay ratios (parameter-free, certified exact)")
+    for name, iv, exact in certified_isospin_ratios():
+        print(f"  {name:<34} = {_fmt(iv)}  ({exact})")
+    print()
+
+    # (H) Gell-Mann-Nishijima structural backbone.
+    gmn = certified_gell_mann_nishijima()
+    print("(H) Gell-Mann-Nishijima Q = I3 + Y/2")
+    print(f"  {gmn.name}: worst-case residual {_fmt(gmn.residual)}\n")
+
+    # (I) weight-diagram figures.
     figs = Path(args.figures_dir)
     figs.mkdir(parents=True, exist_ok=True)
     (figs / "octet_weight_diagram.svg").write_text(octet_weight_diagram_svg())
     (figs / "decuplet_weight_diagram.svg").write_text(decuplet_weight_diagram_svg())
-    print(f"(E) Wrote weight diagrams to {figs}/octet_weight_diagram.svg, "
+    print(f"(I) Wrote weight diagrams to {figs}/octet_weight_diagram.svg, "
           f"decuplet_weight_diagram.svg")
     return 0
 
