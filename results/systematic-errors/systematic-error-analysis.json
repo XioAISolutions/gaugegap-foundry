@@ -1,0 +1,216 @@
+{
+  "finite_size_errors": {
+    "0.1": {
+      "finite_size_error": 0.0036618107848220838,
+      "largest_size": 3,
+      "largest_gap": 0.012840489403626254,
+      "relative_error": 0.28517688615419595
+    },
+    "0.55": {
+      "finite_size_error": 0.01044865430009656,
+      "largest_size": 3,
+      "largest_gap": 0.7810715676194464,
+      "relative_error": 0.013377332799274742
+    },
+    "1.0": {
+      "finite_size_error": 0.003220908541456069,
+      "largest_size": 3,
+      "largest_gap": 1.7795167652822474,
+      "relative_error": 0.0018099905571528593
+    }
+  },
+  "truncation_errors": {
+    "n_links=2_g_mag=0.1": {
+      "truncation_error": 0.06702373585266813,
+      "highest_truncation": 2,
+      "highest_gap": 0.35692168440930333,
+      "relative_error": 0.18778275117576781
+    },
+    "n_links=2_g_mag=0.825": {
+      "truncation_error": 0.1816054306254633,
+      "highest_truncation": 2,
+      "highest_gap": 0.21841372031819062,
+      "relative_error": 0.8314744621395392
+    },
+    "n_links=2_g_mag=1.55": {
+      "truncation_error": 0.14617409759036804,
+      "highest_truncation": 2,
+      "highest_gap": 0.1650242113756999,
+      "relative_error": 0.8857736472230913
+    },
+    "n_links=2_g_mag=2.275": {
+      "truncation_error": 0.11481481998430176,
+      "highest_truncation": 2,
+      "highest_gap": 0.12746174740474636,
+      "relative_error": 0.9007786439622146
+    },
+    "n_links=2_g_mag=3.0": {
+      "truncation_error": 0.09299813679379554,
+      "highest_truncation": 2,
+      "highest_gap": 0.10251022057773618,
+      "relative_error": 0.9072084351166977
+    },
+    "n_links=3_g_mag=0.1": {
+      "truncation_error": 0.06934789628116761,
+      "highest_truncation": 2,
+      "highest_gap": 0.32514186340158885,
+      "relative_error": 0.21328504289069264
+    },
+    "n_links=3_g_mag=0.825": {
+      "truncation_error": 0.12210982740564802,
+      "highest_truncation": 2,
+      "highest_gap": 0.12606740617340462,
+      "relative_error": 0.968607438767218
+    },
+    "n_links=3_g_mag=1.55": {
+      "truncation_error": 0.06342458272443707,
+      "highest_truncation": 2,
+      "highest_gap": 0.06447065864894341,
+      "relative_error": 0.9837743875054473
+    },
+    "n_links=3_g_mag=2.275": {
+      "truncation_error": 0.0347650682989844,
+      "highest_truncation": 2,
+      "highest_gap": 0.03523824903787087,
+      "relative_error": 0.9865719565583995
+    },
+    "n_links=3_g_mag=3.0": {
+      "truncation_error": 0.021352681340752966,
+      "highest_truncation": 2,
+      "highest_gap": 0.021621145243306827,
+      "relative_error": 0.9875832709353373
+    },
+    "n_links=4_g_mag=0.1": {
+      "truncation_error": 0.06814950759602395,
+      "highest_truncation": 2,
+      "highest_gap": 0.31578750922665433,
+      "relative_error": 0.21580811654937912
+    },
+    "n_links=4_g_mag=0.825": {
+      "truncation_error": 0.08317583116149274,
+      "highest_truncation": 2,
+      "highest_gap": 0.0836460321567194,
+      "relative_error": 0.9943786814137736
+    },
+    "n_links=4_g_mag=1.55": {
+      "truncation_error": 0.027834982538546882,
+      "highest_truncation": 2,
+      "highest_gap": 0.02789936021499173,
+      "relative_error": 0.9976925034857876
+    },
+    "n_links=4_g_mag=2.275": {
+      "truncation_error": 0.010636859152921119,
+      "highest_truncation": 2,
+      "highest_gap": 0.010656510439851274,
+      "relative_error": 0.99815593603168
+    },
+    "n_links=4_g_mag=3.0": {
+      "truncation_error": 0.0049862544471004355,
+      "highest_truncation": 2,
+      "highest_gap": 0.004994667985087631,
+      "relative_error": 0.9983154960425167
+    }
+  },
+  "method_comparison": {
+    "comparisons": [
+      {
+        "n_plaquettes": 1,
+        "transverse_field": 0.1,
+        "exact_gap": 0.05722905870834438,
+        "vqe_gap": 0.0,
+        "absolute_error": 0.05722905870834438,
+        "relative_error": 1.0
+      },
+      {
+        "n_plaquettes": 1,
+        "transverse_field": 0.55,
+        "exact_gap": 0.9300023199870633,
+        "vqe_gap": 0.8394404581063541,
+        "absolute_error": 0.09056186188070914,
+        "relative_error": 0.09737810318792418
+      },
+      {
+        "n_plaquettes": 1,
+        "transverse_field": 1.0,
+        "exact_gap": 1.887037648117869,
+        "vqe_gap": 1.8293004001993385,
+        "absolute_error": 0.05773724791853052,
+        "relative_error": 0.030596765240013965
+      },
+      {
+        "n_plaquettes": 2,
+        "transverse_field": 0.1,
+        "exact_gap": 0.016502300188448338,
+        "vqe_gap": 0.007161133099607753,
+        "absolute_error": 0.009341167088840585,
+        "relative_error": 0.5660524279748245
+      },
+      {
+        "n_plaquettes": 2,
+        "transverse_field": 0.55,
+        "exact_gap": 0.791520221919543,
+        "vqe_gap": 0.0,
+        "absolute_error": 0.791520221919543,
+        "relative_error": 1.0
+      },
+      {
+        "n_plaquettes": 2,
+        "transverse_field": 1.0,
+        "exact_gap": 1.7827376738237035,
+        "vqe_gap": 1.4960534526425873,
+        "absolute_error": 0.28668422118111625,
+        "relative_error": 0.16081122051245028
+      },
+      {
+        "n_plaquettes": 3,
+        "transverse_field": 0.1,
+        "exact_gap": 0.012840489403626254,
+        "vqe_gap": 0.09967160391908658,
+        "absolute_error": 0.08683111451546033,
+        "relative_error": 6.76229011107151
+      },
+      {
+        "n_plaquettes": 3,
+        "transverse_field": 0.55,
+        "exact_gap": 0.7810715676194464,
+        "vqe_gap": 0.0,
+        "absolute_error": 0.7810715676194464,
+        "relative_error": 1.0
+      },
+      {
+        "n_plaquettes": 3,
+        "transverse_field": 1.0,
+        "exact_gap": 1.7795167652822474,
+        "vqe_gap": 3.4365399592984973,
+        "absolute_error": 1.6570231940162499,
+        "relative_error": 0.9311646995095497
+      }
+    ],
+    "mean_absolute_error": 0.4242221838720267,
+    "max_absolute_error": 1.6570231940162499,
+    "mean_relative_error": 1.2831437030551414,
+    "max_relative_error": 6.76229011107151
+  },
+  "error_budget": {
+    "finite_size": {
+      "mean": 0.005777124542124905,
+      "max": 0.01044865430009656,
+      "description": "Error from finite lattice size"
+    },
+    "truncation": {
+      "mean": 0.07389331411957813,
+      "max": 0.1816054306254633,
+      "description": "Error from Hilbert space truncation"
+    },
+    "method_comparison": {
+      "mean": 0.4242221838720267,
+      "max": 1.6570231940162499,
+      "description": "Difference between exact and VQE methods"
+    },
+    "total": {
+      "mean": 0.43064841614558563,
+      "max": 1.6669779759544388,
+      "description": "Combined systematic error (quadrature)"
+    }
+  }
+}

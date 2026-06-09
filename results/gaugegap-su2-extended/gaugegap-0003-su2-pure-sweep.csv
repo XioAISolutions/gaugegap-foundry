@@ -1,0 +1,6 @@
+run_id,hypothesis_id,track,model,observable,hamiltonian_hash,value,ground_energy,first_excited_energy,method,hilbert_dim,n_links,n_plaquettes,status,error,param_nx,param_ny,param_g_electric,param_g_magnetic,param_j_max,param_boundary
+20260609T184418Z,gaugegap-0003,GaugeGap,su2_pure_gauge_2plus1d,mass_gap,35c4b67120de3e8b3a1e8c4f00be637f60d5e681dfc87cbdf299ce1e614ed40a,0.375,-0.1,0.275,exact_diagonalization,256,8,4,pass,,2,2,0.5,1.0,0.5,periodic
+20260609T184418Z,gaugegap-0003,GaugeGap,su2_pure_gauge_2plus1d,mass_gap,c9a41fac863ef6f18706e47cbd6e4a82c03b5d1e9d816f7024b582bb606b52b8,0.65625,-0.1,0.55625,exact_diagonalization,256,8,4,pass,,2,2,0.875,1.0,0.5,periodic
+20260609T184418Z,gaugegap-0003,GaugeGap,su2_pure_gauge_2plus1d,mass_gap,0de2a1b1d621e4d61b86bbdccb08f029248b1c111e48715eb34a8fcae660c4f0,0.9375,-0.1,0.8375,exact_diagonalization,256,8,4,pass,,2,2,1.25,1.0,0.5,periodic
+20260609T184418Z,gaugegap-0003,GaugeGap,su2_pure_gauge_2plus1d,mass_gap,392ebbcfc3cfa516146f758b1cb59a9bbfb8b5d154a10e09cb34bf193334b9a0,1.21875,-0.1,1.11875,exact_diagonalization,256,8,4,pass,,2,2,1.625,1.0,0.5,periodic
+20260609T184418Z,gaugegap-0003,GaugeGap,su2_pure_gauge_2plus1d,mass_gap,6b4badc90e4da4d278f08e22583e044bf44e238672234f068e616a7ca46a87e3,1.5,-0.1,1.4,exact_diagonalization,256,8,4,pass,,2,2,2.0,1.0,0.5,periodic
