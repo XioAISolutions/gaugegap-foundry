@@ -26,7 +26,7 @@ The repo now tracks a practical solution-gap scorecard and agent work orders:
 
 ### GaugeGap Track: finite gauge-system benchmarks
 
-**Natural progression**: Z₂ → U(1) → SU(2) → SU(3 prototype scaffold → continuum research questions.
+**Natural progression**: Z₂ → U(1) → SU(2) → SU(3 prototype scaffold) → continuum research questions.
 
 1. **`gaugegap-0001`**: Z₂ dual-chain / Ising sanity benchmark
    - finite transverse-field Ising chain
