@@ -768,3 +768,98 @@ def certified_hyperon_axial() -> List[RelationResult]:
             abs(HYPERON_G1F1[name][0]), note="Cabibbo SU(3)",
         ))
     return out
+
+
+# ===========================================================================
+# V_us determinations and Cabibbo universality.
+# ===========================================================================
+
+# Independent |V_us| determinations (PDG): kaon Kl3, Kmu2 (via f_K/f_pi and
+# V_ud), and Cabibbo-model hyperon semileptonic decays.
+VUS_DETERMINATIONS: Dict[str, Tuple[float, float]] = {
+    "Kl3": (0.2233, 0.0006),
+    "Kmu2 (fK/fpi)": (0.2252, 0.0005),
+    "hyperon decays": (0.2250, 0.0027),
+}
+# Reference value (CKM first row, used elsewhere in this module).
+_VUS_REF = CKM_FIRST_ROW["V_us"]
+
+
+def _angle_deg(iv: Interval, fn) -> Interval:
+    """Apply a monotonic-increasing inverse trig fn to an enclosure, in degrees."""
+    import mpmath as mp
+
+    deg = mp.mpf(180) / mp.pi
+    return Interval(fn(iv.lower) * deg, fn(iv.upper) * deg)
+
+
+def certified_vus_determinations() -> List[Dict[str, object]]:
+    """Certified |V_us| determinations, each as a Cabibbo angle and a residual.
+
+    For each channel the Cabibbo angle is theta_C = asin(|V_us|) (asin is
+    monotonic, so the endpoints give a certified enclosure) and the residual is
+    (channel - reference) against the CKM first-row |V_us|.
+    """
+    import mpmath as mp
+
+    ref = _iv(*_VUS_REF)
+    rows: List[Dict[str, object]] = []
+    for name, val in VUS_DETERMINATIONS.items():
+        vus = _iv(*val)
+        rows.append({
+            "name": name,
+            "vus": vus,
+            "angle_deg": _angle_deg(vus, mp.asin),
+            "residual_vs_ref": vus - ref,
+        })
+    return rows
+
+
+def certified_cabibbo_universality() -> RelationResult:
+    """Certified Cabibbo-universality test sin(theta_C) two ways.
+
+    From |V_us| directly vs from sqrt(1 - |V_ud|^2) (assuming first-row
+    unitarity). The certified residual is the famous first-row / Cabibbo-angle
+    tension; it does not enclose zero. Arithmetic on PDG inputs, not a discovery.
+    """
+    vus = _iv(*CKM_FIRST_ROW["V_us"])
+    vud = _iv(*CKM_FIRST_ROW["V_ud"])
+    one = Interval.from_float(1.0)
+    sin_from_unitarity = (one - vud * vud).sqrt()
+    return RelationResult(
+        "Cabibbo universality |V_us| - sqrt(1-|V_ud|^2)",
+        vus - sin_from_unitarity, float(vus.midpoint()), note="PDG inputs",
+    )
+
+
+# ===========================================================================
+# Meson decay constants: f_K / f_pi and the V_us/V_ud tie.
+# ===========================================================================
+
+FK_FPI: Tuple[float, float] = (1.1934, 0.0019)        # FLAG lattice average
+VUS_VUD_KMU2: Tuple[float, float] = (0.23131, 0.00051)  # |V_us/V_ud| from Kmu2/pimu2
+
+
+def certified_fk_fpi_su3_breaking() -> RelationResult:
+    """Certified SU(3) breaking in the decay constants, (f_K/f_pi) - 1.
+
+    Exact SU(3) gives f_K = f_pi; the certified ~0.19 residual quantifies the
+    flavor-symmetry breaking in the pseudoscalar decay constants.
+    """
+    residual = _iv(*FK_FPI) - Interval.from_float(1.0)
+    return RelationResult("decay constants (f_K/f_pi) - 1", residual, 1.0,
+                          note="SU(3) breaking")
+
+
+def certified_vus_vud_consistency() -> RelationResult:
+    """Certified consistency of |V_us/V_ud| from Kmu2/pimu2 vs the CKM first row.
+
+    Kmu2/pimu2 yields |V_us/V_ud| x (f_K/f_pi); divided by the lattice f_K/f_pi
+    it gives |V_us/V_ud|, compared here against |V_us|/|V_ud| from the first row.
+    """
+    kmu2 = _iv(*VUS_VUD_KMU2)
+    first_row = _iv(*CKM_FIRST_ROW["V_us"]) / _iv(*CKM_FIRST_ROW["V_ud"])
+    return RelationResult(
+        "|V_us/V_ud|: Kmu2 - first-row", kmu2 - first_row,
+        float(first_row.midpoint()), note="PDG inputs",
+    )

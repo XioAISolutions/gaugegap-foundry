@@ -25,9 +25,12 @@ from gaugegap.eightfold import (  # noqa: E402
     PDG_DECUPLET,
     certified_axial_fd,
     certified_cabibbo_angle,
+    certified_cabibbo_universality,
     certified_ckm_unitarity,
     certified_constituent_quark_masses,
+    certified_fk_fpi_su3_breaking,
     certified_hyperon_axial,
+    certified_vus_vud_consistency,
     certified_isospin_ratios,
     certified_moment_predictions,
     certified_moment_relations,
@@ -74,7 +77,12 @@ def build_html() -> str:
     moments = certified_moment_predictions() + certified_moment_relations() + [
         certified_sigma_lambda_transition()
     ]
-    weak = [certified_ckm_unitarity(), certified_axial_fd()] + certified_hyperon_axial()
+    weak = (
+        [certified_ckm_unitarity(), certified_cabibbo_universality(),
+         certified_vus_vud_consistency(), certified_fk_fpi_su3_breaking(),
+         certified_axial_fd()]
+        + certified_hyperon_axial()
+    )
     vector = certified_vector_quark_content()
     decomps = certified_su3_decompositions()
 
