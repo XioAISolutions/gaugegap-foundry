@@ -1,0 +1,160 @@
+{
+  "trends": {
+    "0.1": {
+      "sizes": [
+        1,
+        2,
+        3
+      ],
+      "gaps": [
+        0.05722905870834438,
+        0.016502300188448338,
+        0.012840489403626254
+      ],
+      "ground_energies": [
+        -1.0770329614269012,
+        -2.099051471881364,
+        -3.1253198522096484
+      ],
+      "mean_gap": 0.028857282766806325,
+      "std_gap": 0.020117495985892284,
+      "gap_range": [
+        0.012840489403626254,
+        0.05722905870834438
+      ]
+    },
+    "0.55": {
+      "sizes": [
+        1,
+        2,
+        3
+      ],
+      "gaps": [
+        0.9300023199870633,
+        0.791520221919543,
+        0.7810715676194464
+      ],
+      "ground_energies": [
+        -2.416609194718915,
+        -4.289082333146766,
+        -6.161920322076455
+      ],
+      "mean_gap": 0.8341980365086842,
+      "std_gap": 0.06787802365898672,
+      "gap_range": [
+        0.7810715676194464,
+        0.9300023199870633
+      ]
+    },
+    "1.0": {
+      "sizes": [
+        1,
+        2,
+        3
+      ],
+      "gaps": [
+        1.887037648117869,
+        1.7827376738237035,
+        1.7795167652822474
+      ],
+      "ground_energies": [
+        -4.12310562561766,
+        -7.247399238315777,
+        -10.371719848325732
+      ],
+      "mean_gap": 1.8164306957412732,
+      "std_gap": 0.049943967643024674,
+      "gap_range": [
+        1.7795167652822474,
+        1.887037648117869
+      ]
+    }
+  },
+  "scaling_analysis": {
+    "continuum_value": 0.7802188655951126,
+    "continuum_error": 2.1042380786112536,
+    "total_error": 2.1042382513817968,
+    "fit_parameters": {
+      "O_inf": 0.7802188655951126,
+      "A": 1.9851673166951573,
+      "xi": 0.38695679073686795
+    },
+    "fit_errors": {
+      "O_inf": 1.1831412046317171,
+      "A": 268.3306941228382,
+      "xi": 21.072758874919298
+    },
+    "chi_squared": Infinity,
+    "extrapolation_type": "exponential",
+    "convergence_order": null,
+    "systematic_error": 0.0008527020243339332,
+    "n_sizes": 3,
+    "size_range": [
+      1.0,
+      3.0
+    ]
+  },
+  "continuum_extrapolation": {
+    "continuum_value": 0.7784522350404454,
+    "continuum_error": 0.039189395231575774,
+    "systematic_error": 0.0013096662895005218,
+    "total_error": 0.0392112729250978,
+    "convergence_order": 4,
+    "improvement_type": "richardson",
+    "chi_squared": 1.0,
+    "coefficients": {
+      "order": 4.0
+    },
+    "n_spacings": 3,
+    "spacing_range": [
+      0.3333333333333333,
+      1.0
+    ]
+  },
+  "hypothesis_pruning": {
+    "mean_gap": 0.8931620050055878,
+    "std_gap": 0.7326734191535517,
+    "status_summary": {
+      "total": 2,
+      "active": 2,
+      "falsified": 0,
+      "survived": 0,
+      "hypotheses": {
+        "gaugegap-massless": {
+          "id": "gaugegap-massless",
+          "description": "Mass gap vanishes in continuum limit",
+          "track": "gaugegap",
+          "n_parameters": 0,
+          "prior_probability": 1.0,
+          "log_evidence": -5.0,
+          "status": "active",
+          "evidence_history": [
+            [
+              "2026-06-09T14:40:27.024331",
+              -5.0
+            ]
+          ],
+          "metadata": {}
+        },
+        "gaugegap-massive": {
+          "id": "gaugegap-massive",
+          "description": "Mass gap remains finite in continuum limit",
+          "track": "gaugegap",
+          "n_parameters": 1,
+          "prior_probability": 1.0,
+          "log_evidence": 5.0,
+          "status": "active",
+          "evidence_history": [
+            [
+              "2026-06-09T14:40:27.024337",
+              5.0
+            ]
+          ],
+          "metadata": {}
+        }
+      }
+    },
+    "falsified": [],
+    "survivors": []
+  }
+}

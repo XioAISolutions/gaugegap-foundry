@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Certified Eightfold-Way Dashboard</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 980px; margin: 2rem auto;
+          padding: 0 1rem; color: #1a1a1a; line-height: 1.4; }
+  h1 { border-bottom: 3px solid #2a4d9b; padding-bottom: .3rem; }
+  h2 { margin-top: 2rem; color: #2a4d9b; }
+  table { border-collapse: collapse; width: 100%; margin: .5rem 0 1rem; font-size: .92rem; }
+  th, td { border: 1px solid #ddd; padding: 5px 9px; text-align: left; }
+  th { background: #eef3ff; }
+  td.num { font-family: ui-monospace, monospace; text-align: right; white-space: nowrap; }
+  td.zero { color: #137333; font-weight: 600; }
+  td.nonzero { color: #b3261e; }
+  .note { color: #666; font-size: .85rem; margin: .2rem 0; }
+  .boundary { background: #fff8e1; border: 1px solid #f0d000; padding: .6rem 1rem;
+               border-radius: 6px; font-size: .9rem; }
+  .figs { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  .figs > div { border: 1px solid #eee; border-radius: 6px; padding: .3rem; }
+</style></head><body>
+<h1>Certified Eightfold-Way / Gell-Mann&ndash;Okubo Dashboard</h1>
+<p class="boundary"><strong>Claim boundary.</strong> A finite, effective SU(3)-flavor
+mass-operator / phenomenology suite made rigorous with interval arithmetic. Every
+residual below is a certified enclosure propagated from PDG inputs. This is
+<strong>not</strong> lattice QCD and makes no continuum or first-principles claim.</p>
+
+<h2>Weight diagrams (I&#8323;, Y)</h2>
+<div class="figs"><div><svg xmlns="http://www.w3.org/2000/svg" width="460" height="420" viewBox="0 0 460 420" font-family="sans-serif">
+<rect width="460" height="420" fill="white"/>
+<text x="230.0" y="28" text-anchor="middle" font-size="18" font-weight="bold">Baryon octet (J=1/2)</text>
+<line x1="40" y1="230.0" x2="420" y2="230.0" stroke="#bbb"/><line x1="230.0" y1="60" x2="230.0" y2="390" stroke="#bbb"/><text x="430" y="222.0" font-size="13" fill="#888">I&#8323;</text><text x="238.0" y="72" font-size="13" fill="#888">Y</text>
+<circle cx="277.5" cy="135.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="277.5" y="139.0" text-anchor="middle" font-size="10">p</text>
+<circle cx="182.5" cy="135.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="182.5" y="139.0" text-anchor="middle" font-size="10">n</text>
+<circle cx="325.0" cy="230.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="325.0" y="234.0" text-anchor="middle" font-size="10">Sigma+</text>
+<circle cx="230.0" cy="230.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="230.0" y="234.0" text-anchor="middle" font-size="10">Sigma0</text>
+<circle cx="135.0" cy="230.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="135.0" y="234.0" text-anchor="middle" font-size="10">Sigma-</text>
+<circle cx="230.0" cy="230.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="230.0" y="234.0" text-anchor="middle" font-size="10">Lambda</text>
+<circle cx="277.5" cy="325.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="277.5" y="329.0" text-anchor="middle" font-size="10">Xi0</text>
+<circle cx="182.5" cy="325.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="182.5" y="329.0" text-anchor="middle" font-size="10">Xi-</text>
+</svg></div>
+<div><svg xmlns="http://www.w3.org/2000/svg" width="460" height="420" viewBox="0 0 460 420" font-family="sans-serif">
+<rect width="460" height="420" fill="white"/>
+<text x="230.0" y="28" text-anchor="middle" font-size="18" font-weight="bold">Baryon decuplet (J=3/2)</text>
+<line x1="40" y1="230.0" x2="420" y2="230.0" stroke="#bbb"/><line x1="230.0" y1="60" x2="230.0" y2="390" stroke="#bbb"/><text x="430" y="222.0" font-size="13" fill="#888">I&#8323;</text><text x="238.0" y="72" font-size="13" fill="#888">Y</text>
+<circle cx="87.5" cy="135.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="87.5" y="139.0" text-anchor="middle" font-size="10">Delta-</text>
+<circle cx="182.5" cy="135.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="182.5" y="139.0" text-anchor="middle" font-size="10">Delta0</text>
+<circle cx="277.5" cy="135.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="277.5" y="139.0" text-anchor="middle" font-size="10">Delta+</text>
+<circle cx="372.5" cy="135.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="372.5" y="139.0" text-anchor="middle" font-size="10">Delta++</text>
+<circle cx="135.0" cy="230.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="135.0" y="234.0" text-anchor="middle" font-size="10">Sigma*-</text>
+<circle cx="230.0" cy="230.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="230.0" y="234.0" text-anchor="middle" font-size="10">Sigma*0</text>
+<circle cx="325.0" cy="230.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="325.0" y="234.0" text-anchor="middle" font-size="10">Sigma*+</text>
+<circle cx="182.5" cy="325.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="182.5" y="329.0" text-anchor="middle" font-size="10">Xi*-</text>
+<circle cx="277.5" cy="325.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="277.5" y="329.0" text-anchor="middle" font-size="10">Xi*0</text>
+<circle cx="230.0" cy="420.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="230.0" y="424.0" text-anchor="middle" font-size="10">Omega-</text>
+</svg></div></div>
+
+<h2>Mass-relation battery</h2><table><thead><tr><th>relation</th><th>certified residual</th><th>rel.</th><th>encloses 0?</th></tr></thead><tbody><tr><td>baryon octet GMO 2(N+Xi)-3Lambda-Sigma</td><td class='num'>[-25.9640, -25.6240]</td><td class='num'>0.57%</td><td class='nonzero'>no</td></tr>
+<tr><td>decuplet spacing (Xi*-Sigma*)-(Sigma*-Delta)</td><td class='num'>[-7.0000, -0.2000]</td><td class='num'>2.37%</td><td class='nonzero'>no</td></tr>
+<tr><td>decuplet spacing (Omega-Xi*)-(Xi*-Sigma*)</td><td class='num'>[-9.5400, -5.3600]</td><td class='num'>4.91%</td><td class='nonzero'>no</td></tr>
+<tr><td>pseudoscalar GMO 4K^2-3eta^2-pi^2</td><td class='num'>[54810.6950, 55048.9518]</td><td class='num'>5.63%</td><td class='nonzero'>no</td></tr>
+<tr><td>Coleman-Glashow (n-p)+(Xi--Xi0)-(Sigma--Sigma+)</td><td class='num'>[-0.3068, 0.4348]</td><td class='num'>0.79%</td><td class='zero'>yes</td></tr></tbody></table>
+<h2>Derived certified quantities</h2><table><tbody><tr><td>constituent m_q</td><td class='num'>[410.3333, 411.0000] MeV</td></tr><tr><td>constituent m_s</td><td class='num'>[557.3867, 557.5800] MeV</td></tr><tr><td>m_s - m_q (decuplet spacing)</td><td class='num'>[146.3867, 147.2467] MeV</td></tr><tr><td>Omega- prediction (2&middot;&Xi;*-&Sigma;*)</td><td class='num'>[1678.1000, 1681.7000] MeV (meas 1672.45)</td></tr><tr><td>quark moments &mu;_u, &mu;_d, &mu;_s</td><td class='num'>[1.8517, 1.8517], [-0.9719, -0.9719], [-0.6170, -0.6090] &mu;_N</td></tr><tr><td>Cabibbo angle &theta;_C</td><td class='num'>[12.923, 13.021]&deg;</td></tr></tbody></table>
+<h2>Vector nonet: ideal-mixing tests</h2><p class='note'>phi as s-sbar, omega as light-quark</p><table><thead><tr><th>relation</th><th>certified residual</th><th>rel.</th><th>encloses 0?</th></tr></thead><tbody><tr><td>vector phi as s-sbar: (2K*-rho)-phi</td><td class='num'>[-12.1470, -10.6150]</td><td class='num'>1.12%</td><td class='nonzero'>no</td></tr>
+<tr><td>vector omega as n-nbar: rho-omega</td><td class='num'>[-7.7600, -7.0400]</td><td class='num'>0.95%</td><td class='nonzero'>no</td></tr></tbody></table>
+<h2>Baryon magnetic moments (SU(6) quark model)</h2><table><thead><tr><th>relation</th><th>certified residual</th><th>rel.</th><th>encloses 0?</th></tr></thead><tbody><tr><td>moment Sigma+ (pred-meas)</td><td class='num'>[0.2039, 0.2266]</td><td class='num'>8.76%</td><td class='nonzero'>no</td></tr>
+<tr><td>moment Sigma- (pred-meas)</td><td class='num'>[0.0422, 0.0949]</td><td class='num'>5.91%</td><td class='nonzero'>no</td></tr>
+<tr><td>moment Xi0 (pred-meas)</td><td class='num'>[-0.2039, -0.1652]</td><td class='num'>14.76%</td><td class='nonzero'>no</td></tr>
+<tr><td>moment Xi- (pred-meas)</td><td class='num'>[0.1495, 0.1652]</td><td class='num'>24.18%</td><td class='nonzero'>no</td></tr>
+<tr><td>moment ratio mu_p/mu_n vs -3/2</td><td class='num'>[0.0401, 0.0401]</td><td class='num'>2.67%</td><td class='nonzero'>no</td></tr>
+<tr><td>predicted mu_Sigma0 = (mu_Sigma+ + mu_Sigma-)/2</td><td class='num'>[0.6315, 0.6665]</td><td class='num'>100.00%</td><td class='nonzero'>no</td></tr>
+<tr><td>Sigma0-&gt;Lambda transition moment (pred-meas)</td><td class='num'>[-0.0598, 0.1002]</td><td class='num'>1.25%</td><td class='zero'>yes</td></tr></tbody></table>
+<h2>Isospin decay ratios (parameter-free, exact)</h2>
+<table><thead><tr><th>decay</th><th>certified ratio</th><th>exact</th></tr></thead>
+<tbody><tr><td>Delta+ -&gt; p pi0 : n pi+</td><td class='num'>[2.0000, 2.0000]</td><td class='num'>2:1</td></tr><tr><td>Delta0 -&gt; n pi0 : p pi-</td><td class='num'>[2.0000, 2.0000]</td><td class='num'>2:1</td></tr><tr><td>K*+ -&gt; K0 pi+ : K+ pi0</td><td class='num'>[2.0000, 2.0000]</td><td class='num'>2:1</td></tr><tr><td>Delta++ -&gt; p pi+ (pure)</td><td class='num'>[1.0000, 1.0000]</td><td class='num'>1</td></tr></tbody></table>
+<h2>SU(3) tensor decompositions (exact)</h2><p class='note'>product dim - sum of summand dims</p><table><thead><tr><th>relation</th><th>certified residual</th><th>rel.</th><th>encloses 0?</th></tr></thead><tbody><tr><td>3 (x) 3bar = 1 + 8</td><td class='num'>[0.0000, 0.0000]</td><td class='num'>0.00%</td><td class='zero'>yes</td></tr>
+<tr><td>3 (x) 3 = 3bar + 6</td><td class='num'>[0.0000, 0.0000]</td><td class='num'>0.00%</td><td class='zero'>yes</td></tr>
+<tr><td>3 (x) 3 (x) 3 = 1 + 8 + 8 + 10</td><td class='num'>[0.0000, 0.0000]</td><td class='num'>0.00%</td><td class='zero'>yes</td></tr>
+<tr><td>8 (x) 8 = 1+8+8+10+10bar+27</td><td class='num'>[0.0000, 0.0000]</td><td class='num'>0.00%</td><td class='zero'>yes</td></tr></tbody></table>
+<h2>Weak (Cabibbo) sector</h2><table><thead><tr><th>relation</th><th>certified residual</th><th>rel.</th><th>encloses 0?</th></tr></thead><tbody><tr><td>CKM first-row unitarity |Vud|^2+|Vus|^2+|Vub|^2-1</td><td class='num'>[-0.0025, -0.0006]</td><td class='num'>0.15%</td><td class='nonzero'>no</td></tr>
+<tr><td>Cabibbo universality |V_us| - sqrt(1-|V_ud|^2)</td><td class='num'>[-0.0055, -0.0013]</td><td class='num'>1.52%</td><td class='nonzero'>no</td></tr>
+<tr><td>|V_us/V_ud|: Kmu2 - first-row</td><td class='num'>[-0.0004, 0.0024]</td><td class='num'>0.42%</td><td class='zero'>yes</td></tr>
+<tr><td>decay constants (f_K/f_pi) - 1</td><td class='num'>[0.1915, 0.1953]</td><td class='num'>19.34%</td><td class='nonzero'>no</td></tr>
+<tr><td>axial coupling (F+D) - g_A</td><td class='num'>[-0.0257, 0.0089]</td><td class='num'>0.66%</td><td class='zero'>yes</td></tr>
+<tr><td>hyperon g1/f1 Lambda-&gt;p (pred-meas)</td><td class='num'>[-0.0127, 0.0387]</td><td class='num'>1.81%</td><td class='zero'>yes</td></tr>
+<tr><td>hyperon g1/f1 Sigma-&gt;n (pred-meas)</td><td class='num'>[-0.0340, 0.0320]</td><td class='num'>0.29%</td><td class='zero'>yes</td></tr>
+<tr><td>hyperon g1/f1 Xi-&gt;Lambda (pred-meas)</td><td class='num'>[-0.1157, 0.0057]</td><td class='num'>22.00%</td><td class='zero'>yes</td></tr></tbody></table>
+<p class="note">Generated by scripts/build_eightfold_dashboard.py &mdash; reproduce with
+<code>python3 scripts/run_eightfold.py</code>.</p>
+</body></html>

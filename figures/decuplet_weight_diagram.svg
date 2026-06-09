@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="420" viewBox="0 0 460 420" font-family="sans-serif">
+<rect width="460" height="420" fill="white"/>
+<text x="230.0" y="28" text-anchor="middle" font-size="18" font-weight="bold">Baryon decuplet (J=3/2)</text>
+<line x1="40" y1="230.0" x2="420" y2="230.0" stroke="#bbb"/><line x1="230.0" y1="60" x2="230.0" y2="390" stroke="#bbb"/><text x="430" y="222.0" font-size="13" fill="#888">I&#8323;</text><text x="238.0" y="72" font-size="13" fill="#888">Y</text>
+<circle cx="87.5" cy="135.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="87.5" y="139.0" text-anchor="middle" font-size="10">Delta-</text>
+<circle cx="182.5" cy="135.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="182.5" y="139.0" text-anchor="middle" font-size="10">Delta0</text>
+<circle cx="277.5" cy="135.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="277.5" y="139.0" text-anchor="middle" font-size="10">Delta+</text>
+<circle cx="372.5" cy="135.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="372.5" y="139.0" text-anchor="middle" font-size="10">Delta++</text>
+<circle cx="135.0" cy="230.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="135.0" y="234.0" text-anchor="middle" font-size="10">Sigma*-</text>
+<circle cx="230.0" cy="230.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="230.0" y="234.0" text-anchor="middle" font-size="10">Sigma*0</text>
+<circle cx="325.0" cy="230.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="325.0" y="234.0" text-anchor="middle" font-size="10">Sigma*+</text>
+<circle cx="182.5" cy="325.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="182.5" y="329.0" text-anchor="middle" font-size="10">Xi*-</text>
+<circle cx="277.5" cy="325.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="277.5" y="329.0" text-anchor="middle" font-size="10">Xi*0</text>
+<circle cx="230.0" cy="420.0" r="16" fill="#eef3ff" stroke="#2a4d9b"/><text x="230.0" y="424.0" text-anchor="middle" font-size="10">Omega-</text>
+</svg>

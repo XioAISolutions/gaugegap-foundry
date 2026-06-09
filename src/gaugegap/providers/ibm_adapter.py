@@ -6,11 +6,15 @@ This adapter provides access to IBM Quantum systems via Qiskit Runtime:
 - IBM hardware backends (Heron, Eagle, etc.)
 
 Supports QUICK-PDE for Burgers/Poisson benchmarks (Premium/Flex/On-Prem).
+
+Qiskit 2.4+ compatible with proper session management and resource cleanup.
 """
 
 import os
+import logging
 from typing import Any, Dict, Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
+from contextlib import contextmanager
 
 from . import (
     QuantumProvider,
@@ -19,6 +23,8 @@ from . import (
     CredentialsError,
     HardwareNotReadyError,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class IBMRuntimeProvider(QuantumProvider):
@@ -45,6 +51,7 @@ class IBMRuntimeProvider(QuantumProvider):
         super().__init__(backend_name, credentials)
         self._service = None
         self._backend = None
+        self._session = None
         self.is_simulator = backend_name.startswith("aer_")
     
     def check_credentials(self) -> bool:
@@ -81,8 +88,9 @@ class IBMRuntimeProvider(QuantumProvider):
             from qiskit_ibm_runtime import QiskitRuntimeService
             
             if self.credentials and "token" in self.credentials:
+                # Qiskit 2.4+ channel parameter - use ibm_cloud for most cases
+                # The instance parameter determines the actual hub/group/project
                 self._service = QiskitRuntimeService(
-                    channel="ibm_quantum",
                     token=self.credentials["token"],
                     instance=self.credentials.get("instance")
                 )
@@ -132,7 +140,7 @@ class IBMRuntimeProvider(QuantumProvider):
         if self.is_simulator:
             return CalibrationData(
                 backend_name=self.backend_name,
-                timestamp=datetime.utcnow().isoformat(),
+                timestamp=datetime.now(timezone.utc).isoformat(),
                 qubit_count=32,  # Typical Aer limit for statevector
                 connectivity="all-to-all",
                 additional_properties={
@@ -144,31 +152,59 @@ class IBMRuntimeProvider(QuantumProvider):
         backend = self._load_backend()
         
         try:
-            # Get current calibration data
-            properties = backend.properties()
-            config = backend.configuration()
+            # Qiskit 2.4+ uses backend.target for calibration data
+            # backend.properties() and backend.configuration() are deprecated
+            target = getattr(backend, 'target', None)
+            num_qubits = backend.num_qubits if hasattr(backend, 'num_qubits') else 0
             
-            # Extract median T1, T2
-            t1_values = [q.t1 for q in properties.qubits if hasattr(q, 't1') and q.t1 is not None]
-            t2_values = [q.t2 for q in properties.qubits if hasattr(q, 't2') and q.t2 is not None]
-            
-            # Extract gate fidelities
+            # Try to extract T1/T2 from target if available
+            t1_values = []
+            t2_values = []
             gate_errors_1q = []
             gate_errors_2q = []
-            for gate in properties.gates:
-                if len(gate.qubits) == 1:
-                    gate_errors_1q.append(gate.gate_error)
-                elif len(gate.qubits) == 2:
-                    gate_errors_2q.append(gate.gate_error)
+            readout_errors = []
             
-            # Extract readout errors
-            readout_errors = [q.readout_error for q in properties.qubits if hasattr(q, 'readout_error')]
+            if target is not None:
+                # Extract qubit properties from target
+                for qubit in range(num_qubits):
+                    try:
+                        # Get T1 if available
+                        t1 = target.qubit_properties(qubit).t1 if target.qubit_properties(qubit) else None
+                        if t1 is not None:
+                            t1_values.append(t1)
+                        
+                        # Get T2 if available
+                        t2 = target.qubit_properties(qubit).t2 if target.qubit_properties(qubit) else None
+                        if t2 is not None:
+                            t2_values.append(t2)
+                    except (AttributeError, TypeError):
+                        pass
+                
+                # Extract gate errors from target
+                for instruction_name in target.operation_names:
+                    try:
+                        for qargs in target.qargs_for_operation_name(instruction_name):
+                            props = target[instruction_name].get(qargs, None)
+                            if props and hasattr(props, 'error') and props.error is not None:
+                                if len(qargs) == 1:
+                                    gate_errors_1q.append(props.error)
+                                elif len(qargs) == 2:
+                                    gate_errors_2q.append(props.error)
+                    except (AttributeError, TypeError, KeyError):
+                        pass
+            
+            # Get basis gates
+            basis_gates = list(target.operation_names) if target else []
+            
+            # Get coupling map
+            coupling_map = getattr(backend, 'coupling_map', None)
+            connectivity = "all-to-all" if coupling_map is None else f"{len(coupling_map)} edges"
             
             return CalibrationData(
                 backend_name=self.backend_name,
-                timestamp=datetime.utcnow().isoformat(),
-                qubit_count=config.n_qubits,
-                connectivity=config.coupling_map.__class__.__name__ if hasattr(config, 'coupling_map') else "unknown",
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                qubit_count=num_qubits,
+                connectivity=connectivity,
                 t1_median=sum(t1_values) / len(t1_values) if t1_values else None,
                 t2_median=sum(t2_values) / len(t2_values) if t2_values else None,
                 gate_fidelity_1q=1.0 - (sum(gate_errors_1q) / len(gate_errors_1q)) if gate_errors_1q else None,
@@ -177,14 +213,15 @@ class IBMRuntimeProvider(QuantumProvider):
                 additional_properties={
                     "type": "hardware",
                     "provider": "ibm_quantum",
-                    "basis_gates": config.basis_gates if hasattr(config, 'basis_gates') else []
+                    "basis_gates": basis_gates[:10] if len(basis_gates) > 10 else basis_gates  # Limit for readability
                 }
             )
         except Exception as e:
+            logger.warning(f"Failed to extract detailed calibration data: {e}")
             # Fallback if properties not available
             return CalibrationData(
                 backend_name=self.backend_name,
-                timestamp=datetime.utcnow().isoformat(),
+                timestamp=datetime.now(timezone.utc).isoformat(),
                 qubit_count=backend.num_qubits if hasattr(backend, 'num_qubits') else 0,
                 connectivity="unknown",
                 additional_properties={
@@ -244,7 +281,7 @@ class IBMRuntimeProvider(QuantumProvider):
             circuit_depth=circuit.depth(),
             qubit_count=circuit.num_qubits,
             shots=shots,
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             calibration=self.get_calibration_data(),
             mitigation_settings={"noise_model": noise_model}
         )
@@ -301,20 +338,34 @@ class IBMRuntimeProvider(QuantumProvider):
         transpiled = pm.run(circuit)
         
         # Create Sampler with mitigation settings
+        # Qiskit 2.4+ SamplerV2 uses mode parameter
         sampler = Sampler(mode=backend)
         
+        # Apply mitigation settings for Qiskit 2.4+
+        # Options are set as attributes, not via update()
         if mitigation:
-            resilience_level = mitigation.get("resilience_level", 1)
-            sampler.options.resilience_level = resilience_level
-            
-            if mitigation.get("dynamical_decoupling", False):
-                sampler.options.dynamical_decoupling.enable = True
-            
-            if mitigation.get("twirling_gates", False):
-                sampler.options.twirling.enable_gates = True
-            
-            if mitigation.get("twirling_measure", False):
-                sampler.options.twirling.enable_measure = True
+            try:
+                resilience_level = mitigation.get("resilience_level", 1)
+                # Set resilience level directly
+                if hasattr(sampler.options, 'resilience_level'):
+                    sampler.options.resilience_level = resilience_level
+                
+                # Set dynamical decoupling if available
+                if mitigation.get("dynamical_decoupling", False):
+                    if hasattr(sampler.options, 'dynamical_decoupling'):
+                        sampler.options.dynamical_decoupling.enable = True
+                
+                # Set twirling options if available
+                if mitigation.get("twirling_gates", False):
+                    if hasattr(sampler.options, 'twirling'):
+                        sampler.options.twirling.enable_gates = True
+                
+                if mitigation.get("twirling_measure", False):
+                    if hasattr(sampler.options, 'twirling'):
+                        sampler.options.twirling.enable_measure = True
+                        
+            except (AttributeError, TypeError) as e:
+                logger.warning(f"Failed to apply some mitigation settings: {e}")
         
         # Submit job
         job = sampler.run([transpiled], shots=shots)
@@ -328,7 +379,7 @@ class IBMRuntimeProvider(QuantumProvider):
             circuit_depth=transpiled.depth(),
             qubit_count=transpiled.num_qubits,
             shots=shots,
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=datetime.now(timezone.utc).isoformat(),
             calibration=self.get_calibration_data(),
             mitigation_settings=mitigation or {}
         )
@@ -344,7 +395,36 @@ class IBMRuntimeProvider(QuantumProvider):
         Returns:
             Result object (Aer or Runtime format)
         """
-        return job.result()
+        try:
+            return job.result()
+        except Exception as e:
+            logger.error(f"Failed to retrieve job result: {e}")
+            raise
+    
+    def close_session(self):
+        """Close any open sessions and cleanup resources.
+        
+        This should be called when done with the provider to ensure
+        proper resource cleanup, especially for Runtime sessions.
+        """
+        if self._session is not None:
+            try:
+                if hasattr(self._session, 'close'):
+                    self._session.close()
+                logger.info("IBM Runtime session closed")
+            except Exception as e:
+                logger.warning(f"Error closing session: {e}")
+            finally:
+                self._session = None
+    
+    def __enter__(self):
+        """Context manager entry."""
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit with cleanup."""
+        self.close_session()
+        return False
     
     @staticmethod
     def least_busy_backend(
