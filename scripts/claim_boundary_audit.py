@@ -19,6 +19,10 @@ RISK_PATTERNS = [
     ("proof_complete", re.compile(r"\b(proof complete|complete proof|fully proven|rigorous proof complete)\b", re.I)),
     ("publication_ready", re.compile(r"\b(ready for publication|publication ready|publishable proof)\b", re.I)),
     ("certainty_overclaim", re.compile(r"\b(proven|proved|guaranteed|cannot fail|definitive)\b", re.I)),
+    # Ported from the former inline CI check so the workflow and this script
+    # enforce one shared rule set.
+    ("ai_discovery_claim", re.compile(r"\bai (discovered|proved|solved)\b", re.I)),
+    ("quantum_proof_claim", re.compile(r"\bquantum computer proves\b", re.I)),
 ]
 
 SAFE_CONTEXT_PATTERNS = [
