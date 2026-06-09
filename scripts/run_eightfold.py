@@ -39,8 +39,12 @@ from gaugegap.eightfold import (  # noqa: E402
     certified_moment_relations,
     certified_axial_fd,
     certified_cabibbo_angle,
+    certified_cabibbo_universality,
     certified_ckm_unitarity,
+    certified_fk_fpi_su3_breaking,
     certified_hyperon_axial,
+    certified_vus_determinations,
+    certified_vus_vud_consistency,
     certified_octet_spectrum,
     certified_omega_prediction,
     certified_quark_moments,
@@ -61,6 +65,8 @@ def _fmt(iv) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--figures-dir", default=str(ROOT / "figures"))
+    ap.add_argument("--no-dashboard", action="store_true",
+                    help="skip building the HTML dashboard")
     args = ap.parse_args()
 
     print("# Certified Eightfold-Way / Gell-Mann-Okubo benchmark\n")
@@ -153,7 +159,17 @@ def main() -> int:
     print(f"  {fd.name} = {_fmt(fd.residual)}  (encloses 0: {fd.encloses_zero})")
     for r in certified_hyperon_axial():
         print(f"  {r.name:<40} {_fmt(r.residual):>20}  0?={'Y' if r.encloses_zero else 'n'}")
-    print()
+    print("  |V_us| determinations (Cabibbo angle from asin|V_us|):")
+    for row in certified_vus_determinations():
+        ang = row["angle_deg"]
+        print(f"    {row['name']:<18} V_us={_fmt(row['vus'])}  "
+              f"theta_C=[{float(ang.lower):.3f},{float(ang.upper):.3f}] deg")
+    uni = certified_cabibbo_universality()
+    print(f"  {uni.name} = {_fmt(uni.residual)}  (encloses 0: {uni.encloses_zero})")
+    fk = certified_fk_fpi_su3_breaking()
+    print(f"  {fk.name} = {_fmt(fk.residual)}  (SU(3) breaking ~{fk.rel_percent:.1f}%)")
+    vv = certified_vus_vud_consistency()
+    print(f"  {vv.name} = {_fmt(vv.residual)}  (encloses 0: {vv.encloses_zero})\n")
 
     # (K) weight-diagram figures.
     figs = Path(args.figures_dir)
@@ -162,6 +178,14 @@ def main() -> int:
     (figs / "decuplet_weight_diagram.svg").write_text(decuplet_weight_diagram_svg())
     print(f"(K) Wrote weight diagrams to {figs}/octet_weight_diagram.svg, "
           f"decuplet_weight_diagram.svg")
+
+    # (L) self-contained HTML dashboard (unless suppressed).
+    if not args.no_dashboard:
+        from build_eightfold_dashboard import build_html
+
+        dash = figs / "eightfold_dashboard.html"
+        dash.write_text(build_html())
+        print(f"(L) Wrote dashboard to {dash} ({dash.stat().st_size} bytes)")
     return 0
 
 

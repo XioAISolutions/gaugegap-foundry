@@ -29,8 +29,12 @@ from gaugegap.eightfold import (
     certified_moment_relations,
     certified_axial_fd,
     certified_cabibbo_angle,
+    certified_cabibbo_universality,
     certified_ckm_unitarity,
+    certified_fk_fpi_su3_breaking,
     certified_hyperon_axial,
+    certified_vus_determinations,
+    certified_vus_vud_consistency,
     certified_octet_spectrum,
     certified_omega_prediction,
     certified_quark_moments,
@@ -245,3 +249,45 @@ def test_hyperon_axial_predictions():
     # The Cabibbo SU(3) predictions are consistent with the measured g1/f1.
     for r in rels:
         assert r.encloses_zero
+
+
+def test_vus_determinations():
+    rows = certified_vus_determinations()
+    assert len(rows) == 3
+    for row in rows:
+        # Each channel gives a Cabibbo angle near 13 degrees.
+        assert 12.5 < float(row["angle_deg"].midpoint()) < 13.5
+        assert row["vus"].lower <= row["vus"].upper
+
+
+def test_cabibbo_universality_tension():
+    u = certified_cabibbo_universality()
+    # The first-row / Cabibbo-angle tension: small, negative, not enclosing zero.
+    assert not u.encloses_zero
+    assert abs(float(u.residual.midpoint())) < 0.01
+
+
+def test_fk_fpi_su3_breaking():
+    b = certified_fk_fpi_su3_breaking()
+    # f_K/f_pi - 1 is about 0.19 (SU(3) breaking in decay constants).
+    assert 0.15 < float(b.residual.midpoint()) < 0.22
+
+
+def test_vus_vud_consistency():
+    c = certified_vus_vud_consistency()
+    # Kmu2 and first-row agree on |V_us/V_ud|.
+    assert c.encloses_zero
+
+
+def test_dashboard_builds():
+    # Exercise the self-contained HTML dashboard generator (so CI catches breaks).
+    scripts_dir = str(ROOT / "scripts")
+    if scripts_dir not in sys.path:
+        sys.path.insert(0, scripts_dir)
+    from build_eightfold_dashboard import build_html
+
+    html_doc = build_html()
+    assert html_doc.startswith("<!DOCTYPE html>")
+    assert html_doc.rstrip().endswith("</html>")
+    for token in ("Mass-relation battery", "Cabibbo", "<svg", "tensor decompositions"):
+        assert token in html_doc

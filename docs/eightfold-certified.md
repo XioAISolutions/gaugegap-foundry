@@ -138,14 +138,22 @@ SU(3) dimension formula `dim(p,q) = (p+1)(q+1)(p+q+2)/2`.
 - **Hyperon semileptonic `g₁/f₁`** — parameter-free Cabibbo SU(3) predictions
   (`Λ→p: F+D/3`, `Σ→n: F−D`, `Ξ→Λ: F−D/3`), each certified *consistent with* the
   measured ratios.
+- **`|V_us|` determinations** — Kl3, Kμ2 (via `f_K/f_π`), and hyperon decays, each
+  turned into a certified Cabibbo angle `θ_C = asin|V_us|` (all `≈ 12.9–13.0°`).
+- **Cabibbo universality** — `|V_us| − √(1−|V_ud|²) = [−0.0055, −0.0013]`, a
+  certified residual that does not enclose zero (the first-row tension).
+- **`f_K/f_π` SU(3) breaking** — `(f_K/f_π) − 1 = [0.1915, 0.1953]` (~19.3%), and
+  `|V_us/V_ud|` from Kμ2 is certified consistent with the first row.
 
 ## Launch / dashboard
 
-`python3 scripts/run_eightfold.py` prints the full report (sections A–K) and
-regenerates the weight-diagram SVGs. `python3 scripts/build_eightfold_dashboard.py`
-renders everything — all certified tables plus the inline `(I₃, Y)` weight
-diagrams — into a single self-contained `figures/eightfold_dashboard.html` that
-opens in any browser with no server or external assets.
+`python3 scripts/run_eightfold.py` prints the full report (sections A–L),
+regenerates the weight-diagram SVGs, **and** builds the self-contained
+`figures/eightfold_dashboard.html` (pass `--no-dashboard` to skip). The dashboard
+— all certified tables plus the inline `(I₃, Y)` weight diagrams — opens in any
+browser with no server or external assets; it can also be built on its own with
+`python3 scripts/build_eightfold_dashboard.py`. The dashboard build is exercised
+by the test suite (CI), so it can never silently break.
 
 **(K) Weight diagrams.** The runner emits the `(I₃, Y)` weight diagrams (the octet
 hexagon and the decuplet triangle) as SVG to `figures/`.
