@@ -30,6 +30,7 @@ from gaugegap.eightfold import (
     certified_axial_fd,
     certified_cabibbo_angle,
     certified_ckm_unitarity,
+    certified_hyperon_axial,
     certified_octet_spectrum,
     certified_omega_prediction,
     certified_quark_moments,
@@ -236,3 +237,11 @@ def test_axial_fd_consistency():
     r = certified_axial_fd()
     # F + D should reproduce g_A to within the fit uncertainties.
     assert abs(float(r.residual.midpoint())) < 0.05
+
+
+def test_hyperon_axial_predictions():
+    rels = certified_hyperon_axial()
+    assert len(rels) == 3
+    # The Cabibbo SU(3) predictions are consistent with the measured g1/f1.
+    for r in rels:
+        assert r.encloses_zero

@@ -135,6 +135,17 @@ SU(3) dimension formula `dim(p,q) = (p+1)(q+1)(p+q+2)/2`.
   the monotonic `atan` on the ratio enclosure).
 - **Axial coupling** `(F+D) − g_A = [−0.026, 0.009]` — certified consistent with
   zero (the SU(3) hyperon-fit `F, D` reproduce the nucleon `g_A`).
+- **Hyperon semileptonic `g₁/f₁`** — parameter-free Cabibbo SU(3) predictions
+  (`Λ→p: F+D/3`, `Σ→n: F−D`, `Ξ→Λ: F−D/3`), each certified *consistent with* the
+  measured ratios.
+
+## Launch / dashboard
+
+`python3 scripts/run_eightfold.py` prints the full report (sections A–K) and
+regenerates the weight-diagram SVGs. `python3 scripts/build_eightfold_dashboard.py`
+renders everything — all certified tables plus the inline `(I₃, Y)` weight
+diagrams — into a single self-contained `figures/eightfold_dashboard.html` that
+opens in any browser with no server or external assets.
 
 **(K) Weight diagrams.** The runner emits the `(I₃, Y)` weight diagrams (the octet
 hexagon and the decuplet triangle) as SVG to `figures/`.
@@ -145,6 +156,7 @@ hexagon and the decuplet triangle) as SVG to `figures/`.
 |-----------|------|
 | Model + full certified battery | `src/gaugegap/eightfold.py` |
 | Report runner + figures | `scripts/run_eightfold.py` |
+| HTML dashboard generator | `scripts/build_eightfold_dashboard.py` |
 | Tests | `tests/test_eightfold.py` |
 | Weight diagrams | `figures/octet_weight_diagram.svg`, `figures/decuplet_weight_diagram.svg` |
 

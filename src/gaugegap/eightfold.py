@@ -733,3 +733,38 @@ def certified_axial_fd() -> RelationResult:
     residual = (_iv(*AXIAL["F"]) + _iv(*AXIAL["D"])) - _iv(*AXIAL["g_A"])
     return RelationResult("axial coupling (F+D) - g_A", residual,
                           AXIAL["g_A"][0], note="SU(3) hyperon fit")
+
+
+# Measured hyperon semileptonic axial-to-vector ratios g1/f1 (PDG).
+HYPERON_G1F1: Dict[str, Tuple[float, float]] = {
+    "Lambda->p": (0.718, 0.015),
+    "Sigma->n": (-0.340, 0.017),
+    "Xi->Lambda": (0.25, 0.05),
+}
+
+
+def certified_hyperon_axial() -> List[RelationResult]:
+    """Certified SU(3) (Cabibbo) predictions for hyperon semileptonic g1/f1.
+
+    With the same reduced couplings F, D, the |Delta S|=1 hyperon decays have
+    parameter-free SU(3) predictions:
+        Lambda->p:   F + D/3
+        Sigma->n:    F - D
+        Xi->Lambda:  F - D/3
+    Each is reported as a certified residual (predicted - measured).
+    """
+    F, D = _iv(*AXIAL["F"]), _iv(*AXIAL["D"])
+    three = Interval.from_float(3.0)
+    preds = {
+        "Lambda->p": F + D / three,
+        "Sigma->n": F - D,
+        "Xi->Lambda": F - D / three,
+    }
+    out: List[RelationResult] = []
+    for name, pred in preds.items():
+        meas = _iv(*HYPERON_G1F1[name])
+        out.append(RelationResult(
+            f"hyperon g1/f1 {name} (pred-meas)", pred - meas,
+            abs(HYPERON_G1F1[name][0]), note="Cabibbo SU(3)",
+        ))
+    return out

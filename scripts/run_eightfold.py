@@ -40,6 +40,7 @@ from gaugegap.eightfold import (  # noqa: E402
     certified_axial_fd,
     certified_cabibbo_angle,
     certified_ckm_unitarity,
+    certified_hyperon_axial,
     certified_octet_spectrum,
     certified_omega_prediction,
     certified_quark_moments,
@@ -149,7 +150,10 @@ def main() -> int:
     ang = certified_cabibbo_angle()
     print(f"  Cabibbo angle theta_C = [{float(ang.lower):.3f}, {float(ang.upper):.3f}] deg")
     fd = certified_axial_fd()
-    print(f"  {fd.name} = {_fmt(fd.residual)}  (encloses 0: {fd.encloses_zero})\n")
+    print(f"  {fd.name} = {_fmt(fd.residual)}  (encloses 0: {fd.encloses_zero})")
+    for r in certified_hyperon_axial():
+        print(f"  {r.name:<40} {_fmt(r.residual):>20}  0?={'Y' if r.encloses_zero else 'n'}")
+    print()
 
     # (K) weight-diagram figures.
     figs = Path(args.figures_dir)
