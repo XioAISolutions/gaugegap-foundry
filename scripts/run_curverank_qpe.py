@@ -45,8 +45,10 @@ from gaugegap.curverank_spectral import (
 )
 from gaugegap.curverank_qpe import (
     build_qpe_circuit,
+    build_qpe_circuit_trotter,
     choose_evolution_time,
     extract_phase_from_counts,
+    hamiltonian_to_sparse_pauli,
     measured_phase_to_eigenvalue,
     pad_to_power_of_two,
 )
@@ -67,6 +69,23 @@ def _confirm(prompt: str, assume_yes: bool) -> bool:
     return input(prompt).strip().lower() == "y"
 
 
+def _extract_ibm_counts(job) -> Dict[str, int]:
+    """Extract a counts dict from an IBM job result.
+
+    Handles both the Aer-emulator result (``result.get_counts()``) and the
+    SamplerV2 hardware result (``result[0].data.<creg>.get_counts()``).
+    """
+    result = job.result()
+    if hasattr(result, "get_counts"):
+        return result.get_counts()
+    # SamplerV2 PrimitiveResult: classical register is named "c" in our circuits.
+    data = result[0].data
+    if hasattr(data, "get_counts"):
+        return data.get_counts()
+    register = getattr(data, "c", None) or next(iter(vars(data).values()))
+    return register.get_counts()
+
+
 def run_curverank_qpe(
     family: str,
     n_basis: int,
@@ -77,6 +96,8 @@ def run_curverank_qpe(
     use_emulator: bool = False,
     output_dir: Path = Path("results/curverank"),
     assume_yes: bool = False,
+    method: str = "dense",
+    trotter_reps: int = 2,
 ) -> Dict[str, Any]:
     """Run CurveRank QPE benchmark.
     
@@ -157,12 +178,23 @@ def run_curverank_qpe(
 
     # Pad to a power-of-two dimension so the system register is whole qubits.
     H_pad, state_pad = pad_to_power_of_two(H_best, target_state)
-    U = expm(-1j * H_pad * tau)
 
-    qc = build_qpe_circuit(U, n_precision=n_precision, initial_statevector=state_pad)
+    # "dense" builds an exact controlled exp(-iH tau) from the matrix (accurate
+    # but synthesises into many gates -- simulator only); "trotter" uses
+    # gate-efficient controlled Pauli evolution and is the path toward hardware.
+    if method == "trotter":
+        pauli_op = hamiltonian_to_sparse_pauli(H_pad)
+        qc = build_qpe_circuit_trotter(
+            pauli_op, tau, n_precision=n_precision,
+            reps=trotter_reps, initial_statevector=state_pad,
+        )
+    else:
+        U = expm(-1j * H_pad * tau)
+        qc = build_qpe_circuit(U, n_precision=n_precision, initial_statevector=state_pad)
     n_qubits = qc.num_qubits
     depth = qc.depth()
 
+    print(f"  Method: {method}")
     print(f"  Circuit: {n_qubits} qubits, depth {depth}")
     print(f"  Evolution time: {tau:.4f}")
     
@@ -244,12 +276,12 @@ def run_curverank_qpe(
             
         elif backend_type == "ionq":
             provider = get_provider("ionq", backend_name=device_name or "forte-1")
-            
+
             result_data, metadata = provider.submit_hardware(
                 circuit=qc,
                 shots=shots
             )
-            
+
             counts = result_data
             job_id = metadata.job_id
             metadata_dict = {
@@ -257,7 +289,35 @@ def run_curverank_qpe(
                 "shots": shots,
                 "job_id": job_id
             }
-        
+
+        elif backend_type == "ibm":
+            # IBM Quantum (Runtime). The adapter returns (job, metadata); the
+            # job result is an Aer result (emulator) or a SamplerV2 primitive
+            # result (hardware), so extract counts handling both formats.
+            from qiskit import transpile
+
+            # The adapter treats backends whose name starts with "aer_" as the
+            # local statevector emulator (no Runtime service or credentials);
+            # any other name is a real device reached through Qiskit Runtime.
+            ibm_backend = device_name or ("aer_simulator" if use_emulator else "ibm_brisbane")
+            provider = get_provider("ibm", backend_name=ibm_backend)
+            # Decompose dense/Trotter gates so the Aer emulator path can run them;
+            # the hardware path re-transpiles to the device basis internally.
+            tqc = transpile(qc, basis_gates=["u", "cx"], optimization_level=1)
+
+            if use_emulator:
+                job, metadata = provider.submit_emulator(circuit=tqc, shots=shots)
+            else:
+                job, metadata = provider.submit_hardware(circuit=tqc, shots=shots)
+
+            counts = _extract_ibm_counts(job)
+            job_id = metadata.job_id
+            metadata_dict = {
+                "backend": metadata.backend_name,
+                "shots": shots,
+                "job_id": job_id,
+            }
+
         else:
             raise ValueError(f"Unknown backend type: {backend_type}")
         
@@ -308,6 +368,8 @@ def run_curverank_qpe(
         "classical_eigenvalues": [float(e) for e in best_evals],
         "qpe_target_eigenvalue": float(target_eig),
         "evolution_time": float(tau),
+        "method": method,
+        "trotter_reps": trotter_reps if method == "trotter" else None,
         "target_zeros": [float(z) for z in target_zeros],
         "measured_phase": float(phase),
         "phase_uncertainty": float(uncertainty),
@@ -363,6 +425,12 @@ Examples:
   
   # IonQ hardware
   python scripts/run_curverank_qpe.py --family xp --n-basis 10 --backend ionq --device forte-1 --shots 2048
+
+  # IBM cloud simulator, gate-efficient Trotter circuit
+  python scripts/run_curverank_qpe.py --family xp --n-basis 8 --backend ibm --emulator --method trotter --yes
+
+  # IBM hardware (requires saved credentials)
+  python scripts/run_curverank_qpe.py --family xp --n-basis 8 --backend ibm --device ibm_brisbane --method trotter --n-precision 3 --yes
         """
     )
     
@@ -382,14 +450,28 @@ Examples:
     parser.add_argument(
         "--backend",
         type=str,
-        choices=["simulator", "quantinuum", "ionq"],
+        choices=["simulator", "quantinuum", "ionq", "ibm"],
         default="simulator",
         help="Backend type (default: simulator)"
     )
     parser.add_argument(
         "--device",
         type=str,
-        help="Specific device name (e.g., H2-1, forte-1)"
+        help="Specific device name (e.g., H2-1, forte-1, ibm_brisbane)"
+    )
+    parser.add_argument(
+        "--method",
+        type=str,
+        choices=["dense", "trotter"],
+        default="dense",
+        help="Controlled-evolution synthesis: 'dense' exact unitary (simulator) "
+             "or 'trotter' gate-efficient Pauli evolution (hardware path)"
+    )
+    parser.add_argument(
+        "--trotter-reps",
+        type=int,
+        default=2,
+        help="Trotter steps for the k=0 power when --method trotter (default: 2)"
     )
     parser.add_argument(
         "--shots",
@@ -444,6 +526,8 @@ Examples:
             use_emulator=args.emulator,
             output_dir=args.output_dir,
             assume_yes=args.yes,
+            method=args.method,
+            trotter_reps=args.trotter_reps,
         )
         
         if results:

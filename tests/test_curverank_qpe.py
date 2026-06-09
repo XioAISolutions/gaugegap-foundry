@@ -163,5 +163,61 @@ class TestQPEEndToEnd(unittest.TestCase):
         self.assertLessEqual(abs(res["estimated_eigenvalue"] - target), 2 * resolution)
 
 
+@unittest.skipUnless(_qiskit_available(), "qiskit/qiskit-aer optional dependency not installed")
+class TestTrotterAndIterativeQPE(unittest.TestCase):
+    def test_pauli_decomposition_reconstructs_matrix(self):
+        from gaugegap.curverank_qpe import hamiltonian_to_sparse_pauli
+
+        H = berry_keating_xp(8)  # 3-qubit Hermitian
+        op = hamiltonian_to_sparse_pauli(H)
+        self.assertEqual(op.num_qubits, 3)
+        np.testing.assert_allclose(np.asarray(op.to_matrix()), H, atol=1e-9)
+
+    def test_trotter_recovers_exact_dyadic_phase(self):
+        # A diagonal Hamiltonian is a sum of commuting Z-strings, so Lie-Trotter
+        # is exact -> the trotter path must reproduce the dense dyadic result.
+        from gaugegap.curverank_qpe import estimate_eigenvalue_qpe
+
+        target = 2.5
+        H = np.diag([0.0, target]).astype(complex)
+        vec = np.array([0.0, 1.0], dtype=complex)
+        res = estimate_eigenvalue_qpe(
+            H, vec, n_precision=3, shots=2048, safety=0.75,
+            eigenvalues=np.array([0.0, target]), method="trotter", reps=2,
+        )
+        self.assertEqual(res["method"], "trotter")
+        self.assertEqual(res["measured_phase"], 0.625)
+        self.assertAlmostEqual(res["estimated_eigenvalue"], target, places=9)
+
+    def test_iterative_recovers_exact_dyadic_phase(self):
+        # Iterative QPE on a diagonal (commuting) Hamiltonian is also exact.
+        from gaugegap.curverank_qpe import estimate_eigenvalue_iterative_qpe
+
+        target = 2.5
+        H = np.diag([0.0, target]).astype(complex)
+        vec = np.array([0.0, 1.0], dtype=complex)
+        res = estimate_eigenvalue_iterative_qpe(
+            H, vec, n_iterations=3, shots=2048, safety=0.75,
+            eigenvalues=np.array([0.0, target]), reps=2,
+        )
+        self.assertEqual(res["method"], "iterative")
+        self.assertEqual(res["n_qubits"], 2)  # 1 system + 1 ancilla
+        self.assertEqual(res["measured_phase"], 0.625)
+        self.assertAlmostEqual(res["estimated_eigenvalue"], target, places=9)
+
+    def test_iterative_uses_single_ancilla(self):
+        # The headline NISQ benefit: width is system + 1 regardless of precision.
+        from gaugegap.curverank_qpe import estimate_eigenvalue_iterative_qpe
+
+        H = berry_keating_xp(4)  # 2-qubit system
+        evals, evecs = np.linalg.eigh(H)
+        idx = int(np.argmin(np.where(evals > 1e-9, evals, np.inf)))
+        res = estimate_eigenvalue_iterative_qpe(
+            H, evecs[:, idx], n_iterations=4, shots=1024, eigenvalues=evals, reps=2,
+        )
+        self.assertEqual(res["n_qubits"], 3)  # 2 system + 1 ancilla
+        self.assertEqual(len(res["phase_bits"]), 4)
+
+
 if __name__ == "__main__":
     unittest.main()

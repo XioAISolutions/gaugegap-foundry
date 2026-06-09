@@ -39,9 +39,12 @@ __all__ = [
     "eigenvalue_to_phase",
     "measured_phase_to_eigenvalue",
     "pad_to_power_of_two",
+    "hamiltonian_to_sparse_pauli",
     "build_qpe_circuit",
+    "build_qpe_circuit_trotter",
     "extract_phase_from_counts",
     "estimate_eigenvalue_qpe",
+    "estimate_eigenvalue_iterative_qpe",
 ]
 
 
@@ -192,6 +195,82 @@ def build_qpe_circuit(
     return qc
 
 
+def hamiltonian_to_sparse_pauli(hamiltonian: np.ndarray, atol: float = 1e-12):
+    """Decompose a Hermitian (power-of-two) matrix into a ``SparsePauliOp``.
+
+    This is the bridge from the dense truncated operator to a *gate-efficient*
+    representation: once ``H`` is a sum of Pauli strings, ``exp(-iHt)`` can be
+    realised by Trotterised Pauli rotations whose depth scales polynomially,
+    rather than synthesising a dense controlled unitary (which blows up the
+    two-qubit-gate count and is infeasible on hardware).
+    """
+    from qiskit.quantum_info import Operator, SparsePauliOp
+
+    op = SparsePauliOp.from_operator(Operator(np.asarray(hamiltonian, dtype=complex)))
+    return op.simplify(atol=atol)
+
+
+def build_qpe_circuit_trotter(
+    pauli_op,
+    tau: float,
+    n_precision: int = 6,
+    reps: int = 2,
+    initial_statevector: Optional[np.ndarray] = None,
+):
+    """QPE circuit whose controlled ``U^(2^k)`` use Trotterised time evolution.
+
+    Identical structure to :func:`build_qpe_circuit`, but each controlled power
+    is ``controlled-exp(-i H * tau * 2^k)`` realised with a
+    :class:`~qiskit.circuit.library.PauliEvolutionGate` (Lie-Trotter synthesis)
+    instead of a dense controlled unitary. The Trotter step count is scaled with
+    the evolution time (``reps * 2^k``) so the approximation error stays roughly
+    uniform across the precision register -- the higher-order bits, which use the
+    longest evolutions, get proportionally more steps.
+
+    Parameters
+    ----------
+    pauli_op
+        ``SparsePauliOp`` for the (power-of-two) Hamiltonian.
+    tau
+        Base evolution time (use :func:`choose_evolution_time`).
+    reps
+        Trotter steps for the ``k=0`` power; higher powers use ``reps * 2^k``.
+    """
+    from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
+    from qiskit.circuit.library import PauliEvolutionGate, QFTGate
+    from qiskit.synthesis import LieTrotter
+
+    n_system = pauli_op.num_qubits
+    precision_reg = QuantumRegister(n_precision, "precision")
+    system_reg = QuantumRegister(n_system, "system")
+    classical_reg = ClassicalRegister(n_precision, "c")
+    qc = QuantumCircuit(precision_reg, system_reg, classical_reg)
+
+    for i in range(n_precision):
+        qc.h(precision_reg[i])
+
+    if initial_statevector is not None:
+        state = np.asarray(initial_statevector, dtype=complex)
+        norm = np.linalg.norm(state)
+        if norm == 0:
+            raise ValueError("initial_statevector must be non-zero")
+        qc.initialize(state / norm, system_reg)
+    else:
+        for q in system_reg:
+            qc.h(q)
+
+    for k in range(n_precision):
+        steps = max(1, reps * (2 ** k))
+        evo = PauliEvolutionGate(
+            pauli_op, time=tau * (2 ** k), synthesis=LieTrotter(reps=steps)
+        )
+        qc.append(evo.control(1), [precision_reg[k]] + list(system_reg))
+
+    qc.append(QFTGate(n_precision).inverse(), precision_reg)
+    qc.measure(precision_reg, classical_reg)
+    return qc
+
+
 def extract_phase_from_counts(
     counts: Dict[str, int],
     n_precision: int,
@@ -226,16 +305,28 @@ def estimate_eigenvalue_qpe(
     safety: float = 0.8,
     eigenvalues: Optional[np.ndarray] = None,
     backend: Any = None,
+    method: str = "dense",
+    reps: int = 2,
 ) -> Dict[str, Any]:
-    """Estimate one eigenvalue of ``hamiltonian`` via QPE on a simulator.
+    """Estimate one eigenvalue of ``hamiltonian`` via QPE.
 
     The aliasing-free evolution time is chosen from the full spectrum, the given
     ``eigenvector`` is loaded into the system register, the circuit is run on an
     Aer simulator (or the supplied ``backend``), and the measured phase is
     inverted to an eigenvalue estimate.
 
+    Parameters
+    ----------
+    method : {"dense", "trotter"}
+        ``"dense"`` builds an exact controlled ``exp(-iH tau)`` from the matrix
+        (accurate, but synthesises into many gates -- simulator only).
+        ``"trotter"`` uses controlled Trotterised Pauli evolution
+        (gate-efficient, the path toward real hardware).
+    reps
+        Trotter steps for the ``k=0`` power when ``method == "trotter"``.
+
     Returns a dict with the estimate, its uncertainty, the evolution time, the
-    measured phase, and the predicted phase for cross-checking.
+    measured phase, and circuit metadata.
     """
     from qiskit import transpile
 
@@ -250,10 +341,19 @@ def estimate_eigenvalue_qpe(
     tau = choose_evolution_time(spectrum, safety=safety)
 
     H_pad, vec_pad = pad_to_power_of_two(H, vec)
-    from scipy.linalg import expm
 
-    U = expm(-1j * H_pad * tau)
-    qc = build_qpe_circuit(U, n_precision=n_precision, initial_statevector=vec_pad)
+    if method == "trotter":
+        pauli_op = hamiltonian_to_sparse_pauli(H_pad)
+        qc = build_qpe_circuit_trotter(
+            pauli_op, tau, n_precision=n_precision, reps=reps, initial_statevector=vec_pad
+        )
+    elif method == "dense":
+        from scipy.linalg import expm
+
+        U = expm(-1j * H_pad * tau)
+        qc = build_qpe_circuit(U, n_precision=n_precision, initial_statevector=vec_pad)
+    else:
+        raise ValueError(f"unknown method {method!r}; choose 'dense' or 'trotter'")
 
     if backend is None:
         from qiskit_aer import AerSimulator
@@ -273,9 +373,104 @@ def estimate_eigenvalue_qpe(
         "evolution_time": tau,
         "measured_phase": phase,
         "phase_uncertainty": phase_unc,
+        "method": method,
         "n_precision": n_precision,
         "shots": shots,
         "n_qubits": qc.num_qubits,
         "circuit_depth": qc.depth(),
         "counts": counts,
+    }
+
+
+def estimate_eigenvalue_iterative_qpe(
+    hamiltonian: np.ndarray,
+    eigenvector: np.ndarray,
+    n_iterations: int = 8,
+    shots: int = 2048,
+    safety: float = 0.8,
+    eigenvalues: Optional[np.ndarray] = None,
+    backend: Any = None,
+    reps: int = 2,
+) -> Dict[str, Any]:
+    """Estimate one eigenvalue via *iterative* (Kitaev) phase estimation.
+
+    Iterative QPE uses a **single ancilla** qubit and no inverse-QFT: the phase
+    bits are read one at a time (least-significant first) and fed back as a phase
+    correction on the ancilla. This trades the wide precision register for
+    ``n_iterations`` shallow rounds, which is far friendlier to NISQ hardware
+    than a full register of controlled unitaries plus a QFT.
+
+    The controlled evolutions use the same Trotterised Pauli rotations as
+    :func:`build_qpe_circuit_trotter`, so this is the most hardware-realistic
+    path in the module. Feedback is applied across separate circuit executions
+    (one per bit, majority vote), which needs no mid-circuit measurement and so
+    runs on any backend.
+
+    Returns a dict with the estimate, the recovered phase, the per-bit values,
+    and the evolution time.
+    """
+    from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, transpile
+    from qiskit.circuit.library import PauliEvolutionGate
+    from qiskit.synthesis import LieTrotter
+
+    H = np.asarray(hamiltonian, dtype=complex)
+    vec = np.asarray(eigenvector, dtype=complex)
+    spectrum = (
+        np.asarray(eigenvalues, dtype=float)
+        if eigenvalues is not None
+        else np.linalg.eigvalsh(H).astype(float)
+    )
+    tau = choose_evolution_time(spectrum, safety=safety)
+
+    H_pad, vec_pad = pad_to_power_of_two(H, vec)
+    pauli_op = hamiltonian_to_sparse_pauli(H_pad)
+    n_system = pauli_op.num_qubits
+    state = vec_pad / np.linalg.norm(vec_pad)
+
+    if backend is None:
+        from qiskit_aer import AerSimulator
+
+        backend = AerSimulator()
+
+    def _round(k: int, omega: float) -> int:
+        ancilla = QuantumRegister(1, "ancilla")
+        system = QuantumRegister(n_system, "system")
+        creg = ClassicalRegister(1, "c")
+        qc = QuantumCircuit(ancilla, system, creg)
+        qc.initialize(state, system)
+        qc.h(ancilla[0])
+        steps = max(1, reps * (2 ** k))
+        evo = PauliEvolutionGate(
+            pauli_op, time=tau * (2 ** k), synthesis=LieTrotter(reps=steps)
+        )
+        qc.append(evo.control(1), [ancilla[0]] + list(system))
+        qc.p(-2.0 * np.pi * omega, ancilla[0])  # classical feedback
+        qc.h(ancilla[0])
+        qc.measure(ancilla[0], creg[0])
+        tqc = transpile(qc, backend, basis_gates=["u", "cx"], optimization_level=1)
+        counts = backend.run(tqc, shots=shots).result().get_counts()
+        return 1 if counts.get("1", 0) > counts.get("0", 0) else 0
+
+    bits: Dict[int, int] = {}
+    # Process exponents from high to low; round at exponent k yields bit index
+    # (n-1-k) of the n-bit phase, with feedback from already-known lower bits.
+    n = n_iterations
+    for k in range(n - 1, -1, -1):
+        target_bit = n - 1 - k
+        omega = sum(bits[j] * 2.0 ** (j + k - n) for j in range(target_bit))
+        bits[target_bit] = _round(k, omega)
+
+    m = sum(bits[j] * (2 ** j) for j in range(n))
+    phase = m / (2 ** n)
+    estimate = measured_phase_to_eigenvalue(phase, tau)
+
+    return {
+        "estimated_eigenvalue": estimate,
+        "evolution_time": tau,
+        "measured_phase": phase,
+        "phase_bits": [bits[j] for j in range(n)],
+        "method": "iterative",
+        "n_iterations": n_iterations,
+        "shots": shots,
+        "n_qubits": n_system + 1,
     }
