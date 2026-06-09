@@ -191,46 +191,10 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Check for overclaiming in documentation
-        run: |
-          python -c "
-          import re
-          from pathlib import Path
-          
-          # Forbidden phrases that violate claim boundary
-          forbidden = [
-              r'proof of (the )?yang.?mills',
-              r'proof of (the )?navier.?stokes',
-              r'proof of (the )?riemann hypothesis',
-              r'solved? (the )?millennium prize',
-              r'ai (discovered|proved|solved)',
-              r'quantum computer proves',
-          ]
-          
-          # Files to check
-          files_to_check = [
-              'README.md',
-              'DEPLOYMENT.md',
-              'docs/*.md',
-              'results/sprint-now/PROOF_SUMMARY.md',
-          ]
-          
-          violations = []
-          for pattern in files_to_check:
-              for file_path in Path('.').glob(pattern):
-                  if file_path.is_file():
-                      content = file_path.read_text().lower()
-                      for phrase in forbidden:
-                          if re.search(phrase, content):
-                              violations.append(f'{file_path}: contains \"{phrase}\"')
-          
-          if violations:
-              print('✗ Claim boundary violations detected:')
-              for v in violations:
-                  print(f'  {v}')
-              exit(1)
-          else:
-              print('✓ No claim boundary violations detected')
-          "
+        # Single source of truth: the canonical audit script is context-aware
+        # (deny-list sections that quote phrases in order to ban them are not
+        # violations) and carries all patterns the old inline check had.
+        run: python scripts/claim_boundary_audit.py --strict
       
       - name: Verify AGENTS.md compliance
         run: |

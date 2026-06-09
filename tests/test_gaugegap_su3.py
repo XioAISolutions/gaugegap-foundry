@@ -230,7 +230,7 @@ class TestSU3GapComputation:
         if result.get("gap") is not None:
             assert result["gap"] >= 0  # Mass gap should be non-negative
             assert result["E1"] >= result["E0"]  # E1 >= E0
-            assert result["method"] == "exact_diagonalization"
+            assert result["method"] == "prototype_exact_diagonalization"
     
     def test_compute_gap_too_large(self):
         """Test that large systems fail gracefully."""
@@ -282,7 +282,9 @@ class TestSU3Observables:
         lattice = SU3PureGaugeLattice(config)
         
         result = lattice.compute_wilson_loop(R=1, T=1)
-        assert result is None  # Placeholder
+        # Honest unimplemented-observable status, not a silent None placeholder.
+        assert result["status"] == "not_implemented"
+        assert result["implementation_status"] == "prototype_scaffold"
     
     def test_string_tension_placeholder(self):
         """Test string tension placeholder."""
@@ -296,7 +298,8 @@ class TestSU3Observables:
         lattice = SU3PureGaugeLattice(config)
         
         result = lattice.compute_string_tension()
-        assert result is None  # Placeholder
+        assert result["status"] == "not_implemented"
+        assert result["observable"] == "string_tension"
     
     def test_polyakov_loop_placeholder(self):
         """Test Polyakov loop placeholder."""
@@ -310,7 +313,8 @@ class TestSU3Observables:
         lattice = SU3PureGaugeLattice(config)
         
         result = lattice.compute_polyakov_loop()
-        assert result is None  # Placeholder
+        assert result["status"] == "not_implemented"
+        assert result["observable"] == "polyakov_loop"
     
     def test_gauge_invariance_check(self):
         """Test gauge invariance check."""
@@ -344,7 +348,7 @@ class TestSU3Export:
         
         data = lattice.to_dict()
         
-        assert data["model"] == "su3_pure_gauge_2plus1d"
+        assert data["model"] == "su3_prototype_scaffold_2plus1d"
         assert data["hypothesis_id"] == "gaugegap-0005"
         assert data["track"] == "GaugeGap"
         assert "config" in data

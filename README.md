@@ -11,13 +11,22 @@ The current CurveRank work includes a **computer-assisted spectral screening res
 📄 Example certificate: `results/sprint-now/proof_certificate.json`  
 📊 Example summary: `results/sprint-now/PROOF_SUMMARY.md`
 
+### Hardening status
+
+The repo now tracks a practical solution-gap scorecard and agent work orders:
+
+- `docs/solution-gap-audit.md` — honest gap between current finite benchmarks and a true solution path.
+- `docs/agent-work-orders.md` — execution-ready tasks for Codex/agent runs.
+- `scripts/research_maturity_audit.py` — scans for unbounded placeholder/prototype risk.
+- `Makefile` — one-command smoke, audit, proofpack, and reviewer-packet targets.
+
 ---
 
 ## Current Benchmarks
 
-### GaugeGap Track: Yang-Mills-adjacent finite gauge systems
+### GaugeGap Track: finite gauge-system benchmarks
 
-**Natural progression**: Z₂ → U(1) → SU(2) → SU(3) → continuum Yang-Mills research questions.
+**Natural progression**: Z₂ → U(1) → SU(2) → SU(3 prototype scaffold) → continuum research questions.
 
 1. **`gaugegap-0001`**: Z₂ dual-chain / Ising sanity benchmark
    - finite transverse-field Ising chain
@@ -40,10 +49,11 @@ The current CurveRank work includes a **computer-assisted spectral screening res
    - SU(2) gauge + matter fields, string-breaking dynamics, and meson-spectrum benchmarks
    - current implementation adds a finite Z₂ candidate hardware-readiness validator before any provider submission
 
-6. **`gaugegap-0005`**: SU(3) QCD-like finite benchmark
-   - finite-lattice SU(3) pure gauge theory
-   - closest current finite-system analog in this repo to Yang-Mills-style gauge dynamics
-   - quantum-provider adapters are optional and require credentials
+6. **`gaugegap-0005`**: SU(3) prototype scaffold
+   - finite-system SU(3)-adjacent pipeline scaffold
+   - not a completed production-grade SU(3) lattice gauge implementation yet
+   - records `implementation_status=prototype_scaffold`
+   - plaquette group multiplication, Gauss-law constraints, Wilson loops, and physical-subspace projection remain work-order items
 
 7. **`gaugegap-search-0001`**: Z₂ finite gap candidate search
    - ranks finite Z₂ plaquette candidates by gap size, finite-size survival, perturbation stability, replica agreement, and residuals
@@ -132,19 +142,29 @@ python scripts/run_curverank_screen.py --family xp --n-basis 10,15,20,25,30
 python -m pytest
 ```
 
+### One-command reviewer workflow
+
+```bash
+make audit
+make smoke
+make proofpack
+make reviewer-packet
+```
+
 ### Claim-boundary audit and proofpack
 
 ```bash
 python scripts/claim_boundary_audit.py --strict
+python scripts/research_maturity_audit.py --strict
 python scripts/generate_reproducibility_proofpack.py \
   --output-dir results/proofpack \
   --include-search \
   --include-validation
 ```
 
-The proofpack writes a JSON manifest, a Markdown summary, command logs, output hashes, and the claim boundary used for the run.
+The proofpack writes a JSON manifest, a Markdown summary, command logs, output hashes, and the claim boundary used for the run. The maturity audit flags unbounded placeholder/prototype risk before public claims are made.
 
-### Run SU(3) finite benchmark
+### Run SU(3) prototype scaffold
 
 ```bash
 python scripts/run_gaugegap_su3_pure.py \
@@ -155,7 +175,7 @@ python scripts/run_gaugegap_su3_pure.py \
     --truncation 0.5 \
     --output-dir results/baselines
 
-cat results/baselines/gaugegap-0005-su3-pure-sweep.csv
+cat results/baselines/gaugegap-0005-su3-prototype-sweep.csv
 ```
 
 Optional hardware submission commands require provider credentials and should be treated as exploratory finite-system runs, not proof artifacts.
@@ -216,6 +236,8 @@ Use language like:
 > local screening artifact
 
 > candidate negative result requiring independent review
+
+> prototype scaffold
 
 Avoid unbounded claim language such as:
 
