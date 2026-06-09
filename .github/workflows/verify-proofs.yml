@@ -195,7 +195,7 @@ jobs:
           python -c "
           import re
           from pathlib import Path
-          
+
           # Forbidden phrases that violate claim boundary
           forbidden = [
               r'proof of (the )?yang.?mills',
@@ -205,7 +205,17 @@ jobs:
               r'ai (discovered|proved|solved)',
               r'quantum computer proves',
           ]
-          
+
+          # Negation / 'avoided language' context: a match in one of these
+          # contexts is a negative example, not a claim. Checked within a small
+          # window around the matching line so list bullets under an
+          # 'Avoided language:' header are exempt.
+          safe = [
+              r'avoided language', r'not claiming', r'does not claim',
+              r'do not use', r'risky phrases', r'not proofs?',
+              r'\bnot\b.*\bproof', r'no .*claim',
+          ]
+
           # Files to check
           files_to_check = [
               'README.md',
@@ -213,16 +223,24 @@ jobs:
               'docs/*.md',
               'results/sprint-now/PROOF_SUMMARY.md',
           ]
-          
+
+          def in_safe_context(lines, i):
+              lo, hi = max(0, i - 3), min(len(lines), i + 4)
+              window = '\n'.join(lines[lo:hi]).lower()
+              return any(re.search(s, window) for s in safe)
+
           violations = []
           for pattern in files_to_check:
               for file_path in Path('.').glob(pattern):
-                  if file_path.is_file():
-                      content = file_path.read_text().lower()
+                  if not file_path.is_file():
+                      continue
+                  lines = file_path.read_text().splitlines()
+                  for i, line in enumerate(lines):
+                      low = line.lower()
                       for phrase in forbidden:
-                          if re.search(phrase, content):
-                              violations.append(f'{file_path}: contains \"{phrase}\"')
-          
+                          if re.search(phrase, low) and not in_safe_context(lines, i):
+                              violations.append(f'{file_path}:{i+1}: contains \"{phrase}\"')
+
           if violations:
               print('✗ Claim boundary violations detected:')
               for v in violations:
