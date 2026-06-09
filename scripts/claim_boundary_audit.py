@@ -34,7 +34,14 @@ SAFE_CONTEXT_PATTERNS = [
     re.compile(r"\brisky phrases\b", re.I),
     re.compile(r"\bnegative[- ]result\b", re.I),
     re.compile(r"\brequires? independent.*review\b", re.I),
+    # Deny-list sections that *quote* risky phrases in order to ban them.
+    re.compile(r"\bavoided\s+language\b", re.I),
+    re.compile(r"\bforbidden\s+language\b", re.I),
 ]
+
+# Audit output directories must never be scanned: their reports quote the risky
+# phrases they flag, so scanning them makes the audit poison itself on re-runs.
+AUDIT_OUTPUT_PARTS = ("claim-boundary-audit", "research-maturity-audit")
 
 
 @dataclass(frozen=True)
@@ -80,6 +87,8 @@ def scan(root: Path, include: tuple[str, ...]) -> list[Finding]:
             paths = [path] if _is_text_path(path) else []
         for file_path in paths:
             if any(part in DEFAULT_EXCLUDE_PARTS for part in file_path.parts):
+                continue
+            if any(part in AUDIT_OUTPUT_PARTS for part in file_path.parts):
                 continue
             findings.extend(scan_file(root, file_path))
     return findings

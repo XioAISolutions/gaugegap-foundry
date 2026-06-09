@@ -27,6 +27,10 @@ DEFAULT_EXCLUDE_PARTS = (
     "results",
 )
 
+# The audit scripts define the very patterns they scan for; scanning them
+# reports their own pattern tables as findings.
+EXCLUDE_FILES = ("research_maturity_audit.py", "claim_boundary_audit.py")
+
 MATURITY_PATTERNS = [
     ("placeholder", re.compile(r"\bplaceholder\b", re.I)),
     ("future_implementation", re.compile(r"\bfuture implementation\b", re.I)),
@@ -112,6 +116,8 @@ def scan(root: Path, include: tuple[str, ...]) -> list[MaturityFinding]:
         for file_path in paths:
             if any(part in DEFAULT_EXCLUDE_PARTS for part in file_path.parts):
                 continue
+            if file_path.name in EXCLUDE_FILES:
+                continue
             findings.extend(scan_file(root, file_path))
     return findings
 
@@ -148,6 +154,10 @@ def scan_file(root: Path, file_path: Path) -> list[MaturityFinding]:
 def classify(path: str, kind: str, bounded: bool) -> str:
     suffix = Path(path).suffix.lower()
     is_source = suffix == ".py"
+    # Tests that assert prototype/not-implemented status are the enforcement
+    # mechanism for the claim boundary, not unbounded research claims.
+    if path.startswith("tests/"):
+        return "low"
     in_core = is_source and any(hint in path.lower() for hint in SCIENTIFIC_CORE_HINTS)
 
     if kind == "pass_statement" and in_core:
