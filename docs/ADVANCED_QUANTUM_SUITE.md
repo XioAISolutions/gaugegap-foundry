@@ -229,6 +229,19 @@ All modules are designed to integrate seamlessly with existing gauge theory code
 3. **Observable Measurement**: Respects gauge symmetry
 4. **Error Analysis**: Includes gauge-invariant error metrics
 
+## Correctness status
+
+These modules are research/utility code, not all independently verified. Pieces
+with well-posed reference values are checked against them in the test suite:
+`von_neumann_entropy` (= log dim for the maximally mixed state), Bell-state
+`entanglement_entropy` (= log 2), `mass_gap_metrology` (recovers the spectral
+gap), `adiabatic_evolution` (fidelity → 1 from the correct initial ground
+state), and the Fibonacci braid generators (unitary, correct R-matrix phases,
+Yang-Baxter relation). The "production-ready", "50+ references", and
+"hardness proofs" framing below should be read as aspirational scope: modules
+such as `quantum_complexity` provide analytical *estimates*, not proofs. Build
+on the reference-checked pieces; treat the rest as a starting point to verify.
+
 ## Code Statistics
 
 - **Total Lines of Code**: ~5,500+ lines
@@ -295,13 +308,15 @@ import numpy as np
 # Initial and final Hamiltonians
 H_initial = np.array([[1, 0], [0, -1]])
 H_final = np.array([[0, 1], [1, 0]])
-initial_state = np.array([1, 0], dtype=complex)
+# Start in the GROUND state of H_initial (eigenvalue -1), i.e. |1> = [0, 1];
+# adiabatic state preparation requires starting in the initial ground state.
+initial_state = np.array([0, 1], dtype=complex)
 
-# Adiabatic evolution
+# Adiabatic evolution (use a large enough T to satisfy the adiabatic condition).
 result = adiabatic_quantum.adiabatic_evolution(
-    H_initial, H_final, initial_state, T=10.0
+    H_initial, H_final, initial_state, T=200.0
 )
-print(f"Ground state fidelity: {result.ground_state_fidelity}")
+print(f"Ground state fidelity: {result.ground_state_fidelity}")  # -> ~1.0
 ```
 
 ## Theoretical Contributions
