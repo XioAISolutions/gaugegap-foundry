@@ -234,6 +234,7 @@ def crab_optimization(
     T: float,
     n_basis: int = 5,
     max_iterations: int = 100,
+    seed: int | None = None,
 ) -> ControlResult:
     """
     CRAB (Chopped Random Basis) optimization.
@@ -273,14 +274,17 @@ def crab_optimization(
         Optimization result
     """
     n_controls = len(H_controls)
-    
-    # Random frequencies and phases
-    np.random.seed(42)
-    frequencies = np.random.rand(n_basis) * 2 * np.pi / T
-    phases = np.random.rand(n_basis) * 2 * np.pi
-    
+
+    # Random frequencies and phases from a local seeded generator (do NOT seed
+    # the global np.random state -- that silently couples unrelated code).
+    from gaugegap.seeding import make_rng
+
+    rng = make_rng(seed)
+    frequencies = rng.random(n_basis) * 2 * np.pi / T
+    phases = rng.random(n_basis) * 2 * np.pi
+
     # Initial amplitudes
-    initial_amplitudes = np.random.randn(n_controls * n_basis) * 0.1
+    initial_amplitudes = rng.standard_normal(n_controls * n_basis) * 0.1
     
     def control_function(amplitudes: np.ndarray, t: float) -> np.ndarray:
         """Compute control values at time t."""
