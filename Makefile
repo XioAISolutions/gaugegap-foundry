@@ -14,6 +14,7 @@ smoke:
 	python scripts/run_gap_sweep.py --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-smoke
 	python scripts/run_curverank_screen.py --family xp --n-basis 10,20 --k-zeros 10 --output-dir /tmp/curverank-smoke
 	python scripts/run_gaugegap_su3_pure.py --lattice-sizes 2x2 --g-coupling-points 2 --output-dir /tmp/su3-prototype-smoke
+	python scripts/run_su3_link.py --cutoff 2 --output-dir /tmp/su3-link-smoke
 
 # claim-boundary is the hard gate (matches CI); the maturity audit runs in
 # report mode because driving its high_unbounded count to zero is the open
