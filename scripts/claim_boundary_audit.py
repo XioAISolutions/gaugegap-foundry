@@ -43,9 +43,15 @@ SAFE_CONTEXT_PATTERNS = [
     re.compile(r"\bforbidden\s+language\b", re.I),
 ]
 
-# Audit output directories must never be scanned: their reports quote the risky
-# phrases they flag, so scanning them makes the audit poison itself on re-runs.
-AUDIT_OUTPUT_PARTS = ("claim-boundary-audit", "research-maturity-audit")
+# Generated output directories must never be scanned: their reports/packets
+# quote the risky phrases they flag (and re-copy deny-list docs), so scanning
+# them makes the audit poison itself. These are build artifacts, not sources.
+AUDIT_OUTPUT_PARTS = (
+    "claim-boundary-audit",
+    "research-maturity-audit",
+    "reviewer-packet",
+    "proofpack",
+)
 
 
 @dataclass(frozen=True)
