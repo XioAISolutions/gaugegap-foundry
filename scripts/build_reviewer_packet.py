@@ -37,17 +37,23 @@ CLAIM_BOUNDARY = (
 
 # (source path, packet filename, one-line description for the index).
 CURATED_DOCS = [
+    ("docs/reviewer-outreach.md", "00-reviewer-outreach.md",
+     "Outreach note: what to review and what feedback is sought"),
     ("docs/independent-review-packet.md", "01-independent-review-packet.md",
      "Trust chain + verification obligations for the certified CurveRank result"),
     ("docs/preprint-curverank-certified-screening.md", "02-preprint-curverank.md",
      "Preprint draft: certified finite-truncation spectral screening"),
     ("docs/eightfold-certified.md", "03-eightfold-certified.md",
      "Certified SU(3)-flavor (Eightfold-Way / Gell-Mann-Okubo) relations"),
-    ("docs/solution-gap-audit.md", "04-solution-gap-audit.md",
+    ("docs/anharmonic-certified.md", "04-anharmonic-certified.md",
+     "Certified variational bounds for the quartic anharmonic oscillator"),
+    ("docs/preprint-gaugegap-infrastructure.md", "05-preprint-infrastructure.md",
+     "Preprint draft: verification-first infrastructure overview"),
+    ("docs/solution-gap-audit.md", "06-solution-gap-audit.md",
      "Honest readiness scorecard and claim-boundary discipline"),
-    ("docs/agent-work-orders.md", "05-agent-work-orders.md",
+    ("docs/agent-work-orders.md", "07-agent-work-orders.md",
      "Execution-ready work queue (issue #12)"),
-    ("AGENTS.md", "06-AGENTS.md", "Repository claim-boundary policy"),
+    ("AGENTS.md", "08-AGENTS.md", "Repository claim-boundary policy"),
 ]
 
 
