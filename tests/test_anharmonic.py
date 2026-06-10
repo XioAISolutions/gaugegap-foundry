@@ -15,6 +15,7 @@ from gaugegap.anharmonic import (  # noqa: E402
     REFERENCE_E0,
     anharmonic_hamiltonian_interval,
     certified_anharmonic_bounds,
+    certified_ground_state_enclosure,
 )
 
 # Well-documented ground-state energy of H = 1/2 p^2 + 1/2 x^2 + x^4.
@@ -58,3 +59,26 @@ def test_enclosures_are_tight():
 def test_pad_must_keep_x4_block_exact():
     with pytest.raises(ValueError):
         anharmonic_hamiltonian_interval(n_basis=8, lam=1.0, pad=2)
+
+
+def test_temple_two_sided_encloses_true_energy():
+    # The Temple lower bound + Rayleigh-Ritz upper bound bracket the true E0
+    # from BOTH sides (a genuine certified enclosure, not just an upper bound).
+    enc = certified_ground_state_enclosure(n_basis=30, lam=1.0)
+    assert enc.lower < enc.upper
+    assert enc.lower <= E0_REF <= enc.upper
+    # The lower bound is a real (Temple) lower bound, strictly below the truth.
+    assert enc.lower < E0_REF
+
+
+def test_temple_enclosure_tightens_with_truncation():
+    w20 = certified_ground_state_enclosure(n_basis=20, lam=1.0).width
+    w30 = certified_ground_state_enclosure(n_basis=30, lam=1.0).width
+    assert w30 < w20  # variance shrinks, enclosure tightens
+
+
+def test_temple_uses_rigorous_e1_lower_bound():
+    enc = certified_ground_state_enclosure(n_basis=30, lam=1.0)
+    # beta = 3/2 from the operator bound E1 >= 3/2 (lambda x^4 >= 0).
+    assert enc.e1_lower_bound == 1.5
+    assert float(enc.rayleigh.upper) < enc.e1_lower_bound  # Temple precondition
