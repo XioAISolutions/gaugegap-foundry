@@ -20,7 +20,11 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from gaugegap.anharmonic import REFERENCE_E0, certified_anharmonic_bounds  # noqa: E402
+from gaugegap.anharmonic import (  # noqa: E402
+    REFERENCE_E0,
+    certified_anharmonic_bounds,
+    certified_ground_state_enclosure,
+)
 
 
 def main() -> int:
@@ -47,6 +51,14 @@ def main() -> int:
     for n, enc in enumerate(b.enclosures):
         print(f"  E{n}  in  [{float(enc.lower):.10f}, {float(enc.upper):.10f}]   "
               f"width {float(enc.width()):.2e}")
+    print()
+
+    # Two-sided (Temple) enclosure of the true ground-state energy.
+    gs = certified_ground_state_enclosure(n_basis=args.n_basis, lam=args.lam)
+    print("Certified TWO-SIDED enclosure of the true E0 (Temple lower + Rayleigh-Ritz upper):")
+    print(f"  E0_true in [{gs.lower:.10f}, {gs.upper:.10f}]   width {gs.width:.2e}")
+    print(f"  (Temple lower uses the rigorous bound E1 >= {gs.e1_lower_bound};"
+          f" variance <= {float(gs.variance.upper):.2e})")
     return 0
 
 

@@ -128,3 +128,94 @@ def certified_anharmonic_bounds(n_basis: int = 30, lam: float = 1.0,
     if n_levels is not None:
         enclosures = enclosures[:n_levels]
     return AnharmonicBounds(n_basis=n_basis, lam=lam, enclosures=enclosures)
+
+
+# ---------------------------------------------------------------------------
+# Two-sided (Temple) enclosure of the ground-state energy.
+# ---------------------------------------------------------------------------
+
+def _matvec(matrix: IntervalMatrix, vec: List[Interval]) -> List[Interval]:
+    out: List[Interval] = []
+    for i in range(matrix.m):
+        acc = matrix.entries[i][0] * vec[0]
+        for j in range(1, matrix.n):
+            acc = acc + matrix.entries[i][j] * vec[j]
+        out.append(acc)
+    return out
+
+
+def _dot(a: List[Interval], b: List[Interval]) -> Interval:
+    acc = a[0] * b[0]
+    for i in range(1, len(a)):
+        acc = acc + a[i] * b[i]
+    return acc
+
+
+@dataclass(frozen=True)
+class GroundStateEnclosure:
+    n_basis: int
+    lam: float
+    lower: float        # certified lower bound (Temple's inequality)
+    upper: float        # certified upper bound (Rayleigh-Ritz)
+    rayleigh: Interval  # the Rayleigh quotient <psi|H|psi>
+    variance: Interval  # <psi|H^2|psi> - <psi|H|psi>^2
+    e1_lower_bound: float
+
+    @property
+    def width(self) -> float:
+        return self.upper - self.lower
+
+
+def certified_ground_state_enclosure(n_basis: int = 30, lam: float = 1.0) -> GroundStateEnclosure:
+    """Certified TWO-SIDED enclosure of the true ground-state energy E0.
+
+    Combines the Rayleigh-Ritz upper bound with **Temple's inequality** for a
+    rigorous lower bound:
+
+        E0 >= eps - sigma^2 / (beta - eps),
+
+    where eps = <psi|H|psi>, sigma^2 = <psi|H^2|psi> - eps^2 for a trial vector
+    psi, and beta is any number with eps < beta <= E1. We use the operator bound
+    H = (HO) + lambda x^4 with lambda x^4 >= 0, hence E1 >= 3/2 (every eigenvalue
+    of H is at least the harmonic value), so beta = 3/2 is rigorous. The trial
+    vector is the floating-point ground vector of the truncation (its accuracy
+    only affects tightness, not validity), and eps, sigma^2 are evaluated in
+    interval arithmetic over the exact (N+4)-projected Hamiltonian so that
+    <psi|H^2|psi> = ||H psi||^2 captures every component H couples into.
+    """
+    if lam < 0:
+        raise ValueError("Temple bound here assumes lambda >= 0 (so E1 >= 3/2)")
+
+    # Trial vector: float ground eigenvector of the N-truncation.
+    H_n = anharmonic_hamiltonian_interval(n_basis, lam)
+    A = H_n.to_numpy()
+    import numpy as np
+    w, V = np.linalg.eigh(A)
+    psi = V[:, 0]
+    psi = psi / np.linalg.norm(psi)
+
+    # Embed psi in the larger (N+4) space and evaluate H psi exactly there, so
+    # ||H psi||^2 = <psi|H^2|psi> for the true operator (x^4 spreads by +-4).
+    m = n_basis + 4
+    H_m = anharmonic_hamiltonian_interval(m, lam)
+    psi_iv = [Interval.from_float(float(psi[i])) if i < n_basis else Interval.from_float(0.0)
+              for i in range(m)]
+    h_psi = _matvec(H_m, psi_iv)
+    eps = _dot(psi_iv, h_psi)
+    eps2 = _dot(h_psi, h_psi)
+    variance = eps2 - eps * eps
+
+    beta = Interval.from_float(1.5)  # rigorous: E1 >= 3/2 since lambda x^4 >= 0
+    # Require eps < beta strictly so (beta - eps) is positive (no division by 0).
+    if not (float(eps.upper) < 1.5):
+        raise ValueError("Temple bound requires <psi|H|psi> < 3/2; increase n_basis")
+    temple = eps - variance / (beta - eps)
+
+    # Upper bound: the certified eigenvalue enclosure's upper endpoint (tighter
+    # than the Rayleigh quotient).
+    upper = float(verified_hermitian_eigenvalues(H_n)[0].upper)
+    return GroundStateEnclosure(
+        n_basis=n_basis, lam=lam,
+        lower=float(temple.lower), upper=upper,
+        rayleigh=eps, variance=variance, e1_lower_bound=1.5,
+    )

@@ -51,6 +51,36 @@ rigorous, one-sided bound. The enclosures themselves are `~10⁻¹³` wide.
 Sanity check: at `λ = 0` the system is the harmonic oscillator and the certified
 levels are exactly `{0.5, 1.5, 2.5, 3.5, …}` (zero width).
 
+## Two-sided enclosure of the true ground-state energy (Temple's inequality)
+
+The variational bound above is *one-sided* (an upper bound). A rigorous **lower**
+bound — and hence a genuine two-sided enclosure of the true `E₀` — comes from
+**Temple's inequality**:
+
+```
+E₀  ≥  ε − σ² / (β − ε),   with  ε = ⟨ψ|H|ψ⟩,  σ² = ⟨ψ|H²|ψ⟩ − ε²,
+```
+
+valid for any trial `ψ` and any `β` with `ε < β ≤ E₁`. Because `λx⁴ ⪰ 0`, the
+operator bound `H = HO + λx⁴` gives `Eₙ ≥ n + ½`, so **`E₁ ≥ 3/2`** — a rigorous
+`β = 3/2`. The trial vector is the floating-point ground vector of the truncation
+(its accuracy affects only tightness, not validity), and `ε, σ²` are evaluated in
+interval arithmetic over the exact `(N+4)`-projected Hamiltonian, so
+`⟨ψ|H²|ψ⟩ = ‖Hψ‖²` captures every component `H` couples into.
+
+Result (`λ = 1`), a **machine-checked two-sided enclosure** of the true
+infinite-dimensional `E₀`:
+
+| N | certified `E₀ ∈` | width |
+|---|------------------|-------|
+| 20 | `[0.8033255258, 0.8037739947]` | 4.5×10⁻⁴ |
+| 30 | `[0.8036369143, 0.8037707785]` | 1.3×10⁻⁴ |
+
+Both endpoints are rigorous, and the enclosure tightens as `N` grows (the
+variance `σ²` shrinks). The lower bound's tightness is limited by the weak
+`E₁ ≥ 3/2` operator bound; a sharper rigorous `β` (e.g. via a Lehmann–Maehly step)
+would narrow it further — left as honest future work.
+
 ## Run it
 
 ```bash
