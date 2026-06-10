@@ -24,6 +24,7 @@ from gaugegap.anharmonic import (  # noqa: E402
     REFERENCE_E0,
     certified_anharmonic_bounds,
     certified_ground_state_enclosure,
+    certified_two_sided_spectrum,
 )
 
 
@@ -53,12 +54,22 @@ def main() -> int:
               f"width {float(enc.width()):.2e}")
     print()
 
-    # Two-sided (Temple) enclosure of the true ground-state energy.
+    # Certified two-sided enclosures across the low-lying spectrum.
+    print("Certified TWO-SIDED enclosures (lower = Temple/comparison, upper = Rayleigh-Ritz):")
+    for L in certified_two_sided_spectrum(n_basis=args.n_basis, lam=args.lam,
+                                          n_levels=min(3, args.n_levels)):
+        print(f"  E{L.n}_true in [{L.lower:.10f}, {L.upper:.10f}]   "
+              f"width {L.width:.2e}   (lower via {L.method})")
     gs = certified_ground_state_enclosure(n_basis=args.n_basis, lam=args.lam)
-    print("Certified TWO-SIDED enclosure of the true E0 (Temple lower + Rayleigh-Ritz upper):")
-    print(f"  E0_true in [{gs.lower:.10f}, {gs.upper:.10f}]   width {gs.width:.2e}")
-    print(f"  (Temple lower uses the rigorous bound E1 >= {gs.e1_lower_bound};"
-          f" variance <= {float(gs.variance.upper):.2e})")
+    print(f"  ground-state Temple beta (sharpened E1 lower bound) = {gs.e1_lower_bound:.6f}")
+
+    # Lambda sweep for the ground state.
+    print("\nGround-state two-sided enclosure across lambda:")
+    for lam in (0.1, 0.5, 1.0, 2.0):
+        e = certified_ground_state_enclosure(n_basis=args.n_basis, lam=lam)
+        ref = REFERENCE_E0.get(lam)
+        tag = f"  (ref {ref})" if ref is not None else ""
+        print(f"  lambda={lam:<4}  E0 in [{e.lower:.10f}, {e.upper:.10f}]  width {e.width:.2e}{tag}")
     return 0
 
 
