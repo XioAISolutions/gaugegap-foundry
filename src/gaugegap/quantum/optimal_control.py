@@ -105,6 +105,7 @@ def grape_optimization(
     n_steps: int = 100,
     max_iterations: int = 100,
     learning_rate: float = 0.1,
+    seed: int | None = None,
 ) -> ControlResult:
     """
     GRAPE (Gradient Ascent Pulse Engineering) optimization.
@@ -147,11 +148,14 @@ def grape_optimization(
     ControlResult
         Optimization result
     """
+    from gaugegap.seeding import make_rng
+
     dt = T / n_steps
     n_controls = len(H_controls)
-    
-    # Initialize controls (random)
-    controls = np.random.randn(n_controls, n_steps) * 0.1
+
+    # Initialize controls from a local seeded generator (reproducible).
+    rng = make_rng(seed)
+    controls = rng.standard_normal((n_controls, n_steps)) * 0.1
     
     best_fidelity = 0.0
     iteration = 0
