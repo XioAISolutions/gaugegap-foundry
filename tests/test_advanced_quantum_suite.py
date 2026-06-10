@@ -220,14 +220,22 @@ class TestAdvancedCompilation:
     """Test advanced compilation functions."""
     
     def test_kak_decomposition(self):
-        """Test KAK decomposition."""
-        # Random two-qubit unitary
-        from scipy.stats import unitary_group
-        U = unitary_group.rvs(4)
-        
-        result = advanced_compilation.kak_decomposition(U)
-        assert "canonical_coordinates" in result
-        assert "single_qubit_unitaries" in result
+        """KAK local (Makhlin) invariants on known two-qubit gates."""
+        CNOT = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], dtype=complex)
+        SWAP = np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=complex)
+        local = np.kron(np.array([[0, 1], [1, 0]], dtype=complex), np.eye(2, dtype=complex))
+
+        cases = {  # (G1, G2)
+            id(CNOT): (CNOT, (0.0, 1.0), True),
+            id(SWAP): (SWAP, (-1.0, -3.0), True),
+            id(local): (local, (1.0, 3.0), False),
+        }
+        for U, (g1, g2), entangling in cases.values():
+            res = advanced_compilation.kak_decomposition(U)
+            inv = res["makhlin_invariants"]
+            assert np.isclose(inv["G1"].real, g1, atol=1e-9)
+            assert np.isclose(inv["G2"].real, g2, atol=1e-9)
+            assert res["is_entangling"] is entangling
     
     def test_shannon_decomposition(self):
         """Test Shannon decomposition."""

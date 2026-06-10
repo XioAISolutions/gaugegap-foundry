@@ -232,15 +232,28 @@ All modules are designed to integrate seamlessly with existing gauge theory code
 ## Correctness status
 
 These modules are research/utility code, not all independently verified. Pieces
-with well-posed reference values are checked against them in the test suite:
+with well-posed reference values are checked against them in the test suite
+(`tests/test_quantum_correctness_audit.py`, `tests/test_topological_braiding.py`):
 `von_neumann_entropy` (= log dim for the maximally mixed state), Bell-state
-`entanglement_entropy` (= log 2), `mass_gap_metrology` (recovers the spectral
-gap), `adiabatic_evolution` (fidelity → 1 from the correct initial ground
-state), and the Fibonacci braid generators (unitary, correct R-matrix phases,
-Yang-Baxter relation). The "production-ready", "50+ references", and
-"hardness proofs" framing below should be read as aspirational scope: modules
-such as `quantum_complexity` provide analytical *estimates*, not proofs. Build
-on the reference-checked pieces; treat the rest as a starting point to verify.
+`entanglement_entropy` (= log 2), `concurrence` (1 for a Bell state, 0 for a
+product state), `mass_gap_metrology` (recovers the spectral gap),
+`adiabatic_evolution` (fidelity → 1 from the correct initial ground state), the
+Fibonacci braid generators (unitary, correct R-matrix phases, Yang-Baxter), the
+quantum walks (probability-conserving CTQW, ballistic DTQW spreading), and the
+`kak_decomposition` Makhlin invariants (CNOT/SWAP/iSWAP/local).
+
+Two correctness bugs were found and fixed during this audit: the Fibonacci
+braiding matrix was non-unitary, and `kak_decomposition` returned all-zero
+canonical coordinates (it took the angle of real SVD singular values). The
+latter now returns the robustly-correct **Makhlin local invariants** (`G1`,
+`G2`) and an `is_entangling` flag, and honestly marks the full
+canonical-coordinate / local-gate extraction as `not_implemented` rather than
+returning misleading zeros.
+
+The "production-ready", "50+ references", and "hardness proofs" framing below
+should be read as aspirational scope: modules such as `quantum_complexity`
+provide analytical *estimates*, not proofs. Build on the reference-checked
+pieces; treat the rest as a starting point to verify.
 
 ## Code Statistics
 
