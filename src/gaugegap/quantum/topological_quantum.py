@@ -401,25 +401,28 @@ def topological_qubit_encoding(logical_state: str, n_anyons: int = 4) -> np.ndar
 def measure_topological_charge(
     state: np.ndarray,
     measurement_basis: str = "computational",
+    seed: int | None = None,
 ) -> Tuple[int, float]:
     """
     Measure topological charge.
-    
+
     Mathematical Framework
     ----------------------
     Measurement projects onto fusion channels.
     For Fibonacci: measure whether fusion gives 1 or τ.
-    
+
     Measurement is topologically protected - only depends
     on global topological properties.
-    
+
     Parameters
     ----------
     state : array
         Topological state
     measurement_basis : str
         Measurement basis
-    
+    seed : int, optional
+        Seed for the projective-measurement sampling; reproducible by default.
+
     Returns
     -------
     outcome : int
@@ -427,12 +430,15 @@ def measure_topological_charge(
     probability : float
         Probability of outcome
     """
+    from gaugegap.seeding import make_rng
+
     # Probabilities for each fusion channel
     probs = np.abs(state)**2
-    
-    # Sample outcome
-    outcome = np.random.choice(len(probs), p=probs)
-    
+    probs = probs / probs.sum()
+
+    # Sample outcome from a local seeded generator.
+    outcome = make_rng(seed).choice(len(probs), p=probs)
+
     return int(outcome), float(probs[outcome])
 
 

@@ -256,6 +256,7 @@ def adaptive_quantum_sensing(
     hamiltonian_func: Callable[[float], np.ndarray],
     initial_guess: float,
     n_rounds: int = 10,
+    seed: int | None = None,
 ) -> MetrologyResult:
     """
     Adaptive quantum sensing protocol.
@@ -284,22 +285,26 @@ def adaptive_quantum_sensing(
     MetrologyResult
         Adaptive sensing result
     """
+    from gaugegap.seeding import make_rng
+
+    rng = make_rng(seed)
+
     # Bayesian estimation
     # Prior: Gaussian around initial guess
     theta_grid = np.linspace(initial_guess - 1, initial_guess + 1, 100)
     prior = np.exp(-(theta_grid - initial_guess)**2 / 0.5)
     prior = prior / np.sum(prior)
-    
+
     posterior = prior.copy()
-    
+
     for round_idx in range(n_rounds):
         # Choose optimal measurement (simplified)
         # Full implementation would maximize information gain
-        
+
         # Simulate measurement
         # For demonstration, use true value with noise
         true_value = initial_guess
-        measurement = true_value + np.random.randn() * 0.1 / np.sqrt(round_idx + 1)
+        measurement = true_value + rng.standard_normal() * 0.1 / np.sqrt(round_idx + 1)
         
         # Update posterior (Bayesian update)
         likelihood = np.exp(-(theta_grid - measurement)**2 / 0.01)
@@ -437,45 +442,52 @@ def optimal_observable_selection(
 def mass_gap_metrology(
     hamiltonian: np.ndarray,
     n_measurements: int = 100,
+    seed: int | None = None,
 ) -> MetrologyResult:
     """
     Optimal mass gap measurement using quantum metrology.
-    
+
     Mathematical Framework
     ----------------------
     Mass gap: Δ = E₁ - E₀
-    
+
     Use quantum phase estimation with optimal precision.
     Heisenberg-limited measurement achieves Δθ ~ 1/N.
-    
+
     Parameters
     ----------
     hamiltonian : array
         Gauge theory Hamiltonian
     n_measurements : int
         Number of measurements
-    
+    seed : int, optional
+        Seed for the simulated measurement noise; reproducible by default.
+
     Returns
     -------
     MetrologyResult
         Mass gap estimation
     """
+    from gaugegap.seeding import make_rng
+
+    rng = make_rng(seed)
+
     # Compute exact spectrum
     eigenvalues = np.linalg.eigvalsh(hamiltonian)
     true_gap = eigenvalues[1] - eigenvalues[0]
-    
+
     # Simulate quantum metrology protocol
     # Use ground and first excited states
-    
+
     # Fisher information for gap measurement
     # Simplified: F_Q ~ N² for optimal entangled state
     F_Q = n_measurements**2
-    
+
     # Heisenberg limit uncertainty
     uncertainty = 1.0 / (n_measurements * np.sqrt(F_Q))
-    
+
     # Simulated measurement with Heisenberg scaling
-    gap_estimate = true_gap + np.random.randn() * uncertainty
+    gap_estimate = true_gap + rng.standard_normal() * uncertainty
     
     return MetrologyResult(
         parameter_estimate=float(gap_estimate),
