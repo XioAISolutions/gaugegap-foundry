@@ -36,10 +36,8 @@ proofpack: audit smoke
 proofpack-verify:
 	python scripts/verify_proofpack.py
 
-reviewer-packet: proofpack
-	mkdir -p results/reviewer-packet
-	cp README.md results/reviewer-packet/README.md
-	cp docs/solution-gap-audit.md results/reviewer-packet/solution-gap-audit.md
-	cp docs/agent-work-orders.md results/reviewer-packet/agent-work-orders.md
-	cp results/claim-boundary-audit/claim_boundary_audit.md results/reviewer-packet/claim-boundary-audit.md || true
-	cp results/research-maturity-audit/research_maturity_audit.md results/reviewer-packet/research-maturity-audit.md || true
+# Self-contained packet for outside experts (issue #12 A7): runs the audits,
+# curates the review docs, and writes an INDEX.md with provenance, audit status,
+# reproduction commands, and a reviewer checklist.
+reviewer-packet:
+	python scripts/build_reviewer_packet.py --output-dir results/reviewer-packet
