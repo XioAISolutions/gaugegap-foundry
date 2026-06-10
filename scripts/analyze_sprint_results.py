@@ -23,10 +23,10 @@ from __future__ import annotations
 
 import csv
 import json
-from datetime import datetime, timezone
 from pathlib import Path
 
 from gaugegap.curverank_certified import certified_xp_mismatch
+from gaugegap.ledger import utc_now
 
 REPO_URL = "https://github.com/XioAISolutions/gaugegap-foundry"
 DATA_FILE = Path("results/sprint-now/curverank-0001-spectral-screen.csv")
@@ -133,7 +133,7 @@ def main() -> dict:
     # ---- Certificate --------------------------------------------------------
     certificate = {
         "schema": "gaugegap.curverank_certificate.v2",
-        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "timestamp_utc": utc_now().isoformat(),
         "operator": "Berry-Keating xp",
         "hypothesis_id": rows[0]["hypothesis_id"],
         "run_id": rows[0]["run_id"],

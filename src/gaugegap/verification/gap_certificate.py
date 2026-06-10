@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
 import json
 import math
 from numbers import Real
 from pathlib import Path
 from typing import Any
 
+from gaugegap.ledger import utc_now
 from gaugegap.models.z2_plaquette import CLAIM_BOUNDARY
 
 
@@ -44,7 +44,7 @@ def make_gap_certificate(
         raise ValueError("claim_boundary must not be empty")
     return {
         "schema": "gaugegap.gap_certificate.v1",
-        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "timestamp_utc": utc_now().isoformat(),
         "hypothesis_id": hypothesis_id,
         "model": model,
         "n_qubits": int(n_qubits),
