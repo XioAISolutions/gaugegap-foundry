@@ -1,4 +1,9 @@
-.PHONY: install-dev smoke audit audit-strict proofpack reviewer-packet
+.PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet
+
+# Pin the proofpack clock to the HEAD commit date so the same commit produces a
+# byte-for-byte identical proofpack from a fresh clone (reproducible builds).
+SOURCE_DATE_EPOCH := $(shell git -C . log -1 --format=%ct 2>/dev/null || echo 1700000000)
+export SOURCE_DATE_EPOCH
 
 install-dev:
 	python -m pip install --upgrade pip
@@ -25,6 +30,11 @@ proofpack: audit smoke
 		--output-dir results/proofpack \
 		--include-search \
 		--include-validation
+
+# Assert the proofpack is deterministic: two fresh builds under the same
+# SOURCE_DATE_EPOCH must produce an identical reproducible_digest (issue #12 A4).
+proofpack-verify:
+	python scripts/verify_proofpack.py
 
 reviewer-packet: proofpack
 	mkdir -p results/reviewer-packet
