@@ -77,9 +77,37 @@ infinite-dimensional `E₀`:
 | 30 | `[0.8036369143, 0.8037707785]` | 1.3×10⁻⁴ |
 
 Both endpoints are rigorous, and the enclosure tightens as `N` grows (the
-variance `σ²` shrinks). The lower bound's tightness is limited by the weak
-`E₁ ≥ 3/2` operator bound; a sharper rigorous `β` (e.g. via a Lehmann–Maehly step)
-would narrow it further — left as honest future work.
+variance `σ²` shrinks).
+
+## Sharpened lower bound (comparison oscillator) & the full low-lying spectrum
+
+Temple's `β` (a lower bound on `E₁`) was originally the weak operator bound
+`E₁ ≥ 3/2`. A much sharper rigorous bound comes from a **solvable comparison
+oscillator**: since `(x²−a)² ≥ 0`,
+
+```
+x⁴ ≥ 2a x² − a²   ⇒   H ⪰ ½p² + ½(1+4λa)x² − λa²  =:  H_a,
+```
+
+so by min–max `Eₙ(H) ≥ Eₙ(H_a) = √(1+4λa)(n+½) − λa²` for **every** `a > 0` and
+**every** level `n`. Optimizing `a` gives `E₁ ≥ 2.4375` (λ=1), versus the old
+`3/2`. Using it as Temple's `β` tightens the ground-state enclosure ~2.4×
+(width `1.3×10⁻⁴ → 5.7×10⁻⁵` at N=30).
+
+The comparison-oscillator bounds also give **two-sided enclosures of the excited
+states** (lower = comparison oscillator, upper = Rayleigh–Ritz). At `λ=1`,
+`N=30`, validated against a high-precision `N=200` diagonalization:
+
+| n | certified `Eₙ ∈` | true | width |
+|---|------------------|------|-------|
+| 0 | `[0.80371373, 0.80377078]` | 0.80377065 | 5.7×10⁻⁵ |
+| 1 | `[2.43749004, 2.73789447]` | 2.73789226 | 0.30 |
+| 2 | `[4.59982752, 5.17929787]` | 5.17929169 | 0.58 |
+
+Every certified interval brackets the true level — the ground state tightly
+(Temple), the excited states more loosely (the comparison-oscillator lower bounds
+loosen with `n`) but genuinely two-sided. A `λ` sweep (`λ ∈ {0.1, 0.5, 1, 2}`)
+likewise brackets the documented ground energies.
 
 ## Run it
 

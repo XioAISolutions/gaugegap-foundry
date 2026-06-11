@@ -48,9 +48,14 @@ from gaugegap.rigorous.interval_arithmetic import (
     verified_hermitian_eigenvalues,
 )
 
-# Reference high-precision values for the standard normalization
-# H = 1/2 p^2 + 1/2 x^2 + lambda x^4 (for validation / convergence display only).
-REFERENCE_E0 = {1.0: 0.8037706512, 0.1: 0.5591463, 0.5: 0.6961757}
+# Reference high-precision ground energies for H = 1/2 p^2 + 1/2 x^2 + lambda x^4
+# (from large-N diagonalization; for validation / convergence display only).
+REFERENCE_E0 = {
+    0.1: 0.5591463272,
+    0.5: 0.6961758208,
+    1.0: 0.8037706512,
+    2.0: 0.9515684727,
+}
 
 
 def _sqrt_half_int(n: int) -> Interval:
@@ -134,6 +139,47 @@ def certified_anharmonic_bounds(n_basis: int = 30, lam: float = 1.0,
 # Two-sided (Temple) enclosure of the ground-state energy.
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Comparison-oscillator lower bounds (sharpened, level-resolved).
+# ---------------------------------------------------------------------------
+
+def _comparison_level_interval(n: int, lam: float, a: float) -> Interval:
+    """Certified value of E_n of the comparison oscillator at parameter a.
+
+    Since (x^2 - a)^2 >= 0 gives x^4 >= 2 a x^2 - a^2, for a > 0
+
+        H = 1/2 p^2 + 1/2 x^2 + lambda x^4
+          >= 1/2 p^2 + 1/2 (1 + 4 lambda a) x^2 - lambda a^2  =: H_a,
+
+    a solvable oscillator with E_n(H_a) = sqrt(1 + 4 lambda a) (n + 1/2)
+    - lambda a^2. By min-max E_n(H) >= E_n(H_a) for EVERY a > 0, so the lower
+    endpoint of this interval is a rigorous lower bound on E_n(H).
+    """
+    lam_i = Interval.from_float(float(lam))
+    a_i = Interval.from_float(float(a))
+    one = Interval.from_float(1.0)
+    four = Interval.from_float(4.0)
+    omega2 = one + four * lam_i * a_i          # 1 + 4 lambda a  (> 0)
+    omega = omega2.sqrt()
+    n_half = Interval.from_float(n + 0.5)
+    return omega * n_half - lam_i * (a_i * a_i)
+
+
+def certified_level_lower_bound(n: int, lam: float = 1.0) -> float:
+    """Rigorous lower bound on E_n(H) via the optimized comparison oscillator.
+
+    The bound is valid for any a > 0; we scan a in floating point to find a
+    near-optimal value, then evaluate the bound rigorously at that a.
+    """
+    import numpy as np
+
+    a_max = 1.0 + 1.5 * (n + 1)
+    a_grid = np.linspace(1e-3, a_max, 400)
+    f = np.sqrt(1.0 + 4.0 * lam * a_grid) * (n + 0.5) - lam * a_grid ** 2
+    a_best = float(a_grid[int(np.argmax(f))])
+    return float(_comparison_level_interval(n, lam, a_best).lower)
+
+
 def _matvec(matrix: IntervalMatrix, vec: List[Interval]) -> List[Interval]:
     out: List[Interval] = []
     for i in range(matrix.m):
@@ -205,10 +251,14 @@ def certified_ground_state_enclosure(n_basis: int = 30, lam: float = 1.0) -> Gro
     eps2 = _dot(h_psi, h_psi)
     variance = eps2 - eps * eps
 
-    beta = Interval.from_float(1.5)  # rigorous: E1 >= 3/2 since lambda x^4 >= 0
+    # Temple's beta: a rigorous lower bound on E1. The operator bound gives
+    # E1 >= 3/2; the optimized comparison oscillator gives a much sharper one.
+    # Both are rigorous, so take the larger (it only needs eps < beta <= E1).
+    beta_value = max(1.5, certified_level_lower_bound(1, lam))
+    beta = Interval.from_float(beta_value)
     # Require eps < beta strictly so (beta - eps) is positive (no division by 0).
-    if not (float(eps.upper) < 1.5):
-        raise ValueError("Temple bound requires <psi|H|psi> < 3/2; increase n_basis")
+    if not (float(eps.upper) < beta_value):
+        raise ValueError("Temple bound requires <psi|H|psi> < beta; increase n_basis")
     temple = eps - variance / (beta - eps)
 
     # Upper bound: the certified eigenvalue enclosure's upper endpoint (tighter
@@ -217,5 +267,43 @@ def certified_ground_state_enclosure(n_basis: int = 30, lam: float = 1.0) -> Gro
     return GroundStateEnclosure(
         n_basis=n_basis, lam=lam,
         lower=float(temple.lower), upper=upper,
-        rayleigh=eps, variance=variance, e1_lower_bound=1.5,
+        rayleigh=eps, variance=variance, e1_lower_bound=beta_value,
     )
+
+
+# ---------------------------------------------------------------------------
+# Two-sided enclosures across the low-lying spectrum.
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class LevelEnclosure:
+    n: int
+    lower: float
+    upper: float
+    method: str  # how the lower bound was obtained
+
+    @property
+    def width(self) -> float:
+        return self.upper - self.lower
+
+
+def certified_two_sided_spectrum(n_basis: int = 30, lam: float = 1.0,
+                                 n_levels: int = 3) -> List[LevelEnclosure]:
+    """Certified two-sided enclosures [lower, upper] for the lowest n_levels.
+
+    Upper bounds are Rayleigh-Ritz (certified eigenvalue enclosure upper
+    endpoints); lower bounds are the optimized comparison-oscillator bounds,
+    with the ground state additionally sharpened by Temple's inequality.
+    """
+    uppers = [float(e.upper) for e in certified_anharmonic_bounds(
+        n_basis=n_basis, lam=lam, n_levels=n_levels).enclosures]
+    out: List[LevelEnclosure] = []
+    for n in range(n_levels):
+        comp = certified_level_lower_bound(n, lam)
+        if n == 0:
+            temple = certified_ground_state_enclosure(n_basis=n_basis, lam=lam).lower
+            lower, method = (temple, "Temple") if temple > comp else (comp, "comparison")
+        else:
+            lower, method = comp, "comparison"
+        out.append(LevelEnclosure(n=n, lower=lower, upper=uppers[n], method=method))
+    return out
