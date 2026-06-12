@@ -135,6 +135,31 @@ def certified_anharmonic_bounds(n_basis: int = 30, lam: float = 1.0,
     return AnharmonicBounds(n_basis=n_basis, lam=lam, enclosures=enclosures)
 
 
+def mpmath_ground_eigenvalue(n_basis: int = 20, lam: float = 1.0, dps: int = 40) -> float:
+    """Ground eigenvalue of the truncated anharmonic H via mpmath.eigsy.
+
+    An *independent* high-precision symmetric eigensolver (a different code path
+    from ``verified_hermitian_eigenvalues``, which uses numpy + a residual bound)
+    -- used to cross-check the certified enclosure against a second library.
+    """
+    import mpmath as mp
+
+    with mp.workdps(dps):
+        m = n_basis + 4
+        x = mp.zeros(m)
+        for k in range(m - 1):
+            v = mp.sqrt(mp.mpf(k + 1) / 2)
+            x[k, k + 1] = v
+            x[k + 1, k] = v
+        x4 = (x * x) * (x * x)
+        H = mp.zeros(n_basis)
+        for i in range(n_basis):
+            for j in range(n_basis):
+                H[i, j] = mp.mpf(lam) * x4[i, j] + (mp.mpf(i) + mp.mpf("0.5") if i == j else mp.mpf(0))
+        evals, _ = mp.eigsy(H)
+        return float(min(evals[i] for i in range(n_basis)))
+
+
 # ---------------------------------------------------------------------------
 # Two-sided (Temple) enclosure of the ground-state energy.
 # ---------------------------------------------------------------------------
