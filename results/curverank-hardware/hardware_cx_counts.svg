@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="440" viewBox="0 0 720 440" font-family="Arial, sans-serif">
+<rect width="720" height="440" fill="white"/>
+<text x="70" y="30" font-size="18" font-weight="700">Two-qubit (CX) gate count: dense vs Trotter vs iterative</text>
+<rect x="70" y="56" width="620" height="328" fill="none" stroke="#111827" stroke-width="1.2"/>
+<line x1="70" y1="56.0" x2="690" y2="56.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="60.0" font-size="11" text-anchor="end" fill="#374151">1.62e+04</text>
+<line x1="70" y1="138.0" x2="690" y2="138.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="142.0" font-size="11" text-anchor="end" fill="#374151">1.18e+04</text>
+<line x1="70" y1="220.0" x2="690" y2="220.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="224.0" font-size="11" text-anchor="end" fill="#374151">7.5e+03</text>
+<line x1="70" y1="302.0" x2="690" y2="302.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="306.0" font-size="11" text-anchor="end" fill="#374151">3.16e+03</text>
+<line x1="70" y1="384.0" x2="690" y2="384.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="388.0" font-size="11" text-anchor="end" fill="#374151">-1.17e+03</text>
+<polyline points="70.00,361.38 158.57,360.83 335.71,357.59 690.00,343.54" fill="none" stroke="#1f77b4" stroke-width="2.2"/>
+<circle cx="70.00" cy="361.38" r="3.5" fill="#1f77b4"/>
+<circle cx="158.57" cy="360.83" r="3.5" fill="#1f77b4"/>
+<circle cx="335.71" cy="357.59" r="3.5" fill="#1f77b4"/>
+<circle cx="690.00" cy="343.54" r="3.5" fill="#1f77b4"/>
+<rect x="540" y="63" width="12" height="12" fill="#1f77b4"/>
+<text x="556" y="73" font-size="11" fill="#111827">dense (full QPE)</text>
+<polyline points="70.00,360.40 158.57,350.16 335.71,299.01 690.00,78.62" fill="none" stroke="#d62728" stroke-width="2.2"/>
+<circle cx="70.00" cy="360.40" r="3.5" fill="#d62728"/>
+<circle cx="158.57" cy="350.16" r="3.5" fill="#d62728"/>
+<circle cx="335.71" cy="299.01" r="3.5" fill="#d62728"/>
+<circle cx="690.00" cy="78.62" r="3.5" fill="#d62728"/>
+<rect x="540" y="81" width="12" height="12" fill="#d62728"/>
+<text x="556" y="91" font-size="11" fill="#111827">trotter (full QPE)</text>
+<polyline points="70.00,361.27 158.57,355.82 335.71,328.57 690.00,211.10" fill="none" stroke="#2ca02c" stroke-width="2.2"/>
+<circle cx="70.00" cy="361.27" r="3.5" fill="#2ca02c"/>
+<circle cx="158.57" cy="355.82" r="3.5" fill="#2ca02c"/>
+<circle cx="335.71" cy="328.57" r="3.5" fill="#2ca02c"/>
+<circle cx="690.00" cy="211.10" r="3.5" fill="#2ca02c"/>
+<rect x="540" y="99" width="12" height="12" fill="#2ca02c"/>
+<text x="556" y="109" font-size="11" fill="#111827">iterative (per round)</text>
+<text x="380" y="424" font-size="13" text-anchor="middle">xp truncation size (n_basis)</text>
+<text x="20" y="220" font-size="13" text-anchor="middle" transform="rotate(-90 20 220)">CX gates (transpiled)</text>
+</svg>

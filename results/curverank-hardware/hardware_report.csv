@@ -1,0 +1,5 @@
+n_basis,n_system_qubits,n_pauli_terms,dense_qubits,dense_depth,dense_cx,trotter_qubits,trotter_depth,trotter_cx,iterative_qubits,iterative_depth,iterative_cx
+2,1,1,5,43,26,5,146,78,2,66,32
+4,2,6,6,90,55,6,1047,619,3,545,320
+8,3,25,7,396,226,7,5223,3322,4,2770,1760
+16,4,92,8,1856,969,8,22427,14969,5,11939,7968
