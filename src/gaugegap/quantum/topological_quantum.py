@@ -112,61 +112,69 @@ class BraidingResult:
         }
 
 
-def fibonacci_braiding_matrix(i: int, j: int, total_charge: str = "1") -> np.ndarray:
+def fibonacci_f_matrix() -> np.ndarray:
+    """F-matrix for the Fibonacci fusion space (τττ → τ).
+
+    The change-of-basis between the two fusion trees of three τ anyons with
+    total charge τ:
+
+        F = [[1/φ,  1/√φ],
+             [1/√φ, -1/φ]]
+
+    It is real, symmetric, unitary, and involutory (F² = I), as required.
     """
-    Compute Fibonacci anyon braiding matrix.
-    
+    phi = PHI
+    inv_phi = 1.0 / phi
+    inv_sqrt_phi = 1.0 / np.sqrt(phi)
+    return np.array([
+        [inv_phi, inv_sqrt_phi],
+        [inv_sqrt_phi, -inv_phi],
+    ], dtype=complex)
+
+
+def fibonacci_braiding_matrix(i: int, j: int, total_charge: str = "1") -> np.ndarray:
+    """Unitary Fibonacci anyon braid generator for exchanging anyons (i, i+1).
+
     Mathematical Framework
     ----------------------
-    Fibonacci anyons have fusion rules: τ × τ = 1 + τ
-    
-    For 4 anyons with total charge 1:
-    Fusion tree: (τ₁ × τ₂) × (τ₃ × τ₄) = 1
-    
-    Braiding matrix for exchanging anyons i and i+1:
-    B_i acts on fusion space
-    
-    For τ × τ → τ channel (standard R-matrix):
-    B = [[φ^(-3/4) * e^(4πi/5), φ^(-3/4) * e^(3πi/5)],
-         [φ^(-3/4) * e^(3πi/5), φ^(-3/4) * e^(-4πi/5)]]
-    
-    where φ is the golden ratio
-    
+    Fibonacci anyons fuse as ``τ × τ = 1 + τ``. In the two-dimensional fusion
+    space of three τ anyons with total charge τ, the braid group B_3 is generated
+    by two unitaries built from the diagonal R-matrix and the F-matrix:
+
+        R   = diag(e^{-4πi/5}, e^{3πi/5})       (the two fusion channels)
+        σ_1 = R                                  (braid anyons 1,2)
+        σ_2 = F · R · F                          (braid anyons 2,3)
+
+    Both are unitary (the R eigenvalues are pure phases and F is unitary), and
+    they satisfy the braid / Yang-Baxter relation σ_1 σ_2 σ_1 = σ_2 σ_1 σ_2. This
+    is the genuine universal Fibonacci braiding -- σ_2 mixes the fusion channels,
+    which is what makes the anyons computationally universal. The previous
+    implementation returned only the diagonal R-matrix divided by √φ, which was
+    not even unitary.
+
     Parameters
     ----------
-    i : int
-        First anyon index
-    j : int
-        Second anyon index (must be i+1)
+    i, j : int
+        Adjacent anyon indices (``j == i + 1``). ``i in {0, 1}`` selects the
+        generator σ_1 / σ_2 of the 3-anyon representation.
     total_charge : str
-        Total topological charge
-    
+        Retained for API compatibility (the τ total-charge sector is used).
+
     Returns
     -------
-    array
-        Braiding matrix (unitary)
+    np.ndarray
+        A 2x2 unitary braid generator.
     """
     if j != i + 1:
         raise ValueError("Can only braid adjacent anyons")
-    
-    # Fibonacci braiding matrix for τ × τ → τ
-    # This is the R-matrix (unitary)
-    # Standard form from topological quantum computation literature
-    
-    # For τ × τ fusion, the R-matrix is:
-    # R = [[e^(-4πi/5), 0], [0, e^(3πi/5)]] / sqrt(φ)
-    # But we use the full braiding matrix which is unitary
-    
-    phi = PHI
-    theta = 4 * np.pi / 5
-    
-    # Unitary braiding matrix
-    B = np.array([
-        [np.exp(-1j * theta), 0],
-        [0, np.exp(1j * 3 * theta / 4)]
-    ]) / np.sqrt(phi)
-    
-    return B
+
+    R = np.diag([np.exp(-4j * np.pi / 5), np.exp(3j * np.pi / 5)])
+    if i % 2 == 0:
+        # σ_1: braid the first pair (diagonal in this basis).
+        return R
+    # σ_2: braid the second pair (F-conjugated; mixes the fusion channels).
+    F = fibonacci_f_matrix()
+    return F @ R @ F
 
 
 def ising_braiding_matrix(i: int, j: int) -> np.ndarray:
@@ -393,25 +401,28 @@ def topological_qubit_encoding(logical_state: str, n_anyons: int = 4) -> np.ndar
 def measure_topological_charge(
     state: np.ndarray,
     measurement_basis: str = "computational",
+    seed: int | None = None,
 ) -> Tuple[int, float]:
     """
     Measure topological charge.
-    
+
     Mathematical Framework
     ----------------------
     Measurement projects onto fusion channels.
     For Fibonacci: measure whether fusion gives 1 or τ.
-    
+
     Measurement is topologically protected - only depends
     on global topological properties.
-    
+
     Parameters
     ----------
     state : array
         Topological state
     measurement_basis : str
         Measurement basis
-    
+    seed : int, optional
+        Seed for the projective-measurement sampling; reproducible by default.
+
     Returns
     -------
     outcome : int
@@ -419,12 +430,15 @@ def measure_topological_charge(
     probability : float
         Probability of outcome
     """
+    from gaugegap.seeding import make_rng
+
     # Probabilities for each fusion channel
     probs = np.abs(state)**2
-    
-    # Sample outcome
-    outcome = np.random.choice(len(probs), p=probs)
-    
+    probs = probs / probs.sum()
+
+    # Sample outcome from a local seeded generator.
+    outcome = make_rng(seed).choice(len(probs), p=probs)
+
     return int(outcome), float(probs[outcome])
 
 

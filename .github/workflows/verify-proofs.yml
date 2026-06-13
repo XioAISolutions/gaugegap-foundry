@@ -191,64 +191,10 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Check for overclaiming in documentation
-        run: |
-          python -c "
-          import re
-          from pathlib import Path
-
-          # Forbidden phrases that violate claim boundary
-          forbidden = [
-              r'proof of (the )?yang.?mills',
-              r'proof of (the )?navier.?stokes',
-              r'proof of (the )?riemann hypothesis',
-              r'solved? (the )?millennium prize',
-              r'ai (discovered|proved|solved)',
-              r'quantum computer proves',
-          ]
-
-          # Negation / 'avoided language' context: a match in one of these
-          # contexts is a negative example, not a claim. Checked within a small
-          # window around the matching line so list bullets under an
-          # 'Avoided language:' header are exempt.
-          safe = [
-              r'avoided language', r'not claiming', r'does not claim',
-              r'do not use', r'risky phrases', r'not proofs?',
-              r'\bnot\b.*\bproof', r'no .*claim',
-          ]
-
-          # Files to check
-          files_to_check = [
-              'README.md',
-              'DEPLOYMENT.md',
-              'docs/*.md',
-              'results/sprint-now/PROOF_SUMMARY.md',
-          ]
-
-          def in_safe_context(lines, i):
-              lo, hi = max(0, i - 3), min(len(lines), i + 4)
-              window = '\n'.join(lines[lo:hi]).lower()
-              return any(re.search(s, window) for s in safe)
-
-          violations = []
-          for pattern in files_to_check:
-              for file_path in Path('.').glob(pattern):
-                  if not file_path.is_file():
-                      continue
-                  lines = file_path.read_text().splitlines()
-                  for i, line in enumerate(lines):
-                      low = line.lower()
-                      for phrase in forbidden:
-                          if re.search(phrase, low) and not in_safe_context(lines, i):
-                              violations.append(f'{file_path}:{i+1}: contains \"{phrase}\"')
-
-          if violations:
-              print('✗ Claim boundary violations detected:')
-              for v in violations:
-                  print(f'  {v}')
-              exit(1)
-          else:
-              print('✓ No claim boundary violations detected')
-          "
+        # Single source of truth: the canonical audit script is context-aware
+        # (deny-list sections that quote phrases in order to ban them are not
+        # violations) and carries all patterns the old inline check had.
+        run: python scripts/claim_boundary_audit.py --strict
       
       - name: Verify AGENTS.md compliance
         run: |
@@ -289,5 +235,37 @@ jobs:
           path: ./
           base: ${{ github.event_name == 'push' && github.event.before || github.event.repository.default_branch }}
           head: ${{ github.sha }}
+
+  reproducibility:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Proofpack is deterministic (issue #12 A4)
+        # Two fresh builds under a fixed SOURCE_DATE_EPOCH must share a
+        # reproducible_digest; the verifier exits non-zero otherwise.
+        run: python scripts/verify_proofpack.py
+
+      - name: Reviewer packet builds (issue #12 A7)
+        run: python scripts/build_reviewer_packet.py --output-dir results/reviewer-packet
+
+      - name: Upload reviewer packet
+        uses: actions/upload-artifact@v4
+        with:
+          name: reviewer-packet
+          path: results/reviewer-packet
+          if-no-files-found: error
 
 # Made with Bob

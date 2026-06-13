@@ -631,6 +631,7 @@ def gauge_theory_adiabatic_preparation(
     n_sites: int,
     coupling: float = 1.0,
     T: float = 10.0,
+    seed: int | None = None,
 ) -> Dict[str, Any]:
     """
     Adiabatic preparation of gauge theory ground state.
@@ -661,14 +662,17 @@ def gauge_theory_adiabatic_preparation(
     # Simplified for demonstration
     # Full implementation would construct gauge theory Hamiltonians
     
+    from gaugegap.seeding import make_rng
+
+    rng = make_rng(seed)
     dim = 2**n_sites
-    
+
     # Transverse field Hamiltonian
-    H_initial = np.random.randn(dim, dim)
+    H_initial = rng.standard_normal((dim, dim))
     H_initial = (H_initial + H_initial.T) / 2
-    
+
     # Gauge theory Hamiltonian
-    H_final = np.random.randn(dim, dim)
+    H_final = rng.standard_normal((dim, dim))
     H_final = (H_final + H_final.T) / 2
     
     # Initial state

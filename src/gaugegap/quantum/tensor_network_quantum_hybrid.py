@@ -283,6 +283,7 @@ def hybrid_vqe(
     n_quantum_layers: int = 2,
     n_classical_sweeps: int = 5,
     max_bond_dim: int = 50,
+    seed: int | None = None,
 ) -> HybridResult:
     """
     Hybrid VQE using tensor networks and quantum circuits.
@@ -351,14 +352,17 @@ def hybrid_vqe(
     t_start = time.time()
     # Apply variational layers (simplified)
     # Full implementation would use actual quantum circuit
+    from gaugegap.seeding import make_rng
+
+    rng = make_rng(seed)
     n_params = n_qubits * n_quantum_layers * 2
-    best_params = np.random.randn(n_params) * 0.1
-    
+    best_params = rng.standard_normal(n_params) * 0.1
+
     # Simple optimization loop
     best_energy = np.real(state.conj() @ hamiltonian @ state)
     for _ in range(10):
         # Apply random perturbation
-        trial_params = best_params + np.random.randn(n_params) * 0.01
+        trial_params = best_params + rng.standard_normal(n_params) * 0.01
         # Would apply quantum circuit here
         trial_energy = best_energy  # Placeholder
         if trial_energy < best_energy:

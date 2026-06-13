@@ -211,75 +211,71 @@ def kak_decomposition(
     two_qubit_unitary: np.ndarray,
 ) -> Dict[str, Any]:
     """
-    KAK (Cartan) decomposition of two-qubit unitary.
-    
+    Local-invariant (Makhlin) characterization of a two-qubit unitary.
+
     Mathematical Framework
     ----------------------
-    Any two-qubit unitary can be written:
-    U = (A⊗B) · exp(i(a·XX + b·YY + c·ZZ)) · (C⊗D)
-    
-    where A,B,C,D ∈ SU(2) and a,b,c are canonical coordinates.
-    
-    This is the canonical form, optimal for synthesis.
-    
+    Any two-qubit unitary has a KAK / Cartan canonical form
+    U = (A⊗B) · exp(i(a·XX + b·YY + c·ZZ)) · (C⊗D). The local-equivalence class
+    (everything modulo the single-qubit gates A,B,C,D) is captured exactly by the
+    two Makhlin invariants: with U normalized to SU(4), Q the magic-basis
+    transform, U_B = Q† U Q and m = U_Bᵀ U_B,
+
+        G1 = tr(m)² / 16,    G2 = (tr(m)² − tr(m²)) / 4.
+
+    These are convention-independent and take known values: a local (product)
+    gate (G1,G2)=(1,3); CNOT (0,1); SWAP (−1,−3); iSWAP (0,−1). A gate is
+    non-local (entangling) iff it is not locally equivalent to the identity,
+    (G1,G2) ≠ (1,3).
+
+    NOTE: the canonical coordinates (a,b,c) and the local gates A,B,C,D require a
+    Weyl-chamber reduction and are intentionally NOT returned. The previous
+    implementation returned all-zero coordinates -- it took ``np.angle`` of the
+    (real, non-negative) SVD singular values, which is identically 0 -- and bogus
+    single-qubit blocks. Rather than ship a coordinate solver that is wrong at
+    chamber corners (e.g. SWAP), this exposes only the robustly-correct local
+    invariants and flags the rest as not implemented.
+
     Parameters
     ----------
     two_qubit_unitary : array
-        4×4 unitary matrix
-    
+        4×4 unitary matrix.
+
     Returns
     -------
     dict
-        KAK decomposition parameters
+        Makhlin local invariants, an entangling flag, and an explicit status for
+        the unimplemented canonical-coordinate / local-gate extraction.
     """
-    if two_qubit_unitary.shape != (4, 4):
+    U = np.asarray(two_qubit_unitary, dtype=complex)
+    if U.shape != (4, 4):
         raise ValueError("KAK requires 4×4 unitary")
-    
-    U = two_qubit_unitary
-    
-    # Magic basis transformation
-    # Transforms computational basis to Bell basis
-    magic = np.array([
+
+    # Normalize to SU(4) so det U = 1.
+    U = U / np.linalg.det(U) ** 0.25
+
+    # Magic (Bell) basis.
+    Q = np.array([
         [1, 0, 0, 1j],
         [0, 1j, 1, 0],
         [0, 1j, -1, 0],
-        [1, 0, 0, -1j]
-    ]) / np.sqrt(2)
-    
-    # Transform to magic basis
-    U_magic = magic.conj().T @ U @ magic
-    
-    # SVD to extract canonical coordinates
-    # U_magic = V · D · W^†
-    V, singular_values, Wh = svd(U_magic)
-    
-    # Extract canonical coordinates from singular values
-    # Simplified: use phases
-    phases = np.angle(singular_values)
-    a = phases[0] / 2
-    b = phases[1] / 2
-    c = phases[2] / 2
-    
-    # Single-qubit unitaries
-    # Simplified extraction
-    A = V[:2, :2]
-    B = V[2:, 2:]
-    C = Wh[:2, :2]
-    D = Wh[2:, 2:]
-    
+        [1, 0, 0, -1j],
+    ], dtype=complex) / np.sqrt(2)
+    U_B = Q.conj().T @ U @ Q
+    m = U_B.T @ U_B
+    tr = np.trace(m)
+    g1 = tr * tr / 16.0
+    g2 = (tr * tr - np.trace(m @ m)) / 4.0
+
+    is_local = bool(abs(g1 - 1.0) < 1e-9 and abs(g2 - 3.0) < 1e-9)
+
     return {
-        "canonical_coordinates": {
-            "a": float(a),
-            "b": float(b),
-            "c": float(c),
-        },
-        "single_qubit_unitaries": {
-            "A": A,
-            "B": B,
-            "C": C,
-            "D": D,
-        },
-        "interaction_strength": float(np.sqrt(a**2 + b**2 + c**2)),
+        "makhlin_invariants": {"G1": complex(g1), "G2": complex(g2)},
+        "is_entangling": not is_local,
+        # Honest about scope: the local-equivalence class is exact; the canonical
+        # coordinates / local gates are not extracted here.
+        "canonical_coordinates": {"status": "not_implemented"},
+        "single_qubit_unitaries": {"status": "not_implemented"},
     }
 
 

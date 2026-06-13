@@ -66,13 +66,23 @@ class TestTopologicalQuantum:
     """Test topological quantum computing functions."""
     
     def test_fibonacci_braiding_matrix(self):
-        """Test Fibonacci anyon braiding matrix."""
-        B = topological_quantum.fibonacci_braiding_matrix(0, 1)
-        assert B.shape == (2, 2)
-        # For Fibonacci anyons, det(B) = 1/φ where φ is golden ratio
-        # This is a property of the topological phase
-        phi = (1 + np.sqrt(5)) / 2
-        assert np.allclose(np.abs(np.linalg.det(B)), 1/phi, atol=1e-10)
+        """Fibonacci braid generators must be unitary and satisfy Yang-Baxter."""
+        s1 = topological_quantum.fibonacci_braiding_matrix(0, 1)
+        s2 = topological_quantum.fibonacci_braiding_matrix(1, 2)
+        assert s1.shape == (2, 2) and s2.shape == (2, 2)
+        # Braiding is a unitary operation (the old implementation divided the
+        # R-matrix by sqrt(phi) and was NOT unitary).
+        for B in (s1, s2):
+            assert np.allclose(B @ B.conj().T, np.eye(2), atol=1e-12)
+        # R-matrix eigenvalues are the standard Fibonacci phases.
+        eigs = sorted(np.angle(np.linalg.eigvals(s1)) / np.pi)
+        assert np.allclose(eigs, [-4 / 5, 3 / 5], atol=1e-12)
+        # Braid relation (Yang-Baxter): s1 s2 s1 = s2 s1 s2.
+        assert np.allclose(s1 @ s2 @ s1, s2 @ s1 @ s2, atol=1e-12)
+        # The F-matrix is unitary and involutory.
+        F = topological_quantum.fibonacci_f_matrix()
+        assert np.allclose(F @ F.conj().T, np.eye(2), atol=1e-12)
+        assert np.allclose(F @ F, np.eye(2), atol=1e-12)
     
     def test_braid_sequence(self):
         """Test braiding sequence."""
@@ -210,14 +220,22 @@ class TestAdvancedCompilation:
     """Test advanced compilation functions."""
     
     def test_kak_decomposition(self):
-        """Test KAK decomposition."""
-        # Random two-qubit unitary
-        from scipy.stats import unitary_group
-        U = unitary_group.rvs(4)
-        
-        result = advanced_compilation.kak_decomposition(U)
-        assert "canonical_coordinates" in result
-        assert "single_qubit_unitaries" in result
+        """KAK local (Makhlin) invariants on known two-qubit gates."""
+        CNOT = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], dtype=complex)
+        SWAP = np.array([[1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]], dtype=complex)
+        local = np.kron(np.array([[0, 1], [1, 0]], dtype=complex), np.eye(2, dtype=complex))
+
+        cases = {  # (G1, G2)
+            id(CNOT): (CNOT, (0.0, 1.0), True),
+            id(SWAP): (SWAP, (-1.0, -3.0), True),
+            id(local): (local, (1.0, 3.0), False),
+        }
+        for U, (g1, g2), entangling in cases.values():
+            res = advanced_compilation.kak_decomposition(U)
+            inv = res["makhlin_invariants"]
+            assert np.isclose(inv["G1"].real, g1, atol=1e-9)
+            assert np.isclose(inv["G2"].real, g2, atol=1e-9)
+            assert res["is_entangling"] is entangling
     
     def test_shannon_decomposition(self):
         """Test Shannon decomposition."""
