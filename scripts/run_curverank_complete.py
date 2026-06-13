@@ -53,6 +53,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from gaugegap.ledger import git_state, utc_run_id, write_jsonl
+from gaugegap.plot_svg import write_line_svg
 from gaugegap.curverank_operators import berry_keating_xp, quantum_graph_laplacian
 from gaugegap.curverank_spectral import (
     riemann_zero_targets,
@@ -69,7 +70,6 @@ CLAIM_BOUNDARY = (
     "This is spectral screening of toy truncated operators. "
     "Results do NOT prove the Riemann Hypothesis or resolve the Millennium Prize problem."
 )
-
 
 class CurveRankCompleteWorkflow:
     """Complete end-to-end workflow for CurveRank spectral screening."""
@@ -287,43 +287,140 @@ class CurveRankCompleteWorkflow:
         self,
         top_candidates: List[Dict[str, Any]],
         use_emulator: bool = True,
+        n_precision: int = 8,
+        shots: int = 4096,
     ) -> List[Dict[str, Any]]:
         """
         Run quantum phase estimation on top candidates.
-        
+
+        For each candidate we build a faithful diagonal Hamiltonian from its
+        certified-screening spectrum, pick the smallest strictly-positive
+        eigenvalue as the QPE target (its eigenvector is a computational-basis
+        state), and run a real textbook QPE circuit on the Aer statevector
+        emulator. The evolution time is scaled to the spectral radius so no
+        eigenvalue aliases onto another phase (see
+        :mod:`gaugegap.curverank_qpe`). This demonstrates that QPE recovers the
+        candidate's known finite eigenvalues; it is NOT a proof route to RH.
+
         Parameters
         ----------
         top_candidates : list
-            Top candidates
+            Top candidates (screening records carrying ``candidate_id``).
         use_emulator : bool
-            Use statevector emulator
-        
+            Use the local statevector emulator (the only supported backend here).
+        n_precision : int
+            Number of QPE counting qubits.
+        shots : int
+            Measurement shots per circuit.
+
         Returns
         -------
         list
-            QPE results
+            QPE results, one per candidate.
         """
         print("\n" + "="*80)
         print("STEP 4: Quantum Phase Estimation (Emulator)")
         print("="*80)
-        
-        qpe_results = []
-        
+
+        qpe_results: List[Dict[str, Any]] = []
+
+        # QPE needs a quantum backend; degrade gracefully (no placeholder
+        # success) when the optional qiskit stack is not installed.
+        try:
+            from qiskit_aer import AerSimulator  # noqa: F401
+
+            from gaugegap.curverank_qpe import estimate_eigenvalue_qpe
+            qpe_available = True
+        except ImportError as exc:
+            qpe_available = False
+            reason = str(exc)
+            print(f"\n  Qiskit/Aer not available ({reason}); skipping QPE.")
+
+        # Map candidate_id -> recorded eigenvalues from the generation step.
+        eig_by_id = {
+            c["candidate_id"]: np.array(c["eigenvalues"], dtype=float)
+            for c in self.results.get("operator_candidates", [])
+        }
+
         for candidate in top_candidates:
-            print(f"\nQPE for candidate {candidate['candidate_id']}...")
-            
-            # Placeholder for actual QPE implementation
-            # Real implementation would use Qiskit QPE
+            cid = candidate["candidate_id"]
+            print(f"\nQPE for candidate {cid}...")
+
+            if not qpe_available:
+                qpe_results.append({
+                    "candidate_id": cid,
+                    "method": "qpe_statevector",
+                    "status": "skipped_no_qiskit",
+                    "note": "Install the 'quantum' extra (qiskit, qiskit-aer) to run QPE.",
+                })
+                print("  Status: skipped (qiskit not installed)")
+                continue
+
+            eigenvalues = eig_by_id.get(cid)
+            if eigenvalues is None or eigenvalues.size == 0:
+                qpe_results.append({
+                    "candidate_id": cid,
+                    "method": "qpe_statevector",
+                    "status": "skipped_no_spectrum",
+                    "note": "No recorded spectrum for this candidate.",
+                })
+                print("  Status: skipped (no spectrum)")
+                continue
+
+            # Faithful diagonal Hamiltonian with the candidate's exact spectrum;
+            # the target eigenvector is then a single computational-basis state.
+            positive = eigenvalues[eigenvalues > 1e-9]
+            if positive.size == 0:
+                qpe_results.append({
+                    "candidate_id": cid,
+                    "method": "qpe_statevector",
+                    "status": "skipped_no_positive_eigenvalue",
+                })
+                print("  Status: skipped (no positive eigenvalue)")
+                continue
+
+            target_eig = float(np.min(positive))
+            target_index = int(np.argmin(np.where(eigenvalues > 1e-9, eigenvalues, np.inf)))
+            H_diag = np.diag(eigenvalues.astype(complex))
+            eigenvector = np.zeros(eigenvalues.size, dtype=complex)
+            eigenvector[target_index] = 1.0
+
+            qpe = estimate_eigenvalue_qpe(
+                H_diag,
+                eigenvector,
+                n_precision=n_precision,
+                shots=shots,
+                eigenvalues=eigenvalues,
+            )
+            estimate = qpe["estimated_eigenvalue"]
+            abs_error = abs(estimate - target_eig)
+            # One phase bin maps to this eigenvalue resolution.
+            resolution = (2 * np.pi / qpe["evolution_time"]) / (2 ** n_precision)
+
             qpe_result = {
-                "candidate_id": candidate["candidate_id"],
-                "method": "qpe_statevector_placeholder",
-                "status": "not_implemented",
-                "note": "Requires Qiskit QPE implementation",
+                "candidate_id": cid,
+                "method": "qpe_statevector",
+                "status": "ok",
+                "backend": "aer_statevector_emulator",
+                "use_emulator": use_emulator,
+                "target_eigenvalue": target_eig,
+                "estimated_eigenvalue": estimate,
+                "absolute_error": abs_error,
+                "phase_resolution_eigenvalue": resolution,
+                "within_resolution": bool(abs_error <= 1.5 * resolution),
+                "evolution_time": qpe["evolution_time"],
+                "measured_phase": qpe["measured_phase"],
+                "n_precision": n_precision,
+                "n_qubits": qpe["n_qubits"],
+                "circuit_depth": qpe["circuit_depth"],
+                "shots": shots,
             }
-            
             qpe_results.append(qpe_result)
+            print(f"  Target eigenvalue:    {target_eig:.6f}")
+            print(f"  QPE estimate:         {estimate:.6f} "
+                  f"(error {abs_error:.6f}, resolution {resolution:.6f})")
             print(f"  Status: {qpe_result['status']}")
-        
+
         self.results["quantum_qpe_results"] = qpe_results
         return qpe_results
     
@@ -472,16 +569,55 @@ class CurveRankCompleteWorkflow:
         return gue_statistics
     
     def generate_spectral_plots(self) -> None:
-        """Generate spectral comparison plots."""
+        """Generate spectral comparison plots (dependency-free SVG)."""
         print("\n" + "="*80)
         print("STEP 7: Generating Spectral Plots")
         print("="*80)
-        
-        print("\nSpectral comparison plots would be generated here (SVG format)")
-        print("  - Eigenvalue spectrum vs Riemann zeros")
-        print("  - GUE spacing distribution")
-        print("  - Mismatch vs basis size")
-        print("  - Family comparison")
+
+        screening = self.results.get("spectral_screening", [])
+        if not screening:
+            print("\nNo screening results to plot.")
+            return
+
+        # Mismatch vs basis size, one polyline per family.
+        series: Dict[str, List[tuple]] = {}
+        for r in screening:
+            series.setdefault(r["family"], []).append(
+                (r["basis_size"], r["spectral_mismatch"])
+            )
+        for pts in series.values():
+            pts.sort()
+
+        mismatch_path = self.output_dir / f"{self.hypothesis_id}-mismatch-vs-basis.svg"
+        write_line_svg(
+            mismatch_path,
+            series,
+            title="Spectral mismatch vs truncation size",
+            x_label="basis size",
+            y_label="spectral mismatch (RMS)",
+        )
+        print(f"\n  Saved: {mismatch_path.name}")
+
+        # GUE mean-ratio distribution vs the GUE/Poisson reference lines.
+        ratios = sorted(
+            r["gue_mean_ratio"] for r in screening
+            if not np.isnan(r["gue_mean_ratio"])
+        )
+        if ratios:
+            gue_series = {
+                "candidates": list(enumerate(ratios, start=1)),
+                "GUE (0.5996)": [(1, 0.5996), (len(ratios), 0.5996)],
+                "Poisson (0.3863)": [(1, 0.3863), (len(ratios), 0.3863)],
+            }
+            gue_path = self.output_dir / f"{self.hypothesis_id}-gue-ratios.svg"
+            write_line_svg(
+                gue_path,
+                gue_series,
+                title="GUE nearest-neighbour spacing ratio",
+                x_label="candidate rank",
+                y_label="mean spacing ratio",
+            )
+            print(f"  Saved: {gue_path.name}")
     
     def export_operator_database(self) -> None:
         """Export ranked operator database."""

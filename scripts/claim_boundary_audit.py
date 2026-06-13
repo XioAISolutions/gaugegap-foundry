@@ -34,12 +34,14 @@ SAFE_CONTEXT_PATTERNS = [
     re.compile(r"\btoy\s+benchmark\b", re.I),
     re.compile(r"\bclaim boundary\b", re.I),
     re.compile(r"\bavoid\s+.*claim\b", re.I),
+    # "Avoided language:" lists enumerate phrases the project deliberately does
+    # NOT use; the quoted phrases are negative examples, not claims.
+    re.compile(r"\bavoided\s+language\b", re.I),
     re.compile(r"\bdo not use\b", re.I),
     re.compile(r"\brisky phrases\b", re.I),
     re.compile(r"\bnegative[- ]result\b", re.I),
     re.compile(r"\brequires? independent.*review\b", re.I),
     # Deny-list sections that *quote* risky phrases in order to ban them.
-    re.compile(r"\bavoided\s+language\b", re.I),
     re.compile(r"\bforbidden\s+language\b", re.I),
 ]
 

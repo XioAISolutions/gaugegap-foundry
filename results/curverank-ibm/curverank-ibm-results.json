@@ -1,0 +1,56 @@
+{
+  "generated": "2026-06-13T01:53:03.844044",
+  "run_id": "20260613T015303Z",
+  "mode": "emulator",
+  "claim_boundary": "Spectral screening of finite truncated toy operators; not a proof of the Riemann Hypothesis or the Hilbert-Polya conjecture.",
+  "runs": [
+    {
+      "n_basis": 4,
+      "n_qubits": 8,
+      "circuit_depth": 148,
+      "n_precision": 6,
+      "shots": 4096,
+      "method": "dense",
+      "evolution_time": 5.026548245743669,
+      "target_eigenvalue": 1.210308100211947,
+      "estimated_eigenvalue": 1.2109375,
+      "absolute_error": 0.0006293997880530977,
+      "phase_resolution": 0.01953125,
+      "within_resolution": true,
+      "backend": "aer_simulator",
+      "job_id": "8a7e7f6e-7705-43fa-a6d3-e3895059d380"
+    },
+    {
+      "n_basis": 8,
+      "n_qubits": 9,
+      "circuit_depth": 587,
+      "n_precision": 6,
+      "shots": 4096,
+      "method": "dense",
+      "evolution_time": 5.026548245743669,
+      "target_eigenvalue": 0.99595932956629,
+      "estimated_eigenvalue": 0.99609375,
+      "absolute_error": 0.0001344204337100363,
+      "phase_resolution": 0.01953125,
+      "within_resolution": true,
+      "backend": "aer_simulator",
+      "job_id": "af0108bb-b32c-44dd-b20c-07ea48f2049c"
+    },
+    {
+      "n_basis": 16,
+      "n_qubits": 10,
+      "circuit_depth": 2780,
+      "n_precision": 6,
+      "shots": 4096,
+      "method": "dense",
+      "evolution_time": 5.026548245743669,
+      "target_eigenvalue": 0.836284484730966,
+      "estimated_eigenvalue": 0.83984375,
+      "absolute_error": 0.003559265269034051,
+      "phase_resolution": 0.01953125,
+      "within_resolution": true,
+      "backend": "aer_simulator",
+      "job_id": "075f6c01-9643-4ec4-90a3-9e7373eb6f1b"
+    }
+  ]
+}

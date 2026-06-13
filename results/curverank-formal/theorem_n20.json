@@ -1,0 +1,61 @@
+{
+  "name": "Berry-Keating xp Impossibility (finite truncation)",
+  "statement": "The Berry-Keating xp operator truncated to n=20 is certifiably separated from the first 20 Riemann zeros: M_n >= 35.535690 (certified).",
+  "assumptions": [
+    {
+      "type": "truncation",
+      "description": "Finite basis truncation to 20 states",
+      "validity_range": {
+        "truncation_level": 20
+      },
+      "certified": true
+    },
+    {
+      "type": "mathematical_property",
+      "description": "Berry-Keating xp operator: H = (1/2)(xp + px)",
+      "validity_range": {
+        "operator": "xp"
+      },
+      "certified": true
+    }
+  ],
+  "proof_steps": [
+    {
+      "step_id": 0,
+      "operation": "spectral_analysis",
+      "description": "Certified spectral mismatch of Berry-Keating xp vs Riemann zeros",
+      "inputs": {
+        "n_basis": 20,
+        "k_zeros": 20
+      },
+      "outputs": {
+        "mismatch": "(35.5356899424466, 35.535689942446666)"
+      },
+      "certified_bounds": {
+        "mismatch": [
+          35.5356899424466,
+          35.535689942446666
+        ]
+      },
+      "assumptions": [],
+      "timestamp": "2026-06-13T02:27:08.881325"
+    }
+  ],
+  "conclusion": {
+    "mismatch": [
+      35.5356899424466,
+      35.535689942446666
+    ],
+    "impossibility_certified": [
+      1.0,
+      1.0
+    ]
+  },
+  "verified": true,
+  "metadata": {
+    "operator_name": "Berry-Keating xp",
+    "truncation_level": 20,
+    "n_zeros_compared": 20,
+    "method": "interval_arithmetic_verified_eigenvalue_enclosure"
+  }
+}

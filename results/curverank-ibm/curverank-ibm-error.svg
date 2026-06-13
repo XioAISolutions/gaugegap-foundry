@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="440" viewBox="0 0 720 440" font-family="Arial, sans-serif">
+<rect width="720" height="440" fill="white"/>
+<text x="70" y="30" font-size="18" font-weight="700">Windowed QPE eigenvalue error vs resolution (IBM path)</text>
+<rect x="70" y="56" width="620" height="328" fill="none" stroke="#111827" stroke-width="1.2"/>
+<line x1="70" y1="56.0" x2="690" y2="56.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="60.0" font-size="11" text-anchor="end" fill="#374151">0.0211</text>
+<line x1="70" y1="138.0" x2="690" y2="138.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="142.0" font-size="11" text-anchor="end" fill="#374151">0.0155</text>
+<line x1="70" y1="220.0" x2="690" y2="220.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="224.0" font-size="11" text-anchor="end" fill="#374151">0.00983</text>
+<line x1="70" y1="302.0" x2="690" y2="302.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="306.0" font-size="11" text-anchor="end" fill="#374151">0.00421</text>
+<line x1="70" y1="384.0" x2="690" y2="384.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="388.0" font-size="11" text-anchor="end" fill="#374151">-0.00142</text>
+<polyline points="70.00,354.16 276.67,361.38 690.00,311.45" fill="none" stroke="#1f77b4" stroke-width="2.2"/>
+<circle cx="70.00" cy="354.16" r="3.5" fill="#1f77b4"/>
+<circle cx="276.67" cy="361.38" r="3.5" fill="#1f77b4"/>
+<circle cx="690.00" cy="311.45" r="3.5" fill="#1f77b4"/>
+<rect x="540" y="63" width="12" height="12" fill="#1f77b4"/>
+<text x="556" y="73" font-size="11" fill="#111827">abs error</text>
+<polyline points="70.00,78.62 276.67,78.62 690.00,78.62" fill="none" stroke="#d62728" stroke-width="2.2"/>
+<circle cx="70.00" cy="78.62" r="3.5" fill="#d62728"/>
+<circle cx="276.67" cy="78.62" r="3.5" fill="#d62728"/>
+<circle cx="690.00" cy="78.62" r="3.5" fill="#d62728"/>
+<rect x="540" y="81" width="12" height="12" fill="#d62728"/>
+<text x="556" y="91" font-size="11" fill="#111827">phase resolution</text>
+<text x="380" y="424" font-size="13" text-anchor="middle">xp truncation size (n_basis)</text>
+<text x="20" y="220" font-size="13" text-anchor="middle" transform="rotate(-90 20 220)">eigenvalue (absolute)</text>
+</svg>

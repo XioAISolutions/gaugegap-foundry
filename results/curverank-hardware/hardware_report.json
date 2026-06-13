@@ -1,0 +1,64 @@
+{
+  "generated": "2026-06-13T00:48:47.926256",
+  "n_precision": 4,
+  "metric": "transpiled to {u, cx}, optimization_level=1",
+  "claim_boundary": "Circuit-resource proxy for hardware feasibility only; no hardware run and no scientific claim about operator spectra.",
+  "rows": [
+    {
+      "n_basis": 2,
+      "n_system_qubits": 1,
+      "n_pauli_terms": 1,
+      "dense_qubits": 5,
+      "dense_depth": 43,
+      "dense_cx": 26,
+      "trotter_qubits": 5,
+      "trotter_depth": 146,
+      "trotter_cx": 78,
+      "iterative_qubits": 2,
+      "iterative_depth": 66,
+      "iterative_cx": 32
+    },
+    {
+      "n_basis": 4,
+      "n_system_qubits": 2,
+      "n_pauli_terms": 6,
+      "dense_qubits": 6,
+      "dense_depth": 90,
+      "dense_cx": 55,
+      "trotter_qubits": 6,
+      "trotter_depth": 1047,
+      "trotter_cx": 619,
+      "iterative_qubits": 3,
+      "iterative_depth": 545,
+      "iterative_cx": 320
+    },
+    {
+      "n_basis": 8,
+      "n_system_qubits": 3,
+      "n_pauli_terms": 25,
+      "dense_qubits": 7,
+      "dense_depth": 396,
+      "dense_cx": 226,
+      "trotter_qubits": 7,
+      "trotter_depth": 5223,
+      "trotter_cx": 3322,
+      "iterative_qubits": 4,
+      "iterative_depth": 2770,
+      "iterative_cx": 1760
+    },
+    {
+      "n_basis": 16,
+      "n_system_qubits": 4,
+      "n_pauli_terms": 92,
+      "dense_qubits": 8,
+      "dense_depth": 1856,
+      "dense_cx": 969,
+      "trotter_qubits": 8,
+      "trotter_depth": 22427,
+      "trotter_cx": 14969,
+      "iterative_qubits": 5,
+      "iterative_depth": 11939,
+      "iterative_cx": 7968
+    }
+  ]
+}

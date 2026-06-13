@@ -34,129 +34,56 @@ from typing import Optional, Dict, Any, List
 
 import numpy as np
 from scipy.linalg import expm
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
-from qiskit.circuit.library import QFT
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from gaugegap.curverank_operators import generate_candidate_operators
+from gaugegap.curverank_operators import generate_candidate_family
 from gaugegap.curverank_spectral import (
-    compute_low_spectrum,
     riemann_zero_targets,
-    spectral_mismatch_score
+    spectral_mismatch,
+)
+from gaugegap.curverank_qpe import (
+    build_qpe_circuit,
+    build_qpe_circuit_trotter,
+    choose_evolution_time,
+    extract_phase_from_counts,
+    hamiltonian_to_sparse_pauli,
+    measured_phase_to_eigenvalue,
+    pad_to_power_of_two,
 )
 from gaugegap.providers import get_provider
 from gaugegap.cost_estimation import estimate_job_cost
-from gaugegap.ledger import record_result
+from gaugegap.ledger import utc_run_id
 
 
-def build_qpe_circuit(
-    unitary: np.ndarray,
-    n_precision: int = 4,
-    initial_state: Optional[np.ndarray] = None
-) -> QuantumCircuit:
-    """Build quantum phase estimation circuit.
-    
-    Args:
-        unitary: Unitary operator U = exp(-iHt)
-        n_precision: Number of precision qubits
-        initial_state: Initial eigenstate guess (optional)
-    
-    Returns:
-        QPE circuit
+def _confirm(prompt: str, assume_yes: bool) -> bool:
+    """Ask the user to confirm, auto-proceeding when non-interactive.
+
+    Returns True (proceed) when ``assume_yes`` is set or stdin is not a TTY
+    (e.g. CI, pipes, headless desktop runs); otherwise prompts interactively.
     """
-    n_system = int(np.log2(unitary.shape[0]))
-    
-    # Create registers
-    precision_reg = QuantumRegister(n_precision, 'precision')
-    system_reg = QuantumRegister(n_system, 'system')
-    classical_reg = ClassicalRegister(n_precision, 'c')
-    
-    qc = QuantumCircuit(precision_reg, system_reg, classical_reg)
-    
-    # Initialize precision qubits in superposition
-    for i in range(n_precision):
-        qc.h(precision_reg[i])
-    
-    # Initialize system register (eigenstate guess)
-    if initial_state is not None:
-        # State preparation (simplified - real implementation would use
-        # amplitude encoding or adiabatic preparation)
-        qc.h(system_reg)
-    else:
-        # Default: equal superposition
-        for i in range(n_system):
-            qc.h(system_reg[i])
-    
-    # Controlled unitary operations
-    # U^(2^k) for k = 0, 1, ..., n_precision-1
-    for k in range(n_precision):
-        power = 2 ** k
-        U_power = np.linalg.matrix_power(unitary, power)
-        
-        # Decompose controlled-U into gates (simplified)
-        # Real implementation would use efficient decomposition
-        qc.barrier()
-        qc.append(
-            _unitary_to_gate(U_power, n_system).control(1),
-            [precision_reg[k]] + list(system_reg)
-        )
-    
-    # Inverse QFT on precision register
-    qc.barrier()
-    qc.append(QFT(n_precision, inverse=True), precision_reg)
-    
-    # Measure precision register
-    qc.measure(precision_reg, classical_reg)
-    
-    return qc
+    if assume_yes or not sys.stdin.isatty():
+        print(f"{prompt} [auto-yes]")
+        return True
+    return input(prompt).strip().lower() == "y"
 
 
-def _unitary_to_gate(U: np.ndarray, n_qubits: int):
-    """Convert unitary matrix to quantum gate (placeholder).
-    
-    Real implementation would use efficient decomposition algorithms.
+def _extract_ibm_counts(job) -> Dict[str, int]:
+    """Extract a counts dict from an IBM job result.
+
+    Handles both the Aer-emulator result (``result.get_counts()``) and the
+    SamplerV2 hardware result (``result[0].data.<creg>.get_counts()``).
     """
-    from qiskit.extensions import UnitaryGate
-    return UnitaryGate(U, label=f"U^k")
-
-
-def extract_phase_from_counts(
-    counts: Dict[str, int],
-    n_precision: int
-) -> tuple[float, float]:
-    """Extract estimated phase from measurement counts.
-    
-    Args:
-        counts: Measurement counts
-        n_precision: Number of precision qubits
-    
-    Returns:
-        (estimated_phase, uncertainty)
-    """
-    # Find most frequent bitstring
-    max_count = 0
-    max_bitstring = None
-    
-    for bitstring, count in counts.items():
-        if count > max_count:
-            max_count = count
-            max_bitstring = bitstring
-    
-    # Convert bitstring to phase
-    # Phase = bitstring_value / 2^n_precision
-    if max_bitstring is None:
-        return 0.0, 1.0  # No valid measurement
-    
-    bitstring_value = int(max_bitstring, 2)
-    phase = bitstring_value / (2 ** n_precision)
-    
-    # Estimate uncertainty from distribution width
-    total_counts = sum(counts.values())
-    uncertainty = 1.0 / (2 ** n_precision) * np.sqrt(1.0 / max_count)
-    
-    return phase, uncertainty
+    result = job.result()
+    if hasattr(result, "get_counts"):
+        return result.get_counts()
+    # SamplerV2 PrimitiveResult: classical register is named "c" in our circuits.
+    data = result[0].data
+    if hasattr(data, "get_counts"):
+        return data.get_counts()
+    register = getattr(data, "c", None) or next(iter(vars(data).values()))
+    return register.get_counts()
 
 
 def run_curverank_qpe(
@@ -167,7 +94,10 @@ def run_curverank_qpe(
     shots: int = 1024,
     n_precision: int = 4,
     use_emulator: bool = False,
-    output_dir: Path = Path("results/curverank")
+    output_dir: Path = Path("results/curverank"),
+    assume_yes: bool = False,
+    method: str = "dense",
+    trotter_reps: int = 2,
 ) -> Dict[str, Any]:
     """Run CurveRank QPE benchmark.
     
@@ -199,52 +129,78 @@ def run_curverank_qpe(
     
     # Step 1: Generate and screen candidate operators
     print("Step 1: Generating candidate operators...")
-    operators = generate_candidate_operators(
+    candidates = generate_candidate_family(
         family=family,
-        n_basis=n_basis,
-        n_candidates=5
+        n_basis_range=[n_basis],
     )
-    print(f"  Generated {len(operators)} candidates")
-    
+    operators = [c["operator"] for c in candidates]
+    print(f"  Generated {len(operators)} candidate(s)")
+
     # Step 2: Classical spectral screening
     print("\nStep 2: Classical spectral screening...")
-    k_zeros = min(10, n_basis // 2)
+    k_zeros = max(1, min(10, n_basis // 2))
     target_zeros = riemann_zero_targets(k_zeros)
-    
+
     scores = []
     for i, H in enumerate(operators):
-        evals = compute_low_spectrum(H, k=k_zeros)
-        score = spectral_mismatch_score(evals, target_zeros)
-        scores.append((score, i, evals))
+        eigvals, eigvecs = np.linalg.eigh(H)
+        score = spectral_mismatch(eigvals, target_zeros)
+        scores.append((score, i, eigvals, eigvecs))
         print(f"  Candidate {i}: mismatch = {score:.6f}")
-    
+
     # Select best candidate
-    scores.sort()
-    best_score, best_idx, best_evals = scores[0]
+    scores.sort(key=lambda s: s[0])
+    best_score, best_idx, best_evals, best_evecs = scores[0]
     H_best = operators[best_idx]
-    
+
+    # Pick the smallest strictly-positive eigenvalue as the QPE target and grab
+    # its eigenvector so the system register is prepared in (close to) an
+    # eigenstate -- this is what gives a clean phase read.
+    positive = [(e, j) for j, e in enumerate(best_evals) if e > 1e-9]
+    if not positive:
+        print("  No positive eigenvalue to estimate; aborting.")
+        return {}
+    target_eig, target_col = min(positive, key=lambda p: p[0])
+    target_state = best_evecs[:, target_col]
+
     print(f"\n  Best candidate: {best_idx} (mismatch = {best_score:.6f})")
     print(f"  Target zeros: {target_zeros[:3]}")
     print(f"  Best eigenvalues: {best_evals[:3]}")
-    
+    print(f"  QPE target eigenvalue: {target_eig:.6f}")
+
     # Step 3: Build QPE circuit
     print("\nStep 3: Building QPE circuit...")
-    
-    # Evolution time (choose to resolve first eigenvalue)
-    tau = 2 * np.pi / abs(best_evals[0]) if abs(best_evals[0]) > 1e-10 else 1.0
-    U = expm(-1j * H_best * tau)
-    
-    qc = build_qpe_circuit(U, n_precision=n_precision)
+
+    # Evolution time scaled to the spectral radius so NO eigenvalue aliases onto
+    # another phase (in particular the target is not folded to phase zero, which
+    # is what tau = 2*pi/|E_1| used to do).
+    tau = choose_evolution_time(best_evals)
+
+    # Pad to a power-of-two dimension so the system register is whole qubits.
+    H_pad, state_pad = pad_to_power_of_two(H_best, target_state)
+
+    # "dense" builds an exact controlled exp(-iH tau) from the matrix (accurate
+    # but synthesises into many gates -- simulator only); "trotter" uses
+    # gate-efficient controlled Pauli evolution and is the path toward hardware.
+    if method == "trotter":
+        pauli_op = hamiltonian_to_sparse_pauli(H_pad)
+        qc = build_qpe_circuit_trotter(
+            pauli_op, tau, n_precision=n_precision,
+            reps=trotter_reps, initial_statevector=state_pad,
+        )
+    else:
+        U = expm(-1j * H_pad * tau)
+        qc = build_qpe_circuit(U, n_precision=n_precision, initial_statevector=state_pad)
     n_qubits = qc.num_qubits
     depth = qc.depth()
-    
+
+    print(f"  Method: {method}")
     print(f"  Circuit: {n_qubits} qubits, depth {depth}")
     print(f"  Evolution time: {tau:.4f}")
     
     if n_qubits > 20:
         print(f"\n  Warning: {n_qubits} qubits may exceed hardware limits")
-        response = input("  Continue? (y/n): ")
-        if response.lower() != 'y':
+        if not _confirm("  Continue? (y/n): ", assume_yes):
             return {}
     
     # Step 4: Cost estimation
@@ -276,8 +232,7 @@ def run_curverank_qpe(
             print(f"  Confidence: {cost_est.confidence}")
             
             if cost_est.estimated_cost_usd > 20.0:
-                response = input("\n  Cost exceeds $20. Continue? (y/n): ")
-                if response.lower() != 'y':
+                if not _confirm("\n  Cost exceeds $20. Continue? (y/n): ", assume_yes):
                     print("  Aborted by user.")
                     return {}
     
@@ -285,10 +240,13 @@ def run_curverank_qpe(
     print("\nStep 5: Running quantum job...")
     try:
         if backend_type == "simulator":
-            # Local simulator
+            # Local simulator (transpile so the dense controlled-unitary and
+            # state preparation decompose into runnable basis gates).
+            from qiskit import transpile
             from qiskit_aer import AerSimulator
             backend = AerSimulator()
-            job = backend.run(qc, shots=shots)
+            tqc = transpile(qc, backend, basis_gates=["u", "cx"], optimization_level=1)
+            job = backend.run(tqc, shots=shots)
             result = job.result()
             counts = result.get_counts()
             job_id = "simulator"
@@ -318,12 +276,12 @@ def run_curverank_qpe(
             
         elif backend_type == "ionq":
             provider = get_provider("ionq", backend_name=device_name or "forte-1")
-            
+
             result_data, metadata = provider.submit_hardware(
                 circuit=qc,
                 shots=shots
             )
-            
+
             counts = result_data
             job_id = metadata.job_id
             metadata_dict = {
@@ -331,7 +289,35 @@ def run_curverank_qpe(
                 "shots": shots,
                 "job_id": job_id
             }
-        
+
+        elif backend_type == "ibm":
+            # IBM Quantum (Runtime). The adapter returns (job, metadata); the
+            # job result is an Aer result (emulator) or a SamplerV2 primitive
+            # result (hardware), so extract counts handling both formats.
+            from qiskit import transpile
+
+            # The adapter treats backends whose name starts with "aer_" as the
+            # local statevector emulator (no Runtime service or credentials);
+            # any other name is a real device reached through Qiskit Runtime.
+            ibm_backend = device_name or ("aer_simulator" if use_emulator else "ibm_brisbane")
+            provider = get_provider("ibm", backend_name=ibm_backend)
+            # Decompose dense/Trotter gates so the Aer emulator path can run them;
+            # the hardware path re-transpiles to the device basis internally.
+            tqc = transpile(qc, basis_gates=["u", "cx"], optimization_level=1)
+
+            if use_emulator:
+                job, metadata = provider.submit_emulator(circuit=tqc, shots=shots)
+            else:
+                job, metadata = provider.submit_hardware(circuit=tqc, shots=shots)
+
+            counts = _extract_ibm_counts(job)
+            job_id = metadata.job_id
+            metadata_dict = {
+                "backend": metadata.backend_name,
+                "shots": shots,
+                "job_id": job_id,
+            }
+
         else:
             raise ValueError(f"Unknown backend type: {backend_type}")
         
@@ -347,20 +333,21 @@ def run_curverank_qpe(
     print("\nStep 6: Analyzing results...")
     
     phase, uncertainty = extract_phase_from_counts(counts, n_precision)
-    
-    # Convert phase to eigenvalue
-    # E = phase / tau (since U = exp(-iHt) and phase = Et)
-    eigenvalue_est = phase / tau if tau != 0 else 0
-    eigenvalue_unc = uncertainty / tau if tau != 0 else 0
-    
+
+    # Invert the (aliasing-free) phase->eigenvalue map. The phase is folded at
+    # 0.5 to recover signed eigenvalues; uncertainty is propagated through the
+    # same linear scale 2*pi/tau.
+    eigenvalue_est = measured_phase_to_eigenvalue(phase, tau)
+    eigenvalue_unc = uncertainty * 2 * np.pi / tau if tau != 0 else 0
+
     print(f"  Measured phase: {phase:.6f} ± {uncertainty:.6f}")
     print(f"  Estimated eigenvalue: {eigenvalue_est:.6f} ± {eigenvalue_unc:.6f}")
     print(f"  Target (first zero): {target_zeros[0]:.6f}")
-    print(f"  Classical (first eigenvalue): {best_evals[0]:.6f}")
-    
+    print(f"  Classical (target eigenvalue): {target_eig:.6f}")
+
     # Compute agreement metrics
     error_vs_target = abs(eigenvalue_est - target_zeros[0])
-    error_vs_classical = abs(eigenvalue_est - best_evals[0])
+    error_vs_classical = abs(eigenvalue_est - target_eig)
     
     print(f"\n  Error vs target: {error_vs_target:.6f}")
     print(f"  Error vs classical: {error_vs_classical:.6f}")
@@ -379,6 +366,10 @@ def run_curverank_qpe(
         "best_candidate_idx": best_idx,
         "classical_mismatch": float(best_score),
         "classical_eigenvalues": [float(e) for e in best_evals],
+        "qpe_target_eigenvalue": float(target_eig),
+        "evolution_time": float(tau),
+        "method": method,
+        "trotter_reps": trotter_reps if method == "trotter" else None,
         "target_zeros": [float(z) for z in target_zeros],
         "measured_phase": float(phase),
         "phase_uncertainty": float(uncertainty),
@@ -397,19 +388,21 @@ def run_curverank_qpe(
         json.dump(metrics, f, indent=2)
     
     print(f"\nResults saved to: {output_file}")
-    
-    # Record in ledger
-    record_result(
-        hypothesis_id="curverank-0001",
-        result_type="quantum_qpe",
-        metrics=metrics,
-        metadata={
-            "track": "curverank",
-            "method": "qpe_spectral_validation",
-            "scope": "truncated_operator_screening"
-        }
-    )
-    
+
+    # Append a provenance record to the JSONL ledger.
+    ledger_record = {
+        "hypothesis_id": "curverank-0001",
+        "result_type": "quantum_qpe",
+        "run_id": utc_run_id(),
+        "track": "curverank",
+        "method": "qpe_spectral_validation",
+        "scope": "truncated_operator_screening",
+        "metrics": metrics,
+    }
+    ledger_path = output_dir / "curverank-qpe-ledger.jsonl"
+    with ledger_path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(ledger_record, sort_keys=True, default=str) + "\n")
+
     print(f"\n{'='*60}")
     print("QPE benchmark complete")
     print(f"{'='*60}\n")
@@ -432,6 +425,12 @@ Examples:
   
   # IonQ hardware
   python scripts/run_curverank_qpe.py --family xp --n-basis 10 --backend ionq --device forte-1 --shots 2048
+
+  # IBM cloud simulator, gate-efficient Trotter circuit
+  python scripts/run_curverank_qpe.py --family xp --n-basis 8 --backend ibm --emulator --method trotter --yes
+
+  # IBM hardware (requires saved credentials)
+  python scripts/run_curverank_qpe.py --family xp --n-basis 8 --backend ibm --device ibm_brisbane --method trotter --n-precision 3 --yes
         """
     )
     
@@ -451,14 +450,28 @@ Examples:
     parser.add_argument(
         "--backend",
         type=str,
-        choices=["simulator", "quantinuum", "ionq"],
+        choices=["simulator", "quantinuum", "ionq", "ibm"],
         default="simulator",
         help="Backend type (default: simulator)"
     )
     parser.add_argument(
         "--device",
         type=str,
-        help="Specific device name (e.g., H2-1, forte-1)"
+        help="Specific device name (e.g., H2-1, forte-1, ibm_brisbane)"
+    )
+    parser.add_argument(
+        "--method",
+        type=str,
+        choices=["dense", "trotter"],
+        default="dense",
+        help="Controlled-evolution synthesis: 'dense' exact unitary (simulator) "
+             "or 'trotter' gate-efficient Pauli evolution (hardware path)"
+    )
+    parser.add_argument(
+        "--trotter-reps",
+        type=int,
+        default=2,
+        help="Trotter steps for the k=0 power when --method trotter (default: 2)"
     )
     parser.add_argument(
         "--shots",
@@ -483,18 +496,22 @@ Examples:
         default=Path("results/curverank"),
         help="Output directory (default: results/curverank)"
     )
-    
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="Auto-confirm all prompts (non-interactive runs)"
+    )
+
     args = parser.parse_args()
-    
+
     # Validate parameters
     if args.n_basis < 4:
         print("Error: n-basis must be at least 4")
         sys.exit(1)
-    
+
     if args.n_precision > 8:
         print("Warning: n-precision > 8 may be impractical on current hardware")
-        response = input("Continue? (y/n): ")
-        if response.lower() != 'y':
+        if not _confirm("Continue? (y/n): ", args.yes):
             return
     
     # Run benchmark
@@ -507,7 +524,10 @@ Examples:
             shots=args.shots,
             n_precision=args.n_precision,
             use_emulator=args.emulator,
-            output_dir=args.output_dir
+            output_dir=args.output_dir,
+            assume_yes=args.yes,
+            method=args.method,
+            trotter_reps=args.trotter_reps,
         )
         
         if results:

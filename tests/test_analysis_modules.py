@@ -214,17 +214,22 @@ class TestDMRGSolver:
         n_sites = 2
         local_dim = 2
         dim = local_dim**n_sites
-        
-        # Heisenberg-like Hamiltonian
+
+        # Heisenberg-like Hamiltonian (seeded for determinism)
+        np.random.seed(0)
         H = np.random.randn(dim, dim)
         H = (H + H.T) / 2  # Make Hermitian
-        
+        true_ground = float(np.linalg.eigvalsh(H)[0])
+
         solver = DMRGSolver(max_bond_dim=10)
         result = solver.solve(H, n_sites, local_dim)
-        
+
         assert result.method == "DMRG"
         assert result.system_size == n_sites
-        assert result.ground_state_energy < 0  # Should find lowest eigenvalue
+        # DMRG should recover the true lowest eigenvalue. Its sign depends on the
+        # random draw (a random Hermitian matrix need not have a negative ground
+        # state), so compare to the exact value rather than assuming it is < 0.
+        assert abs(result.ground_state_energy - true_ground) < 1e-6
     
     def test_entanglement_computation(self):
         """Test entanglement entropy computation."""

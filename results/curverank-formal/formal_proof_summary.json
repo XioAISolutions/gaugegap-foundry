@@ -1,0 +1,145 @@
+{
+  "generated": "2026-06-13T02:28:20.083659",
+  "n_panel": [
+    10,
+    15,
+    20,
+    25,
+    30
+  ],
+  "k_zeros": 20,
+  "discharged_proofs": [
+    {
+      "family": "xp",
+      "n_basis": 30,
+      "certified_lower": 40.00965971015598,
+      "threshold": 1.0,
+      "separated": true,
+      "discharged_wellformed": true,
+      "lean4": "results/curverank-formal/discharged/xp_n30_separation.lean",
+      "coq": "results/curverank-formal/discharged/xp_n30_separation.v"
+    },
+    {
+      "family": "dirac_rindler",
+      "n_basis": 30,
+      "certified_lower": 26.12413905227466,
+      "threshold": 1.0,
+      "separated": true,
+      "discharged_wellformed": true,
+      "lean4": "results/curverank-formal/discharged/dirac_rindler_n30_separation.lean",
+      "coq": "results/curverank-formal/discharged/dirac_rindler_n30_separation.v"
+    },
+    {
+      "family": "quantum_graph",
+      "n_basis": 30,
+      "certified_lower": 76.16571605454685,
+      "threshold": 1.0,
+      "separated": true,
+      "discharged_wellformed": true,
+      "lean4": "results/curverank-formal/discharged/quantum_graph_n30_separation.lean",
+      "coq": "results/curverank-formal/discharged/quantum_graph_n30_separation.v"
+    }
+  ],
+  "all_discharged_wellformed": true,
+  "all_theorems_verified": true,
+  "all_certificates_wellformed": true,
+  "claim_boundary": "Certified finite-truncation separation theorem only. Proves a finite matrix is provably far from the first k Riemann zeros (a negative result). Does NOT prove the Riemann Hypothesis or the Hilbert-Polya conjecture, asserts no continuum (n->inf) limit, and is not a Millennium Prize submission.",
+  "rigor_note": "The machine-CHECKED content is the interval-arithmetic certificate: verified Hermitian eigenvalue enclosures + certified zeta-zero enclosures + the order-statistic mismatch bound, all checked by Theorem.verify(). The Lean/Coq/Isabelle exports transcribe the theorem STATEMENT and the certified numeric bounds into each assistant; their proof TERMS are left as `sorry`/`Admitted` placeholders, so they are statement+bound scaffolds for assistant ingestion, not yet assistant-discharged proofs.",
+  "theorems": [
+    {
+      "n_basis": 10,
+      "k_zeros": 20,
+      "statement": "The Berry-Keating xp operator truncated to n=10 is certifiably separated from the first 20 Riemann zeros: M_n >= 27.391322 (certified).",
+      "mismatch_lower": 27.391322449240906,
+      "mismatch_upper": 27.391322449240935,
+      "theorem_verified": true,
+      "certificates_wellformed": {
+        "lean4": true,
+        "coq": true,
+        "isabelle": true
+      },
+      "export_dir": "results/curverank-formal/proof_assistants/n10",
+      "export_formats": [
+        "coq",
+        "isabelle",
+        "lean4"
+      ]
+    },
+    {
+      "n_basis": 15,
+      "k_zeros": 20,
+      "statement": "The Berry-Keating xp operator truncated to n=15 is certifiably separated from the first 20 Riemann zeros: M_n >= 29.390825 (certified).",
+      "mismatch_lower": 29.390824646996478,
+      "mismatch_upper": 29.390824646996514,
+      "theorem_verified": true,
+      "certificates_wellformed": {
+        "lean4": true,
+        "coq": true,
+        "isabelle": true
+      },
+      "export_dir": "results/curverank-formal/proof_assistants/n15",
+      "export_formats": [
+        "coq",
+        "isabelle",
+        "lean4"
+      ]
+    },
+    {
+      "n_basis": 20,
+      "k_zeros": 20,
+      "statement": "The Berry-Keating xp operator truncated to n=20 is certifiably separated from the first 20 Riemann zeros: M_n >= 35.535690 (certified).",
+      "mismatch_lower": 35.5356899424466,
+      "mismatch_upper": 35.535689942446666,
+      "theorem_verified": true,
+      "certificates_wellformed": {
+        "lean4": true,
+        "coq": true,
+        "isabelle": true
+      },
+      "export_dir": "results/curverank-formal/proof_assistants/n20",
+      "export_formats": [
+        "coq",
+        "isabelle",
+        "lean4"
+      ]
+    },
+    {
+      "n_basis": 25,
+      "k_zeros": 20,
+      "statement": "The Berry-Keating xp operator truncated to n=25 is certifiably separated from the first 20 Riemann zeros: M_n >= 36.603411 (certified).",
+      "mismatch_lower": 36.603410611887064,
+      "mismatch_upper": 36.60341061188713,
+      "theorem_verified": true,
+      "certificates_wellformed": {
+        "lean4": true,
+        "coq": true,
+        "isabelle": true
+      },
+      "export_dir": "results/curverank-formal/proof_assistants/n25",
+      "export_formats": [
+        "coq",
+        "isabelle",
+        "lean4"
+      ]
+    },
+    {
+      "n_basis": 30,
+      "k_zeros": 20,
+      "statement": "The Berry-Keating xp operator truncated to n=30 is certifiably separated from the first 20 Riemann zeros: M_n >= 40.009660 (certified).",
+      "mismatch_lower": 40.00965971015598,
+      "mismatch_upper": 40.00965971015604,
+      "theorem_verified": true,
+      "certificates_wellformed": {
+        "lean4": true,
+        "coq": true,
+        "isabelle": true
+      },
+      "export_dir": "results/curverank-formal/proof_assistants/n30",
+      "export_formats": [
+        "coq",
+        "isabelle",
+        "lean4"
+      ]
+    }
+  ]
+}
