@@ -1,4 +1,5 @@
-.PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet
+.PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
+	curverank curverank-formal curverank-ibm curverank-hardware
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -42,3 +43,34 @@ proofpack-verify:
 # reproduction commands, and a reviewer checklist.
 reviewer-packet:
 	python scripts/build_reviewer_packet.py --output-dir results/reviewer-packet
+
+# --- CurveRank (Hilbert-Polya / Riemann spectral screening) reproduction -------
+# One-command regeneration of the CurveRank result bundles. Honest scope: these
+# produce a certified finite-truncation NEGATIVE result plus a quantum benchmark;
+# they are not a proof of the Riemann Hypothesis (see docs/curverank-formal-proof.md
+# and docs/riemann-operator-landscape.md).
+
+# Machine-checkable formal proof of the finite-truncation separation theorem:
+# verified interval certificate exported to Lean 4 / Coq / Isabelle, plus the
+# discharged (no-`sorry`) Lean/Coq proofs for all three operator families.
+curverank-formal:
+	python scripts/run_curverank_formal_proof.py \
+		--n-panel 10,15,20,25,30 --k-zeros 20 \
+		--output-dir results/curverank-formal
+
+# Windowed QPE eigenvalue recovery on the local IBM/Aer emulator (no credentials,
+# no cost). The real-hardware path stays staged behind a credential check; see
+# docs/curverank-ibm-runbook.md.
+curverank-ibm:
+	python scripts/run_curverank_ibm.py --emulator \
+		--n-basis 4,8,16 --n-precision 6 --shots 4096 --yes \
+		--output-dir results/curverank-ibm
+
+# Hardware-feasibility report: dense vs Trotter vs iterative circuit cost
+# (width/depth/CX), evidence rather than assertion.
+curverank-hardware:
+	python scripts/run_curverank_hardware_report.py \
+		--output-dir results/curverank-hardware
+
+# Regenerate all CurveRank bundles.
+curverank: curverank-formal curverank-ibm curverank-hardware
