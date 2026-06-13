@@ -36,6 +36,8 @@ import numpy as np
 
 __all__ = [
     "choose_evolution_time",
+    "choose_evolution_time_windowed",
+    "unwrap_phase_to_eigenvalue",
     "eigenvalue_to_phase",
     "measured_phase_to_eigenvalue",
     "pad_to_power_of_two",
@@ -85,6 +87,51 @@ def choose_evolution_time(
     if radius <= 0.0:
         raise ValueError("spectral radius is zero; cannot choose an evolution time")
     return safety * np.pi / radius
+
+
+def choose_evolution_time_windowed(window_radius: float, safety: float = 0.8) -> float:
+    """Evolution time for *windowed* QPE targeting one eigenvalue.
+
+    When the prepared state is (close to) an eigenstate and classical screening
+    supplies a prior window ``|E - center| <= window_radius``, the global
+    no-aliasing constraint of :func:`choose_evolution_time` is unnecessarily
+    conservative: the phase only needs to be injective *on the window*.  Taking
+
+        tau = safety * pi / window_radius
+
+    makes one full phase turn correspond to ``2*window_radius/safety``, so the
+    per-bin eigenvalue resolution improves by the ratio (spectral radius /
+    window radius) relative to the global choice.  The measured phase then
+    determines ``E`` only modulo ``2*pi/tau``; :func:`unwrap_phase_to_eigenvalue`
+    resolves that wrap using the window prior.
+
+    TRUST MODEL: windowed estimates additionally rely on (i) the prepared state
+    being an eigenstate of the targeted eigenvalue and (ii) the classical window
+    prior actually containing it.  Out-of-window spectral components alias to
+    arbitrary phases (suppressed only by their amplitude in the prepared state).
+    """
+    if not 0.0 < safety < 1.0:
+        raise ValueError("safety must lie strictly in (0, 1)")
+    if window_radius <= 0.0:
+        raise ValueError("window_radius must be positive")
+    return safety * np.pi / window_radius
+
+
+def unwrap_phase_to_eigenvalue(phase: float, tau: float, center: float) -> float:
+    """Invert a (possibly wrapped) QPE phase using a window prior.
+
+    The measured phase determines ``E`` modulo ``2*pi/tau``; among the lattice
+    of candidates ``-2*pi*phase/tau + m*(2*pi)/tau`` this returns the one
+    closest to ``center``.  With ``tau`` from
+    :func:`choose_evolution_time_windowed` exactly one candidate lies inside
+    the prior window, so the choice is unambiguous whenever the prior holds.
+    """
+    if tau == 0:
+        raise ValueError("tau must be non-zero")
+    period = 2.0 * np.pi / tau
+    base = -2.0 * np.pi * phase / tau
+    m = round((center - base) / period)
+    return float(base + m * period)
 
 
 def eigenvalue_to_phase(eigenvalue: float, tau: float) -> float:
@@ -307,6 +354,7 @@ def estimate_eigenvalue_qpe(
     backend: Any = None,
     method: str = "dense",
     reps: int = 2,
+    window: Optional[tuple] = None,
 ) -> Dict[str, Any]:
     """Estimate one eigenvalue of ``hamiltonian`` via QPE.
 
@@ -324,6 +372,12 @@ def estimate_eigenvalue_qpe(
         (gate-efficient, the path toward real hardware).
     reps
         Trotter steps for the ``k=0`` power when ``method == "trotter"``.
+    window : (center, radius), optional
+        Classical prior ``|E - center| <= radius`` for the targeted eigenvalue.
+        When given, ``tau`` is scaled to the window instead of the full spectral
+        radius (:func:`choose_evolution_time_windowed`), improving the per-bin
+        resolution by the ratio (spectral radius / window radius); the measured
+        phase is unwrapped against ``center``. See that function's TRUST MODEL.
 
     Returns a dict with the estimate, its uncertainty, the evolution time, the
     measured phase, and circuit metadata.
@@ -338,7 +392,12 @@ def estimate_eigenvalue_qpe(
         if eigenvalues is not None
         else np.linalg.eigvalsh(H).astype(float)
     )
-    tau = choose_evolution_time(spectrum, safety=safety)
+    if window is not None:
+        center, radius = float(window[0]), float(window[1])
+        tau = choose_evolution_time_windowed(radius, safety=safety)
+    else:
+        center = None
+        tau = choose_evolution_time(spectrum, safety=safety)
 
     H_pad, vec_pad = pad_to_power_of_two(H, vec)
 
@@ -364,8 +423,13 @@ def estimate_eigenvalue_qpe(
     counts = backend.run(tqc, shots=shots).result().get_counts()
 
     phase, phase_unc = extract_phase_from_counts(counts, n_precision)
-    estimate = measured_phase_to_eigenvalue(phase, tau)
-    eig_unc = abs(measured_phase_to_eigenvalue(phase_unc, tau) - measured_phase_to_eigenvalue(0.0, tau))
+    if center is not None:
+        estimate = unwrap_phase_to_eigenvalue(phase, tau, center)
+    else:
+        estimate = measured_phase_to_eigenvalue(phase, tau)
+    # Uncertainty is the resolution scale 2*pi/tau times the phase uncertainty;
+    # the same for windowed and global modes (unwrapping only shifts by periods).
+    eig_unc = abs(2.0 * np.pi * phase_unc / tau)
 
     return {
         "estimated_eigenvalue": estimate,
@@ -374,6 +438,7 @@ def estimate_eigenvalue_qpe(
         "measured_phase": phase,
         "phase_uncertainty": phase_unc,
         "method": method,
+        "windowed": window is not None,
         "n_precision": n_precision,
         "shots": shots,
         "n_qubits": qc.num_qubits,

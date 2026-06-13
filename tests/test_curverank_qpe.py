@@ -21,9 +21,11 @@ if str(SRC) not in sys.path:
 from gaugegap.curverank_operators import berry_keating_xp
 from gaugegap.curverank_qpe import (
     choose_evolution_time,
+    choose_evolution_time_windowed,
     eigenvalue_to_phase,
     measured_phase_to_eigenvalue,
     pad_to_power_of_two,
+    unwrap_phase_to_eigenvalue,
 )
 
 
@@ -161,6 +163,64 @@ class TestQPEEndToEnd(unittest.TestCase):
         )
         resolution = (2 * np.pi / res["evolution_time"]) / (2 ** n_precision)
         self.assertLessEqual(abs(res["estimated_eigenvalue"] - target), 2 * resolution)
+
+
+class TestWindowing(unittest.TestCase):
+    def test_windowed_tau_is_larger_than_global(self):
+        # A tight window (small radius) yields a larger tau than the global
+        # spectral-radius choice -> finer eigenvalue resolution.
+        evals = np.linalg.eigvalsh(berry_keating_xp(12))
+        radius = float(np.max(np.abs(evals)))
+        tau_global = choose_evolution_time(evals)
+        tau_window = choose_evolution_time_windowed(0.5)
+        self.assertGreater(tau_window, tau_global)
+        # Resolution improvement equals the radius ratio.
+        self.assertAlmostEqual(tau_window / tau_global, radius / 0.5, places=6)
+
+    def test_window_radius_validation(self):
+        with self.assertRaises(ValueError):
+            choose_evolution_time_windowed(0.0)
+        with self.assertRaises(ValueError):
+            choose_evolution_time_windowed(1.0, safety=1.5)
+
+    def test_unwrap_selects_in_window_candidate(self):
+        # tau scaled to a window of radius 0.5 about center 5.0; a phase that
+        # naively inverts far outside the window must be unwrapped back into it.
+        tau = choose_evolution_time_windowed(0.5)
+        center = 5.0
+        true_E = 5.2
+        phase = eigenvalue_to_phase(true_E, tau)  # in [0,1), wraps many times
+        recovered = unwrap_phase_to_eigenvalue(phase, tau, center)
+        self.assertAlmostEqual(recovered, true_E, places=9)
+
+    def test_unwrap_rejects_zero_tau(self):
+        with self.assertRaises(ValueError):
+            unwrap_phase_to_eigenvalue(0.25, 0.0, 1.0)
+
+
+@unittest.skipUnless(_qiskit_available(), "qiskit/qiskit-aer optional dependency not installed")
+class TestWindowedQPEEndToEnd(unittest.TestCase):
+    def test_windowing_beats_global_resolution(self):
+        from gaugegap.curverank_qpe import estimate_eigenvalue_qpe
+
+        H = berry_keating_xp(8)
+        evals, evecs = np.linalg.eigh(H)
+        idx = int(np.argmin(np.where(evals > 1e-9, evals, np.inf)))
+        target = float(evals[idx])
+
+        g = estimate_eigenvalue_qpe(
+            H, evecs[:, idx], n_precision=6, shots=4096, eigenvalues=evals,
+        )
+        w = estimate_eigenvalue_qpe(
+            H, evecs[:, idx], n_precision=6, shots=4096, eigenvalues=evals,
+            window=(target, 0.5),
+        )
+        self.assertTrue(w["windowed"])
+        self.assertGreater(w["evolution_time"], g["evolution_time"])
+        self.assertLessEqual(
+            abs(w["estimated_eigenvalue"] - target),
+            abs(g["estimated_eigenvalue"] - target) + 1e-9,
+        )
 
 
 @unittest.skipUnless(_qiskit_available(), "qiskit/qiskit-aer optional dependency not installed")

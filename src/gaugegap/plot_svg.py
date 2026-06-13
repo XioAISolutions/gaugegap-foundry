@@ -4,6 +4,96 @@ from collections import defaultdict
 from pathlib import Path
 from xml.sax.saxutils import escape
 
+_LINE_COLORS = ["#1f77b4", "#d62728", "#2ca02c", "#9467bd", "#ff7f0e", "#8c564b"]
+
+
+def write_line_svg(
+    path: Path,
+    series: dict[str, list[tuple[float, float]]],
+    title: str,
+    x_label: str,
+    y_label: str,
+    width: int = 720,
+    height: int = 440,
+) -> None:
+    """Write a minimal multi-series line/scatter SVG (no plotting deps).
+
+    ``series`` maps a label to a list of ``(x, y)`` points; each is drawn as a
+    coloured polyline with circular markers, plus a legend, axes box, gridlines,
+    and y-axis tick labels. Used by the CurveRank and FlowGap complete
+    workflows for dependency-free diagnostic figures.
+    """
+    all_pts = [p for pts in series.values() for p in pts]
+    xs = [p[0] for p in all_pts] or [0.0, 1.0]
+    ys = [p[1] for p in all_pts] or [0.0, 1.0]
+    xmin, xmax = min(xs), max(xs)
+    ymin, ymax = min(ys), max(ys)
+    if xmax == xmin:
+        xmax = xmin + 1.0
+    if ymax == ymin:
+        ymax = ymin + 1.0
+    pad = 0.08 * (ymax - ymin)
+    ymin -= pad
+    ymax += pad
+
+    left, right, top, bottom = 70, 30, 56, 56
+    plot_w = width - left - right
+    plot_h = height - top - bottom
+
+    def sx(x: float) -> float:
+        return left + (x - xmin) / (xmax - xmin) * plot_w
+
+    def sy(y: float) -> float:
+        return top + (ymax - y) / (ymax - ymin) * plot_h
+
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}" font-family="Arial, sans-serif">',
+        f'<rect width="{width}" height="{height}" fill="white"/>',
+        f'<text x="{left}" y="30" font-size="18" font-weight="700">{escape(title)}</text>',
+        f'<rect x="{left}" y="{top}" width="{plot_w}" height="{plot_h}" '
+        f'fill="none" stroke="#111827" stroke-width="1.2"/>',
+    ]
+    for i in range(5):
+        gy = top + plot_h * i / 4
+        yval = ymax - (ymax - ymin) * i / 4
+        parts.append(
+            f'<line x1="{left}" y1="{gy:.1f}" x2="{left+plot_w}" y2="{gy:.1f}" '
+            f'stroke="#e5e7eb" stroke-width="1"/>'
+        )
+        parts.append(
+            f'<text x="{left-8}" y="{gy+4:.1f}" font-size="11" text-anchor="end" '
+            f'fill="#374151">{yval:.3g}</text>'
+        )
+    for idx, (label, pts) in enumerate(series.items()):
+        color = _LINE_COLORS[idx % len(_LINE_COLORS)]
+        pts_sorted = sorted(pts)
+        poly = " ".join(f"{sx(x):.2f},{sy(y):.2f}" for x, y in pts_sorted)
+        parts.append(
+            f'<polyline points="{poly}" fill="none" stroke="{color}" stroke-width="2.2"/>'
+        )
+        for x, y in pts_sorted:
+            parts.append(f'<circle cx="{sx(x):.2f}" cy="{sy(y):.2f}" r="3.5" fill="{color}"/>')
+        ly = top + 16 + idx * 18
+        parts.append(
+            f'<rect x="{left+plot_w-150}" y="{ly-9}" width="12" height="12" fill="{color}"/>'
+        )
+        parts.append(
+            f'<text x="{left+plot_w-134}" y="{ly+1}" font-size="11" '
+            f'fill="#111827">{escape(label)}</text>'
+        )
+    parts.append(
+        f'<text x="{left+plot_w/2:.0f}" y="{height-16}" font-size="13" '
+        f'text-anchor="middle">{escape(x_label)}</text>'
+    )
+    parts.append(
+        f'<text x="20" y="{top+plot_h/2:.0f}" font-size="13" text-anchor="middle" '
+        f'transform="rotate(-90 20 {top+plot_h/2:.0f})">{escape(y_label)}</text>'
+    )
+    parts.append("</svg>")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(parts), encoding="utf-8")
+
 
 def write_gap_svg(path: Path, records: list[dict[str, object]]) -> None:
     grouped: dict[int, list[tuple[float, float]]] = defaultdict(list)

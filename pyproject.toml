@@ -41,10 +41,11 @@ flow = [
 spectral = [
   "scipy>=1.11",
 ]
-# Optional independent rigorous-arithmetic backend (Arb) used only to
-# cross-check the mpmath.iv certified enclosures during independent review.
+# Optional independent rigorous-arithmetic backend (Arb): cross-checks the
+# mpmath.iv certified enclosures and supplies independently certified Riemann
+# zero enclosures (acb.zeta_zeros, which requires python-flint >= 0.7).
 crosscheck = [
-  "python-flint>=0.6",
+  "python-flint>=0.7",
 ]
 dev = [
   "pytest>=8",

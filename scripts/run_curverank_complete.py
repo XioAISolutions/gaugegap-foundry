@@ -53,6 +53,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from gaugegap.ledger import git_state, utc_run_id, write_jsonl
+from gaugegap.plot_svg import write_line_svg
 from gaugegap.curverank_operators import berry_keating_xp, quantum_graph_laplacian
 from gaugegap.curverank_spectral import (
     riemann_zero_targets,
@@ -69,7 +70,6 @@ CLAIM_BOUNDARY = (
     "This is spectral screening of toy truncated operators. "
     "Results do NOT prove the Riemann Hypothesis or resolve the Millennium Prize problem."
 )
-
 
 class CurveRankCompleteWorkflow:
     """Complete end-to-end workflow for CurveRank spectral screening."""
@@ -569,16 +569,55 @@ class CurveRankCompleteWorkflow:
         return gue_statistics
     
     def generate_spectral_plots(self) -> None:
-        """Generate spectral comparison plots."""
+        """Generate spectral comparison plots (dependency-free SVG)."""
         print("\n" + "="*80)
         print("STEP 7: Generating Spectral Plots")
         print("="*80)
-        
-        print("\nSpectral comparison plots would be generated here (SVG format)")
-        print("  - Eigenvalue spectrum vs Riemann zeros")
-        print("  - GUE spacing distribution")
-        print("  - Mismatch vs basis size")
-        print("  - Family comparison")
+
+        screening = self.results.get("spectral_screening", [])
+        if not screening:
+            print("\nNo screening results to plot.")
+            return
+
+        # Mismatch vs basis size, one polyline per family.
+        series: Dict[str, List[tuple]] = {}
+        for r in screening:
+            series.setdefault(r["family"], []).append(
+                (r["basis_size"], r["spectral_mismatch"])
+            )
+        for pts in series.values():
+            pts.sort()
+
+        mismatch_path = self.output_dir / f"{self.hypothesis_id}-mismatch-vs-basis.svg"
+        write_line_svg(
+            mismatch_path,
+            series,
+            title="Spectral mismatch vs truncation size",
+            x_label="basis size",
+            y_label="spectral mismatch (RMS)",
+        )
+        print(f"\n  Saved: {mismatch_path.name}")
+
+        # GUE mean-ratio distribution vs the GUE/Poisson reference lines.
+        ratios = sorted(
+            r["gue_mean_ratio"] for r in screening
+            if not np.isnan(r["gue_mean_ratio"])
+        )
+        if ratios:
+            gue_series = {
+                "candidates": list(enumerate(ratios, start=1)),
+                "GUE (0.5996)": [(1, 0.5996), (len(ratios), 0.5996)],
+                "Poisson (0.3863)": [(1, 0.3863), (len(ratios), 0.3863)],
+            }
+            gue_path = self.output_dir / f"{self.hypothesis_id}-gue-ratios.svg"
+            write_line_svg(
+                gue_path,
+                gue_series,
+                title="GUE nearest-neighbour spacing ratio",
+                x_label="candidate rank",
+                y_label="mean spacing ratio",
+            )
+            print(f"  Saved: {gue_path.name}")
     
     def export_operator_database(self) -> None:
         """Export ranked operator database."""

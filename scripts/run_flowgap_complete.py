@@ -53,6 +53,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from gaugegap.ledger import git_state, utc_run_id, write_jsonl
+from gaugegap.plot_svg import write_line_svg
 from gaugegap.flowgap_burgers import (
     burgers_viscous_1d,
     poisson_matrix_1d,
@@ -303,7 +304,9 @@ class FlowGapCompleteWorkflow:
         
         if len(filtered) < 2:
             print("Insufficient data for Richardson extrapolation")
-            return {"status": "insufficient_data"}
+            result = {"viscosity": viscosity, "status": "insufficient_data"}
+            self.results["richardson_extrapolation"] = result
+            return result
         
         spacings = np.array([r["dx"] for r in filtered])
         max_velocities = np.array([r["max_velocity"] for r in filtered])
@@ -521,17 +524,62 @@ class FlowGapCompleteWorkflow:
                     json.dump(time_series_data, f, indent=2)
                 print(f"  Saved time series: {time_series_path.name}")
         
-        print("\nDiagnostic plots would be generated here (SVG format)")
-        print("  - Kinetic energy vs time")
-        print("  - Residual norm vs time")
-        print("  - Max velocity vs grid spacing")
-    
+        classical = self.results.get("classical_results", [])
+
+        # Kinetic energy and residual histories, one polyline per (nx, nu).
+        kinetic_series: Dict[str, List[Tuple[float, float]]] = {}
+        residual_series: Dict[str, List[Tuple[float, float]]] = {}
+        for result in classical:
+            if "kinetic_history" not in result or "residual_history" not in result:
+                continue
+            label = f"nx={result['nx']}, nu={result['nu']:.4f}"
+            kinetic_series[label] = list(enumerate(result["kinetic_history"]))
+            residual_series[label] = list(enumerate(result["residual_history"]))
+
+        if kinetic_series:
+            kpath = self.output_dir / f"{self.hypothesis_id}-kinetic-energy.svg"
+            write_line_svg(
+                kpath, kinetic_series,
+                title="Kinetic energy vs step", x_label="time step",
+                y_label="kinetic energy",
+            )
+            print(f"  Saved plot: {kpath.name}")
+
+            rpath = self.output_dir / f"{self.hypothesis_id}-residual.svg"
+            write_line_svg(
+                rpath, residual_series,
+                title="Residual norm vs step", x_label="time step",
+                y_label="residual norm",
+            )
+            print(f"  Saved plot: {rpath.name}")
+
+        # Max velocity vs grid spacing (regular runs), one polyline per viscosity.
+        vel_series: Dict[str, List[Tuple[float, float]]] = {}
+        for result in classical:
+            if result.get("status") != "regular" or "dx" not in result:
+                continue
+            vel_series.setdefault(f"nu={result['nu']:.4f}", []).append(
+                (result["dx"], result["max_velocity"])
+            )
+        if vel_series:
+            vpath = self.output_dir / f"{self.hypothesis_id}-max-velocity-vs-dx.svg"
+            write_line_svg(
+                vpath, vel_series,
+                title="Max velocity vs grid spacing", x_label="grid spacing dx",
+                y_label="max velocity",
+            )
+            print(f"  Saved plot: {vpath.name}")
+
     def generate_publication_outputs(self) -> None:
         """Generate publication-ready outputs."""
         print("\n" + "="*80)
         print("STEP 7: Generating Publication Outputs")
         print("="*80)
-        
+
+        # Resolve the final status/warnings BEFORE persisting so the saved JSON
+        # reflects the real outcome (previously it was always "running").
+        self._finalize_status()
+
         # Save complete results as JSON
         results_path = self.output_dir / f"{self.hypothesis_id}-complete-results.json"
         with open(results_path, 'w') as f:
@@ -585,14 +633,38 @@ class FlowGapCompleteWorkflow:
         
         print(f"Saved summary report: {report_path}")
     
-    def finalize(self) -> None:
-        """Finalize workflow."""
-        self.results["status"] = "complete"
+    def _finalize_status(self) -> None:
+        """Resolve overall status and collect non-fatal sub-step warnings.
+
+        Surfaces failures that the workflow continued past (e.g. a Richardson
+        extrapolation that could not be performed) instead of silently reporting
+        success. Idempotent so it can run before persistence and again at the
+        end of the workflow.
+        """
+        warnings: List[str] = []
+        richardson = self.results.get("richardson_extrapolation", {})
+        if richardson.get("status") not in (None, "success"):
+            warnings.append(
+                f"Richardson extrapolation did not succeed "
+                f"(status={richardson.get('status')!r})"
+            )
+
+        self.results["warnings"] = warnings
+        self.results["status"] = "complete_with_warnings" if warnings else "complete"
         self.results["completion_time"] = datetime.utcnow().isoformat()
-        
+
+    def finalize(self) -> None:
+        """Print the closing summary (status/warnings already resolved)."""
+        self._finalize_status()
+        warnings = self.results.get("warnings", [])
+
         print("\n" + "="*80)
-        print("WORKFLOW COMPLETE")
+        print("WORKFLOW COMPLETE" if not warnings else "WORKFLOW COMPLETE (with warnings)")
         print("="*80)
+        if warnings:
+            print("\nWarnings:")
+            for w in warnings:
+                print(f"  - {w}")
         print(f"\nResults saved to: {self.output_dir}")
         print(f"Hypothesis ID: {self.hypothesis_id}")
         print(f"Run ID: {self.run_id}")
