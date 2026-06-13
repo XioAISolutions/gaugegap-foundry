@@ -124,6 +124,17 @@ class TestRiemannZeroIntervals(unittest.TestCase):
 
 
 class TestCertifiedMismatch(unittest.TestCase):
+    def test_certified_lower_bounds_are_monotone(self):
+        # A certified finite statement: across the panel the certified mismatch
+        # lower bound is strictly increasing, i.e. larger truncations are
+        # certifiably *more* separated from the zeros (the separation does not
+        # erode with n over the tested range). This is a finite-truncation fact,
+        # NOT a continuum (n->inf) claim.
+        panel = [10, 15, 20, 25, 30, 40]
+        lowers = [certified_xp_mismatch(n, 20).lower for n in panel]
+        for a, b in zip(lowers, lowers[1:]):
+            self.assertLess(a, b)
+
     def test_reproduces_recorded_values(self):
         for n, recorded in RECORDED.items():
             enclosure = certified_xp_mismatch(n, 20)
