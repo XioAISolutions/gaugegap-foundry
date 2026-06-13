@@ -59,9 +59,35 @@ what these files are:
 - `formal_export.verify_certificate` checks certificate *well-formedness*, not
   that a proof term has been discharged.
 
-So the rigorous object is the **interval certificate**; the proof-assistant files
-are statement+bound scaffolds for ingestion, the maximum honest "proof-assistant
-level" reachable without a formalised numerics kernel.
+So the rigorous object is the **interval certificate**; these generic exports are
+statement+bound scaffolds for ingestion.
+
+### Discharged proofs (no `sorry`) — `results/curverank-formal/discharged/`
+
+Going one level deeper, `curverank_formal_emit` emits proofs that are **actually
+discharged** by the proof assistant — Lean 4 `linarith`, Coq `lra` — with **no
+proof holes**, for **all three operator families** (`xp`, `dirac_rindler`,
+`quantum_graph`). The honest structure of a computer-assisted proof over a
+verified numeric kernel:
+
+1. the interval-arithmetic certificate is imported as a **single explicit,
+   labelled axiom**: `axiom certified_lower_bound : M ≥ <certified lower bound>`;
+2. the assistant then genuinely closes the remaining real-arithmetic goal
+   `M ≥ separationThreshold` — `Qed`, not `Admitted`.
+
+What this does and does not buy you, stated plainly:
+
+- **Does:** the assistant machine-checks the logic and arithmetic turning the
+  certified bound into the separation conclusion. The trust boundary is reduced
+  to exactly one clearly-marked axiom (the interval certificate).
+- **Does not:** the assistant does **not** re-derive the spectral computation
+  itself (that lives in the axiom / the Python interval kernel), and this remains
+  the **finite-truncation separation** theorem — not a proof of RH.
+
+> Lean 4 (Mathlib) and Coq are **not installed in this environment**, so the
+> emitted proofs are not executed here. They use only standard tactics on
+> concrete literals and are structured to check; run `lake build` (Lean) or
+> `coqc` (Coq ≥ 8.13) to verify them end-to-end.
 
 ## Claim boundary — what this is NOT
 

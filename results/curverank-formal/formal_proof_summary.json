@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-13T01:48:33.054285",
+  "generated": "2026-06-13T02:28:20.083659",
   "n_panel": [
     10,
     15,
@@ -8,6 +8,39 @@
     30
   ],
   "k_zeros": 20,
+  "discharged_proofs": [
+    {
+      "family": "xp",
+      "n_basis": 30,
+      "certified_lower": 40.00965971015598,
+      "threshold": 1.0,
+      "separated": true,
+      "discharged_wellformed": true,
+      "lean4": "results/curverank-formal/discharged/xp_n30_separation.lean",
+      "coq": "results/curverank-formal/discharged/xp_n30_separation.v"
+    },
+    {
+      "family": "dirac_rindler",
+      "n_basis": 30,
+      "certified_lower": 26.12413905227466,
+      "threshold": 1.0,
+      "separated": true,
+      "discharged_wellformed": true,
+      "lean4": "results/curverank-formal/discharged/dirac_rindler_n30_separation.lean",
+      "coq": "results/curverank-formal/discharged/dirac_rindler_n30_separation.v"
+    },
+    {
+      "family": "quantum_graph",
+      "n_basis": 30,
+      "certified_lower": 76.16571605454685,
+      "threshold": 1.0,
+      "separated": true,
+      "discharged_wellformed": true,
+      "lean4": "results/curverank-formal/discharged/quantum_graph_n30_separation.lean",
+      "coq": "results/curverank-formal/discharged/quantum_graph_n30_separation.v"
+    }
+  ],
+  "all_discharged_wellformed": true,
   "all_theorems_verified": true,
   "all_certificates_wellformed": true,
   "claim_boundary": "Certified finite-truncation separation theorem only. Proves a finite matrix is provably far from the first k Riemann zeros (a negative result). Does NOT prove the Riemann Hypothesis or the Hilbert-Polya conjecture, asserts no continuum (n->inf) limit, and is not a Millennium Prize submission.",

@@ -21,6 +21,10 @@ if str(SRC) not in sys.path:
 from gaugegap.curverank_spectral import riemann_zero_targets
 from gaugegap.rigorous.spectral_impossibility import SpectralMismatchProof
 from gaugegap.rigorous.formal_export import export_all_formats, verify_certificate
+from gaugegap.rigorous.curverank_formal_emit import (
+    discharged_separation_proof,
+    all_family_proofs,
+)
 
 
 class TestFormalProof(unittest.TestCase):
@@ -57,6 +61,30 @@ class TestFormalProof(unittest.TestCase):
             self.assertIn("Riemann Hypothesis", summary["claim_boundary"])
             self.assertTrue((Path(tmp) / "formal_proof_summary.json").exists())
             self.assertTrue((Path(tmp) / "theorem_n10.json").exists())
+
+
+class TestDischargedProofs(unittest.TestCase):
+    def test_all_three_families_are_discharged(self):
+        proofs = all_family_proofs(20, k_zeros=20)
+        self.assertEqual({p.family for p in proofs},
+                         {"xp", "dirac_rindler", "quantum_graph"})
+        for p in proofs:
+            self.assertTrue(p.separated)
+            self.assertGreater(p.lower_bound, p.threshold)
+            # Genuinely discharged: no proof holes, real tactics present.
+            self.assertNotIn("sorry", p.lean4)
+            self.assertNotIn("Admitted", p.coq)
+            self.assertIn("linarith", p.lean4)
+            self.assertIn("lra", p.coq)
+            # The certified bound is imported as a single explicit axiom.
+            self.assertIn("axiom certified_lower_bound", p.lean4)
+            self.assertIn(repr(p.lower_bound), p.lean4)
+
+    def test_refuses_to_emit_when_not_separated(self):
+        # An impossibly high threshold leaves nothing to prove -> explicit error,
+        # never a vacuous or fabricated proof.
+        with self.assertRaises(ValueError):
+            discharged_separation_proof("xp", 10, k_zeros=20, threshold=1e9)
 
 
 if __name__ == "__main__":

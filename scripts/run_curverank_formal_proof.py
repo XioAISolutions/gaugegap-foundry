@@ -47,6 +47,7 @@ if str(SRC) not in sys.path:
 from gaugegap.curverank_spectral import riemann_zero_targets
 from gaugegap.rigorous.spectral_impossibility import SpectralMismatchProof
 from gaugegap.rigorous.formal_export import export_all_formats, verify_certificate
+from gaugegap.rigorous.curverank_formal_emit import all_family_proofs
 
 
 CLAIM_BOUNDARY = (
@@ -105,10 +106,45 @@ def build_and_export(n_panel: List[int], k_zeros: int, output_dir: Path) -> dict
             f"isabelle={cert_status['isabelle']}"
         )
 
+    # Discharged (no-`sorry`) multi-family separation proofs: Lean `linarith` /
+    # Coq `lra`, with the interval certificate as a single explicit axiom.
+    discharged_dir = output_dir / "discharged"
+    discharged_dir.mkdir(parents=True, exist_ok=True)
+    discharged_n = max(n_panel)
+    discharged_rows = []
+    for proof in all_family_proofs(discharged_n, k_zeros):
+        stem = f"{proof.family}_n{proof.n}_separation"
+        (discharged_dir / f"{stem}.lean").write_text(proof.lean4, encoding="utf-8")
+        (discharged_dir / f"{stem}.v").write_text(proof.coq, encoding="utf-8")
+        # Static well-formedness: discharged (no holes), tactics present.
+        ok = (
+            "sorry" not in proof.lean4
+            and "Admitted" not in proof.coq
+            and "linarith" in proof.lean4
+            and "lra" in proof.coq
+        )
+        discharged_rows.append({
+            "family": proof.family,
+            "n_basis": proof.n,
+            "certified_lower": proof.lower_bound,
+            "threshold": proof.threshold,
+            "separated": proof.separated,
+            "discharged_wellformed": bool(ok),
+            "lean4": _rel(discharged_dir / f"{stem}.lean"),
+            "coq": _rel(discharged_dir / f"{stem}.v"),
+        })
+        print(
+            f"discharged  {proof.family:14s} n={proof.n} "
+            f"M>={proof.lower_bound:.4f} >= thr {proof.threshold}  "
+            f"[no-sorry={ok}]"
+        )
+
     summary = {
         "generated": datetime.utcnow().isoformat(),
         "n_panel": n_panel,
         "k_zeros": k_zeros,
+        "discharged_proofs": discharged_rows,
+        "all_discharged_wellformed": all(r["discharged_wellformed"] for r in discharged_rows),
         "all_theorems_verified": all(r["theorem_verified"] for r in rows),
         "all_certificates_wellformed": all(
             all(r["certificates_wellformed"].values()) for r in rows
