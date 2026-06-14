@@ -1,0 +1,8 @@
+{"input": "I love this, it is excellent and wonderful", "expected": "pos"}
+{"input": "an amazing and delightful experience, the best", "expected": "pos"}
+{"input": "great product, happy with it", "expected": "pos"}
+{"input": "fantastic, truly good", "expected": "pos"}
+{"input": "this is terrible and awful", "expected": "neg"}
+{"input": "the worst, i hate it, horrible", "expected": "neg"}
+{"input": "bad and disappointing, poor quality", "expected": "neg"}
+{"input": "broken on arrival, awful experience", "expected": "neg"}

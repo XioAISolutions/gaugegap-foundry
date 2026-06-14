@@ -1,0 +1,38 @@
+{
+  "claim_boundary": "Eval-first demonstration with deterministic toy models; every claim is backed by a logged, reproducible eval run. Not a production eval framework or a claim about real model quality.",
+  "datasets": {
+    "D": {
+      "path": "examples/sentiment_cases.jsonl",
+      "n_cases": 8
+    }
+  },
+  "models": {
+    "M": "keyword_sentiment"
+  },
+  "evals": {
+    "E": {
+      "model": "M",
+      "dataset": "D",
+      "metric": "accuracy",
+      "score": 1.0,
+      "n_cases": 8,
+      "log_file": "E_log.jsonl"
+    }
+  },
+  "assertions": [
+    {
+      "kind": "score",
+      "eval": "E",
+      "threshold": 0.8,
+      "score": 1.0,
+      "passed": true
+    },
+    {
+      "kind": "no_regression",
+      "eval": "E",
+      "baseline": 0.75,
+      "score": 1.0,
+      "passed": true
+    }
+  ]
+}

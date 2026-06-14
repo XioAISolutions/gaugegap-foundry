@@ -1,0 +1,8 @@
+{"correct": true, "expected": "pos", "input": "I love this, it is excellent and wonderful", "prediction": "pos"}
+{"correct": true, "expected": "pos", "input": "an amazing and delightful experience, the best", "prediction": "pos"}
+{"correct": true, "expected": "pos", "input": "great product, happy with it", "prediction": "pos"}
+{"correct": true, "expected": "pos", "input": "fantastic, truly good", "prediction": "pos"}
+{"correct": true, "expected": "neg", "input": "this is terrible and awful", "prediction": "neg"}
+{"correct": true, "expected": "neg", "input": "the worst, i hate it, horrible", "prediction": "neg"}
+{"correct": true, "expected": "neg", "input": "bad and disappointing, poor quality", "prediction": "neg"}
+{"correct": true, "expected": "neg", "input": "broken on arrival, awful experience", "prediction": "neg"}
