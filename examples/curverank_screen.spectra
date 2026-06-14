@@ -1,0 +1,23 @@
+# Spectra program: certified screening of candidate Hilbert-Polya operators.
+#
+# Certification is first-class: each `certify` yields a rigorous interval, and
+# each `assert separated` is discharged by the interval kernel (emitting a
+# Lean/Coq certificate) or the program fails. This screens finite truncations;
+# it is a certified NEGATIVE result, not a proof of the Riemann Hypothesis.
+
+zeros    Z   = riemann(20)
+
+operator xp  = berry_keating(n=20)
+operator dr  = dirac_rindler(n=20)
+operator qg  = quantum_graph(n=20)
+
+certify  Mx  = mismatch(xp, Z)
+certify  Md  = mismatch(dr, Z)
+certify  Mq  = mismatch(qg, Z)
+
+# Each candidate truncation must be certifiably bounded away from the zeros.
+assert   separated(Mx, threshold=1.0)
+assert   separated(Md, threshold=1.0)
+assert   separated(Mq, threshold=1.0)
+
+report   "results/spectra-demo"
