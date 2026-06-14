@@ -84,10 +84,40 @@ class TestSpectra(unittest.TestCase):
             self.assertTrue((Path(tmp) / "Mx_separation.lean").exists())
             self.assertTrue((Path(tmp) / "Mx_separation.v").exists())
 
+    def test_prove_monotone_passes_for_xp(self):
+        prog = run_program(
+            "zeros Z = riemann(20)\n"
+            "prove monotone(berry_keating, panel=10,15,20, zeros=Z)\n"
+        )
+        self.assertEqual(len(prog.monotonicity), 1)
+        m = prog.monotonicity[0]
+        self.assertEqual(m["family"], "xp")
+        self.assertTrue(all(a < b for a, b in zip(m["lowers"], m["lowers"][1:])))
+        self.assertIn("norm_num", m["lean4"])
+        self.assertNotIn("sorry", m["lean4"])
+
+    def test_prove_monotone_fails_for_dirac_rindler(self):
+        # dirac_rindler bounds fluctuate; the language must refuse the claim.
+        with self.assertRaises(SpectraError):
+            run_program(
+                "zeros Z = riemann(20)\n"
+                "prove monotone(dirac_rindler, panel=10,15,20, zeros=Z)\n"
+            )
+
+    def test_measure_backend_validation(self):
+        # An unknown backend is a parse/semantic error (no silent default).
+        with self.assertRaises(SpectraError):
+            run_program(
+                "zeros Z = riemann(20)\n"
+                "operator xp = berry_keating(n=8)\n"
+                "measure Q = qpe(xp, window=0.5, precision=4, backend=nonsense)\n"
+            )
+
     def test_example_program_runs(self):
         prog = run_file(ROOT / "examples" / "curverank_screen.spectra")
         self.assertEqual(len(prog.assertions), 3)
         self.assertTrue(all(a["separated"] for a in prog.assertions))
+        self.assertEqual(len(prog.monotonicity), 1)
 
 
 if __name__ == "__main__":

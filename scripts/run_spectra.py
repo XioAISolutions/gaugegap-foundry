@@ -37,6 +37,10 @@ def main() -> int:
         print(f"  assert separated({a['certificate']}, > {a['threshold']}): "
               f"OK (certified lower {a['certified_lower']:.6f}) "
               f"-> Lean/Coq certificate")
+    for mono in prog.monotonicity:
+        lows = ", ".join(f"{x:.4f}" for x in mono["lowers"])
+        print(f"  prove monotone({mono['family']}, panel={mono['panel']}): "
+              f"OK [{lows}] -> Lean/Coq certificate")
     for name, m in prog.measurements.items():
         print(f"  measure {name}: target={m['target_eigenvalue']:.5f} "
               f"est={m['estimated_eigenvalue']:.5f} err={m['absolute_error']:.5f}")

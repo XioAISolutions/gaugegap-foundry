@@ -142,3 +142,83 @@ def all_family_proofs(
         discharged_separation_proof(fam, n, k_zeros, threshold)
         for fam in ("xp", "dirac_rindler", "quantum_graph")
     ]
+
+
+@dataclass
+class DischargedMonotonicity:
+    family: str
+    panel: List[int]
+    k_zeros: int
+    lowers: List[float]
+    lean4: str
+    coq: str
+
+
+def _monotone_lean(family: str, panel: List[int], k: int, lowers: List[float]) -> str:
+    ns = f"CurveRankCertified.Monotone{family.title().replace('_', '')}"
+    label = _FAMILY_LABEL[family]
+    conj = " ∧ ".join(f"({lowers[i]!r} < {lowers[i + 1]!r})" for i in range(len(lowers) - 1))
+    return f"""import Mathlib.Tactic
+
+namespace {ns}
+
+/-- Certified L2 mismatch lower bounds for the {label} truncations at
+    n ∈ {panel}, against the first {k} Riemann zeros. Each entry is a certified
+    lower bound on the corresponding M_n (produced by the interval kernel). -/
+def L : List ℝ := {lowers!r}
+
+/-- The certified lower bounds are strictly increasing across the tested panel.
+    This is a finite statement about the COMPUTED BOUNDS — not a continuum
+    monotonicity claim about M_n, and not a proof of the Riemann Hypothesis.
+    Discharged by `norm_num` (no proof holes). -/
+theorem certified_bounds_strictly_increasing : {conj} := by
+  norm_num
+
+end {ns}
+"""
+
+
+def _monotone_coq(family: str, panel: List[int], k: int, lowers: List[float]) -> str:
+    sec = f"CurveRankCertified_Monotone_{family}"
+    label = _FAMILY_LABEL[family]
+    conj = " /\\ ".join(f"({lowers[i]!r} < {lowers[i + 1]!r})" for i in range(len(lowers) - 1))
+    return f"""(* Requires Coq >= 8.13 (decimal real literals). *)
+Require Import Reals.
+Require Import Lra.
+Open Scope R_scope.
+
+Section {sec}.
+
+(* Certified mismatch lower bounds for the {label} truncations at n in {panel}
+   vs the first {k} Riemann zeros; finite statement about the computed bounds. *)
+
+Theorem certified_bounds_strictly_increasing : {conj}.
+Proof.
+  lra.
+Qed.
+
+End {sec}.
+"""
+
+
+def discharged_monotonicity_proof(
+    family: str, panel: List[int], k_zeros: int = 20
+) -> DischargedMonotonicity:
+    """Discharged Lean/Coq proof that the certified lower bounds strictly increase
+    across ``panel``. Raises ``ValueError`` if they do not (e.g. dirac_rindler),
+    so a monotonicity claim can never pass unless the certificates support it."""
+    if len(panel) < 2:
+        raise ValueError("monotonicity needs a panel of at least 2 truncations")
+    lowers = [float(certified_family_mismatch(family, n, k_zeros).lower) for n in panel]
+    for a, b in zip(lowers, lowers[1:]):
+        if not a < b:
+            raise ValueError(
+                f"{family}: certified lower bounds are not strictly increasing "
+                f"across {panel}: {lowers}"
+            )
+    return DischargedMonotonicity(
+        family=family, panel=list(panel), k_zeros=k_zeros, lowers=lowers,
+        lean4=_monotone_lean(family, panel, k_zeros, lowers),
+        coq=_monotone_coq(family, panel, k_zeros, lowers),
+    )
+

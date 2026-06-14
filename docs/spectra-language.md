@@ -69,8 +69,15 @@ One statement per line; `#` starts a comment.
 | `operator x = <family>(n=N)` | a finite truncation of a candidate family |
 | `certify M = mismatch(x, Z)` | certified L2 spectral mismatch interval `M_n` |
 | `assert separated(M, threshold=t)` | discharge `M ≥ t` (Lean/Coq) or fail |
-| `measure Q = qpe(x, window=r, precision=p)` | windowed QPE eigenvalue recovery (needs qiskit) |
+| `prove monotone(family, panel=a,b,c, zeros=Z)` | discharge that the certified lower bounds strictly increase across the panel, or fail |
+| `measure Q = qpe(x, window=r, precision=p[, backend=emulator\|ibm-hardware])` | windowed QPE eigenvalue recovery (needs qiskit; `ibm-hardware` needs a token) |
 | `report "dir"` | write the JSON report + emitted certificates |
+
+`prove monotone` is a finite statement about the *computed certified bounds* — not
+a continuum monotonicity claim about `M_n`, and not a proof of RH. It fails
+honestly when the bounds do not increase (e.g. `dirac_rindler`). `measure` with
+`backend=ibm-hardware` runs on a real device when a token is configured and fails
+with a clear error otherwise (it never silently falls back).
 
 Families: `berry_keating` (xp), `dirac_rindler`, `quantum_graph`.
 
@@ -96,6 +103,7 @@ self-documenting, and it bakes the project's integrity rule into the language �
 a program that runs only asserts what is certified. That is a genuine
 differentiator, not a reimplementation.
 
-Possible extensions (only if a need appears): a `prove monotone` verb over a
-panel; vendor backends for `measure` (`backend=ibm-hardware`); export of the whole
-program-run as a reviewer packet.
+Implemented extensions: the `prove monotone(...)` verb over a panel, and a
+`backend=ibm-hardware` option on `measure`. Possible future extensions (only if a
+need appears): export of the whole program-run as a reviewer packet; additional
+candidate families.
