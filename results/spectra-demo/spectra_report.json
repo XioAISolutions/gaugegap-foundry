@@ -66,5 +66,26 @@
       "coq_file": "Mq_separation.v"
     }
   ],
+  "monotonicity": [
+    {
+      "family": "xp",
+      "panel": [
+        10,
+        15,
+        20,
+        25,
+        30
+      ],
+      "lowers": [
+        27.391322449240906,
+        29.390824646996478,
+        35.5356899424466,
+        36.603410611887064,
+        40.00965971015598
+      ],
+      "lean4_file": "xp_monotone.lean",
+      "coq_file": "xp_monotone.v"
+    }
+  ],
   "measurements": {}
 }
