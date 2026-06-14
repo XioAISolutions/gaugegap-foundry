@@ -1,0 +1,70 @@
+{
+  "claim_boundary": "Certified finite-truncation spectral screening + benchmark; not a proof of the Riemann Hypothesis.",
+  "zeros": {
+    "Z": 20
+  },
+  "operators": {
+    "xp": {
+      "family": "xp",
+      "n": 20
+    },
+    "dr": {
+      "family": "dirac_rindler",
+      "n": 20
+    },
+    "qg": {
+      "family": "quantum_graph",
+      "n": 20
+    }
+  },
+  "certificates": {
+    "Mx": {
+      "family": "xp",
+      "n": 20,
+      "k_zeros": 20,
+      "lower": 35.5356899424466,
+      "upper": 35.535689942446666
+    },
+    "Md": {
+      "family": "dirac_rindler",
+      "n": 20,
+      "k_zeros": 20,
+      "lower": 26.191066278053995,
+      "upper": 26.191066278054155
+    },
+    "Mq": {
+      "family": "quantum_graph",
+      "n": 20,
+      "k_zeros": 20,
+      "lower": 76.1657160545473,
+      "upper": 76.1657160545483
+    }
+  },
+  "assertions": [
+    {
+      "certificate": "Mx",
+      "threshold": 1.0,
+      "certified_lower": 35.5356899424466,
+      "separated": true,
+      "lean4_file": "Mx_separation.lean",
+      "coq_file": "Mx_separation.v"
+    },
+    {
+      "certificate": "Md",
+      "threshold": 1.0,
+      "certified_lower": 26.191066278053995,
+      "separated": true,
+      "lean4_file": "Md_separation.lean",
+      "coq_file": "Md_separation.v"
+    },
+    {
+      "certificate": "Mq",
+      "threshold": 1.0,
+      "certified_lower": 76.1657160545473,
+      "separated": true,
+      "lean4_file": "Mq_separation.lean",
+      "coq_file": "Mq_separation.v"
+    }
+  ],
+  "measurements": {}
+}
