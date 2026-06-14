@@ -20,4 +20,9 @@ assert   separated(Mx, threshold=1.0)
 assert   separated(Md, threshold=1.0)
 assert   separated(Mq, threshold=1.0)
 
+# The certified lower bounds for xp strictly increase across the panel (a finite
+# statement about the bounds, not a continuum claim). For dirac_rindler they do
+# NOT, so a `prove monotone(dirac_rindler, ...)` would correctly fail the program.
+prove    monotone(berry_keating, panel=10,15,20,25,30, zeros=Z)
+
 report   "results/spectra-demo"

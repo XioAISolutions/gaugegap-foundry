@@ -34,7 +34,10 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from gaugegap.curverank_certified import certified_family_mismatch
-from gaugegap.rigorous.curverank_formal_emit import discharged_separation_proof
+from gaugegap.rigorous.curverank_formal_emit import (
+    discharged_monotonicity_proof,
+    discharged_separation_proof,
+)
 
 _FAMILIES = {
     "berry_keating": "xp",
@@ -55,6 +58,7 @@ class Program:
     operators: Dict[str, Dict] = field(default_factory=dict)
     certificates: Dict[str, Dict] = field(default_factory=dict)
     assertions: List[Dict] = field(default_factory=list)
+    monotonicity: List[Dict] = field(default_factory=list)
     measurements: Dict[str, Dict] = field(default_factory=dict)
     report_dir: Optional[str] = None
 
@@ -80,6 +84,12 @@ class Program:
                  "coq_file": f"{a['certificate']}_separation.v"}
                 for a in self.assertions
             ],
+            "monotonicity": [
+                {"family": m["family"], "panel": m["panel"], "lowers": m["lowers"],
+                 "lean4_file": f"{m['family']}_monotone.lean",
+                 "coq_file": f"{m['family']}_monotone.v"}
+                for m in self.monotonicity
+            ],
             "measurements": self.measurements,
         }
 
@@ -89,9 +99,12 @@ _RE_ZEROS = re.compile(r"^zeros\s+(\w+)\s*=\s*riemann\(\s*(\d+)\s*\)$")
 _RE_OPERATOR = re.compile(r"^operator\s+(\w+)\s*=\s*(\w+)\(\s*n\s*=\s*(\d+)\s*\)$")
 _RE_CERTIFY = re.compile(r"^certify\s+(\w+)\s*=\s*mismatch\(\s*(\w+)\s*,\s*(\w+)\s*\)$")
 _RE_ASSERT = re.compile(r"^assert\s+separated\(\s*(\w+)\s*,\s*threshold\s*=\s*([\d.]+)\s*\)$")
+_RE_PROVE_MONO = re.compile(
+    r"^prove\s+monotone\(\s*(\w+)\s*,\s*panel\s*=\s*([\d,]+)\s*,\s*zeros\s*=\s*(\w+)\s*\)$"
+)
 _RE_MEASURE = re.compile(
     r"^measure\s+(\w+)\s*=\s*qpe\(\s*(\w+)\s*,\s*window\s*=\s*([\d.]+)\s*,\s*"
-    r"precision\s*=\s*(\d+)\s*\)$"
+    r"precision\s*=\s*(\d+)\s*(?:,\s*backend\s*=\s*([\w-]+)\s*)?\)$"
 )
 _RE_REPORT = re.compile(r'^report\s+"([^"]+)"$')
 
@@ -135,9 +148,15 @@ class Interpreter:
         if m:
             self._assert_separated(m.group(1), float(m.group(2)))
             return
+        m = _RE_PROVE_MONO.match(line)
+        if m:
+            panel = [int(x) for x in m.group(2).split(",") if x.strip()]
+            self._prove_monotone(m.group(1), panel, m.group(3))
+            return
         m = _RE_MEASURE.match(line)
         if m:
-            self._measure(m.group(1), m.group(2), float(m.group(3)), int(m.group(4)))
+            self._measure(m.group(1), m.group(2), float(m.group(3)), int(m.group(4)),
+                          m.group(5) or "emulator")
             return
         m = _RE_REPORT.match(line)
         if m:
@@ -180,9 +199,31 @@ class Interpreter:
             "lean4": proof.lean4, "coq": proof.coq,
         })
 
-    def _measure(self, name: str, op_name: str, window: float, precision: int) -> None:
+    def _prove_monotone(self, fam_token: str, panel: List[int], zeros_name: str) -> None:
+        if fam_token not in _FAMILIES:
+            raise SpectraError(f"unknown family {fam_token!r}")
+        if zeros_name not in self.p.zeros:
+            raise SpectraError(f"unknown zeros set {zeros_name!r}")
+        family = _FAMILIES[fam_token]
+        k = self.p.zeros[zeros_name]
+        # Raises if the certified lower bounds are not strictly increasing across
+        # the panel: a monotonicity claim cannot pass unless the kernel backs it.
+        try:
+            proof = discharged_monotonicity_proof(family, panel, k)
+        except ValueError as exc:
+            raise SpectraError(f"monotonicity failed: {exc}") from exc
+        self.p.monotonicity.append({
+            "family": family, "panel": list(panel), "k_zeros": k,
+            "lowers": proof.lowers, "lean4": proof.lean4, "coq": proof.coq,
+        })
+
+    def _measure(self, name: str, op_name: str, window: float, precision: int,
+                 backend: str = "emulator") -> None:
         if op_name not in self.p.operators:
             raise SpectraError(f"unknown operator {op_name!r}")
+        if backend not in ("emulator", "ibm-hardware"):
+            raise SpectraError(f"unknown backend {backend!r} "
+                               "(use 'emulator' or 'ibm-hardware')")
         op = self.p.operators[op_name]
         # QPE needs qiskit; import lazily so certify/assert work without it.
         try:
@@ -194,11 +235,18 @@ class Interpreter:
             spec.loader.exec_module(mod)
         except Exception as exc:  # pragma: no cover - depends on qiskit
             raise SpectraError(f"qpe unavailable (needs qiskit): {exc}") from exc
-        row = mod.run_one(
-            n_basis=op["n"], n_precision=precision, shots=4096, reps=2,
-            window_radius=window, use_emulator=True, device="aer_simulator",
-            method="dense",
-        )
+        use_emulator = backend == "emulator"
+        try:
+            row = mod.run_one(
+                n_basis=op["n"], n_precision=precision, shots=4096, reps=2,
+                window_radius=window, use_emulator=use_emulator,
+                device="ibm_brisbane", method="dense",
+            )
+        except Exception as exc:  # hardware needs a token; fail honestly
+            raise SpectraError(
+                f"qpe on backend {backend!r} failed: {exc}"
+            ) from exc
+        row["backend_request"] = backend
         self.p.measurements[name] = row
 
     def _write_report(self, out: Path) -> None:
@@ -210,6 +258,10 @@ class Interpreter:
             stem = f"{a['certificate']}_separation"
             (out / f"{stem}.lean").write_text(a["lean4"], encoding="utf-8")
             (out / f"{stem}.v").write_text(a["coq"], encoding="utf-8")
+        for mono in self.p.monotonicity:
+            stem = f"{mono['family']}_monotone"
+            (out / f"{stem}.lean").write_text(mono["lean4"], encoding="utf-8")
+            (out / f"{stem}.v").write_text(mono["coq"], encoding="utf-8")
 
 
 def run_program(source: str) -> Program:
