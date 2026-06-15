@@ -406,10 +406,16 @@ def verified_hermitian_eigenvalues(matrix: IntervalMatrix) -> List[Interval]:
     # Approximate eigendecomposition (float guess only; rigor is independent).
     theta, X = np.linalg.eigh(A_mid)
 
+    # Convert the interval matrix to the mpmath directed-rounding context ONCE and
+    # reuse it across all n residual evaluations (previously it was reconverted
+    # per eigenpair). This changes nothing numerically -- the same iv entries are
+    # used in the same operations -- it only removes redundant conversion work.
+    A_iv = _matrix_to_iv(matrix)
+
     enclosures: List[Interval] = []
     for i in range(n):
         th = mp.mpf(float(theta[i]))
-        radius = certified_residual_radius(matrix, float(theta[i]), X[:, i])
+        radius = certified_residual_radius(matrix, float(theta[i]), X[:, i], _A_iv=A_iv)
         lo = (mp.iv.mpf([th, th]) - mp.iv.mpf([radius, radius])).a
         hi = (mp.iv.mpf([th, th]) + mp.iv.mpf([radius, radius])).b
         enclosures.append(Interval(mp.mpf(lo), mp.mpf(hi)))
@@ -418,7 +424,15 @@ def verified_hermitian_eigenvalues(matrix: IntervalMatrix) -> List[Interval]:
     return enclosures
 
 
-def certified_residual_radius(matrix: "IntervalMatrix", theta: float, x_col) -> mp.mpf:
+def _matrix_to_iv(matrix: "IntervalMatrix"):
+    """Convert an interval matrix to a grid of mpmath directed-rounding numbers."""
+    return [
+        [mp.iv.mpf([entry.lower, entry.upper]) for entry in row]
+        for row in matrix.entries
+    ]
+
+
+def certified_residual_radius(matrix: "IntervalMatrix", theta: float, x_col, _A_iv=None) -> mp.mpf:
     """Certified (outward-rounded) residual radius for one approximate eigenpair.
 
     Given a real symmetric interval matrix ``A``, an approximate eigenvalue
@@ -433,15 +447,22 @@ def certified_residual_radius(matrix: "IntervalMatrix", theta: float, x_col) -> 
     ``scripts/cross_check_arb.py``) can be fed the *same* eigenpair and compared.
     """
     n = matrix.m
-    x_iv = [Interval.from_float(float(x_col[k])) for k in range(n)]
-    th_iv = Interval(mp.mpf(float(theta)), mp.mpf(float(theta)))
+    iv = mp.iv
+    # Work directly in the mpmath iv context (same directed-rounding arithmetic as
+    # the Interval wrapper, without the per-operation _to_iv/_from_iv round-trips).
+    A = _A_iv if _A_iv is not None else _matrix_to_iv(matrix)
+    x_iv = [iv.mpf([mp.mpf(float(x_col[k])), mp.mpf(float(x_col[k]))]) for k in range(n)]
+    tv = mp.mpf(float(theta))
+    th_iv = iv.mpf([tv, tv])
 
     # Residual r = A x - theta x, computed rigorously in interval arithmetic.
+    # Identical operation order to the prior Interval-based loop, so the resulting
+    # enclosure endpoints are bit-for-bit the same.
     residual_sq = None
     for row in range(n):
-        acc = matrix.entries[row][0] * x_iv[0]
+        acc = A[row][0] * x_iv[0]
         for col in range(1, n):
-            acc = acc + matrix.entries[row][col] * x_iv[col]
+            acc = acc + A[row][col] * x_iv[col]
         acc = acc - (th_iv * x_iv[row])
         term = acc * acc
         residual_sq = term if residual_sq is None else residual_sq + term
@@ -454,8 +475,8 @@ def certified_residual_radius(matrix: "IntervalMatrix", theta: float, x_col) -> 
     # Final radius, with directed (outward) rounding so the enclosure is a
     # guaranteed bound rather than a round-to-nearest estimate:
     #   radius >= ||r||_upper / ||x||_lower  (round the quotient up).
-    residual_norm_upper = _sqrt_up(residual_sq.upper)
-    norm_x_lower = _sqrt_down(norm_x_sq.lower)
+    residual_norm_upper = _sqrt_up(mp.mpf(residual_sq.b))
+    norm_x_lower = _sqrt_down(mp.mpf(norm_x_sq.a))
     return _div_up(residual_norm_upper, norm_x_lower)
 
 
