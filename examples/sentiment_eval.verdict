@@ -1,0 +1,15 @@
+# Verdict program: an AI claim is only valid if a logged eval backs it.
+#
+# The keyword_sentiment model is evaluated on a labelled dataset; the score
+# assertion passes only because the eval measured it. Swapping in `always_pos`
+# would drop the score to 0.5 and the same assertion would correctly fail.
+
+dataset D = cases("examples/sentiment_cases.jsonl")
+model   M = keyword_sentiment()
+
+eval    E = run(M, D, metric=accuracy)
+
+assert  score(E) >= 0.8
+assert  no_regression(E, baseline=0.75)
+
+report  "results/verdict-demo"
