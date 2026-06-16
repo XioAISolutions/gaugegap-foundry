@@ -1,5 +1,5 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
-	curverank curverank-formal curverank-ibm curverank-hardware
+	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -72,5 +72,12 @@ curverank-hardware:
 	python scripts/run_curverank_hardware_report.py \
 		--output-dir results/curverank-hardware
 
+# Quantum signal extraction: recover eigenvalues from the correlation signal
+# g(t)=<psi|exp(-iHt)|psi> (Hadamard test -> Prony/ESPRIT) and validate them
+# against the certified enclosures. Exact statevector mode, no credentials.
+curverank-signal:
+	python scripts/run_curverank_signal.py --n-basis 8 --method esprit \
+		--output-dir results/curverank-signal
+
 # Regenerate all CurveRank bundles.
-curverank: curverank-formal curverank-ibm curverank-hardware
+curverank: curverank-formal curverank-ibm curverank-hardware curverank-signal
