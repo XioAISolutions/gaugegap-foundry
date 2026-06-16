@@ -1,0 +1,75 @@
+{
+  "claim_boundary": "Finite-operator spectral screening + method benchmark; extracted eigenvalues are evidence validated against the certified kernel, not a proof of the Riemann Hypothesis.",
+  "n_basis": 8,
+  "method": "esprit",
+  "mode": "exact",
+  "dt": 0.19653945266163095,
+  "n_times": 32,
+  "in_certified_enclosure": "8/8",
+  "estimates": [
+    {
+      "estimate": 0.9959593295662932,
+      "in_certified_enclosure": true,
+      "nearest_enclosure": [
+        0.9959593295662867,
+        0.9959593295662986
+      ]
+    },
+    {
+      "estimate": 7.057529328270688,
+      "in_certified_enclosure": true,
+      "nearest_enclosure": [
+        7.057529328270672,
+        7.0575293282707
+      ]
+    },
+    {
+      "estimate": -12.787631637495071,
+      "in_certified_enclosure": true,
+      "nearest_enclosure": [
+        -12.787631637495085,
+        -12.787631637495045
+      ]
+    },
+    {
+      "estimate": -0.9959593295662901,
+      "in_certified_enclosure": true,
+      "nearest_enclosure": [
+        -0.9959593295662943,
+        -0.9959593295662863
+      ]
+    },
+    {
+      "estimate": 12.787631637495064,
+      "in_certified_enclosure": true,
+      "nearest_enclosure": [
+        12.787631637495046,
+        12.787631637495094
+      ]
+    },
+    {
+      "estimate": 3.4603594039213212,
+      "in_certified_enclosure": true,
+      "nearest_enclosure": [
+        3.460359403921312,
+        3.460359403921326
+      ]
+    },
+    {
+      "estimate": -3.460359403921315,
+      "in_certified_enclosure": true,
+      "nearest_enclosure": [
+        -3.460359403921322,
+        -3.460359403921307
+      ]
+    },
+    {
+      "estimate": -7.057529328270689,
+      "in_certified_enclosure": true,
+      "nearest_enclosure": [
+        -7.057529328270699,
+        -7.057529328270667
+      ]
+    }
+  ]
+}
