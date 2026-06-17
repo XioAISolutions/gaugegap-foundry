@@ -62,13 +62,41 @@ Design choices (verification-first):
   checks the CUDA-Q path against the numpy reference. **CI verifies the fallback;**
   the GPU path is exercised only where CUDA-Q + a GPU exist.
 
-## Recommended next step (follow-up, only when needed)
+## Wired in: GPU-able `g(t)` + benchmark
 
-Wire `backend="auto"` into the QPE and `g(t)` pipelines so large-`n` runs use the
-GPU when present and the existing CPU path otherwise. Add `cuda-quantum` as an
-optional extra (e.g. `pip install -e '.[gpu]'`). Until a run actually needs more
-qubits than CPU handles, the adapter + this evaluation are the right amount of
-investment — *good tool, adopt it the moment the simulations outgrow the CPU.*
+`backend="auto"` is now wired into a circuit form of the correlation signal:
+
+```python
+from gaugegap.providers import cudaq_adapter as cq
+g = cq.circuit_correlation_signal(H, times, backend="auto", trotter_steps=200)
+```
+
+`circuit_correlation_signal` runs the time evolution as a **Trotter circuit**
+through the backend (numpy now, CUDA-Q GPU when present), using `|+...+>` as the
+probe state. It is the GPU-able sibling of
+`curverank_signal.correlation_signal`. Verification-first: the numpy backend is
+**validated against the exact eigendecomposition within Trotter error** (see
+`tests/test_cudaq_adapter.py`), and the CUDA-Q backend runs the identical gate
+list.
+
+Benchmark the backends:
+
+```bash
+python scripts/run_cudaq_benchmark.py --max-qubits 12   # make cudaq-benchmark
+```
+
+On CPU it shows the full-matrix numpy simulator's steep growth (e.g. ~0.7 s at
+n=10), i.e. exactly where a GPU statevector pays off; the CUDA-Q rows populate
+when a GPU is present.
+
+## Still outstanding (needs a GPU to validate)
+
+Wiring `backend="auto"` into the **QPE** path (`curverank_qpe`, which builds
+qiskit circuits) needs a qiskit→gate-list bridge; and exercising the CUDA-Q path
+end-to-end needs an actual GPU. Per the repo's verification-first stance, those
+land once GPU CI (or a GPU dev machine) is available — the numpy-validated `g(t)`
+path and the capability-gated adapter are the honest, testable groundwork. Add
+`cuda-quantum` as an optional extra (`pip install -e '.[gpu]'`) when adopting.
 
 ## Claim boundary
 

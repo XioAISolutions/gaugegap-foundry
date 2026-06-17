@@ -168,3 +168,105 @@ def ghz_circuit(n_qubits: int) -> List[Gate]:
     gates: List[Gate] = [("h", (0,), None)]
     gates += [("cx", (i, i + 1), None) for i in range(n_qubits - 1)]
     return gates
+
+
+# --------------------------------------------------------------------------- #
+# GPU-able correlation signal g(t) via a Trotter circuit
+# --------------------------------------------------------------------------- #
+
+_PAULI = {
+    "I": np.eye(2, dtype=complex),
+    "X": np.array([[0, 1], [1, 0]], dtype=complex),
+    "Y": np.array([[0, -1j], [1j, 0]], dtype=complex),
+    "Z": np.array([[1, 0], [0, -1]], dtype=complex),
+}
+
+
+def _pauli_matrix(pstring: str) -> np.ndarray:
+    M = np.array([[1.0 + 0j]])
+    for ch in pstring:
+        M = np.kron(M, _PAULI[ch])
+    return M
+
+
+def pauli_decompose(H: np.ndarray, tol: float = 1e-9) -> List[Tuple[float, str]]:
+    """Decompose a Hermitian 2^n x 2^n matrix into real Pauli coefficients.
+
+    Returns ``[(coeff, "XIZ"), ...]`` with ``H = sum coeff * P`` and
+    ``|coeff| > tol``. Raises if the dimension is not a power of two.
+    """
+    from itertools import product
+
+    H = np.asarray(H, dtype=complex)
+    dim = H.shape[0]
+    n = int(round(np.log2(dim)))
+    if 2 ** n != dim:
+        raise ValueError("pauli_decompose requires a 2^n x 2^n matrix")
+    terms: List[Tuple[float, str]] = []
+    for letters in product("IXYZ", repeat=n):
+        pstring = "".join(letters)
+        coeff = np.trace(_pauli_matrix(pstring).conj().T @ H) / dim
+        if abs(coeff) > tol:
+            terms.append((float(coeff.real), pstring))
+    return terms
+
+
+def _term_gates(coeff: float, pstring: str, dt: float) -> List[Gate]:
+    """Gate list for exp(-i coeff dt P) (validated against exact evolution)."""
+    active = [q for q, ch in enumerate(pstring) if ch != "I"]
+    if not active:
+        return []
+    pre: List[Gate] = []
+    post: List[Gate] = []
+    for q in active:
+        if pstring[q] == "X":
+            pre.append(("h", (q,), None))
+            post.append(("h", (q,), None))
+        elif pstring[q] == "Y":
+            pre.append(("rx", (q,), np.pi / 2))
+            post.append(("rx", (q,), -np.pi / 2))
+    ladder = [("cx", (active[i], active[i + 1]), None) for i in range(len(active) - 1)]
+    unladder = [("cx", (active[i], active[i + 1]), None)
+                for i in reversed(range(len(active) - 1))]
+    rz = [("rz", (active[-1],), 2.0 * coeff * dt)]
+    return pre + ladder + rz + unladder + post
+
+
+def trotter_gates(terms: Sequence[Tuple[float, str]], t: float, steps: int) -> List[Gate]:
+    """First-order Trotter gate list for exp(-iHt) from Pauli ``terms``."""
+    dt = t / steps if steps else 0.0
+    gates: List[Gate] = []
+    for _ in range(steps):
+        for coeff, pstring in terms:
+            gates += _term_gates(coeff, pstring, dt)
+    return gates
+
+
+def circuit_correlation_signal(
+    H: np.ndarray, times: Sequence[float], *, backend: str = "auto",
+    trotter_steps: int = 200, prep: str = "plus", pauli_tol: float = 1e-9,
+) -> np.ndarray:
+    """``g(t) = <psi|exp(-iHt)|psi>`` via a Trotter circuit on the chosen backend.
+
+    This is the GPU-able sibling of ``curverank_signal.correlation_signal``: it
+    runs the time evolution as a circuit through :func:`statevector`, so
+    ``backend="auto"`` uses the CUDA-Q GPU simulator when available and numpy
+    otherwise. ``prep="plus"`` uses |+...+> as the probe state (so g(t) is the
+    amplitude of |0...0> after prep -> Trotter -> prep, since H^n is self-inverse).
+
+    The numpy backend is validated against the exact eigendecomposition within
+    Trotter error; the CUDA-Q backend runs the identical gate list.
+    """
+    H = np.asarray(H, dtype=complex)
+    dim = H.shape[0]
+    n = int(round(np.log2(dim)))
+    if 2 ** n != dim:
+        raise ValueError("dimension must be a power of two")
+    terms = pauli_decompose(H, tol=pauli_tol)
+    prep_gates: List[Gate] = ([("h", (q,), None) for q in range(n)]
+                              if prep == "plus" else [])
+    out = np.empty(len(times), dtype=complex)
+    for k, t in enumerate(times):
+        gates = prep_gates + trotter_gates(terms, float(t), trotter_steps) + prep_gates
+        out[k] = statevector(gates, n, backend=backend)[0]
+    return out

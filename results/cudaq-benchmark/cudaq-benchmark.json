@@ -1,0 +1,34 @@
+{
+  "claim_boundary": "Simulation timing only; not a proof of the Riemann Hypothesis.",
+  "cudaq_available": false,
+  "backend_info": {
+    "available": false,
+    "fallback": "numpy"
+  },
+  "rows": [
+    {
+      "n_qubits": 4,
+      "numpy_s": 0.001911594000034711,
+      "cudaq_s": null,
+      "speedup": null
+    },
+    {
+      "n_qubits": 6,
+      "numpy_s": 0.00581362299999455,
+      "cudaq_s": null,
+      "speedup": null
+    },
+    {
+      "n_qubits": 8,
+      "numpy_s": 0.04288326599998982,
+      "cudaq_s": null,
+      "speedup": null
+    },
+    {
+      "n_qubits": 10,
+      "numpy_s": 0.7159005070000148,
+      "cudaq_s": null,
+      "speedup": null
+    }
+  ]
+}

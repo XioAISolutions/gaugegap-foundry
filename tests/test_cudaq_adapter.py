@@ -66,5 +66,43 @@ class TestCudaqParity(unittest.TestCase):
             self.fail("cudaq probabilities do not match reference")
 
 
+class TestPauliAndTrotterSignal(unittest.TestCase):
+    def _tfim(self, n: int, h: float = 0.7) -> np.ndarray:
+        # -sum ZZ - h sum X on a chain.
+        H = np.zeros((2 ** n, 2 ** n), dtype=complex)
+        for q in range(n - 1):
+            s = ["I"] * n
+            s[q] = s[q + 1] = "Z"
+            H -= cq._pauli_matrix("".join(s))
+        for q in range(n):
+            s = ["I"] * n
+            s[q] = "X"
+            H -= h * cq._pauli_matrix("".join(s))
+        return H
+
+    def test_pauli_decompose_roundtrip(self):
+        H = self._tfim(2)
+        recon = np.zeros_like(H)
+        for coeff, pstr in cq.pauli_decompose(H):
+            recon += coeff * cq._pauli_matrix(pstr)
+        np.testing.assert_allclose(recon, H, atol=1e-9)
+
+    def test_circuit_correlation_signal_matches_exact(self):
+        from scipy.linalg import expm
+        n = 2
+        H = self._tfim(n)
+        psi = np.ones(2 ** n, dtype=complex) / np.sqrt(2 ** n)  # |++>
+        times = [0.0, 0.3, 0.7, 1.2]
+        g = cq.circuit_correlation_signal(H, times, backend="numpy", trotter_steps=300)
+        exact = np.array([np.vdot(psi, expm(-1j * H * t) @ psi) for t in times])
+        self.assertAlmostEqual(g[0], 1.0 + 0j, places=9)        # g(0)=1
+        np.testing.assert_allclose(g, exact, atol=2e-4)         # within Trotter error
+
+    def test_auto_backend_runs(self):
+        H = self._tfim(2)
+        g = cq.circuit_correlation_signal(H, [0.5], backend="auto", trotter_steps=50)
+        self.assertEqual(g.shape, (1,))
+
+
 if __name__ == "__main__":
     unittest.main()
