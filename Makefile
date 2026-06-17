@@ -1,6 +1,6 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
-	curverank-noise-study
+	curverank-noise-study cudaq-benchmark
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -84,6 +84,11 @@ curverank-signal:
 # under modelled dephasing + shot noise. Exact statevector envelopes, no creds.
 curverank-noise-study:
 	python scripts/run_curverank_noise_study.py --output-dir results/curverank-noise
+
+# Benchmark the simulation backends (numpy vs CUDA-Q) across qubit counts.
+# CUDA-Q rows populate only where CUDA-Q + a GPU are present; numpy always runs.
+cudaq-benchmark:
+	python scripts/run_cudaq_benchmark.py --max-qubits 12 --output-dir results/cudaq-benchmark
 
 # Regenerate all CurveRank bundles.
 curverank: curverank-formal curverank-ibm curverank-hardware curverank-signal \
