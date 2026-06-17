@@ -98,5 +98,56 @@ class TestAmplitudeEstimation(unittest.TestCase):
         self.assertLess(out["abs_error"], 0.03)
 
 
+class TestQCELS(unittest.TestCase):
+    def _dominant_state(self, n: int, seed: int):
+        H = berry_keating_xp(n)
+        w, V = np.linalg.eigh(H)
+        psi = V[:, 0] + 0.25 * (V[:, 3] + V[:, 5])
+        return H, w[0], psi / np.linalg.norm(psi)
+
+    def test_recovers_dominant_eigenvalue(self):
+        H, ground, psi = self._dominant_state(8, 0)
+        r = cs.qcels(H, psi, total_time=80, rng=np.random.default_rng(0))
+        self.assertLess(abs(r.eigenvalue - ground), 1e-3)
+
+    def test_error_improves_with_longer_evolution(self):
+        # Heisenberg-style: longer coherent time -> smaller error.
+        H, ground, psi = self._dominant_state(8, 0)
+        err_short = abs(cs.qcels(H, psi, total_time=20,
+                                 rng=np.random.default_rng(0)).eigenvalue - ground)
+        err_long = abs(cs.qcels(H, psi, total_time=160,
+                                rng=np.random.default_rng(0)).eigenvalue - ground)
+        self.assertLess(err_long, err_short)
+
+    def test_qcels_robust_under_modest_noise(self):
+        H, ground, psi = self._dominant_state(8, 0)
+        r = cs.qcels(H, psi, total_time=80, shots=8192, dephasing=0.02,
+                     rng=np.random.default_rng(1))
+        self.assertLess(abs(r.eigenvalue - ground), 5e-3)
+
+
+class TestNoiseModel(unittest.TestCase):
+    def test_dephasing_decays_signal_magnitude(self):
+        H = berry_keating_xp(6)
+        psi = _random_state(6, 2)
+        times = np.linspace(0.5, 3.0, 5)
+        g0 = cs.correlation_signal(H, psi, times)
+        gd = cs.correlation_signal(H, psi, times, dephasing=0.3)
+        # exp(-0.3 t) envelope strictly shrinks the magnitude at t>0.
+        self.assertTrue(np.all(np.abs(gd) < np.abs(g0) + 1e-12))
+        np.testing.assert_allclose(np.abs(gd), np.exp(-0.3 * times) * np.abs(g0), atol=1e-12)
+
+    def test_extract_under_noise_recovers_within_tolerance(self):
+        H = berry_keating_xp(8)
+        true = np.sort(np.linalg.eigvalsh(H))
+        psi = _random_state(8, 4)
+        r = cs.extract_eigenvalues(H, psi, method="esprit", shots=200000,
+                                   dephasing=0.0, rng=np.random.default_rng(9))
+        est = np.sort(r.eigenvalues)
+        # With finite shots the dominant modes are recovered to modest accuracy.
+        dominant = true[np.argsort(np.abs(np.linalg.eigh(H)[1].conj().T @ psi) ** 2)[-1]]
+        self.assertTrue(min(abs(dominant - e) for e in est) < 0.2)
+
+
 if __name__ == "__main__":
     unittest.main()
