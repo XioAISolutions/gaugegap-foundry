@@ -1,0 +1,104 @@
+{
+  "claim_boundary": "Finite-operator method benchmark under modelled dephasing/shot noise; extracted eigenvalues are evidence validated against the certified kernel, not a proof of the Riemann Hypothesis.",
+  "n_basis": 8,
+  "total_time": 80.0,
+  "ground_eigenvalue": -12.787631637495055,
+  "rows": [
+    {
+      "dephasing": 0.0,
+      "shots": null,
+      "qcels_ground_error": 8.70457905044475e-06,
+      "esprit_max_error": 9.327272233573737
+    },
+    {
+      "dephasing": 0.0,
+      "shots": 16384,
+      "qcels_ground_error": 2.945027613776574e-06,
+      "esprit_max_error": 1.9963615203203307
+    },
+    {
+      "dephasing": 0.0,
+      "shots": 4096,
+      "qcels_ground_error": 1.0572703242672787e-05,
+      "esprit_max_error": 2.357136159286994
+    },
+    {
+      "dephasing": 0.0,
+      "shots": 1024,
+      "qcels_ground_error": 0.00011961880167987715,
+      "esprit_max_error": 3.6365916210571347
+    },
+    {
+      "dephasing": 0.01,
+      "shots": null,
+      "qcels_ground_error": 1.006053412311303e-05,
+      "esprit_max_error": 9.327272233573716
+    },
+    {
+      "dephasing": 0.01,
+      "shots": 16384,
+      "qcels_ground_error": 2.7232018858569518e-05,
+      "esprit_max_error": 1.8906420671613513
+    },
+    {
+      "dephasing": 0.01,
+      "shots": 4096,
+      "qcels_ground_error": 1.2899470478444641e-05,
+      "esprit_max_error": 2.496022835847021
+    },
+    {
+      "dephasing": 0.01,
+      "shots": 1024,
+      "qcels_ground_error": 9.259611569589765e-05,
+      "esprit_max_error": 2.0727440308462386
+    },
+    {
+      "dephasing": 0.03,
+      "shots": null,
+      "qcels_ground_error": 1.4851397589055182e-05,
+      "esprit_max_error": 9.327272233573742
+    },
+    {
+      "dephasing": 0.03,
+      "shots": 16384,
+      "qcels_ground_error": 7.525800392116366e-05,
+      "esprit_max_error": 1.899572273818161
+    },
+    {
+      "dephasing": 0.03,
+      "shots": 4096,
+      "qcels_ground_error": 0.00024647449069981064,
+      "esprit_max_error": 5.044654668700618
+    },
+    {
+      "dephasing": 0.03,
+      "shots": 1024,
+      "qcels_ground_error": 0.00013544280544763865,
+      "esprit_max_error": 2.2960274132536473
+    },
+    {
+      "dephasing": 0.1,
+      "shots": null,
+      "qcels_ground_error": 6.857293218409666e-05,
+      "esprit_max_error": 9.327272233573726
+    },
+    {
+      "dephasing": 0.1,
+      "shots": 16384,
+      "qcels_ground_error": 0.0014986529795564252,
+      "esprit_max_error": 1.9241037880525456
+    },
+    {
+      "dephasing": 0.1,
+      "shots": 4096,
+      "qcels_ground_error": 0.00019156022407074147,
+      "esprit_max_error": 2.425723854910755
+    },
+    {
+      "dephasing": 0.1,
+      "shots": 1024,
+      "qcels_ground_error": 0.007470202273722748,
+      "esprit_max_error": 2.049457345874679
+    }
+  ]
+}

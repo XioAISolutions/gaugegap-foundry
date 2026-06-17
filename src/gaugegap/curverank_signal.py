@@ -77,29 +77,37 @@ def hadamard_test(
 
 def correlation_signal(
     H: np.ndarray, psi: np.ndarray, times: Sequence[float], *,
-    shots: Optional[int] = None, rng: Optional[np.random.Generator] = None,
+    shots: Optional[int] = None, dephasing: float = 0.0,
+    rng: Optional[np.random.Generator] = None,
 ) -> np.ndarray:
     """Return ``g(t) = <psi|exp(-iHt)|psi>`` sampled at ``times``.
 
     Exact mode uses the Hermitian eigendecomposition, so
     ``g(t) = sum_j |<E_j|psi>|^2 exp(-i E_j t)`` -- a sum of complex exponentials
-    whose frequencies are exactly the eigenvalues of ``H``. With ``shots`` it
-    runs a Hadamard test (Re and Im) per time.
+    whose frequencies are exactly the eigenvalues of ``H``.
+
+    ``dephasing`` (>= 0) applies a global coherence-decay envelope
+    ``g(t) -> exp(-dephasing * t) * g(t)`` -- a standard model of hardware
+    decoherence. ``shots`` adds Hadamard-test shot noise on the (possibly
+    dephased) real and imaginary parts. Both default to the noiseless limit.
     """
     H = np.asarray(H, dtype=complex)
     psi = np.asarray(psi, dtype=complex)
     w, V = np.linalg.eigh(H)
     overlaps = np.abs(V.conj().T @ psi) ** 2  # |<E_j|psi>|^2
     times = np.asarray(times, dtype=float)
+    g = np.exp(-1j * np.outer(times, w)) @ overlaps
+    if dephasing:
+        g = g * np.exp(-float(dephasing) * times)
     if shots is None:
-        phases = np.exp(-1j * np.outer(times, w))  # (T, dim)
-        return phases @ overlaps
+        return g
     rng = rng or np.random.default_rng()
-    out = np.empty(times.shape, dtype=complex)
-    for k, t in enumerate(times):
-        U = (V * np.exp(-1j * w * t)) @ V.conj().T
-        out[k] = hadamard_test(psi, U, part="both", shots=shots, rng=rng)
-    return out
+
+    def _sample(x: np.ndarray) -> np.ndarray:
+        p0 = np.clip((1.0 + x) / 2.0, 0.0, 1.0)
+        return 2.0 * (rng.binomial(shots, p0) / shots) - 1.0
+
+    return _sample(g.real) + 1j * _sample(g.imag)
 
 
 # --------------------------------------------------------------------------- #
@@ -186,7 +194,7 @@ def extract_eigenvalues(
     H: np.ndarray, psi: np.ndarray, *, order: Optional[int] = None,
     n_times: Optional[int] = None, dt: Optional[float] = None,
     method: str = "esprit", shots: Optional[int] = None,
-    rng: Optional[np.random.Generator] = None,
+    dephasing: float = 0.0, rng: Optional[np.random.Generator] = None,
 ) -> ExtractionResult:
     """Recover eigenvalues of ``H`` from the correlation signal of ``|psi>``.
 
@@ -206,7 +214,7 @@ def extract_eigenvalues(
     if n_times is None:
         n_times = max(4 * order, 2 * order + 2)
     times = np.arange(n_times) * dt
-    g = correlation_signal(H, psi, times, shots=shots, rng=rng)
+    g = correlation_signal(H, psi, times, shots=shots, dephasing=dephasing, rng=rng)
     estimator = {"prony": prony, "esprit": esprit}[method]
     freqs, amps = estimator(g, dt, order)
     weights = np.abs(amps)
@@ -217,6 +225,62 @@ def extract_eigenvalues(
         method=method, eigenvalues=freqs[order_by_weight],
         weights=weights[order_by_weight], dt=dt, n_times=n_times,
     )
+
+
+def _qcels_residual(g: np.ndarray, t: np.ndarray, theta: float) -> float:
+    """Least-squares residual of a single complex exponential fit at frequency
+    ``theta`` (with the optimal amplitude projected out)."""
+    A = np.mean(g * np.exp(1j * theta * t))
+    return float(np.sum(np.abs(g - A * np.exp(-1j * theta * t)) ** 2))
+
+
+@dataclass
+class QCELSResult:
+    eigenvalue: float            # estimated dominant eigenvalue
+    total_time: int              # final evolution time used
+    levels: int
+    dt: float
+
+
+def qcels(
+    H: np.ndarray, psi: np.ndarray, *, total_time: float = 80.0, levels: int = 5,
+    grid: int = 200, shots: Optional[int] = None, dephasing: float = 0.0,
+    rng: Optional[np.random.Generator] = None,
+) -> QCELSResult:
+    """Quantum Complex Exponential Least Squares for the *dominant* eigenvalue.
+
+    Fits ``g(t) ~ A e^{-i theta t}`` for the eigenvalue carrying the largest
+    overlap weight in ``|psi>``, refining a multilevel schedule that doubles the
+    evolution time. The sampling step ``dt`` is held sub-Nyquist (so longer time
+    means more samples, not coarser ones), and each level parabolically refines
+    the residual minimum. With a clean signal the error scales roughly like
+    ``1/total_time`` -- a Heisenberg-style improvement from longer coherent
+    evolution rather than more ancillas.
+    """
+    H = np.asarray(H, dtype=complex)
+    w = np.linalg.eigvalsh(H)
+    radius = float(np.max(np.abs(w))) or 1.0
+    dt = 0.5 * np.pi / radius  # sub-Nyquist for the full band
+    rng = rng or np.random.default_rng()
+    lo, hi = -radius, radius
+    best = 0.0
+    for level in range(levels):
+        T = total_time / (2 ** (levels - 1 - level))
+        n = max(20, int(T / dt))
+        t = np.arange(n) * dt
+        g = correlation_signal(H, psi, t, shots=shots, dephasing=dephasing, rng=rng)
+        thetas = np.linspace(lo, hi, grid)
+        res = np.array([_qcels_residual(g, t, th) for th in thetas])
+        i = int(np.argmin(res))
+        best = float(thetas[i])
+        if 0 < i < grid - 1:  # parabolic sub-grid refinement
+            y0, y1, y2 = res[i - 1], res[i], res[i + 1]
+            denom = y0 - 2 * y1 + y2
+            if denom != 0:
+                best = thetas[i] + 0.5 * (y0 - y2) / denom * (thetas[1] - thetas[0])
+        half = (hi - lo) / 6.0
+        lo, hi = best - half, best + half
+    return QCELSResult(eigenvalue=best, total_time=int(total_time), levels=levels, dt=dt)
 
 
 def validate_against_certified(

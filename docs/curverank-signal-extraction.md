@@ -53,6 +53,38 @@ python scripts/run_curverank_signal.py --n-basis 8 --method prony --shots 8192
 Output: per-eigenvalue estimate, whether it falls in a certified enclosure, and a
 JSON report under `results/curverank-signal/`.
 
+## QCELS — Heisenberg-style single-eigenvalue estimation
+
+`qcels(H, psi)` estimates the **dominant** eigenvalue (largest overlap weight in
+`|ψ⟩`) by fitting `g(t) ~ A e^{-iθt}` over a multilevel schedule that doubles the
+coherent evolution time, with a sub-Nyquist `dt` and parabolic sub-grid
+refinement. With a clean signal the error scales roughly like `1/total_time` — a
+Heisenberg-style gain from *longer evolution*, not more ancillas:
+
+| total_time | abs error (exact) |
+|---:|---:|
+| 10 | 1.7e-4 |
+| 40 | 4.8e-5 |
+| 160 | 1.9e-6 |
+| 320 | 3.8e-8 |
+
+## Noise study (`scripts/run_curverank_noise_study.py`, `make curverank-noise-study`)
+
+`correlation_signal(..., dephasing=γ, shots=N)` models hardware decoherence
+(`g(t) → e^{-γt} g(t)`) and Hadamard-test shot noise. Sweeping both reveals an
+honest, useful contrast:
+
+- **QCELS (dominant eigenvalue) is robust** — error stays ~1e-4–1e-3 across
+  dephasing up to 0.1 and shot budgets down to ~1k, because it only fits one
+  frequency.
+- **ESPRIT full-spectrum super-resolution is fragile** — recovering *all*
+  eigenvalues is ill-conditioned under noise, and the max error grows by orders
+  of magnitude.
+
+The practical lesson: extract *one* well-separated eigenvalue robustly (QCELS);
+treat full-spectrum super-resolution as an exact/low-noise tool. Either way the
+output is validated against the certified enclosures.
+
 ## Honest limits
 
 - **Sampling cost** — exact mode is the noiseless limit; with `--shots`, accuracy

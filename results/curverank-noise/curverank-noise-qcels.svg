@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="440" viewBox="0 0 720 440" font-family="Arial, sans-serif">
+<rect width="720" height="440" fill="white"/>
+<text x="70" y="30" font-size="18" font-weight="700">QCELS ground-state error vs shot setting (per dephasing level)</text>
+<rect x="70" y="56" width="620" height="328" fill="none" stroke="#111827" stroke-width="1.2"/>
+<line x1="70" y1="56.0" x2="690" y2="56.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="60.0" font-size="11" text-anchor="end" fill="#374151">0.00807</text>
+<line x1="70" y1="138.0" x2="690" y2="138.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="142.0" font-size="11" text-anchor="end" fill="#374151">0.0059</text>
+<line x1="70" y1="220.0" x2="690" y2="220.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="224.0" font-size="11" text-anchor="end" fill="#374151">0.00374</text>
+<line x1="70" y1="302.0" x2="690" y2="302.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="306.0" font-size="11" text-anchor="end" fill="#374151">0.00157</text>
+<line x1="70" y1="384.0" x2="690" y2="384.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="388.0" font-size="11" text-anchor="end" fill="#374151">-0.000594</text>
+<polyline points="70.00,361.16 111.33,361.38 152.67,361.09 194.00,356.96" fill="none" stroke="#1f77b4" stroke-width="2.2"/>
+<circle cx="70.00" cy="361.16" r="3.5" fill="#1f77b4"/>
+<circle cx="111.33" cy="361.38" r="3.5" fill="#1f77b4"/>
+<circle cx="152.67" cy="361.09" r="3.5" fill="#1f77b4"/>
+<circle cx="194.00" cy="356.96" r="3.5" fill="#1f77b4"/>
+<rect x="540" y="63" width="12" height="12" fill="#1f77b4"/>
+<text x="556" y="73" font-size="11" fill="#111827">dephasing=0.0</text>
+<polyline points="235.33,361.11 276.67,360.46 318.00,361.00 359.33,357.98" fill="none" stroke="#d62728" stroke-width="2.2"/>
+<circle cx="235.33" cy="361.11" r="3.5" fill="#d62728"/>
+<circle cx="276.67" cy="360.46" r="3.5" fill="#d62728"/>
+<circle cx="318.00" cy="361.00" r="3.5" fill="#d62728"/>
+<circle cx="359.33" cy="357.98" r="3.5" fill="#d62728"/>
+<rect x="540" y="81" width="12" height="12" fill="#d62728"/>
+<text x="556" y="91" font-size="11" fill="#111827">dephasing=0.01</text>
+<polyline points="400.67,360.93 442.00,358.64 483.33,352.16 524.67,356.36" fill="none" stroke="#2ca02c" stroke-width="2.2"/>
+<circle cx="400.67" cy="360.93" r="3.5" fill="#2ca02c"/>
+<circle cx="442.00" cy="358.64" r="3.5" fill="#2ca02c"/>
+<circle cx="483.33" cy="352.16" r="3.5" fill="#2ca02c"/>
+<circle cx="524.67" cy="356.36" r="3.5" fill="#2ca02c"/>
+<rect x="540" y="99" width="12" height="12" fill="#2ca02c"/>
+<text x="556" y="109" font-size="11" fill="#111827">dephasing=0.03</text>
+<polyline points="566.00,358.89 607.33,304.74 648.67,354.24 690.00,78.62" fill="none" stroke="#9467bd" stroke-width="2.2"/>
+<circle cx="566.00" cy="358.89" r="3.5" fill="#9467bd"/>
+<circle cx="607.33" cy="304.74" r="3.5" fill="#9467bd"/>
+<circle cx="648.67" cy="354.24" r="3.5" fill="#9467bd"/>
+<circle cx="690.00" cy="78.62" r="3.5" fill="#9467bd"/>
+<rect x="540" y="117" width="12" height="12" fill="#9467bd"/>
+<text x="556" y="127" font-size="11" fill="#111827">dephasing=0.1</text>
+<text x="380" y="424" font-size="13" text-anchor="middle">shot setting index (exact, 16384, 4096, 1024)</text>
+<text x="20" y="220" font-size="13" text-anchor="middle" transform="rotate(-90 20 220)">abs error</text>
+</svg>

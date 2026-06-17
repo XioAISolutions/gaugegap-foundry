@@ -1,5 +1,6 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
-	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal
+	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
+	curverank-noise-study
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -79,5 +80,11 @@ curverank-signal:
 	python scripts/run_curverank_signal.py --n-basis 8 --method esprit \
 		--output-dir results/curverank-signal
 
+# Noise study: QCELS (dominant eigenvalue) vs ESPRIT (full spectrum) accuracy
+# under modelled dephasing + shot noise. Exact statevector envelopes, no creds.
+curverank-noise-study:
+	python scripts/run_curverank_noise_study.py --output-dir results/curverank-noise
+
 # Regenerate all CurveRank bundles.
-curverank: curverank-formal curverank-ibm curverank-hardware curverank-signal
+curverank: curverank-formal curverank-ibm curverank-hardware curverank-signal \
+	curverank-noise-study
