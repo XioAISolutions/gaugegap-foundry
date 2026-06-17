@@ -33,11 +33,15 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from gaugegap.curverank_certified import certified_family_mismatch
+import numpy as np
+
+from gaugegap.curverank_certified import certified_family_mismatch, certified_xp_spectrum
+from gaugegap.curverank_operators import berry_keating_xp
 from gaugegap.rigorous.curverank_formal_emit import (
     discharged_monotonicity_proof,
     discharged_separation_proof,
 )
+from gaugegap import curverank_signal as _signal
 
 _FAMILIES = {
     "berry_keating": "xp",
@@ -59,6 +63,7 @@ class Program:
     certificates: Dict[str, Dict] = field(default_factory=dict)
     assertions: List[Dict] = field(default_factory=list)
     monotonicity: List[Dict] = field(default_factory=list)
+    extractions: Dict[str, Dict] = field(default_factory=dict)
     measurements: Dict[str, Dict] = field(default_factory=dict)
     report_dir: Optional[str] = None
 
@@ -90,6 +95,7 @@ class Program:
                  "coq_file": f"{m['family']}_monotone.v"}
                 for m in self.monotonicity
             ],
+            "extractions": self.extractions,
             "measurements": self.measurements,
         }
 
@@ -105,6 +111,9 @@ _RE_PROVE_MONO = re.compile(
 _RE_MEASURE = re.compile(
     r"^measure\s+(\w+)\s*=\s*qpe\(\s*(\w+)\s*,\s*window\s*=\s*([\d.]+)\s*,\s*"
     r"precision\s*=\s*(\d+)\s*(?:,\s*backend\s*=\s*([\w-]+)\s*)?\)$"
+)
+_RE_EXTRACT = re.compile(
+    r"^extract\s+(\w+)\s*=\s*spectrum\(\s*(\w+)\s*,\s*method\s*=\s*(\w+)\s*\)$"
 )
 _RE_REPORT = re.compile(r'^report\s+"([^"]+)"$')
 
@@ -157,6 +166,10 @@ class Interpreter:
         if m:
             self._measure(m.group(1), m.group(2), float(m.group(3)), int(m.group(4)),
                           m.group(5) or "emulator")
+            return
+        m = _RE_EXTRACT.match(line)
+        if m:
+            self._extract(m.group(1), m.group(2), m.group(3))
             return
         m = _RE_REPORT.match(line)
         if m:
@@ -216,6 +229,42 @@ class Interpreter:
             "family": family, "panel": list(panel), "k_zeros": k,
             "lowers": proof.lowers, "lean4": proof.lean4, "coq": proof.coq,
         })
+
+    def _extract(self, name: str, op_name: str, method: str) -> None:
+        """Extract the operator's spectrum from its quantum correlation signal and
+        REQUIRE every recovered eigenvalue to land inside a certified enclosure --
+        the certification-first rule applied to signal extraction."""
+        if op_name not in self.p.operators:
+            raise SpectraError(f"unknown operator {op_name!r}")
+        if method not in ("esprit", "prony"):
+            raise SpectraError(f"unknown method {method!r} (use 'esprit' or 'prony')")
+        op = self.p.operators[op_name]
+        if op["family"] != "xp":
+            raise SpectraError(
+                f"extract currently supports the xp (berry_keating) family, not "
+                f"{op['family']!r}"
+            )
+        n = op["n"]
+        H = berry_keating_xp(n)
+        rng = np.random.default_rng(abs(hash(("spectra-extract", op_name, n))) % (2**32))
+        psi = rng.standard_normal(n) + 1j * rng.standard_normal(n)
+        psi /= np.linalg.norm(psi)
+        result = _signal.extract_eigenvalues(H, psi, method=method,
+                                             rng=np.random.default_rng(0))
+        enclosures = certified_xp_spectrum(n)
+        report = _signal.validate_against_certified(result.eigenvalues, enclosures)
+        if not all(r["in_certified_enclosure"] for r in report):
+            misses = [r["estimate"] for r in report if not r["in_certified_enclosure"]]
+            raise SpectraError(
+                f"extraction rejected: {len(misses)} eigenvalue(s) fell outside the "
+                f"certified enclosures (e.g. {misses[:3]}); the certified kernel does "
+                f"not back this spectrum"
+            )
+        self.p.extractions[name] = {
+            "operator": op_name, "family": "xp", "n": n, "method": method,
+            "eigenvalues": [float(x) for x in sorted(result.eigenvalues)],
+            "all_in_certified_enclosure": True,
+        }
 
     def _measure(self, name: str, op_name: str, window: float, precision: int,
                  backend: str = "emulator") -> None:

@@ -70,6 +70,7 @@ One statement per line; `#` starts a comment.
 | `certify M = mismatch(x, Z)` | certified L2 spectral mismatch interval `M_n` |
 | `assert separated(M, threshold=t)` | discharge `M ≥ t` (Lean/Coq) or fail |
 | `prove monotone(family, panel=a,b,c, zeros=Z)` | discharge that the certified lower bounds strictly increase across the panel, or fail |
+| `extract S = spectrum(op, method=esprit\|prony)` | recover the operator's spectrum from its quantum correlation signal; **fails** unless every recovered eigenvalue lands in a certified enclosure |
 | `measure Q = qpe(x, window=r, precision=p[, backend=emulator\|ibm-hardware])` | windowed QPE eigenvalue recovery (needs qiskit; `ibm-hardware` needs a token) |
 | `report "dir"` | write the JSON report + emitted certificates |
 

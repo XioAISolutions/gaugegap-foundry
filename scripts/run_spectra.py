@@ -41,6 +41,9 @@ def main() -> int:
         lows = ", ".join(f"{x:.4f}" for x in mono["lowers"])
         print(f"  prove monotone({mono['family']}, panel={mono['panel']}): "
               f"OK [{lows}] -> Lean/Coq certificate")
+    for name, e in prog.extractions.items():
+        print(f"  extract {name}: {e['method']} on {e['operator']} (n={e['n']}) "
+              f"-> {len(e['eigenvalues'])} eigenvalues, all in certified enclosures")
     for name, m in prog.measurements.items():
         print(f"  measure {name}: target={m['target_eigenvalue']:.5f} "
               f"est={m['estimated_eigenvalue']:.5f} err={m['absolute_error']:.5f}")

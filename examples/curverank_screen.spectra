@@ -25,4 +25,8 @@ assert   separated(Mq, threshold=1.0)
 # NOT, so a `prove monotone(dirac_rindler, ...)` would correctly fail the program.
 prove    monotone(berry_keating, panel=10,15,20,25,30, zeros=Z)
 
+# Recover the operator's spectrum from its quantum correlation signal; every
+# recovered eigenvalue MUST land in a certified enclosure or the program fails.
+extract  Sx = spectrum(xp, method=esprit)
+
 report   "results/spectra-demo"

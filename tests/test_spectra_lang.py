@@ -118,6 +118,32 @@ class TestSpectra(unittest.TestCase):
         self.assertEqual(len(prog.assertions), 3)
         self.assertTrue(all(a["separated"] for a in prog.assertions))
         self.assertEqual(len(prog.monotonicity), 1)
+        self.assertIn("Sx", prog.extractions)
+
+
+class TestExtractVerb(unittest.TestCase):
+    def test_extract_recovers_spectrum_in_enclosures(self):
+        prog = run_program(
+            "operator xp = berry_keating(n=8)\n"
+            "extract Sx = spectrum(xp, method=esprit)\n"
+        )
+        e = prog.extractions["Sx"]
+        self.assertEqual(len(e["eigenvalues"]), 8)
+        self.assertTrue(e["all_in_certified_enclosure"])
+
+    def test_extract_rejects_unsupported_family(self):
+        with self.assertRaises(SpectraError):
+            run_program(
+                "operator dr = dirac_rindler(n=8)\n"
+                "extract S = spectrum(dr, method=esprit)\n"
+            )
+
+    def test_extract_unknown_method(self):
+        with self.assertRaises(SpectraError):
+            run_program(
+                "operator xp = berry_keating(n=8)\n"
+                "extract S = spectrum(xp, method=nonsense)\n"
+            )
 
 
 if __name__ == "__main__":
