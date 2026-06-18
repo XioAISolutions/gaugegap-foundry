@@ -4,7 +4,8 @@ A consulting / small-engagement offer built on capability already demonstrated i
 this repository. Honest scope, fixed deliverables.
 
 > Contact: **Viacheslav (Slava) Smagin** · slavazeph@gmail.com · 647-863-9522 ·
-> github.com/XioAISolutions · xioai.co · rates **[day / project]**.
+> github.com/XioAISolutions · xioai.co · rates **CAD $800–1,200 / day or fixed
+> per-deliverable (specialist work; negotiable)**.
 >
 > *Note: this is a specialist/technical-depth offer. For most engagements lead with
 > the primary portfolio (`docs/portfolio/README.md`) — AI product & construction-

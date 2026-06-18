@@ -5,8 +5,8 @@ case studies are drawn from the XIO AI portfolio; the delivery case studies from
 10+ years of construction leadership. (For deep technical engineering evidence, see
 [`technical-depth.md`](./technical-depth.md).)
 
-> Where a number isn't yet measured, it's marked **[metric: ___]** so you can fill
-> it honestly rather than guess.
+> These read cleanly as-is. Where real traction exists (users, docs reviewed, time
+> saved), drop it into the marked HTML comments — never estimate a number.
 
 ## Applied AI
 
@@ -18,7 +18,8 @@ personas, curated source packs, citation verification, **approval-gated** DOCX
 exports, and end-to-end audit trails.
 **Result.** A demo that turns "the AI said so" into reviewable, sourced, sign-off-
 gated output. *Skills: applied-AI product design, RAG/citation discipline, approval
-workflows, regulated-domain UX.* **[metric: pilot users / docs reviewed ___]**
+workflows, regulated-domain UX.*
+<!-- Optional: add real traction here when available (pilot users, docs reviewed, time saved). Leave omitted rather than estimate. -->
 
 ### 2. CRUMB — portable context handoff between AI tools
 **Problem.** Moving a task between AI tools loses memory, repo context, and
@@ -71,5 +72,5 @@ estimating, procurement, trade coordination, reporting, closeout.*
 ---
 
 > Honest by default: applied-AI items are demos/working concepts (not yet
-> revenue-scale unless noted); construction metrics are from delivered work. Fill
-> the **[metric: ___]** blanks with real numbers before sending.
+> revenue-scale unless noted); construction metrics are from delivered work. Add
+> real traction into the marked HTML comments as it lands — never estimate.

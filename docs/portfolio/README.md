@@ -9,7 +9,15 @@ GitHub: github.com/XioAISolutions · Web: xioai.co
 > hands-on **applied-AI building** — shipped demos, agent workflows, AI handoff
 > tooling, and product narratives that turn messy operational pain into usable
 > systems. Available for **AI product roles, construction-tech / ConTech product
-> roles, or applied-AI contracting (XIO AI)**. **Rate / range: [your number].**
+> roles, or applied-AI contracting (XIO AI)**.
+
+**Rates (CAD, negotiable — adjust before sending):**
+
+| Engagement | Contract | Full-time equivalent |
+|---|---|---|
+| AI Product (PM / product lead) | $600–1,000 / day | ~$120–180k |
+| Construction-tech product / solutions | $550–900 / day | ~$110–160k |
+| Applied-AI contracting (XIO AI) | $90–150 / hr | project-based available |
 
 ---
 

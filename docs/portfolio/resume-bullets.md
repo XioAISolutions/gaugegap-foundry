@@ -1,7 +1,7 @@
 # Résumé / profile bullets (copy-paste)
 
 Drop-in bio + bullets for LinkedIn, a CV, or a proposal. All construction metrics
-are from delivered work; fill any **[metric: ___]** honestly. Two tracks below —
+are from delivered work; add applied-AI traction only when real. Two tracks below —
 lead with the **primary** for most roles; add the **technical-depth** line when the
 audience is engineering-heavy.
 
@@ -57,6 +57,12 @@ audience is engineering-heavy.
 - **Construction-tech product / solutions** — your field-fluency is the moat.
 - **Applied-AI contracting (XIO AI)** — fastest to invoice; least gatekeeping.
 - **Marketplaces:** Toptal, Braintrust, Upwork, Contra — lead with case studies.
+
+## Rate anchors (CAD, negotiable)
+- **AI Product:** $600–1,000 / day (~$120–180k FT).
+- **Construction-tech product / solutions:** $550–900 / day (~$110–160k FT).
+- **Applied-AI contracting (XIO AI):** $90–150 / hr, or fixed project price.
+- Set the exact number per client/role; these are starting anchors, not floors.
 
 > Honest in interviews: applied-AI items are demos/working concepts unless a metric
 > is filled; construction numbers are delivered. The quantum repo is a *rigor
