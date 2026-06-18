@@ -3,7 +3,12 @@
 A consulting / small-engagement offer built on capability already demonstrated in
 this repository. Honest scope, fixed deliverables.
 
-> Contact: **[your name]** · **[email]** · **[links]** · rates **[day / project]**.
+> Contact: **Viacheslav (Slava) Smagin** · slavazeph@gmail.com · 647-863-9522 ·
+> github.com/XioAISolutions · xioai.co · rates **[day / project]**.
+>
+> *Note: this is a specialist/technical-depth offer. For most engagements lead with
+> the primary portfolio (`docs/portfolio/README.md`) — AI product & construction-
+> tech. This page is for clients who specifically need certified numerics.*
 
 ## What I provide
 

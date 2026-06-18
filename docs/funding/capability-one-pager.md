@@ -1,6 +1,7 @@
 # Capability one-pager — GaugeGap Foundry
 
-> **[Organization / your name]** · **[email]** · **[links]**
+> **XIO AI / Viacheslav (Slava) Smagin** · slavazeph@gmail.com · 647-863-9522 ·
+> github.com/XioAISolutions · xioai.co
 
 ## What it is
 

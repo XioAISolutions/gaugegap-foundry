@@ -1,68 +1,75 @@
 # Case studies
 
-Four worked examples from this repository, each: **problem → what was built →
-result**, with metrics that trace to merged, tested work. (PR numbers reference
-this repo's history.)
+Worked examples in the **problem → what I built → result** format. The applied-AI
+case studies are drawn from the XIO AI portfolio; the delivery case studies from
+10+ years of construction leadership. (For deep technical engineering evidence, see
+[`technical-depth.md`](./technical-depth.md).)
 
-## 1. A ~14× speedup of a certified-numerics kernel — with zero result change
+> Where a number isn't yet measured, it's marked **[metric: ___]** so you can fill
+> it honestly rather than guess.
 
-**Problem.** Certified eigenvalue enclosures (directed-rounding interval
-arithmetic) dominated runtime: a representative screening workload took ~155 s,
-~98% inside one residual routine.
+## Applied AI
 
-**What I built.** Profiled the hot path, then reused the mpmath interval matrix
-**once per eigensolve** (instead of once per eigenpair) and kept all arithmetic in
-the directed-rounding context — same operations, same order, same precision.
+### 1. XIO Compliance Brain — trustworthy AI review for regulated work
+**Problem.** AI drafts for legal/compliance work are unusable if you can't trace
+*why* — no sources, no approvals, no audit trail.
+**What I built.** A Canadian legal/compliance workbench with task-specific reviewer
+personas, curated source packs, citation verification, **approval-gated** DOCX
+exports, and end-to-end audit trails.
+**Result.** A demo that turns "the AI said so" into reviewable, sourced, sign-off-
+gated output. *Skills: applied-AI product design, RAG/citation discipline, approval
+workflows, regulated-domain UX.* **[metric: pilot users / docs reviewed ___]**
 
-**Result.** **~14.5× faster (155 s → ~10.7 s), bit-for-bit identical output** —
-verified by the recorded certified values and 49 tests, plus the full suite (490
-passed). *Skills: profiling, numerical linear algebra, interval arithmetic,
-regression safety.* (PR #29)
+### 2. CRUMB — portable context handoff between AI tools
+**Problem.** Moving a task between AI tools loses memory, repo context, and
+guardrails; you re-explain everything.
+**What I built.** A copy-paste handoff *format* plus a CLI/tooling layer that
+carries tasks, memory, repo maps, workflows, guardrails, and agent context across
+tools.
+**Result.** A reusable interchange pattern + tooling that shortens cold-start on any
+new AI tool. *Skills: developer tooling, format/spec design, agent workflows, DX.*
 
-## 2. A certified result, exported to three proof assistants
+### 3. PenguinWalkOS — keep a solopreneur's operations visible & safe
+**Problem.** Small operators lose leads and get silently broken by website/tool
+changes, with no one watching.
+**What I built.** A workspace concept that watches websites, protects lead flow,
+explains changes in plain language, and **queues risky fixes for human approval**.
+**Result.** An "operations cockpit" pattern that keeps automation visible and
+reversible. *Skills: product narrative, monitoring/automation, human-in-the-loop
+design.*
 
-**Problem.** Turn a numerical separation result into something a machine can check
-— without overclaiming.
+### 4. GaugeGap Foundry — proof of engineering rigor (technical-depth exhibit)
+**Problem.** Demos are easy; the harder question is whether I can drive *rigorous*,
+correct, well-tested engineering.
+**What I built / result.** A public, CI-green quantum/scientific-computing repo:
+~490 passing tests, byte-reproducible artifacts, a self-auditing claim boundary at
+0 high findings, including a **~14.5× certified-kernel speedup with bit-identical
+output**. Full write-up in [`technical-depth.md`](./technical-depth.md). *Skills:
+engineering discipline, testing, reproducibility, honest scoping.*
 
-**What I built.** Assembled the certified finite-truncation theorem as a formal
-object and exported it to **Lean 4 / Coq / Isabelle**, with discharged
-(`linarith`/`lra`) proofs whose single trust input is the interval certificate.
+## Construction delivery
 
-**Result.** Reproducible proof bundle + honest docs precisely stating what is and
-is **not a proof** (it is the finite-truncation separation, not the Riemann
-Hypothesis). *Skills: formal methods, computer-assisted proof, scientific
-integrity.* (PR #10)
+### 5. 15% completion-rate improvement through planning discipline
+**Problem.** Custom-home builds slipped on coordination, sequencing, and late issue
+escalation.
+**What I built.** Tighter planning, clearer vendor coordination, schedule
+discipline, and proactive issue escalation across homeowners, consultants,
+engineers, suppliers, and trades.
+**Result.** **~15% improvement in completion rates** (SKR Homes / 2G Engineering).
+*Skills: scheduling, procurement, QA/QC, stakeholder coordination.*
 
-## 3. A quantum signal-extraction toolkit
-
-**Problem.** Extract eigenvalues / spectral content from quantum states beyond
-textbook QPE, in a way that is testable without hardware.
-
-**What I built.** Hadamard test, the correlation signal `g(t)`, Prony/ESPRIT
-super-resolution, **QCELS** (Heisenberg-style, ~`1/T` scaling), classical shadows,
-and amplitude estimation — all with an exact statevector mode for deterministic
-tests, plus a dephasing+shot noise model and study.
-
-**Result.** Recovers a benchmark operator's spectrum to ~1e-14 (exact mode), every
-eigenvalue validated against certified enclosures; honest finding that QCELS is
-noise-robust while full-spectrum super-resolution is fragile. *Skills: quantum
-algorithms, signal processing, statistics, test design.* (PRs #31/#32)
-
-## 4. Two "honest-by-construction" DSLs
-
-**Problem.** Make scientific integrity executable, not aspirational.
-
-**What I built.** **Spectra** (a claim only passes if the interval kernel
-discharges it, emitting a Lean/Coq certificate) and **Verdict** (a model claim
-only passes if a logged, reproducible eval backs it) — small interpreters where an
-unbacked claim *fails the program*.
-
-**Result.** Working DSLs + CLIs + tests where the honest-failure cases are
-asserted. *Skills: language/interpreter design, API design, developer experience.*
-(PRs #26/#27/#33)
+### 6. 80+ projects, $10M+ scopes — the field reality software must model
+**Problem.** Construction software repeatedly misses how delivery actually works:
+estimating, selections, substitutions, procurement timing, change orders, RFIs.
+**What I built.** Owned that full workflow on **80+ residential/retail projects**
+incl. **$10M+** luxury scopes, plus multi-site retail rollouts across Ontario and
+build-outs across Canada/U.S.
+**Result.** Deep, lived requirements for any ConTech/PropTech product — the exact
+gap AI tools need to close for contractors, dealers, and suppliers. *Skills:
+estimating, procurement, trade coordination, reporting, closeout.*
 
 ---
 
-> Every metric above is reproducible from the repo (`make` targets, `pytest`,
-> `claim_boundary_audit.py`). Nothing is fabricated; the science stays a certified
-> **negative** result, not a proof of any Millennium Prize problem.
+> Honest by default: applied-AI items are demos/working concepts (not yet
+> revenue-scale unless noted); construction metrics are from delivered work. Fill
+> the **[metric: ___]** blanks with real numbers before sending.
