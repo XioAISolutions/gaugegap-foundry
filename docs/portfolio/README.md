@@ -1,42 +1,81 @@
-# Portfolio — GaugeGap Foundry
+# Viacheslav (Slava) Smagin — AI Product & Construction-Tech Leader
 
-A capability portfolio built from a real, public, CI-green codebase:
-**verification-first quantum / scientific-computing infrastructure.** Every claim
-below links to merged, tested work in this repository — no slideware.
+**Applied AI Builder · Director of Construction**
+Toronto, ON · 647-863-9522 · slavazeph@gmail.com · English / Russian
+GitHub: github.com/XioAISolutions · Web: xioai.co
 
-> Maintainer: **[your name]** · **[email]** · **[GitHub/LinkedIn]** ·
-> available for **[contract / full-time]**, **[rate / range]**.
+> Construction-tech product leader with **10+ years owning real-world delivery**
+> (luxury residential, retail rollouts, procurement, field execution) paired with
+> hands-on **applied-AI building** — shipped demos, agent workflows, AI handoff
+> tooling, and product narratives that turn messy operational pain into usable
+> systems. Available for **AI product roles, construction-tech / ConTech product
+> roles, or applied-AI contracting (XIO AI)**. **Rate / range: [your number].**
 
-## Snapshot
+---
 
-- **Language/stack:** Python (numpy, scipy, mpmath, `python-flint`/Arb), Qiskit /
-  IBM Runtime, optional CUDA-Q, Lean 4 / Coq / Isabelle export, GitHub Actions CI.
-- **Scale of evidence:** ~490 tests passing, byte-reproducible build artifacts, a
-  strict automated claim-boundary audit at **0 high findings**, ~35 reviewed PRs.
-- **Ethos:** every result is reproducible and scope-bounded before any claim — the
-  same discipline teams want in research, safety-critical, and ML-eval work.
+## Why me — the rare overlap
 
-## Skills matrix (each linked to real work)
+Most "AI for construction" fails because the builder doesn't understand the field,
+or the field expert can't shape software. I'm the translation layer: I've **lived
+the friction on active job sites** *and* I **ship working AI systems**.
 
-| Skill | Demonstrated by |
+| Field-fluent (10+ yrs) | AI-fluent (building now) |
 |---|---|
-| Rigorous / certified numerics | interval-arithmetic eigenvalue enclosures + a **~14× kernel speedup, bit-identical** (`src/gaugegap/rigorous/`, PR #29) |
-| Formal verification | machine-checkable separation theorem exported to **Lean 4 / Coq / Isabelle** (`docs/curverank-formal-proof.md`, PR #10) |
-| Quantum software | QPE (register/windowed/iterative/Trotter), IBM Runtime path with mitigation (`curverank_qpe.py`, `providers/ibm_adapter.py`) |
-| Quantum signal processing | Hadamard test, `g(t)`, Prony/ESPRIT, **QCELS**, classical shadows, amplitude estimation (`curverank_signal.py`, PRs #31/#32) |
-| Language / DSL design | two interpreters, **Spectra** & **Verdict**, with certified / eval-first semantics (`spectra_lang/`, `verdict_lang/`) |
-| GPU acceleration | optional, capability-gated **CUDA-Q** backend with CPU fallback + parity test (`providers/cudaq_adapter.py`, PRs #34/#35) |
-| Reproducibility / DevX | one-command `make` targets, hashed proofpacks, reviewer packets, hermetic CI |
-| Technical writing | cited landscape survey, honest evaluations, runbooks (`docs/`) |
+| 80+ residential / retail projects delivered | Public applied-AI portfolio (demos + GitHub) |
+| $10M+ luxury residential scopes | Agent workflows, AI handoff tooling, MCP/CLI concepts |
+| Quoting, procurement, substitutions, RFIs, change orders | Compliance/audit trails, content-risk analysis, lead-flow monitoring |
+| 15% completion-rate improvement via planning discipline | Local/hosted compute, Next.js-style product surfaces |
 
-## How to read the repo in 5 minutes
+## Three ways to work with me
 
-1. `README.md` — the tracks, diagrams, and claim boundary.
-2. `docs/curverank-formal-proof.md` — certified result → machine-checkable proof.
-3. `docs/curverank-signal-extraction.md` — the quantum signal-extraction toolkit.
-4. `docs/portfolio/case-studies.md` — four worked case studies with metrics.
+1. **AI Product roles** (PropTech / ConTech / applied-AI startups) — I do
+   discovery, write requirements, shape prototypes, run demo loops, and push to
+   shipped, *usable* outcomes. Player-coach, bias for action.
+2. **Construction-tech / ConTech product & solutions** — I own the practical
+   workflow your software must understand: estimating, selections, procurement
+   timing, delivery constraints, trade coordination, closeout.
+3. **Applied-AI contracting via XIO AI** (xioai.co) — discovery → requirements →
+   prototype → shipped tool, with logs, approvals, and guardrails baked in.
 
-> **Honest scope.** The science here is finite-system spectral *screening* — a
-> certified **negative** result. It is **not a proof** of the Riemann Hypothesis
-> or any Millennium Prize problem. What it demonstrates is engineering capability:
-> rigorous, reproducible, well-tested quantum and scientific software.
+## Selected applied-AI portfolio
+
+| Project | Why it matters |
+|---|---|
+| **CRUMB** | Copy-paste AI handoff format + CLI/tooling for moving tasks, memory, repo maps, workflows, and agent context between AI tools. |
+| **XIO Compliance Brain** | Canadian legal/compliance workbench: reviewer personas, source packs, citation verification, approval-gated DOCX exports, audit trails. |
+| **BrainSNN** | Browser-native 3D cognitive-security / affective-intelligence demo with content-risk analysis and MCP bridge concepts. |
+| **PenguinWalkOS** | Workspace for solopreneurs: watches sites, protects lead flow, explains changes, queues risky fixes for approval. |
+| **OpenClaw Workspace** | Local desktop workspace for agent skills + service integrations (localhost service-wrapper pattern). |
+| **GaugeGap Foundry** | Verification-first quantum/scientific-computing repo — my **technical-depth exhibit** (rigor, tests, CI). See [`technical-depth.md`](./technical-depth.md). |
+
+## Selected delivery signals (construction)
+
+- **80+** residential & retail projects delivered; **$10M+** luxury residential scopes.
+- **15%** completion-rate improvement through tighter planning, vendor coordination,
+  and schedule discipline (SKR Homes / 2G Engineering).
+- Multi-site retail rollout delivery across Ontario + IT-room / site-readiness
+  build-outs across Canada and the U.S. (High Tide Inc.).
+
+## Skills
+
+**AI / Product:** AI product strategy, discovery, roadmap shaping, MVPs, demos, LLM
+workflows, agent handoffs, MCP/CLI concepts, workflow automation, UX thinking,
+GitHub, Railway, local compute.
+**Construction / Ops:** budgeting, scheduling, procurement, quotes, site changes,
+supplier coordination, QA/QC, trade sequencing, RFIs, closeout, reporting, MS
+Project, Excel, Revit/BIM, drawings.
+**Leadership:** stakeholder & vendor management, cross-functional alignment, risk
+control, documentation, executive communication.
+
+## Education & safety
+B.Tech, Construction Management — George Brown College. Health & safety: supervision
+basics, confined space, traffic control, fall protection, WHMIS.
+
+---
+
+### Two-track portfolio
+- **This page** — primary: AI Product & Construction-Tech (who hires/pays me).
+- [`technical-depth.md`](./technical-depth.md) — proof I can drive rigorous,
+  CI-green, well-tested engineering, on a real public codebase.
+- [`case-studies.md`](./case-studies.md) — worked applied-AI + delivery case studies.
+- [`resume-bullets.md`](./resume-bullets.md) — copy-paste bio & bullets.
