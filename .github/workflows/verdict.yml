@@ -1,0 +1,18 @@
+name: Verdict eval gate
+
+# Demonstrates Verdict as a CI gate: a model claim only passes if a logged,
+# reproducible eval backs it. Fails the job if an assertion is unmet.
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+jobs:
+  verdict:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verdict gate (macro-F1 + no-regression)
+        uses: ./.github/actions/verdict
+        with:
+          program: examples/sentiment_f1.verdict

@@ -1,0 +1,8 @@
+# Verdict eval gated on macro-F1 (not just accuracy), with a regression floor.
+# A claim only passes if a logged, reproducible eval backs it.
+dataset D = cases("examples/sentiment_cases.jsonl")
+model   M = keyword_sentiment()
+eval    E = run(M, D, metric=f1)
+assert  score(E) >= 0.8
+assert  no_regression(E, baseline=0.75)
+report  "results/verdict-f1-demo"

@@ -15,6 +15,43 @@
       "dataset": "D",
       "metric": "accuracy",
       "score": 1.0,
+      "metrics": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "per_label": {
+          "neg": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 4,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          },
+          "pos": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "support": 4,
+            "tp": 4,
+            "fp": 0,
+            "fn": 0
+          }
+        },
+        "confusion_matrix": {
+          "neg": {
+            "neg": 4,
+            "pos": 0
+          },
+          "pos": {
+            "neg": 0,
+            "pos": 4
+          }
+        },
+        "n_cases": 8
+      },
       "n_cases": 8,
       "log_file": "E_log.jsonl"
     }
