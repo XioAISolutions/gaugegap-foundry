@@ -130,3 +130,5 @@ certify-scaling:
 geometry-figures:
 	python scripts/generate_geometry_figures.py $(if $(SACRED),--sacred-overlay,) \
 		--output-dir figures/geometry
+	python scripts/generate_geometry_html.py \
+		--output figures/geometry/geometry_explorer.html

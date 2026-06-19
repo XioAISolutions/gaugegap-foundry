@@ -89,6 +89,33 @@ class TestSVGAndFigures(unittest.TestCase):
         self.assertIn("<circle", out)
         self.assertTrue(out.endswith("</svg>\n"))
 
+    def test_interactive_html_is_self_contained_and_deterministic(self):
+        import tempfile
+        path = ROOT / "scripts" / "generate_geometry_html.py"
+        spec = importlib.util.spec_from_file_location("geomhtml", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        import sys as _sys
+        outs = []
+        with tempfile.TemporaryDirectory() as d:
+            for k in range(2):
+                p = Path(d) / f"explorer{k}.html"
+                old = _sys.argv
+                _sys.argv = ["prog", "--output", str(p), "--cy-grid", "6"]
+                try:
+                    mod.main()
+                finally:
+                    _sys.argv = old
+                outs.append(p.read_text())
+            self.assertEqual(outs[0], outs[1])  # deterministic
+        html = outs[0]
+        self.assertIn("<canvas", html)
+        self.assertIn("const DATA =", html)
+        # self-contained: no external script/style references
+        self.assertNotIn("http://", html)
+        self.assertNotIn("https://", html)
+        self.assertNotIn("cdn", html.lower())
+
     def test_figures_generate_and_are_deterministic(self):
         import tempfile
         path = ROOT / "scripts" / "generate_geometry_figures.py"

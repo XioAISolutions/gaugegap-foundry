@@ -34,6 +34,23 @@ Produces `su3_fundamental_weight.svg`, `su3_octet_weight.svg`,
 `calabi_yau_cross_section.svg`. Output is byte-deterministic (rounded coordinates),
 matching the repo's hashed-artifact discipline.
 
+## Interactive explorer (flatten the higher-dimensional form)
+
+`make geometry-figures` (or `python scripts/generate_geometry_html.py`) also writes
+`figures/geometry/geometry_explorer.html` — a **self-contained, dependency-free**
+page (vanilla JS + `<canvas>`, no CDN). Drag to rotate the exact 3D structure and
+pull the **flatten** slider to collapse it to its exact 2D shadow:
+
+- the su(3) octet/decuplet weights lie on a plane in the sum-zero R^3 embedding, so
+  flattening to `(T3, Y)` is exact;
+- the Calabi-Yau Fermat cross-section flattens from its R^3 projection to a 2D
+  shadow.
+
+This realises the "rotate the higher-dimensional form, watch it flatten" idea for
+outreach/dashboards, with no Python runtime dependency and byte-deterministic
+output. (We deliberately avoid matplotlib/plotly/manim here to keep the core
+dependency-light and the artifacts reproducible.)
+
 ## Library
 
 ```python
