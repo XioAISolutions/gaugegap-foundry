@@ -77,6 +77,9 @@ _RE_ASSERT_SCORE = re.compile(r"^assert\s+score\(\s*(\w+)\s*\)\s*>=\s*([\d.]+)$"
 _RE_ASSERT_NOREG = re.compile(
     r"^assert\s+no_regression\(\s*(\w+)\s*,\s*baseline\s*=\s*([\d.]+)\s*\)$"
 )
+_RE_ASSERT_NOREG_FILE = re.compile(
+    r'^assert\s+no_regression\(\s*(\w+)\s*,\s*baseline_file\s*=\s*"([^"]+)"\s*\)$'
+)
 _RE_REPORT = re.compile(r'^report\s+"([^"]+)"$')
 
 
@@ -120,6 +123,10 @@ class Interpreter:
         m = _RE_ASSERT_SCORE.match(line)
         if m:
             self._assert_score(m.group(1), float(m.group(2)))
+            return
+        m = _RE_ASSERT_NOREG_FILE.match(line)
+        if m:
+            self._assert_no_regression_file(m.group(1), m.group(2))
             return
         m = _RE_ASSERT_NOREG.match(line)
         if m:
@@ -200,6 +207,34 @@ class Interpreter:
         self.p.assertions.append({
             "kind": "no_regression", "eval": eval_name, "baseline": baseline,
             "score": score, "passed": True,
+        })
+
+    def _assert_no_regression_file(self, eval_name: str, baseline_path: str) -> None:
+        """Compare this run's eval score against the SAME eval's score in a prior
+        report file (true CI regression tracking, not an inline number)."""
+        if eval_name not in self.p.evals:
+            raise VerdictError(f"unknown eval {eval_name!r}")
+        p = (self.base / baseline_path) if not Path(baseline_path).is_absolute() \
+            else Path(baseline_path)
+        if not p.exists():
+            raise VerdictError(f"baseline report not found: {baseline_path}")
+        try:
+            prior = json.loads(p.read_text(encoding="utf-8"))
+            baseline = float(prior["evals"][eval_name]["score"])
+        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+            raise VerdictError(
+                f"baseline file {baseline_path} has no score for eval "
+                f"{eval_name!r}: {exc}"
+            ) from exc
+        score = self.p.evals[eval_name]["score"]
+        if not score >= baseline:
+            raise VerdictError(
+                f"regression: score({eval_name})={score:.4f} < prior-run "
+                f"baseline {baseline:.4f} ({baseline_path})"
+            )
+        self.p.assertions.append({
+            "kind": "no_regression", "eval": eval_name, "baseline": baseline,
+            "baseline_file": baseline_path, "score": score, "passed": True,
         })
 
     def _write_report(self, out: Path) -> None:

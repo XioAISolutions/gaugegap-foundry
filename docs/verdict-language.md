@@ -89,6 +89,19 @@ register_model("ext", command_model("my-classifier --text {input}"))  # external
 
 No provider SDK is imported by the package, so the core stays hermetic and CI-safe.
 
+## Regression against a prior run
+
+Besides an inline floor (`assert no_regression(E, baseline=0.75)`), a claim can be
+gated against the **same eval's score in a previous report** — true CI regression
+tracking:
+
+```
+assert no_regression(E, baseline_file="results/verdict-demo/verdict_report.json")
+```
+
+The prior report is the `verdict_report.json` written by `report`; the assertion
+fails if this run's score for `E` drops below the recorded one.
+
 ## CI gate
 
 `scripts/run_verdict.py` exits non-zero on any unbacked or below-threshold claim,

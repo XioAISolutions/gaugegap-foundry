@@ -92,6 +92,47 @@ class TestProductizationHooks(unittest.TestCase):
         model = command_model("printf pos")
         self.assertEqual(model("anything"), "pos")
 
+    def test_no_regression_from_prior_run_file(self):
+        import tempfile
+        import os
+        with tempfile.TemporaryDirectory() as d:
+            # First run writes a baseline report.
+            run_program(self._program(
+                "model M = keyword_sentiment()\n"
+                "eval E = run(M, D, metric=f1)\n"
+                f'report "{d}"\n'
+            ))
+            baseline = os.path.join(d, "verdict_report.json")
+            self.assertTrue(os.path.exists(baseline))
+            # Second run gates against the prior report; same model -> no regression.
+            prog = run_program(self._program(
+                "model M = keyword_sentiment()\n"
+                "eval E = run(M, D, metric=f1)\n"
+                f'assert no_regression(E, baseline_file="{baseline}")\n'
+            ))
+            a = prog.assertions[0]
+            self.assertTrue(a["passed"])
+            self.assertEqual(a["baseline_file"], baseline)
+
+    def test_no_regression_file_detects_drop(self):
+        import tempfile
+        import os
+        with tempfile.TemporaryDirectory() as d:
+            # Baseline from the strong model.
+            run_program(self._program(
+                "model M = keyword_sentiment()\n"
+                "eval E = run(M, D, metric=f1)\n"
+                f'report "{d}"\n'
+            ))
+            baseline = os.path.join(d, "verdict_report.json")
+            # A weaker model must fail the regression gate.
+            with self.assertRaises(VerdictError):
+                run_program(self._program(
+                    "model M = always_neg()\n"
+                    "eval E = run(M, D, metric=f1)\n"
+                    f'assert no_regression(E, baseline_file="{baseline}")\n'
+                ))
+
 
 if __name__ == "__main__":
     unittest.main()

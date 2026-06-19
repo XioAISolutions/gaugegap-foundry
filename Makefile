@@ -1,6 +1,7 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
-	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget
+	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget \
+	certify-scaling
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -116,3 +117,9 @@ quantum-validate:
 error-budget:
 	python scripts/run_error_budget.py --n-basis 8 --n-runs 20 \
 		--output-dir results/error-budget
+
+# Scaling benchmark of the rigorous certified-eigenvalue kernel (~O(n^3) exact
+# arithmetic): wall-time + max enclosure width vs truncation size.
+certify-scaling:
+	python scripts/run_certify_scaling.py --sizes 4,8,16,32 \
+		--output-dir results/certify-scaling
