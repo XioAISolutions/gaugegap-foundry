@@ -87,3 +87,5 @@ basics, confined space, traffic control, fall protection, WHMIS.
   CI-green, well-tested engineering, on a real public codebase.
 - [`case-studies.md`](./case-studies.md) — worked applied-AI + delivery case studies.
 - [`resume-bullets.md`](./resume-bullets.md) — copy-paste bio & bullets.
+- [`outreach-templates.md`](./outreach-templates.md) — LinkedIn About + cold
+  outreach, application, and freelance-proposal templates.
