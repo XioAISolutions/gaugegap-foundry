@@ -59,6 +59,8 @@ def certify_spectrum(
     *,
     error: float = 1e-12,
     formal_family: Optional[str] = None,
+    emit_formal: bool = False,
+    name: str = "Matrix",
     k_zeros: int = 20,
     threshold: float = 1.0,
 ) -> SpectrumCertificate:
@@ -69,9 +71,12 @@ def certify_spectrum(
     H : a Hermitian (real-symmetric or complex-Hermitian) matrix.
     error : interval half-width added to each matrix entry (input uncertainty).
     formal_family : optional registered family ({"xp","dirac_rindler",
-        "quantum_graph"}); when given, the discharged Lean/Coq separation proof
+        "quantum_graph"}); when given, the discharged Lean/Coq *separation* proof
         for that family is attached. Only meaningful when ``H`` actually is that
         family's truncation.
+    emit_formal : when True (and no ``formal_family``), attach a generic discharged
+        Lean/Coq *global spectral enclosure* certificate for this matrix.
+    name : a label used in the generic certificate's namespace.
     """
     enclosures: List[Interval] = build_certified_general(H, error=error)
     tuples = [tuple(float(x) for x in iv.to_tuple()) for iv in enclosures]
@@ -88,12 +93,19 @@ def certify_spectrum(
             formal_family, len(midpoints), k_zeros=k_zeros, threshold=threshold
         )
         formal = {
+            "kind": "separation_proof",
             "family": proof.family,
             "separated": proof.lower_bound > proof.threshold,
             "lower_bound": proof.lower_bound,
             "lean4": proof.lean4,
             "coq": proof.coq,
         }
+    elif emit_formal:
+        from gaugegap.rigorous.enclosure_certificate import (
+            emit_enclosure_certificate,
+        )
+
+        formal = emit_enclosure_certificate(tuples, name=name).to_dict()
 
     return SpectrumCertificate(
         n=len(midpoints),
@@ -123,12 +135,18 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--formal-family", type=str, default=None,
                     choices=[None, "xp", "dirac_rindler", "quantum_graph"],
                     help="attach the discharged Lean/Coq separation proof")
+    ap.add_argument("--emit-formal", action="store_true",
+                    help="attach a generic discharged Lean/Coq spectral-enclosure "
+                         "certificate (for any Hermitian matrix)")
+    ap.add_argument("--name", type=str, default="Matrix",
+                    help="label for the generic certificate namespace")
     ap.add_argument("--output", type=Path, default=None,
                     help="write the JSON certificate here (default: stdout)")
     args = ap.parse_args(argv)
 
     H = _load_matrix(args.matrix)
-    cert = certify_spectrum(H, error=args.error, formal_family=args.formal_family)
+    cert = certify_spectrum(H, error=args.error, formal_family=args.formal_family,
+                            emit_formal=args.emit_formal, name=args.name)
     payload = json.dumps(cert.to_dict(), indent=2)
     if args.output is not None:
         args.output.write_text(payload)

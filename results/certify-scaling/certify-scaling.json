@@ -1,0 +1,34 @@
+{
+  "claim_boundary": "benchmark of the rigorous interval kernel cost/accuracy at finite truncations; not a physics or continuum claim",
+  "operator": "berry_keating_xp",
+  "rows": [
+    {
+      "all_classical_bracketed": true,
+      "dim": 4,
+      "max_enclosure_width": 1.3068657267467643e-11,
+      "n_basis": 4,
+      "seconds": 0.00786575699999048
+    },
+    {
+      "all_classical_bracketed": true,
+      "dim": 8,
+      "max_enclosure_width": 2.858913106251748e-11,
+      "n_basis": 8,
+      "seconds": 0.03775942199999349
+    },
+    {
+      "all_classical_bracketed": true,
+      "dim": 16,
+      "max_enclosure_width": 5.503864031197736e-11,
+      "n_basis": 16,
+      "seconds": 0.24615186799999833
+    },
+    {
+      "all_classical_bracketed": true,
+      "dim": 32,
+      "max_enclosure_width": 1.1023360002582194e-10,
+      "n_basis": 32,
+      "seconds": 1.7685644860000025
+    }
+  ]
+}

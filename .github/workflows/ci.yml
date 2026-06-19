@@ -114,6 +114,8 @@ jobs:
           python scripts/run_quantum_validation.py --operator berry_keating_xp --n-basis 8 --methods esprit,qcels,krylov,qpe --emulator --output-dir results/quantum-validation
       - name: Error-budget smoke (repeated-seed runs + CI)
         run: python scripts/run_error_budget.py --n-basis 8 --n-runs 4 --output-dir results/error-budget
+      - name: Certify scaling smoke
+        run: python scripts/run_certify_scaling.py --sizes 4,8 --output-dir results/certify-scaling
 
   packaging:
     runs-on: ubuntu-latest
