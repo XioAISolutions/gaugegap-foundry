@@ -75,6 +75,11 @@ def run_one(
     use_emulator: bool,
     device: str,
     method: str,
+    *,
+    H: "np.ndarray | None" = None,
+    operator: str = "berry_keating_xp",
+    target_index: "int | None" = None,
+    mitigation: "dict | None" = None,
 ) -> Dict[str, object]:
     """Windowed QPE for one truncation, run through the IBM provider.
 
@@ -83,12 +88,26 @@ def run_one(
     ``method='trotter'`` is gate-efficient for scaling studies but, at the large
     windowed tau, accumulates Trotter error that can exceed the nominal phase
     resolution — reported honestly via absolute_error.
+
+    ``H`` (optional) lets the caller supply any Hermitian operator; otherwise the
+    named ``operator`` is built from the registry (default: Berry-Keating xp).
+    ``target_index`` selects which eigenvalue to recover (default: the smallest
+    positive one, matching the original behaviour).
     """
     from qiskit import transpile
 
-    H = berry_keating_xp(n_basis)
+    if H is None:
+        from gaugegap.curverank_registry import get_operator
+
+        spec = get_operator(operator)
+        H = spec.build(n_basis)
+        operator = spec.name
+    H = np.asarray(H)
     evals, evecs = np.linalg.eigh(H)
-    idx = int(np.argmin(np.where(evals > 1e-9, evals, np.inf)))
+    if target_index is None:
+        idx = int(np.argmin(np.where(evals > 1e-9, evals, np.inf)))
+    else:
+        idx = int(target_index)
     target = float(evals[idx])
 
     # Windowed evolution time: precision spent on the target, not the full radius.
@@ -114,15 +133,32 @@ def run_one(
     if use_emulator:
         job, metadata = provider.submit_emulator(circuit=tqc, shots=shots)
     else:
-        job, metadata = provider.submit_hardware(circuit=tqc, shots=shots)
+        try:
+            job, metadata = provider.submit_hardware(
+                circuit=tqc, shots=shots, mitigation=mitigation
+            )
+        except TypeError:
+            # Adapter without a mitigation kwarg.
+            job, metadata = provider.submit_hardware(circuit=tqc, shots=shots)
     counts = _extract_counts(job)
 
     phase, phase_unc = extract_phase_from_counts(counts, n_precision)
     estimate = unwrap_phase_to_eigenvalue(phase, tau, target)
     resolution = (2 * np.pi / tau) / (2 ** n_precision)
 
+    calibration = None
+    cal = getattr(metadata, "calibration", None)
+    if cal is not None and hasattr(cal, "to_dict"):
+        try:
+            calibration = cal.to_dict()
+        except Exception:  # pragma: no cover - defensive
+            calibration = None
+
+    is_hardware = not use_emulator
     return {
+        "operator": operator,
         "n_basis": n_basis,
+        "target_index": idx,
         "n_qubits": tqc.num_qubits,
         "circuit_depth": tqc.depth(),
         "n_precision": n_precision,
@@ -136,6 +172,11 @@ def run_one(
         "within_resolution": bool(abs(float(estimate) - target) <= 1.5 * resolution),
         "backend": metadata.backend_name,
         "job_id": metadata.job_id,
+        "is_hardware": is_hardware,
+        # Claim-boundary gate: only a real provider job id makes this a hardware result.
+        "hardware_confirmed": bool(is_hardware and metadata.job_id),
+        "mitigation": mitigation,
+        "calibration": calibration,
     }
 
 
@@ -143,6 +184,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
+    parser.add_argument("--operator", type=str, default="berry_keating_xp",
+                        help="Operator family from the registry "
+                             "(berry_keating_xp, dirac_rindler, quantum_graph)")
     parser.add_argument("--n-basis", type=str, default="4,8",
                         help="Comma-separated power-of-two-friendly truncations")
     parser.add_argument("--n-precision", type=int, default=6)
@@ -192,6 +236,7 @@ def main() -> int:
         row = run_one(
             n, args.n_precision, args.shots, args.trotter_reps,
             args.window_radius, use_emulator, args.device, args.method,
+            operator=args.operator,
         )
         rows.append(row)
         print(

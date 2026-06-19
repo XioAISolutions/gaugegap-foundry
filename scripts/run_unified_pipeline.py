@@ -46,8 +46,12 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from gaugegap.curverank_operators import berry_keating_xp
-from gaugegap.curverank_certified import certified_xp_spectrum, certified_xp_mismatch
+from gaugegap.curverank_registry import get_operator, OperatorSpec
+from gaugegap.curverank_certified import (
+    certified_family_mismatch,
+    certified_spectral_mismatch,
+    riemann_zero_intervals,
+)
 from gaugegap import curverank_signal as cs
 from gaugegap.quantum import quantum_information as qi
 from gaugegap.quantum import quantum_subspace_methods as qsm
@@ -62,12 +66,12 @@ def _smallest_positive_index(evals: np.ndarray) -> int:
     return int(np.argmin(np.where(evals > 1e-9, evals, np.inf)))
 
 
-def stage0_classical(n_basis: int) -> dict:
-    H = berry_keating_xp(n_basis)
+def stage0_classical(spec: OperatorSpec, n_basis: int) -> dict:
+    H = spec.build(n_basis)
     H = (H + H.conj().T) / 2.0
     evals, evecs = np.linalg.eigh(H)
     return {
-        "operator": "berry_keating_xp",
+        "operator": spec.name,
         "n_basis": n_basis,
         "eigenvalues": [float(x) for x in evals],
         "spectral_gap": float(evals[1] - evals[0]),
@@ -77,9 +81,13 @@ def stage0_classical(n_basis: int) -> dict:
     }
 
 
-def stage1_certified(n_basis: int, k_zeros: int) -> dict:
-    encl = certified_xp_spectrum(n_basis)
-    mismatch = certified_xp_mismatch(n_basis, k_zeros)
+def stage1_certified(spec: OperatorSpec, n_basis: int, k_zeros: int) -> dict:
+    encl = spec.certified(n_basis)
+    if spec.formal_family is not None:
+        mismatch = certified_family_mismatch(spec.formal_family, n_basis, k_zeros)
+    else:
+        # General path: mismatch of the certified spectrum vs the Riemann zeros.
+        mismatch = certified_spectral_mismatch(encl, riemann_zero_intervals(k_zeros))
     return {
         "enclosures": [list(iv.to_tuple()) for iv in encl],
         "mismatch_M_n": list(mismatch.to_tuple()),
@@ -88,32 +96,64 @@ def stage1_certified(n_basis: int, k_zeros: int) -> dict:
     }
 
 
-def stage2_qpe(n_basis: int, n_precision: int, shots: int) -> dict:
-    """Reuse the proven windowed-QPE entrypoint (real Aer emulator run)."""
+def stage2_qpe(spec: OperatorSpec, H, n_basis: int, n_precision: int, shots: int,
+               device: str = "", mitigation: "dict | None" = None) -> dict:
+    """Reuse the proven windowed-QPE entrypoint (Aer emulator by default).
+
+    When ``device`` is non-empty the same circuit is submitted to that IBM
+    backend; the result is only labelled a hardware result once the provider
+    returns a job id (``hardware_confirmed``).
+    """
     import importlib
 
     scripts_dir = str(ROOT / "scripts")
     if scripts_dir not in sys.path:
         sys.path.insert(0, scripts_dir)
     rci = importlib.import_module("run_curverank_ibm")
+
+    # Hardware request without credentials: stage it rather than crashing.
+    if device:
+        try:
+            from gaugegap.providers import get_provider
+            has_creds = get_provider("ibm", backend_name=device).check_credentials()
+        except Exception:
+            has_creds = False
+        if not has_creds:
+            return {
+                "operator": spec.name,
+                "staged": True,
+                "requested_device": device,
+                "note": ("hardware run staged: no IBM credentials found; see "
+                         "docs/curverank-ibm-runbook.md"),
+                "hardware_confirmed": False,
+            }
+
     r = rci.run_one(
-        n_basis=n_basis,
-        n_precision=n_precision,
-        shots=shots,
-        reps=2,
-        window_radius=0.5,
-        use_emulator=True,
-        device="",
-        method="dense",
+        n_basis,
+        n_precision,
+        shots,
+        2,
+        0.5,
+        not device,
+        device,
+        "dense",
+        H=H,
+        operator=spec.name,
+        mitigation=mitigation,
     )
     return {
+        "operator": r["operator"],
         "target_eigenvalue": r["target_eigenvalue"],
         "estimated_eigenvalue": r["estimated_eigenvalue"],
         "absolute_error": r["absolute_error"],
         "n_qubits": r["n_qubits"],
         "circuit_depth": r["circuit_depth"],
         "shots": r["shots"],
-        "backend": "aer_simulator",
+        "backend": r["backend"],
+        "job_id": r["job_id"],
+        "is_hardware": r["is_hardware"],
+        "hardware_confirmed": r["hardware_confirmed"],
+        "calibration": r.get("calibration"),
     }
 
 
@@ -274,8 +314,13 @@ def stage5_cross_validation(classical, certified, qpe, signal) -> dict:
     }
 
 
-def stage6_formal(n_basis: int, k_zeros: int, threshold: float) -> dict:
-    proof = discharged_separation_proof("xp", n_basis, k_zeros=k_zeros, threshold=threshold)
+def stage6_formal(spec: OperatorSpec, n_basis: int, k_zeros: int,
+                  threshold: float) -> dict:
+    if spec.formal_family is None:
+        return {"skipped": "no formal family registered for this operator"}
+    proof = discharged_separation_proof(
+        spec.formal_family, n_basis, k_zeros=k_zeros, threshold=threshold
+    )
     return {
         "family": proof.family,
         "n": proof.n,
@@ -289,11 +334,14 @@ def stage6_formal(n_basis: int, k_zeros: int, threshold: float) -> dict:
     }
 
 
-def stage7_dsl(n_basis: int, threshold: float) -> dict:
+def stage7_dsl(spec: OperatorSpec, n_basis: int, threshold: float) -> dict:
     """A Spectra program: the assert only passes because the kernel certifies it."""
+    if spec.dsl_form is None:
+        return {"skipped": "no Spectra DSL form registered for this operator"}
+    op_expr = spec.dsl_form.format(n=n_basis)
     src = (
         f"zeros Z = riemann(20)\n"
-        f"operator xp = berry_keating(n={n_basis})\n"
+        f"operator xp = {op_expr}\n"
         f"certify Mx = mismatch(xp, Z)\n"
         f"assert separated(Mx, threshold={threshold})\n"
         f"extract Sx = spectrum(xp, method=esprit)\n"
@@ -311,16 +359,22 @@ def stage7_dsl(n_basis: int, threshold: float) -> dict:
 
 def write_markdown(path: Path, p: dict) -> None:
     cv = p["stage5_cross_validation"]
+    qpe = p.get("stage2_qpe", {})
+    if qpe.get("hardware_confirmed"):
+        quantum_level = (f"hardware (IBM `{qpe.get('backend')}`, "
+                         f"job `{qpe.get('job_id')}`)")
+    else:
+        quantum_level = "simulation"
     lines = [
         "# Unified CurveRank pipeline report",
         "",
-        "One finite truncation of the Berry-Keating `xp` operator, threaded through "
+        f"One finite truncation of the `{p['operator']}` operator, threaded through "
         "every depth of the repository and cross-validated. **Claim boundary:** "
         "finite-operator spectral screening + method benchmark; a certified "
         "*negative* result, **not** a proof of the Riemann Hypothesis or any "
-        "Millennium Prize problem. Maximum quantum level reached: simulation.",
+        f"Millennium Prize problem. Maximum quantum level reached: {quantum_level}.",
         "",
-        f"- Operator: `berry_keating_xp`, n_basis = **{p['n_basis']}**, "
+        f"- Operator: `{p['operator']}`, n_basis = **{p['n_basis']}**, "
         f"k_zeros = **{p['k_zeros']}**",
         f"- Certified spectral mismatch M_n = "
         f"**[{p['stage1_certified']['mismatch_M_n'][0]:.6f}, "
@@ -352,11 +406,14 @@ def write_markdown(path: Path, p: dict) -> None:
         "",
         "## Stage results",
         "",
-        (f"- **Stage 2 QPE** (Aer): est {p['stage2_qpe']['estimated_eigenvalue']:.8f}, "
-         f"err {p['stage2_qpe']['absolute_error']:.2e}, "
-         f"{p['stage2_qpe']['n_qubits']} qubits / depth "
-         f"{p['stage2_qpe']['circuit_depth']}."
-         if not p["stage2_qpe"].get("skipped") else "- **Stage 2 QPE**: skipped."),
+        (("- **Stage 2 QPE**: skipped." if p["stage2_qpe"].get("skipped")
+          else f"- **Stage 2 QPE**: staged ({p['stage2_qpe'].get('note', '')})."
+          if p["stage2_qpe"].get("staged")
+          else f"- **Stage 2 QPE** (`{p['stage2_qpe'].get('backend')}`): est "
+               f"{p['stage2_qpe']['estimated_eigenvalue']:.8f}, "
+               f"err {p['stage2_qpe']['absolute_error']:.2e}, "
+               f"{p['stage2_qpe']['n_qubits']} qubits / depth "
+               f"{p['stage2_qpe']['circuit_depth']}.")),
         f"- **Stage 3 signal**: ESPRIT modes in certified enclosure: "
         f"{p['stage3_signal']['esprit_in_enclosure']}; QCELS dominant "
         f"{p['stage3_signal']['qcels_dominant']:.8f}.",
@@ -390,13 +447,17 @@ def write_markdown(path: Path, p: dict) -> None:
         "",
         "## Stage results (continued)",
         "",
-        f"- **Stage 6 formal**: separated = {p['stage6_formal']['separated']} "
-        f"(lower bound {p['stage6_formal']['lower_bound']:.6f} > threshold "
-        f"{p['stage6_formal']['threshold']}); Lean4 + Coq certificates emitted "
-        f"({p['stage6_formal']['lean4_chars']} + {p['stage6_formal']['coq_chars']} chars).",
-        f"- **Stage 7 DSL**: Spectra assertion satisfied = "
-        f"{p['stage7_dsl']['assertion_satisfied']} (certified lower "
-        f"{p['stage7_dsl']['certified_lower']:.6f}).",
+        (f"- **Stage 6 formal**: separated = {p['stage6_formal']['separated']} "
+         f"(lower bound {p['stage6_formal']['lower_bound']:.6f} > threshold "
+         f"{p['stage6_formal']['threshold']}); Lean4 + Coq certificates emitted "
+         f"({p['stage6_formal']['lean4_chars']} + {p['stage6_formal']['coq_chars']} chars)."
+         if not p["stage6_formal"].get("skipped")
+         else f"- **Stage 6 formal**: skipped ({p['stage6_formal']['skipped']})."),
+        (f"- **Stage 7 DSL**: Spectra assertion satisfied = "
+         f"{p['stage7_dsl']['assertion_satisfied']} (certified lower "
+         f"{p['stage7_dsl']['certified_lower']:.6f})."
+         if not p["stage7_dsl"].get("skipped")
+         else f"- **Stage 7 DSL**: skipped ({p['stage7_dsl']['skipped']})."),
         "",
         "_Generated by `scripts/run_unified_pipeline.py`._",
     ]
@@ -406,6 +467,9 @@ def write_markdown(path: Path, p: dict) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--operator", type=str, default="berry_keating_xp",
+                    help="operator family from the registry "
+                         "(berry_keating_xp, dirac_rindler, quantum_graph)")
     ap.add_argument("--n-basis", type=int, default=8,
                     help="truncation size; a power of two enables the qubit view")
     ap.add_argument("--k-zeros", type=int, default=20)
@@ -421,19 +485,29 @@ def main() -> int:
                          "Heisenberg-limit metrology)")
     ap.add_argument("--skip-audit", action="store_true",
                     help="skip running the claim-boundary audit on the report")
+    ap.add_argument("--qpe-device", type=str, default="",
+                    help="IBM backend for the QPE stage; empty = local Aer "
+                         "(real hardware needs credentials and is otherwise staged)")
+    ap.add_argument("--qpe-resilience", type=int, default=None,
+                    help="IBM resilience/mitigation level for a hardware QPE run")
     ap.add_argument("--output-dir", type=Path,
                     default=ROOT / "results" / "unified-pipeline")
     args = ap.parse_args()
 
+    spec = get_operator(args.operator)
+    mitigation = ({"resilience_level": args.qpe_resilience}
+                  if args.qpe_resilience is not None else None)
+
     print("=" * 72)
     print("Unified CurveRank pipeline — one path through every depth of the repo")
+    print(f"  operator: {spec.name}")
     print("=" * 72)
 
-    c0 = stage0_classical(args.n_basis)
-    print(f"[0] classical: {args.n_basis} eigenvalues, gap "
+    c0 = stage0_classical(spec, args.n_basis)
+    print(f"[0] classical: {len(c0['eigenvalues'])} eigenvalues, gap "
           f"{c0['spectral_gap']:.6f}")
 
-    c1 = stage1_certified(args.n_basis, args.k_zeros)
+    c1 = stage1_certified(spec, args.n_basis, args.k_zeros)
     print(f"[1] certified: M_n = [{c1['mismatch_M_n'][0]:.6f}, "
           f"{c1['mismatch_M_n'][1]:.6f}]")
 
@@ -441,9 +515,14 @@ def main() -> int:
         c2 = {"skipped": True}
         print("[2] QPE: skipped")
     else:
-        c2 = stage2_qpe(args.n_basis, args.qpe_precision, args.shots)
-        print(f"[2] QPE: est {c2['estimated_eigenvalue']:.8f} "
-              f"(err {c2['absolute_error']:.2e}, depth {c2['circuit_depth']})")
+        c2 = stage2_qpe(spec, c0["_H"], args.n_basis, args.qpe_precision,
+                        args.shots, device=args.qpe_device, mitigation=mitigation)
+        if c2.get("staged"):
+            print(f"[2] QPE: staged ({c2['note']})")
+        else:
+            print(f"[2] QPE: est {c2['estimated_eigenvalue']:.8f} "
+                  f"(err {c2['absolute_error']:.2e}, depth {c2['circuit_depth']}, "
+                  f"backend {c2['backend']})")
 
     c3 = stage3_signal(c0["_H"], c1["_enclosures"], args.seed)
     print(f"[3] signal: ESPRIT in enclosure {c3['esprit_in_enclosure']}, "
@@ -463,23 +542,34 @@ def main() -> int:
               f"Heisenberg-limited "
               f"{c4b['metrology_heisenberg']['heisenberg_limited']}")
 
-    qpe_for_cv = c2 if not args.skip_quantum else {
-        "estimated_eigenvalue": float(
-            c0["_evals"][_smallest_positive_index(c0["_evals"])]
-        )
-    }
+    # Use the QPE estimate for cross-validation only when it actually ran;
+    # otherwise (skipped or staged) fall back to the classical target.
+    if not args.skip_quantum and not c2.get("staged"):
+        qpe_for_cv = c2
+    else:
+        qpe_for_cv = {
+            "estimated_eigenvalue": float(
+                c0["_evals"][_smallest_positive_index(c0["_evals"])]
+            )
+        }
     c5 = stage5_cross_validation(c0, c1, qpe_for_cv, c3)
     print(f"[5] cross-validation: max error {c5['max_cross_method_error']:.2e}, "
           f"agree<1e-2 {c5['all_methods_agree_to_1e-2']}")
 
-    c6 = stage6_formal(args.n_basis, args.k_zeros, args.threshold)
-    print(f"[6] formal: separated {c6['separated']} (Lean4+Coq emitted)")
+    c6 = stage6_formal(spec, args.n_basis, args.k_zeros, args.threshold)
+    if c6.get("skipped"):
+        print(f"[6] formal: skipped ({c6['skipped']})")
+    else:
+        print(f"[6] formal: separated {c6['separated']} (Lean4+Coq emitted)")
 
-    c7 = stage7_dsl(args.n_basis, args.threshold)
-    print(f"[7] DSL: Spectra assertion satisfied {c7['assertion_satisfied']}")
+    c7 = stage7_dsl(spec, args.n_basis, args.threshold)
+    if c7.get("skipped"):
+        print(f"[7] DSL: skipped ({c7['skipped']})")
+    else:
+        print(f"[7] DSL: Spectra assertion satisfied {c7['assertion_satisfied']}")
 
     pipeline = {
-        "operator": "berry_keating_xp",
+        "operator": spec.name,
         "n_basis": args.n_basis,
         "k_zeros": args.k_zeros,
         "claim_boundary": (
@@ -504,10 +594,16 @@ def main() -> int:
     write_markdown(out / "pipeline.md", pipeline)
     print(f"[8] report: {out / 'pipeline.json'} + {out / 'pipeline.md'}")
 
-    if not args.skip_audit:
+    audit_path = out / "pipeline.md"
+    audit_inside_repo = ROOT in audit_path.resolve().parents
+    if not args.skip_audit and not audit_inside_repo:
+        print("[8] claim-boundary audit: skipped (report is outside the repo root; "
+              "the audit only scans paths under the repo)")
+    if not args.skip_audit and audit_inside_repo:
+        rel = audit_path.resolve().relative_to(ROOT)
         proc = subprocess.run(
             [sys.executable, str(ROOT / "scripts" / "claim_boundary_audit.py"),
-             "--include", str(out / "pipeline.md"), "--strict"],
+             "--include", str(rel), "--strict"],
             capture_output=True, text=True,
         )
         ok = proc.returncode == 0

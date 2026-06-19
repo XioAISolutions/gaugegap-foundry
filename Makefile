@@ -1,6 +1,6 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
-	curverank-noise-study cudaq-benchmark unified
+	curverank-noise-study cudaq-benchmark unified quantum-validate
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -101,3 +101,11 @@ curverank: curverank-formal curverank-ibm curverank-hardware curverank-signal \
 unified:
 	python scripts/run_unified_pipeline.py --n-basis 8 --k-zeros 20 --deep \
 		--output-dir results/unified-pipeline
+
+# Quantum-validation harness: check each quantum method's eigenvalue estimates
+# against the certified interval kernel (ESPRIT/QCELS/Krylov are pure-numpy; QPE
+# uses the local Aer emulator). Honest scope: certified screening + benchmark.
+quantum-validate:
+	python scripts/run_quantum_validation.py --operator berry_keating_xp \
+		--n-basis 8 --methods esprit,qcels,krylov \
+		--output-dir results/quantum-validation
