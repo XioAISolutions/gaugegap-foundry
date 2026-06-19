@@ -1,6 +1,6 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
-	curverank-noise-study cudaq-benchmark unified quantum-validate
+	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -109,3 +109,10 @@ quantum-validate:
 	python scripts/run_quantum_validation.py --operator berry_keating_xp \
 		--n-basis 8 --methods esprit,qcels,krylov \
 		--output-dir results/quantum-validation
+
+# Hardened error budget (A6): repeated-seed runs + confidence intervals +
+# source-separated components (statistical / truncation / numerical). Honest
+# scope: the CI is a fixed-truncation statistical interval, no continuum claim.
+error-budget:
+	python scripts/run_error_budget.py --n-basis 8 --n-runs 20 \
+		--output-dir results/error-budget

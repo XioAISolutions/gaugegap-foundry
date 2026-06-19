@@ -112,6 +112,8 @@ jobs:
           python scripts/run_unified_pipeline.py --n-basis 8 --k-zeros 20 --deep --output-dir results/unified-pipeline
           python scripts/run_unified_pipeline.py --operator quantum_graph --n-basis 6 --skip-quantum --output-dir results/unified-pipeline-qg
           python scripts/run_quantum_validation.py --operator berry_keating_xp --n-basis 8 --methods esprit,qcels,krylov,qpe --emulator --output-dir results/quantum-validation
+      - name: Error-budget smoke (repeated-seed runs + CI)
+        run: python scripts/run_error_budget.py --n-basis 8 --n-runs 4 --output-dir results/error-budget
 
   packaging:
     runs-on: ubuntu-latest

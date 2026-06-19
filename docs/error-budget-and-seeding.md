@@ -57,9 +57,39 @@ part of A6, the offending call sites were fixed:
 `child_seeds(parent, n)` derives independent, reproducible sub-stream seeds via
 `SeedSequence` spawning for parallel/independent sub-tasks.
 
+## Repeated-seed runs & confidence intervals (A6)
+
+`gaugegap.repeated_runs` turns the seeding + budget primitives into a hardened
+error budget:
+
+```python
+from gaugegap.repeated_runs import repeated_run
+stats = repeated_run(estimator, parent_seed=1234, n_runs=20, level=0.95)
+stats.mean, stats.ci_low, stats.ci_high, stats.ci_halfwidth
+```
+
+`repeated_run(fn, ...)` runs `fn(seed)` over `n_runs` independent `child_seeds`
+and returns mean / sample std / SEM / a normal-approximation confidence interval.
+
+`scripts/run_error_budget.py` (`make error-budget`) is the worked example: it
+estimates `|λ_min|` of the Berry-Keating xp truncation from the QCELS quantum
+signal under modelled shot noise + dephasing, repeated over child seeds for a 95%
+**statistical** CI, then combines it with the **certified-enclosure** (truncation)
+bound and a **numerical-precision** bound into a single source-separated
+`ErrorBudget` (statistical in quadrature, systematic bounds linear).
+
+### What a confidence interval here does and does NOT imply
+
+- **Does:** quantify the statistical spread of a stochastic estimator at a
+  **fixed** finite truncation / shot count.
+- **Does not:** bound the truncation error (that is the separate certified
+  component), nor imply anything about the continuum / thermodynamic limit. The CI
+  is a finite-system statistical statement, never a continuum mass-gap claim.
+
 ## Tested
 
 `tests/test_error_budget_and_seeding.py` checks the quadrature/linear
 combination math, `dominant`/`by_category`, seed reproducibility, child-seed
 independence, and — crucially — that the fixed functions are reproducible **and
-do not pollute the global NumPy RNG state**.
+do not pollute the global NumPy RNG state**. `tests/test_repeated_runs.py` checks
+the confidence-interval math and the reproducibility of repeated-seed runs.
