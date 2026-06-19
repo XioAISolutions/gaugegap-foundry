@@ -1,26 +1,23 @@
-"""Visualization tools for cross-platform quantum experiment comparison.
+"""Visualization tools.
 
-This module provides utilities for:
-- Comparing results across providers (Quantinuum, IBM, Braket, IonQ)
-- Visualizing emulator vs hardware performance
-- Plotting calibration drift over time
-- Generating publication-ready comparison figures
+- ``weight_diagrams`` / ``cy_projection`` / ``svg``: exact 2D projections of
+  higher-dimensional structures (su(3) weight space, Calabi-Yau slices) — the
+  "Geometry of GaugeGap" layer.
+- ``cross_platform_comparison``: cross-provider comparison utilities (placeholder).
 """
+from gaugegap.visualization import weight_diagrams, cy_projection, svg
 
-from .cross_platform_comparison import (
-    compare_providers,
-    plot_gap_comparison,
-    load_workflow_results,
-    generate_comparison_report,
-    ComparisonMetrics,
-)
+# The cross-platform comparison module is an optional/placeholder component; never
+# let its (in)completeness break importing the visualization package.
+try:  # pragma: no cover - optional component
+    from .cross_platform_comparison import (  # noqa: F401
+        compare_providers,
+        plot_gap_comparison,
+        load_workflow_results,
+        generate_comparison_report,
+        ComparisonMetrics,
+    )
+except Exception:  # pragma: no cover
+    pass
 
-__all__ = [
-    "compare_providers",
-    "plot_gap_comparison",
-    "load_workflow_results",
-    "generate_comparison_report",
-    "ComparisonMetrics",
-]
-
-# Made with Bob
+__all__ = ["weight_diagrams", "cy_projection", "svg"]
