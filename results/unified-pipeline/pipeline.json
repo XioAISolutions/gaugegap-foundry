@@ -1,0 +1,191 @@
+{
+  "claim_boundary": "finite-operator spectral screening + method benchmark; certified negative result; not a proof of the Riemann Hypothesis or any Millennium Prize problem; max quantum level = simulation",
+  "k_zeros": 20,
+  "n_basis": 8,
+  "operator": "berry_keating_xp",
+  "stage0_classical": {
+    "eigenvalues": [
+      -12.787631637495066,
+      -7.057529328270691,
+      -3.46035940392132,
+      -0.9959593295662911,
+      0.99595932956629,
+      3.460359403921322,
+      7.057529328270691,
+      12.787631637495062
+    ],
+    "n_basis": 8,
+    "operator": "berry_keating_xp",
+    "spectral_gap": 5.730102309224375
+  },
+  "stage1_certified": {
+    "enclosures": [
+      [
+        -12.787631637495085,
+        -12.787631637495045
+      ],
+      [
+        -7.057529328270699,
+        -7.057529328270667
+      ],
+      [
+        -3.460359403921322,
+        -3.460359403921307
+      ],
+      [
+        -0.9959593295662943,
+        -0.9959593295662863
+      ],
+      [
+        0.9959593295662867,
+        0.9959593295662986
+      ],
+      [
+        3.460359403921312,
+        3.460359403921326
+      ],
+      [
+        7.057529328270672,
+        7.0575293282707
+      ],
+      [
+        12.787631637495046,
+        12.787631637495094
+      ]
+    ],
+    "k_zeros": 20,
+    "mismatch_M_n": [
+      25.226079861277082,
+      25.226079861277107
+    ]
+  },
+  "stage2_qpe": {
+    "absolute_error": 0.0001344204337100363,
+    "backend": "aer_simulator",
+    "circuit_depth": 587,
+    "estimated_eigenvalue": 0.99609375,
+    "n_qubits": 9,
+    "shots": 4096,
+    "target_eigenvalue": 0.99595932956629
+  },
+  "stage3_signal": {
+    "esprit_all_certified": true,
+    "esprit_eigenvalues": [
+      -12.787631637495071,
+      -7.057529328270689,
+      -3.460359403921315,
+      -0.9959593295662901,
+      0.9959593295662932,
+      3.4603594039213212,
+      7.057529328270688,
+      12.787631637495064
+    ],
+    "esprit_in_enclosure": "8/8",
+    "n_times": 32,
+    "qcels_dominant": 7.057793627987908
+  },
+  "stage4_advanced": {
+    "ground_state_entanglement_entropy": {
+      "qubit_0": 0.193973,
+      "qubit_1": 0.193973,
+      "qubit_2": 0.193973
+    },
+    "max_possible_per_qubit": 0.693147,
+    "n_qubits": 3
+  },
+  "stage4b_deep_quantum": {
+    "entanglement_structure": {
+      "ground_entropy_q0": 0.193973,
+      "ground_negativity_q0": 0.515507,
+      "n_qubits": 3
+    },
+    "hamiltonian_simulation": {
+      "first_order": 1.0000000000000036,
+      "fourth_order": 0.9999999999999976,
+      "qdrift": 0.4629306201162004,
+      "second_order": 1.0000000000000044
+    },
+    "metrology_heisenberg": {
+      "fisher_information": 36.0,
+      "gap_parameter": 5.730102309224375,
+      "heisenberg_limited": true,
+      "precision_uncertainty": 0.05555555555555555
+    },
+    "quantum_krylov": {
+      "all_certified": true,
+      "classical_reference": [
+        -12.787631637495066,
+        -7.057529328270691,
+        -3.46035940392132,
+        -0.9959593295662911
+      ],
+      "energies": [
+        -12.787631637495053,
+        -7.057529328270647,
+        -3.4603594039213093,
+        -0.9959593295662916
+      ],
+      "in_certified_enclosure": "4/4"
+    }
+  },
+  "stage5_cross_validation": {
+    "all_methods_agree_to_1e-2": true,
+    "certified_enclosure": [
+      0.9959593295662867,
+      0.9959593295662986
+    ],
+    "classical_in_enclosure": true,
+    "max_cross_method_error": 0.0001344204337100363,
+    "methods": [
+      {
+        "abs_error_vs_classical": 0.0,
+        "estimate": 0.99595932956629,
+        "method": "classical (exact)"
+      },
+      {
+        "abs_error_vs_classical": 5.9396931817445875e-15,
+        "estimate": 0.9959593295662927,
+        "method": "certified enclosure"
+      },
+      {
+        "abs_error_vs_classical": 0.0001344204337100363,
+        "estimate": 0.99609375,
+        "method": "quantum QPE"
+      },
+      {
+        "abs_error_vs_classical": 3.219646771412954e-15,
+        "estimate": 0.9959593295662932,
+        "method": "quantum ESPRIT"
+      }
+    ],
+    "qcels_validation": {
+      "abs_error": 0.00026429971721686485,
+      "certified_enclosure": [
+        7.057529328270672,
+        7.0575293282707
+      ],
+      "estimate": 7.057793627987908,
+      "in_certified_enclosure": false,
+      "nearest_classical": 7.057529328270691
+    },
+    "target_eigenvalue": 0.99595932956629
+  },
+  "stage6_formal": {
+    "coq_chars": 791,
+    "family": "xp",
+    "lean4_chars": 1085,
+    "lean4_excerpt": "import Mathlib.Tactic",
+    "lower_bound": 25.226079861277082,
+    "n": 8,
+    "separated": true,
+    "threshold": 1.0,
+    "upper_bound": 25.226079861277107
+  },
+  "stage7_dsl": {
+    "assertion_satisfied": true,
+    "certified_lower": 25.226079861277082,
+    "extraction_modes": 8,
+    "note": "An unbacked claim fails the program; this one passes by certificate.",
+    "program": "zeros Z = riemann(20)\noperator xp = berry_keating(n=8)\ncertify Mx = mismatch(xp, Z)\nassert separated(Mx, threshold=1.0)\nextract Sx = spectrum(xp, method=esprit)\n"
+  }
+}

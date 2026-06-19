@@ -1,6 +1,6 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
-	curverank-noise-study cudaq-benchmark
+	curverank-noise-study cudaq-benchmark unified
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -93,3 +93,11 @@ cudaq-benchmark:
 # Regenerate all CurveRank bundles.
 curverank: curverank-formal curverank-ibm curverank-hardware curverank-signal \
 	curverank-noise-study
+
+# Unified pipeline: one truncation threaded through every depth of the repo
+# (classical -> certified -> QPE -> signal -> advanced quantum -> cross-validated
+# -> formal Lean/Coq -> Spectra DSL -> claim-boundary-audited report). Honest
+# scope: certified NEGATIVE result + method benchmark; not a proof of RH.
+unified:
+	python scripts/run_unified_pipeline.py --n-basis 8 --k-zeros 20 --deep \
+		--output-dir results/unified-pipeline
