@@ -43,7 +43,19 @@ add to them.
    I'd value a check that the variational logic and the interval implementation
    are sound.
 
-3. **The claim-boundary discipline itself:** is the boundary drawn in the right
+3. **Lattice gauge-theory benchmarks** (finite-system, explicitly not continuum):
+   - **Z₂** dual chain / plaquette: finite exact-diagonalization benchmarks with
+     Pauli-replica validation (`docs/gaugegap-0002.md`, `tests/test_*z2*`).
+   - **U(1)** compact gauge in truncated link spaces: smallest-truncation sanity
+     checks (`docs/gaugegap-0004-hardware-readiness.md`).
+   - **SU(3)** is an explicitly labelled **prototype scaffold**, not a Yang-Mills
+     engine: the plaquette/Wilson-loop/string-tension/Polyakov/Gauss-law
+     observables return `not_implemented` by design (`docs/gaugegap-0005.md`,
+     `src/gaugegap/gaugegap_su3_pure.py`, `tests/test_gaugegap_su3.py`). The
+     question is whether the finite-system boundaries are marked clearly enough
+     and the prototype status is unambiguous.
+
+4. **The claim-boundary discipline itself:** is the boundary drawn in the right
    place, and is the language throughout appropriately scoped?
 
 **How to verify without trusting me.** Everything reproduces from a fresh clone:
