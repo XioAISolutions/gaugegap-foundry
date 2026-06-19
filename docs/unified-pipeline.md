@@ -57,12 +57,55 @@ certified enclosure `[0.99595933, 0.99595933]`):
 - **Quantum metrology (Heisenberg limit)** for the spectral gap: reports the
   precision, Fisher information, and Heisenberg-limited flag.
 
+## Any Hermitian operator (not just xp)
+
+The pipeline is driven by an operator **registry**
+(`src/gaugegap/curverank_registry.py`). Pass `--operator` to run the same path on
+a different family; an arbitrary Hermitian matrix can be certified through the
+general kernel `verified_hermitian_eigenvalues` via `build_certified_general`.
+
+```bash
+python scripts/run_unified_pipeline.py --operator quantum_graph --n-basis 6 --skip-quantum
+python scripts/run_unified_pipeline.py --operator dirac_rindler --n-basis 8 --deep
+```
+
+Registered families: `berry_keating_xp`, `dirac_rindler`, `quantum_graph`. For
+operators without a registered formal family or Spectra form, the formal-proof and
+DSL stages **skip cleanly** (recorded as `skipped` in the report) rather than fail.
+
+## Quantum-validation harness
+
+`scripts/run_quantum_validation.py` (`make quantum-validate`) checks each quantum
+method's eigenvalue estimates against the certified interval enclosures and reports
+residuals vs the classical exact spectrum — "validate a QPU estimate against
+certified ground truth." ESPRIT/QCELS/Krylov are pure-numpy; QPE uses Aer.
+
+```bash
+make quantum-validate
+python scripts/run_quantum_validation.py --operator berry_keating_xp --methods esprit,qcels,krylov,qpe --emulator
+```
+
+Representative (n_basis=8): ESPRIT **8/8** and Krylov **4/4** inside certified
+enclosures; QPE and QCELS report small residuals but sit outside the ~1e-14
+enclosure (honestly flagged as the coarser methods).
+
+## Real-hardware staging
+
+The QPE stage defaults to the local Aer emulator. Pass `--qpe-device <ibm_backend>`
+(and optional `--qpe-resilience <level>`) to target real hardware. Without IBM
+credentials the run is **staged** (not executed), and the report continues to say
+"maximum quantum level reached: simulation". It is only labelled a hardware result
+once the provider returns a job id (`hardware_confirmed`), which is then recorded
+with the backend, shots, and calibration snapshot. See
+`docs/curverank-ibm-runbook.md`.
+
 ## Run it
 
 ```bash
 make unified                      # n_basis=8, full path incl. Aer QPE + --deep
 python scripts/run_unified_pipeline.py --n-basis 16 --k-zeros 30 --deep
 python scripts/run_unified_pipeline.py --skip-quantum   # fast, no simulator
+python scripts/run_unified_pipeline.py --qpe-device ibm_brisbane   # staged w/o creds
 ```
 
 Outputs land in `results/unified-pipeline/` (`pipeline.json`, `pipeline.md`).

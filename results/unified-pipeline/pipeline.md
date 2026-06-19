@@ -1,6 +1,6 @@
 # Unified CurveRank pipeline report
 
-One finite truncation of the Berry-Keating `xp` operator, threaded through every depth of the repository and cross-validated. **Claim boundary:** finite-operator spectral screening + method benchmark; a certified *negative* result, **not** a proof of the Riemann Hypothesis or any Millennium Prize problem. Maximum quantum level reached: simulation.
+One finite truncation of the `berry_keating_xp` operator, threaded through every depth of the repository and cross-validated. **Claim boundary:** finite-operator spectral screening + method benchmark; a certified *negative* result, **not** a proof of the Riemann Hypothesis or any Millennium Prize problem. Maximum quantum level reached: simulation.
 
 - Operator: `berry_keating_xp`, n_basis = **8**, k_zeros = **20**
 - Certified spectral mismatch M_n = **[25.226080, 25.226080]**
@@ -22,7 +22,7 @@ QCELS independently recovers the dominant eigenvalue **7.05779363** (nearest cla
 
 ## Stage results
 
-- **Stage 2 QPE** (Aer): est 0.99609375, err 1.34e-04, 9 qubits / depth 587.
+- **Stage 2 QPE** (`aer_simulator`): est 0.99609375, err 1.34e-04, 9 qubits / depth 587.
 - **Stage 3 signal**: ESPRIT modes in certified enclosure: 8/8; QCELS dominant 7.05779363.
 - **Stage 4 advanced**: ground-state entanglement entropy {'qubit_0': 0.193973, 'qubit_1': 0.193973, 'qubit_2': 0.193973}.
 
