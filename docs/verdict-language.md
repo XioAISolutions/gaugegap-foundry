@@ -68,9 +68,39 @@ One statement per line; `#` starts a comment.
 Both encode the same conviction the rest of this repo enforces by review and CI:
 **a claim you can't back is a bug, so make the language refuse it.**
 
+## Metrics
+
+`eval ... metric=<name>` supports `accuracy`, `precision`, `recall`, and `f1`
+(macro-averaged over the observed labels). Every eval also records a per-label
+breakdown and a confusion matrix in the report as evidence
+(`src/gaugegap/verdict_lang/metrics.py`). `assert score(E) >= t` gates on the
+chosen metric, so you can require, e.g., F1 rather than raw accuracy.
+
+## Plugging in a real model
+
+The bundled classifiers are deterministic toys, but a real model plugs in behind
+the same `Callable[[str], str]` interface:
+
+```python
+from gaugegap.verdict_lang import register_model, command_model
+register_model("my_llm", lambda text: my_classifier(text))   # any Python callable
+register_model("ext", command_model("my-classifier --text {input}"))  # external CLI
+```
+
+No provider SDK is imported by the package, so the core stays hermetic and CI-safe.
+
+## CI gate
+
+`scripts/run_verdict.py` exits non-zero on any unbacked or below-threshold claim,
+so a `.verdict` program is a drop-in CI gate. The repo ships a composite action
+(`.github/actions/verdict`) and a workflow (`.github/workflows/verdict.yml`) that
+run `examples/sentiment_f1.verdict` (gated on F1 + a no-regression floor).
+
 ## Honest limits & possible extensions
 
-The models are toys and the only metric is accuracy — by design, to keep the demo
-hermetic. Real use would register real models behind the same `MODELS` interface
-and add metrics (F1, calibration), held-out splits, and per-slice asserts. None of
-that changes the core rule.
+By design the bundled models are toys, so the demo stays hermetic. Real use
+registers real models (above). Remaining extensions: baseline-from-prior-run
+regression (today the baseline is an inline number), structured (non-string)
+input/output, calibration/cost/latency metrics, and a hosted runner. None of that
+changes the core rule: **a claim you can't back is a bug, so the language refuses
+it.**

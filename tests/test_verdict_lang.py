@@ -78,7 +78,7 @@ class TestVerdict(unittest.TestCase):
                 run_program(
                     f'dataset D = cases("{_dataset(tmp)}")\n'
                     "model M = keyword_sentiment()\n"
-                    "eval E = run(M, D, metric=f1)\n"  # unknown metric
+                    "eval E = run(M, D, metric=bogus_metric)\n"  # unknown metric
                 )
         with self.assertRaises(VerdictError):
             run_program("this is not valid verdict\n")

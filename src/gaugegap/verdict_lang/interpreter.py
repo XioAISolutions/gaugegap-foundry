@@ -32,8 +32,9 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from gaugegap.verdict_lang.models import MODELS
+from gaugegap.verdict_lang.metrics import SCALAR_METRICS, compute_metrics, scalar_metric
 
-_METRICS = {"accuracy"}
+_METRICS = set(SCALAR_METRICS)
 
 
 class VerdictError(Exception):
@@ -60,6 +61,7 @@ class Program:
             "models": self.models,
             "evals": {k: {"model": v["model"], "dataset": v["dataset"],
                           "metric": v["metric"], "score": v["score"],
+                          "metrics": v.get("metrics", {}),
                           "n_cases": len(v["log"]), "log_file": f"{k}_log.jsonl"}
                       for k, v in self.evals.items()},
             "assertions": self.assertions,
@@ -156,17 +158,20 @@ class Interpreter:
         fn = MODELS[self.p.models[model_name]]
         cases = self.p.datasets[ds_name]["cases"]
         log = []
-        correct = 0
+        expected_list = []
+        predicted_list = []
         for rec in cases:
             pred = fn(str(rec["input"]))
             ok = pred == rec["expected"]
-            correct += int(ok)
+            expected_list.append(rec["expected"])
+            predicted_list.append(pred)
             log.append({"input": rec["input"], "expected": rec["expected"],
                         "prediction": pred, "correct": ok})
-        score = correct / len(cases)
+        metrics = compute_metrics(expected_list, predicted_list)
+        score = scalar_metric(metrics, metric)
         self.p.evals[name] = {
             "model": model_name, "dataset": ds_name, "metric": metric,
-            "score": score, "log": log,
+            "score": score, "metrics": metrics, "log": log,
         }
 
     def _assert_score(self, eval_name: str, threshold: float) -> None:

@@ -6,5 +6,11 @@ from gaugegap.verdict_lang.interpreter import (
     run_file,
     run_program,
 )
+from gaugegap.verdict_lang.models import MODELS, register_model, command_model
+from gaugegap.verdict_lang.metrics import compute_metrics, SCALAR_METRICS
 
-__all__ = ["Interpreter", "Program", "VerdictError", "run_file", "run_program"]
+__all__ = [
+    "Interpreter", "Program", "VerdictError", "run_file", "run_program",
+    "MODELS", "register_model", "command_model",
+    "compute_metrics", "SCALAR_METRICS",
+]

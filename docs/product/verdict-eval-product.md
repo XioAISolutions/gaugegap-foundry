@@ -28,12 +28,23 @@ guardrails are an active spend area. The differentiator is **enforcement**
 
 ## MVP scope (Phase 1)
 
-- Real model adapters (OpenAI / Anthropic / local) behind the existing
-  capability-gated pattern — keep a deterministic offline mode for tests.
-- Metrics beyond accuracy (F1, exact-match, pass-rate, calibration, cost/latency).
-- A **GitHub Action**: run the `.verdict` program, fail the check on an unbacked or
-  below-threshold claim, attach the eval log as an artifact.
-- `verdict.yaml`/`.verdict` config + a hosted-or-local runner.
+- [x] **Real model adapters** — `register_model(name, fn)` plugs any
+  `Callable[[str], str]` (LLM/HTTP/ML) in behind the eval interface; `command_model`
+  wraps an external CLI with no provider dependency in the repo, keeping CI
+  hermetic (`src/gaugegap/verdict_lang/models.py`).
+- [x] **Metrics beyond accuracy** — macro precision / recall / **F1** + per-label
+  breakdown + confusion matrix, computed from the logged eval and surfaced in the
+  report (`src/gaugegap/verdict_lang/metrics.py`); `assert score(E) >= t` can gate
+  on any of them.
+- [x] **GitHub Action** — `.github/actions/verdict` (composite) + `verdict.yml`
+  run a `.verdict` program and fail the check (exit 1) on any unbacked or
+  below-threshold claim; example `examples/sentiment_f1.verdict` gates on F1.
+- [ ] `verdict.yaml` config + a hosted-or-local runner (next).
+
+Remaining for a full product: baseline-from-prior-run regression (today the
+baseline is an inline number), richer input/output types (structured, not just
+string labels), and the hosted runner. Cost/latency/calibration metrics are
+future work.
 
 ## Phased roadmap
 

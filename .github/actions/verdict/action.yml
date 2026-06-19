@@ -1,0 +1,25 @@
+name: "Verdict eval gate"
+description: >
+  Run a Verdict .verdict program as a CI gate. Fails the step (exit 1) if any
+  eval-backed assertion does not hold — i.e. a model claim is not backed by a
+  logged, reproducible eval.
+inputs:
+  program:
+    description: "Path to the .verdict program"
+    required: true
+  python-version:
+    description: "Python version"
+    required: false
+    default: "3.12"
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Install package
+      shell: bash
+      run: python -m pip install --upgrade pip && python -m pip install -e .
+    - name: Run Verdict gate
+      shell: bash
+      run: python scripts/run_verdict.py "${{ inputs.program }}"
