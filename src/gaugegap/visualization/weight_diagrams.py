@@ -100,6 +100,75 @@ def su3_root_system() -> List[Dict]:
     return out
 
 
+def su2_weights(dim: int) -> List[Dict]:
+    """1D weight ladder of the su(2) irrep of dimension ``dim`` (spin j=(dim-1)/2).
+
+    Weights are m = -j, -j+1, ..., +j (each multiplicity 1).
+    """
+    if dim < 1:
+        raise ValueError("dim must be >= 1")
+    j = (dim - 1) / 2.0
+    return [{"m": float(m - j), "mult": 1} for m in range(dim)]
+
+
+def _an_orthobasis(N: int) -> np.ndarray:
+    """A deterministic orthonormal basis of the sum-zero subspace of R^N."""
+    # Gram-Schmidt on the simple-root directions e_i - e_{i+1}.
+    raw = [np.eye(N)[i] - np.eye(N)[i + 1] for i in range(N - 1)]
+    basis: List[np.ndarray] = []
+    for v in raw:
+        w = v.astype(float)
+        for b in basis:
+            w = w - np.dot(w, b) * b
+        n = np.linalg.norm(w)
+        if n > 1e-12:
+            basis.append(w / n)
+    return np.array(basis)  # (N-1, N)
+
+
+def an_roots(N: int) -> List[np.ndarray]:
+    """Roots of A_{N-1} (su(N)): e_i - e_j for i != j, in R^N."""
+    eye = np.eye(N)
+    return [eye[i] - eye[j] for i in range(N) for j in range(N) if i != j]
+
+
+def suN_root_system_2d(N: int) -> List[Dict]:
+    """su(N) root system projected to 2D (first two sum-zero basis directions).
+
+    The 2D picture is a faithful projection of the rank-(N-1) root system — the
+    same flatten-the-higher-dimensional-object idea (A2 -> hexagon, A3 -> a
+    cuboctahedron shadow, ...).
+    """
+    roots = an_roots(N)
+    basis = _an_orthobasis(N)
+    out = []
+    for r in roots:
+        coords = basis @ r  # length N-1
+        x = float(coords[0]) if coords.size >= 1 else 0.0
+        y = float(coords[1]) if coords.size >= 2 else 0.0
+        out.append({"x": x, "y": y, "rN": tuple(float(v) for v in r)})
+    out.sort(key=lambda d: np.arctan2(d["y"], d["x"]))
+    return out
+
+
+def weyl_orbit_closed_AN(points_rN: List[Tuple[float, ...]], tol: float = 1e-9) -> bool:
+    """Check a set of R^N vectors is closed under the S_N Weyl group (permutations).
+
+    Generalises :func:`weyl_orbit_closed` to any rank; used for su(N) root systems.
+    """
+    from itertools import permutations
+
+    def key(v):
+        return tuple(round(x, 6) for x in v)
+
+    table = {key(v) for v in points_rN}
+    for v in points_rN:
+        for perm in permutations(v):
+            if key(perm) not in table:
+                return False
+    return True
+
+
 # Named representations for convenience.
 NAMED_IRREPS = {
     "fundamental": (1, 0),   # 3

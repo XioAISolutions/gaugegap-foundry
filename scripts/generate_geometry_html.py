@@ -33,6 +33,7 @@ warnings.filterwarnings("ignore")
 
 from gaugegap.visualization.weight_diagrams import su3_weights, su3_dimension
 from gaugegap.visualization.cy_projection import fermat_patches
+from gaugegap.visualization.lattice_projection import cubic_lattice, wilson_loop
 
 _PREC = 4
 
@@ -77,6 +78,24 @@ def _cy_dataset(n: int, n_grid: int) -> dict:
         idx += gi * gj
     return {"kind": "cy", "label": f"Calabi-Yau Fermat z1^{n}+z2^{n}=1",
             "points": pts, "edges": segs}
+
+
+def _lattice_dataset() -> dict:
+    lat = cubic_lattice(3, 3, 3)
+    loop = wilson_loop(lat, (0, 0, 0), R=2, T=2, plane="xy")
+    ctr = lat.sites.mean(axis=0)
+    pts = []
+    for s in lat.sites:
+        x, y, z = (s - ctr)
+        pts.append({"x3": _round(x), "y3": _round(y), "z3": _round(z),
+                    "xf": _round(x), "yf": _round(y), "mult": 1})
+    loop_edges = {tuple(sorted((loop[i], loop[i + 1]))) for i in range(len(loop) - 1)}
+    edges = []
+    for (a, b) in lat.links:
+        hl = 1 if tuple(sorted((a, b))) in loop_edges else 0
+        edges.append([a, b, hl])
+    return {"kind": "lattice", "label": "Lattice + Wilson loop", "points": pts,
+            "edges": edges}
 
 
 _HTML = """<!doctype html>
@@ -127,9 +146,11 @@ function draw(){const d=DATA.sets[cur];ctx.clearRect(0,0,640,640);
  const tf=r=>[320+(r[0]-cx)*sc, 320-(r[1]-cyy)*sc];
  if(sacred.checked){const phi=(1+Math.sqrt(5))/2;let rr=260;ctx.strokeStyle='#d4a017';
    for(let k=0;k<6;k++){ctx.globalAlpha=.18;ctx.beginPath();ctx.arc(320,320,rr,0,7);ctx.stroke();rr/=phi;}ctx.globalAlpha=1;}
- // edges
- ctx.strokeStyle='#3b6ea5';ctx.globalAlpha=.5;ctx.lineWidth=.8;
- for(const e of d.edges){const a=tf(P[e[0]]),b=tf(P[e[1]]);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();}
+ // edges (e[2]==1 highlights the Wilson loop)
+ for(const e of d.edges){const a=tf(P[e[0]]),b=tf(P[e[1]]);
+   if(e[2]){ctx.strokeStyle='#f0c674';ctx.globalAlpha=.95;ctx.lineWidth=2.6;}
+   else{ctx.strokeStyle='#3b6ea5';ctx.globalAlpha=.5;ctx.lineWidth=.8;}
+   ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();}
  ctx.globalAlpha=1;
  // points
  for(let i=0;i<d.points.length;i++){const q=d.points[i],r=tf(P[i]);
@@ -172,6 +193,7 @@ def main() -> int:
     data = {"sets": [
         _weight_dataset(1, 1, "su(3) octet"),
         _weight_dataset(3, 0, "su(3) decuplet"),
+        _lattice_dataset(),
         _cy_dataset(args.cy_n, args.cy_grid),
     ]}
     html = _HTML.replace("__DATA__", json.dumps(data, sort_keys=True))
