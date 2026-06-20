@@ -1,7 +1,7 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
 	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget \
-	certify-scaling geometry-figures certified-bracket certified-shadows qsvt
+	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -142,6 +142,16 @@ certified-shadows:
 qsvt:
 	python scripts/run_qsvt.py --operator berry_keating_xp --coeffs 0,0,1 \
 		--output-dir results/qsvt
+
+# Temple-Kato certified ground-energy bracket from a quantum trial state (rigorous
+# lower + variational upper + Lean/Coq), dependency-light.
+temple-bracket:
+	python scripts/run_temple_bracket.py --operator berry_keating_xp --n-basis 8 \
+		--output-dir results/temple-bracket
+
+# Finite Lindbladian open-system steady state (numpy), cross-validated.
+open-system:
+	python scripts/run_open_system.py --n-sites 2 --output-dir results/open-system
 
 # Geometry-of-GaugeGap figures: exact 2D projections of higher-dim structures
 # (su(3) weight diagrams + root system, Calabi-Yau cross-section). Deterministic
