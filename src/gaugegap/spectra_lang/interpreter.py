@@ -65,6 +65,7 @@ class Program:
     monotonicity: List[Dict] = field(default_factory=list)
     extractions: Dict[str, Dict] = field(default_factory=dict)
     measurements: Dict[str, Dict] = field(default_factory=dict)
+    quantum_validations: Dict[str, Dict] = field(default_factory=dict)
     report_dir: Optional[str] = None
 
     def to_dict(self) -> Dict:
@@ -97,6 +98,7 @@ class Program:
             ],
             "extractions": self.extractions,
             "measurements": self.measurements,
+            "quantum_validations": self.quantum_validations,
         }
 
 
@@ -115,6 +117,10 @@ _RE_MEASURE = re.compile(
 _RE_EXTRACT = re.compile(
     r"^extract\s+(\w+)\s*=\s*spectrum\(\s*(\w+)\s*,\s*method\s*=\s*(\w+)\s*\)$"
 )
+_RE_CERTIFY_QUANTUM = re.compile(
+    r"^certify_quantum\s+(\w+)\s*=\s*validate\(\s*(\w+)\s*,\s*method\s*=\s*(\w+)\s*\)$"
+)
+_RE_ASSERT_QUANTUM = re.compile(r"^assert\s+quantum_certified\(\s*(\w+)\s*\)$")
 _RE_REPORT = re.compile(r'^report\s+"([^"]+)"$')
 
 
@@ -170,6 +176,14 @@ class Interpreter:
         m = _RE_EXTRACT.match(line)
         if m:
             self._extract(m.group(1), m.group(2), m.group(3))
+            return
+        m = _RE_CERTIFY_QUANTUM.match(line)
+        if m:
+            self._certify_quantum(m.group(1), m.group(2), m.group(3))
+            return
+        m = _RE_ASSERT_QUANTUM.match(line)
+        if m:
+            self._assert_quantum(m.group(1))
             return
         m = _RE_REPORT.match(line)
         if m:
@@ -297,6 +311,39 @@ class Interpreter:
             ) from exc
         row["backend_request"] = backend
         self.p.measurements[name] = row
+
+    def _certify_quantum(self, name: str, op_name: str, method: str) -> None:
+        """Run a quantum eigensolver on an operator and record whether its
+        estimates land inside the certified enclosures (cross-validation as data).
+        ``assert quantum_certified(name)`` later gates on it."""
+        if op_name not in self.p.operators:
+            raise SpectraError(f"unknown operator {op_name!r}")
+        if method not in ("esprit", "qcels", "krylov"):
+            raise SpectraError(
+                f"unknown quantum method {method!r} (use esprit/qcels/krylov)")
+        family = self.p.operators[op_name]["family"]
+        n = self.p.operators[op_name]["n"]
+        from gaugegap.quantum_validation import validate_operator
+        try:
+            reports = validate_operator(family, n, methods=(method,))
+        except Exception as exc:
+            raise SpectraError(f"quantum validation failed: {exc}") from exc
+        self.p.quantum_validations[name] = reports[method].to_dict()
+
+    def _assert_quantum(self, name: str) -> None:
+        """Fail the program unless every quantum estimate in ``name`` was certified
+        (inside its interval enclosure)."""
+        if name not in self.p.quantum_validations:
+            raise SpectraError(f"unknown quantum validation {name!r} "
+                               "(must follow a certify_quantum)")
+        rep = self.p.quantum_validations[name]
+        if not rep.get("all_certified", False):
+            raise SpectraError(
+                f"quantum claim rejected: {rep.get('n_in_enclosure')} estimates "
+                f"inside the certified enclosures for {name!r}; the certified kernel "
+                f"does not back this quantum spectrum")
+        self.p.assertions_quantum = getattr(self.p, "assertions_quantum", [])
+        self.p.quantum_validations[name]["asserted"] = True
 
     def _write_report(self, out: Path) -> None:
         out.mkdir(parents=True, exist_ok=True)
