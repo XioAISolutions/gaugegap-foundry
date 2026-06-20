@@ -41,6 +41,9 @@ from gaugegap.visualization.lattice_projection import (
     cubic_lattice, wilson_loop, project as lattice_project,
 )
 from gaugegap.visualization.weight_certificate import weight_symmetry_certificate
+from gaugegap.visualization.topology import (
+    fermat_quintic_hodge, dynkin_diagram_AN, cartan_matrix_AN,
+)
 
 _SIZE = 600
 _PAD = 70
@@ -198,6 +201,46 @@ def lattice_wilson_svg(sacred: bool) -> SVGCanvas:
     return c
 
 
+def hodge_diamond_svg(diamond, sacred: bool) -> SVGCanvas:
+    c = SVGCanvas(_SIZE, _SIZE)
+    n = diamond.complex_dim
+    dy = (_SIZE - 2 * _PAD) / (2 * n)
+    dx = dy
+    cx = _SIZE / 2
+    top = _PAD
+    if sacred:
+        golden_overlay(c, cx, top + n * dy, (_SIZE - 2 * _PAD) / 2)
+    for (p, q), v in diamond.h.items():
+        x = cx + (q - p) * dx
+        y = top + (p + q) * dy
+        c.circle(x, y, 16, fill="#161b22", stroke=_ACCENT, stroke_width=1.2,
+                 opacity=0.9)
+        c.text(x, y + 4, str(v), size=13, fill=_POINT)
+    chi = diamond.euler_characteristic()
+    c.text(cx, _SIZE - 34, f"{diamond.name}  Hodge diamond", size=15)
+    c.text(cx, _SIZE - 16, f"Euler characteristic chi = {chi}   (Betti "
+           f"{diamond.betti_numbers()})", size=10, fill="#8b949e")
+    return c
+
+
+def dynkin_svg(N: int, sacred: bool) -> SVGCanvas:
+    d = dynkin_diagram_AN(N)
+    c = SVGCanvas(_SIZE, 280)
+    r = N - 1
+    y = 140
+    xs = [_PAD + i * (_SIZE - 2 * _PAD) / max(1, r - 1) for i in range(r)] if r > 1 \
+        else [_SIZE / 2]
+    for (a, b) in d["bonds"]:
+        c.line(xs[a - 1], y, xs[b - 1], y, stroke=_ACCENT, stroke_width=2.0)
+    for i, x in enumerate(xs, start=1):
+        c.circle(x, y, 12, fill="#161b22", stroke=_POINT, stroke_width=2.0)
+        c.text(x, y + 34, f"a{i}", size=12, fill="#8b949e")
+    c.text(_SIZE / 2, 40, f"Dynkin diagram {d['type']} = {d['group']}", size=15)
+    c.text(_SIZE / 2, 250, "simple roots chained by single bonds (Cartan A_{N-1})",
+           size=10, fill="#8b949e")
+    return c
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -219,6 +262,8 @@ def main() -> int:
         "su4_root_system.svg": suN_root_svg(4, args.sacred_overlay),
         "lattice_wilson_loop.svg": lattice_wilson_svg(args.sacred_overlay),
         "calabi_yau_cross_section.svg": cy_svg(args.cy_n, args.cy_grid, args.sacred_overlay),
+        "calabi_yau_hodge_diamond.svg": hodge_diamond_svg(fermat_quintic_hodge(), args.sacred_overlay),
+        "su4_dynkin_diagram.svg": dynkin_svg(4, args.sacred_overlay),
     }
     for name, canvas in figs.items():
         canvas.write(out / name)
@@ -238,6 +283,13 @@ def main() -> int:
     (out / "weight_symmetry_certificates.json").write_text(
         json.dumps(certs, indent=2, sort_keys=True))
     print(f"  wrote {len(certs)} symmetry certificates (.lean/.coq) + json")
+    # Exact topology: Calabi-Yau Hodge diamond + A_{N-1} Cartan/Dynkin data.
+    topo = {
+        "calabi_yau_quintic": fermat_quintic_hodge().to_dict(),
+        "dynkin": {f"su{N}": dynkin_diagram_AN(N) for N in (2, 3, 4, 5)},
+    }
+    (out / "topology_data.json").write_text(json.dumps(topo, indent=2, sort_keys=True))
+    print(f"  wrote {out / 'topology_data.json'}")
     print(f"\n{len(figs)} figures + data + certificates -> {out}"
           + ("  (with decorative sacred-geometry overlay)" if args.sacred_overlay else ""))
     return 0

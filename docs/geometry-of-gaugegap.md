@@ -42,6 +42,16 @@ Produces (byte-deterministic, in `figures/geometry/`):
 - **discharged symmetry certificates** `weight_symmetry_<rep>.lean` / `.coq` +
   `weight_symmetry_certificates.json` (see below).
 
+## Exact topology: Calabi-Yau Hodge diamond + Dynkin/Cartan
+
+`visualization/topology.py` carries standard exact invariants:
+- the **Fermat quintic** Hodge diamond (`h^{1,1}=1`, `h^{2,1}=101`), with verified
+  Hodge symmetry, **Euler characteristic χ = −200**, and Betti numbers
+  `[1,0,1,204,1,0,1]` (`calabi_yau_hodge_diamond.svg`, `topology_data.json`);
+- the A_{N-1} **Cartan matrix** and **Dynkin diagram** behind the weight diagrams
+  (`su4_dynkin_diagram.svg`). The "generations ~ |χ|/2" remark is the standard
+  string-compactification heuristic, labelled as such — not a result of this repo.
+
 ## Verified symmetry invariant (the "prove" layer)
 
 The weight diagram's balance is a *first-class verified claim*, in the same honest

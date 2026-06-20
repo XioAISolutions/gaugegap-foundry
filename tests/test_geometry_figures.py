@@ -106,6 +106,31 @@ class TestGroupsAndLatticeAndCertificate(unittest.TestCase):
         for a, b in zip(loop[:-1], loop[1:]):
             self.assertIn(tuple(sorted((a, b))), link_set)
 
+    def test_quintic_hodge_invariants(self):
+        from gaugegap.visualization.topology import (
+            fermat_quintic_hodge, calabi_yau_threefold,
+        )
+        q = fermat_quintic_hodge()
+        self.assertEqual(q.euler_characteristic(), -200)
+        self.assertEqual(q.betti_numbers(), [1, 0, 1, 204, 1, 0, 1])
+        self.assertTrue(q.hodge_symmetric())
+        # general CY3 Euler formula chi = 2(h11 - h21)
+        cy = calabi_yau_threefold(3, 243)
+        self.assertEqual(cy.euler_characteristic(), 2 * (3 - 243))
+        self.assertTrue(cy.hodge_symmetric())
+
+    def test_cartan_and_dynkin_AN(self):
+        from gaugegap.visualization.topology import cartan_matrix_AN, dynkin_diagram_AN
+        import numpy as np
+        C = cartan_matrix_AN(4)
+        self.assertEqual(C.shape, (3, 3))
+        self.assertTrue((np.diag(C) == 2).all())
+        self.assertEqual(C[0, 1], -1)
+        self.assertEqual(C[0, 2], 0)
+        d = dynkin_diagram_AN(5)
+        self.assertEqual(len(d["nodes"]), 4)
+        self.assertEqual(d["bonds"], [(1, 2), (2, 3), (3, 4)])
+
     def test_weight_symmetry_certificate_is_balanced_and_hole_free(self):
         from gaugegap.visualization.weight_certificate import (
             weight_symmetry_certificate,
@@ -201,7 +226,7 @@ class TestSVGAndFigures(unittest.TestCase):
                     _sys.argv = old
             a = sorted(Path(d1).glob("*.svg"))
             b = sorted(Path(d2).glob("*.svg"))
-            self.assertEqual(len(a), 8)
+            self.assertEqual(len(a), 10)
             for fa, fb in zip(a, b):
                 self.assertEqual(fa.read_text(), fb.read_text(), msg=fa.name)
 
