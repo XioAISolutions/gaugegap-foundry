@@ -67,6 +67,14 @@ spectral = [
 crosscheck = [
   "python-flint>=0.7",
 ]
+# Optional SDP backend (dual-VQE style lower-bound cross-check). Not required.
+sdp = [
+  "cvxpy>=1.4",
+]
+# Optional open-quantum cross-check (the numpy Lindbladian path needs no deps).
+open-quantum = [
+  "qutip>=5.0",
+]
 dev = [
   "pytest>=8",
   "scipy>=1.11",

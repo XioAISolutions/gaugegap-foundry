@@ -1,0 +1,11 @@
+{
+  "claim_boundary": "rigorous trial-state bracket on a finite-matrix ground energy (Temple lower + variational upper); not a continuum/Millennium claim",
+  "contains_exact": true,
+  "interval_kernel_lower": -3.493959207442449,
+  "kind": "temple_kato_bracket",
+  "lower": -3.493959207442449,
+  "mu_E1_lower": -2.603875471615702,
+  "upper": -3.488277972662546,
+  "valid": true,
+  "width": 0.0056812347799026774
+}

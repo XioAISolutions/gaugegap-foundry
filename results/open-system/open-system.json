@@ -1,0 +1,12 @@
+{
+  "claim_boundary": "exact finite open-system steady state, cross-validated; non-Hermitian Liouvillian (not interval-certified); not a continuum/Millennium claim",
+  "dim": 4,
+  "gamma": 0.3,
+  "is_valid_density_matrix": true,
+  "kind": "lindbladian_steady_state",
+  "long_time_matches": true,
+  "n_sites": 2,
+  "relaxation_gap": 0.19206065023490973,
+  "residual_norm": 2.1422067668019988e-16,
+  "steady_total_Z": 0.06482767487789298
+}

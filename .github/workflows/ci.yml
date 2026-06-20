@@ -122,6 +122,10 @@ jobs:
         run: python scripts/run_certified_shadows.py --operator berry_keating_xp --n-basis 8 --n-snapshots 300 --n-batches 8 --output-dir results/certified-shadows
       - name: QSVT transform smoke
         run: python scripts/run_qsvt.py --operator berry_keating_xp --n-basis 8 --coeffs 0,0,1 --output-dir results/qsvt
+      - name: Temple-Kato bracket smoke
+        run: python scripts/run_temple_bracket.py --operator berry_keating_xp --n-basis 8 --output-dir results/temple-bracket
+      - name: Open-system steady-state smoke
+        run: python scripts/run_open_system.py --n-sites 2 --output-dir results/open-system
 
   packaging:
     runs-on: ubuntu-latest
