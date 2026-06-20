@@ -105,6 +105,28 @@ a program that runs only asserts what is certified. That is a genuine
 differentiator, not a reimplementation.
 
 Implemented extensions: the `prove monotone(...)` verb over a panel, and a
-`backend=ibm-hardware` option on `measure`. Possible future extensions (only if a
-need appears): export of the whole program-run as a reviewer packet; additional
-candidate families.
+`backend=ibm-hardware` option on `measure`.
+
+## Quantum claims are first-class too (`certify_quantum` / `assert quantum_certified`)
+
+Quantum estimates become certified-or-rejected claims, mirroring the
+certificate→assert rule for the interval kernel:
+
+```
+operator xp = berry_keating(n=8)
+certify_quantum Cx = validate(xp, method=esprit)   # run a quantum eigensolver
+assert quantum_certified(Cx)                        # fails unless every estimate
+                                                    # lands in a certified enclosure
+```
+
+`certify_quantum` runs the chosen quantum method (`esprit`/`qcels`/`krylov`) via
+`quantum_validation.validate_operator` and records, per estimate, whether it lies
+inside the certified interval enclosure; `assert quantum_certified` fails the
+program unless **all** do. (ESPRIT certifies the xp spectrum; QCELS — a coarser
+dominant-eigenvalue method — correctly fails the gate.)
+
+Beyond the DSL, the certified-quantum stack adds gauge operators (`z2`, `u1`) to
+the operator registry (so the certify / bracket / validation / shadows pipeline
+runs on gauge Hamiltonians) and `quantum_validation.quantum_error_budget(...)` — a
+source-separated error budget (statistical CI + certified-enclosure + numerical)
+for shot-noisy quantum estimators.

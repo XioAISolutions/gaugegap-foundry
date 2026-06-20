@@ -182,3 +182,72 @@ def validate_operator(
             classical_evals=classical, operator=spec.name, n_basis=n_basis,
         )
     return reports
+
+
+def quantum_error_budget(
+    operator: str,
+    n_basis: int,
+    *,
+    method: str = "qcels",
+    n_runs: int = 20,
+    shots: int = 1500,
+    dephasing: float = 0.01,
+    parent_seed: int = 1234,
+    level: float = 0.95,
+) -> dict:
+    """Certified error budget for a stochastic quantum estimator.
+
+    Generalises the ``run_error_budget`` QCELS pattern to any shot-noisy quantum
+    method: runs ``method`` over independent child seeds, builds a confidence
+    interval, and assembles a source-separated ``ErrorBudget`` (statistical CI +
+    certified-enclosure truncation bound + numerical precision). Honest scope: the
+    CI is a fixed-truncation statistical band; no continuum claim.
+    """
+    from gaugegap.repeated_runs import repeated_run
+    from gaugegap.error_budget import ErrorBudget
+    from gaugegap.seeding import make_rng
+
+    spec = get_operator(operator)
+    H = spec.build(n_basis)
+    H = (H + H.conj().T) / 2.0
+    evals = np.linalg.eigvalsh(H)
+    target = float(min(evals, key=abs))           # smallest-|.| eigenvalue
+    psi = np.ones(H.shape[0]) / np.sqrt(H.shape[0])
+
+    def estimator(seed: int) -> float:
+        rng = make_rng(seed)
+        if method == "qcels":
+            return abs(float(cs.qcels(H, psi, total_time=60.0, levels=4,
+                                      shots=shots, dephasing=dephasing,
+                                      rng=rng).eigenvalue))
+        if method == "esprit":
+            er = cs.extract_eigenvalues(H, psi, method="esprit", shots=shots,
+                                        dephasing=dephasing, rng=rng)
+            vals = np.asarray(er.eigenvalues)
+            return abs(float(vals[np.argmin(np.abs(vals - target))]))
+        raise ValueError(f"method {method!r} not supported for error budget "
+                         "(use 'qcels' or 'esprit')")
+
+    stats = repeated_run(estimator, parent_seed=parent_seed, n_runs=n_runs, level=level)
+
+    # certified enclosure half-width for the target eigenvalue (truncation bound)
+    enclosures = spec.certified(n_basis)
+    idx = int(np.argmin([abs((iv.lower + iv.upper) / 2 - target) for iv in enclosures]))
+    lo, hi = float(enclosures[idx].lower), float(enclosures[idx].upper)
+
+    budget = ErrorBudget(quantity=f"{method}_estimate(|lambda_min|,{spec.name})")
+    budget.add(f"{method}_shot_noise", stats.ci_halfwidth, "statistical", "stochastic")
+    budget.add("certified_truncation_enclosure", (hi - lo) / 2, "truncation", "bound")
+    budget.add("numerical_precision", 1e-12 * max(1.0, abs(target)), "numerical", "bound")
+    dominant = budget.dominant()
+    return {
+        "operator": spec.name, "method": method, "n_basis": n_basis,
+        "target_magnitude_classical": abs(target),
+        "repeated_runs": stats.to_dict(),
+        "error_budget": budget.as_dict(),
+        "by_category": budget.by_category(),
+        "total": budget.total(),
+        "dominant_source": dominant.name if dominant else None,
+        "claim_boundary": ("fixed-truncation statistical error budget for a quantum "
+                           "estimator; not a continuum/Millennium claim"),
+    }

@@ -91,6 +91,40 @@ def _dirac_spec() -> OperatorSpec:
     )
 
 
+def _z2_spec() -> OperatorSpec:
+    from gaugegap.z2_chain import hamiltonian_dense
+
+    def build(n, **kw):
+        return hamiltonian_dense(n, kw.get("exchange", 1.0),
+                                 kw.get("field", 1.0), kw.get("periodic", False))
+    return OperatorSpec(
+        name="z2",
+        build=build,
+        certified=lambda n, **kw: build_certified_general(build(n, **kw)),
+        formal_family=None,   # general certified path; no bespoke separation proof
+        dsl_form=None,
+        size_kw="n_sites",
+    )
+
+
+def _u1_spec() -> OperatorSpec:
+    from gaugegap.gaugegap_u1 import u1_plaquette_hamiltonian
+
+    def build(n, **kw):
+        # n is the link truncation; fix a small 2-link plaquette by default.
+        return u1_plaquette_hamiltonian(kw.get("n_links", 2),
+                                        kw.get("g_electric", 1.0),
+                                        kw.get("g_magnetic", 1.0), n)
+    return OperatorSpec(
+        name="u1",
+        build=build,
+        certified=lambda n, **kw: build_certified_general(build(n, **kw)),
+        formal_family=None,
+        dsl_form=None,
+        size_kw="truncation",
+    )
+
+
 def _quantum_graph_spec() -> OperatorSpec:
     return OperatorSpec(
         name="quantum_graph",
@@ -116,13 +150,16 @@ _REGISTRY = {
     "berry_keating": _xp_spec,
     "dirac_rindler": _dirac_spec,
     "quantum_graph": _quantum_graph_spec,
+    "z2": _z2_spec,
+    "u1": _u1_spec,
 }
 
 
 def list_operators() -> list[str]:
     """Canonical registered operator names (deduplicated)."""
     seen = []
-    for spec_factory in (_xp_spec, _dirac_spec, _quantum_graph_spec):
+    for spec_factory in (_xp_spec, _dirac_spec, _quantum_graph_spec,
+                         _z2_spec, _u1_spec):
         name = spec_factory().name
         if name not in seen:
             seen.append(name)
