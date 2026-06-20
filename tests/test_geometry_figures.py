@@ -18,6 +18,7 @@ warnings.filterwarnings("ignore")
 
 from gaugegap.visualization.weight_diagrams import (
     su3_weights, su3_dimension, su3_root_system, NAMED_IRREPS,
+    geometry_dataset, weyl_orbit_closed, weight_centroid,
 )
 from gaugegap.visualization.cy_projection import fermat_patches, orthographic
 from gaugegap.visualization.svg import SVGCanvas
@@ -53,6 +54,25 @@ class TestWeightDiagrams(unittest.TestCase):
     def test_named_irreps(self):
         self.assertEqual(NAMED_IRREPS["adjoint"], (1, 1))
         self.assertEqual(su3_dimension(*NAMED_IRREPS["decuplet"]), 10)
+
+    def test_symmetry_invariants(self):
+        # Every irrep: centroid at the origin and the weight set is Weyl-closed.
+        for (p, q) in [(1, 0), (1, 1), (3, 0), (2, 2)]:
+            ws = su3_weights(p, q)
+            cx, cy = weight_centroid(ws)
+            self.assertAlmostEqual(cx, 0.0, places=9)
+            self.assertAlmostEqual(cy, 0.0, places=9)
+            self.assertTrue(weyl_orbit_closed(ws), msg=f"({p},{q})")
+
+    def test_geometry_dataset_json_serialisable(self):
+        import json
+        d = geometry_dataset()
+        s = json.dumps(d)  # must not raise (plain floats/ints/bools)
+        self.assertIn("representations", d)
+        self.assertTrue(all(r["weyl_orbit_closed"]
+                            for r in d["representations"].values()))
+        self.assertEqual(len(d["root_system"]), 6)
+        self.assertGreater(len(s), 0)
 
 
 class TestCYProjection(unittest.TestCase):

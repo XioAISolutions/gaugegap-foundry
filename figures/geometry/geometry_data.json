@@ -1,0 +1,251 @@
+{
+  "claim_boundary": "exact su(3) representation-theory data (Freudenthal multiplicities); symmetry invariants are verifiable, not a physics claim",
+  "representations": {
+    "adjoint": {
+      "centroid": [
+        0.0,
+        0.0
+      ],
+      "dimension": 8,
+      "dynkin": [
+        1,
+        1
+      ],
+      "n_weight_sites": 7,
+      "weights": [
+        {
+          "mult": 1,
+          "t3": -0.5,
+          "y": -1.0
+        },
+        {
+          "mult": 1,
+          "t3": 0.5,
+          "y": -1.0
+        },
+        {
+          "mult": 1,
+          "t3": -1.0,
+          "y": 0.0
+        },
+        {
+          "mult": 2,
+          "t3": 0.0,
+          "y": 0.0
+        },
+        {
+          "mult": 1,
+          "t3": 1.0,
+          "y": 0.0
+        },
+        {
+          "mult": 1,
+          "t3": -0.5,
+          "y": 1.0
+        },
+        {
+          "mult": 1,
+          "t3": 0.5,
+          "y": 1.0
+        }
+      ],
+      "weyl_orbit_closed": true
+    },
+    "antifundamental": {
+      "centroid": [
+        0.0,
+        0.0
+      ],
+      "dimension": 3,
+      "dynkin": [
+        0,
+        1
+      ],
+      "n_weight_sites": 3,
+      "weights": [
+        {
+          "mult": 1,
+          "t3": -0.5,
+          "y": -0.333333333
+        },
+        {
+          "mult": 1,
+          "t3": 0.5,
+          "y": -0.333333333
+        },
+        {
+          "mult": 1,
+          "t3": 0.0,
+          "y": 0.666666667
+        }
+      ],
+      "weyl_orbit_closed": true
+    },
+    "decuplet": {
+      "centroid": [
+        0.0,
+        0.0
+      ],
+      "dimension": 10,
+      "dynkin": [
+        3,
+        0
+      ],
+      "n_weight_sites": 10,
+      "weights": [
+        {
+          "mult": 1,
+          "t3": 0.0,
+          "y": -2.0
+        },
+        {
+          "mult": 1,
+          "t3": -0.5,
+          "y": -1.0
+        },
+        {
+          "mult": 1,
+          "t3": 0.5,
+          "y": -1.0
+        },
+        {
+          "mult": 1,
+          "t3": -1.0,
+          "y": 0.0
+        },
+        {
+          "mult": 1,
+          "t3": 0.0,
+          "y": 0.0
+        },
+        {
+          "mult": 1,
+          "t3": 1.0,
+          "y": 0.0
+        },
+        {
+          "mult": 1,
+          "t3": -1.5,
+          "y": 1.0
+        },
+        {
+          "mult": 1,
+          "t3": -0.5,
+          "y": 1.0
+        },
+        {
+          "mult": 1,
+          "t3": 0.5,
+          "y": 1.0
+        },
+        {
+          "mult": 1,
+          "t3": 1.5,
+          "y": 1.0
+        }
+      ],
+      "weyl_orbit_closed": true
+    },
+    "fundamental": {
+      "centroid": [
+        0.0,
+        0.0
+      ],
+      "dimension": 3,
+      "dynkin": [
+        1,
+        0
+      ],
+      "n_weight_sites": 3,
+      "weights": [
+        {
+          "mult": 1,
+          "t3": -0.0,
+          "y": -0.666666667
+        },
+        {
+          "mult": 1,
+          "t3": -0.5,
+          "y": 0.333333333
+        },
+        {
+          "mult": 1,
+          "t3": 0.5,
+          "y": 0.333333333
+        }
+      ],
+      "weyl_orbit_closed": true
+    },
+    "sextet": {
+      "centroid": [
+        0.0,
+        0.0
+      ],
+      "dimension": 6,
+      "dynkin": [
+        2,
+        0
+      ],
+      "n_weight_sites": 6,
+      "weights": [
+        {
+          "mult": 1,
+          "t3": -0.0,
+          "y": -1.333333333
+        },
+        {
+          "mult": 1,
+          "t3": -0.5,
+          "y": -0.333333333
+        },
+        {
+          "mult": 1,
+          "t3": 0.5,
+          "y": -0.333333333
+        },
+        {
+          "mult": 1,
+          "t3": -1.0,
+          "y": 0.666666667
+        },
+        {
+          "mult": 1,
+          "t3": -0.0,
+          "y": 0.666666667
+        },
+        {
+          "mult": 1,
+          "t3": 1.0,
+          "y": 0.666666667
+        }
+      ],
+      "weyl_orbit_closed": true
+    }
+  },
+  "root_system": [
+    {
+      "t3": -0.5,
+      "y": -1.0
+    },
+    {
+      "t3": 0.5,
+      "y": -1.0
+    },
+    {
+      "t3": 1.0,
+      "y": 0.0
+    },
+    {
+      "t3": 0.5,
+      "y": 1.0
+    },
+    {
+      "t3": -0.5,
+      "y": 1.0
+    },
+    {
+      "t3": -1.0,
+      "y": 0.0
+    }
+  ]
+}

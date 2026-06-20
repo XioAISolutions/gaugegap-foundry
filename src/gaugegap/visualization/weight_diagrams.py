@@ -108,3 +108,67 @@ NAMED_IRREPS = {
     "sextet": (2, 0),        # 6
     "decuplet": (3, 0),      # 10
 }
+
+
+def weight_centroid(weights: List[Dict]) -> Tuple[float, float]:
+    """Multiplicity-weighted centroid of a weight set in the (T3, Y) plane.
+
+    For any su(3) irrep this is the origin (the weights are balanced about 0) — a
+    cheap, exact symmetry invariant.
+    """
+    total = sum(w["mult"] for w in weights) or 1
+    t3 = sum(w["t3"] * w["mult"] for w in weights) / total
+    y = sum(w["y"] * w["mult"] for w in weights) / total
+    return (t3, y)
+
+
+def weyl_orbit_closed(weights: List[Dict], tol: float = 1e-9) -> bool:
+    """Check the weight multiset is invariant under the A2 Weyl group.
+
+    The Weyl group of su(3) is S3 acting by permuting the three sum-zero R^3
+    coordinates. A genuine weight diagram is closed under that action with matching
+    multiplicities — a verifiable geometric symmetry invariant.
+    """
+    from itertools import permutations
+
+    def key(r3):
+        return tuple(round(x, 6) for x in r3)
+
+    table = {key(w["r3"]): w["mult"] for w in weights}
+    for w in weights:
+        a, b, c = w["r3"]
+        for perm in permutations((a, b, c)):
+            k = key(perm)
+            if k not in table or table[k] != w["mult"]:
+                return False
+    return True
+
+
+def geometry_dataset() -> Dict:
+    """Exact, JSON-serialisable geometry data + symmetry invariants for export.
+
+    Suitable for downstream verification (e.g. asserting Weyl closure / centroid).
+    """
+    reps = {}
+    for name, (p, q) in NAMED_IRREPS.items():
+        ws = su3_weights(p, q)
+        cx, cy = weight_centroid(ws)
+        reps[name] = {
+            "dynkin": [p, q],
+            "dimension": su3_dimension(p, q),
+            "n_weight_sites": len(ws),
+            "weights": [{"t3": float(round(w["t3"], 9)), "y": float(round(w["y"], 9)),
+                         "mult": int(w["mult"])} for w in ws],
+            "centroid": [float(round(cx, 12)) + 0.0, float(round(cy, 12)) + 0.0],
+            "weyl_orbit_closed": bool(weyl_orbit_closed(ws)),
+        }
+    roots = su3_root_system()
+    return {
+        "claim_boundary": ("exact su(3) representation-theory data (Freudenthal "
+                           "multiplicities); symmetry invariants are verifiable, "
+                           "not a physics claim"),
+        "representations": reps,
+        "root_system": [{"t3": float(round(r["t3"], 9)), "y": float(round(r["y"], 9))}
+                        for r in roots],
+    }
+

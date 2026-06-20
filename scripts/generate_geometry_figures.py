@@ -33,7 +33,7 @@ warnings.filterwarnings("ignore")
 
 from gaugegap.visualization.svg import SVGCanvas, golden_overlay, vesica_overlay
 from gaugegap.visualization.weight_diagrams import (
-    su3_weights, su3_dimension, su3_root_system, NAMED_IRREPS,
+    su3_weights, su3_dimension, su3_root_system, NAMED_IRREPS, geometry_dataset,
 )
 from gaugegap.visualization.cy_projection import fermat_patches, orthographic
 
@@ -156,7 +156,12 @@ def main() -> int:
     for name, canvas in figs.items():
         canvas.write(out / name)
         print(f"  wrote {out / name}")
-    print(f"\n{len(figs)} figures -> {out}"
+    # Exact geometry data + verifiable symmetry invariants (Weyl closure, centroid).
+    import json
+    (out / "geometry_data.json").write_text(
+        json.dumps(geometry_dataset(), indent=2, sort_keys=True))
+    print(f"  wrote {out / 'geometry_data.json'}")
+    print(f"\n{len(figs)} figures + data -> {out}"
           + ("  (with decorative sacred-geometry overlay)" if args.sacred_overlay else ""))
     return 0
 

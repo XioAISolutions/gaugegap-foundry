@@ -97,8 +97,9 @@ _HTML = """<!doctype html>
 <canvas id="c" width="640" height="640"></canvas>
 <div class="row">
   <label>flatten <input id="flat" type="range" min="0" max="100" value="0"></label>
+  <button id="play">&#9654; play</button>
   <label><input id="sacred" type="checkbox"> golden overlay</label>
-  <span class="note">drag to rotate &middot; slide to flatten to the exact 2D shadow</span>
+  <span class="note">drag to rotate &middot; slide (or play) to flatten to the exact 2D shadow</span>
 </div>
 <div class="note">Faithful projections of exact objects (su(3) weights via Freudenthal;
 Fermat surface). Overlay is decorative only — not a mathematical claim.</div>
@@ -146,6 +147,14 @@ c.addEventListener('pointerdown',e=>{drag=true;px=e.clientX;py=e.clientY;});
 addEventListener('pointerup',()=>drag=false);
 addEventListener('pointermove',e=>{if(!drag)return;yaw+=(e.clientX-px)*.01;pitch+=(e.clientY-py)*.01;px=e.clientX;py=e.clientY;draw();});
 flat.addEventListener('input',draw);sacred.addEventListener('change',draw);
+// Auto-play: slowly rotate while easing flatten 0->100->0 (the "reel" loop).
+let playing=false,phase=0,raf=0;
+const play=document.getElementById('play');
+function tick(){if(!playing)return;phase+=0.012;yaw+=0.006;
+ flat.value=Math.round(50-50*Math.cos(phase));draw();raf=requestAnimationFrame(tick);}
+play.onclick=()=>{playing=!playing;play.classList.toggle('active',playing);
+ play.innerHTML=playing?'&#10073;&#10073; pause':'&#9654; play';
+ if(playing)tick();else cancelAnimationFrame(raf);};
 mk();draw();
 </script></body></html>
 """
