@@ -126,6 +126,8 @@ jobs:
         run: python scripts/run_temple_bracket.py --operator berry_keating_xp --n-basis 8 --output-dir results/temple-bracket
       - name: Open-system steady-state smoke
         run: python scripts/run_open_system.py --n-sites 2 --output-dir results/open-system
+      - name: Certified-quantum capstone smoke
+        run: python scripts/run_certified_quantum_report.py --operator berry_keating_xp --n-basis 8 --output-dir results/certified-quantum
 
   packaging:
     runs-on: ubuntu-latest

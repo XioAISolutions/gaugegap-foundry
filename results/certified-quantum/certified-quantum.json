@@ -1,0 +1,377 @@
+{
+  "all_checks_pass": true,
+  "checks": {
+    "error_budget_positive_total": true,
+    "interval_bracket_contains_E0": true,
+    "open_system_valid_steady_state": true,
+    "qsvt_transform_certified": true,
+    "shadow_CIs_cover_exact": true,
+    "temple_bracket_contains_E0": true,
+    "validation_esprit_krylov_certified": true
+  },
+  "claim_boundary": "every quantum result is bracketed/cross-validated/certified against the interval kernel; finite-system, simulation-level; not a continuum/Millennium claim",
+  "error_budget": {
+    "by_category": {
+      "numerical": 1e-12,
+      "statistical": 0.00031973284076192154,
+      "truncation": 5.9396931817445875e-15
+    },
+    "claim_boundary": "fixed-truncation statistical error budget for a quantum estimator; not a continuum/Millennium claim",
+    "dominant_source": "qcels_shot_noise",
+    "error_budget": {
+      "bound_total": 1.0059396931817446e-12,
+      "by_category": {
+        "numerical": 1e-12,
+        "statistical": 0.00031973284076192154,
+        "truncation": 5.9396931817445875e-15
+      },
+      "components": [
+        {
+          "category": "statistical",
+          "kind": "stochastic",
+          "name": "qcels_shot_noise",
+          "value": 0.00031973284076192154
+        },
+        {
+          "category": "truncation",
+          "kind": "bound",
+          "name": "certified_truncation_enclosure",
+          "value": 5.9396931817445875e-15
+        },
+        {
+          "category": "numerical",
+          "kind": "bound",
+          "name": "numerical_precision",
+          "value": 1e-12
+        }
+      ],
+      "dominant": "qcels_shot_noise",
+      "quantity": "qcels_estimate(|lambda_min|,berry_keating_xp)",
+      "stochastic_total": 0.00031973284076192154,
+      "total": 0.00031973284176786123
+    },
+    "method": "qcels",
+    "n_basis": 8,
+    "operator": "berry_keating_xp",
+    "repeated_runs": {
+      "ci": [
+        0.9973608646281327,
+        0.9980003303096565
+      ],
+      "ci_halfwidth": 0.00031973284076192154,
+      "ci_level": 0.95,
+      "interpretation": "statistical spread of the estimator at a fixed finite system; no continuum/thermodynamic-limit implication",
+      "mean": 0.9976805974688946,
+      "n_runs": 8,
+      "samples": [
+        0.9977715200295647,
+        0.9983608735121038,
+        0.9971479644093556,
+        0.9978925133626235,
+        0.9971198389365087,
+        0.9978117715445429,
+        0.9980936763622189,
+        0.9972466215942388
+      ],
+      "sem": 0.0001631319979774833,
+      "std": 0.0004614069679935544
+    },
+    "target_magnitude_classical": 0.9959593295662895,
+    "total": 0.00031973284176786123
+  },
+  "exact_E0": -12.787631637495055,
+  "exact_gap": 5.730102309224367,
+  "interval_bracket": {
+    "claim_boundary": "rigorous two-sided bracket on a finite-matrix eigenvalue (certified lower + variational upper); not a continuum or Millennium claim",
+    "index": 0,
+    "label": "E0",
+    "lower": -12.787631637507566,
+    "method": "quantum_krylov",
+    "upper": -12.787631637495053,
+    "valid": true,
+    "width": 1.2512657576735364e-11
+  },
+  "n_basis": 8,
+  "open_system": {
+    "claim_boundary": "exact finite open-system steady state, cross-validated; non-Hermitian Liouvillian (not interval-certified); not a continuum/Millennium claim",
+    "dim": 4,
+    "is_valid_density_matrix": true,
+    "kind": "lindbladian_steady_state",
+    "relaxation_gap": 0.19206065023490973,
+    "residual_norm": 2.1422067668019988e-16
+  },
+  "operator": "berry_keating_xp",
+  "qsvt": {
+    "all_inside_certified": true,
+    "certified_enclosures": [
+      [
+        0.006066007926894356,
+        0.0060660079272094785
+      ],
+      [
+        0.006066007926893976,
+        0.006066007927209892
+      ],
+      [
+        0.07322547234859413,
+        0.07322547234979476
+      ],
+      [
+        0.07322547234858957,
+        0.07322547234979954
+      ],
+      [
+        0.304596668032355,
+        0.30459666803466384
+      ],
+      [
+        0.3045966680323647,
+        0.30459666803465435
+      ],
+      [
+        0.9999999999960874,
+        1.0000000000000002
+      ],
+      [
+        0.9999999999960882,
+        1.0000000000000002
+      ]
+    ],
+    "claim_boundary": "certified polynomial transform of a finite Hermitian spectrum; not a continuum/Millennium claim",
+    "coeffs": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "kind": "qsvt_eigenvalue_transform",
+    "max_residual_vs_reference": 8.881784197001252e-16,
+    "transformed_eigenvalues": [
+      0.006066007927051715,
+      0.006066007927051921,
+      0.07322547234919438,
+      0.0732254723491945,
+      0.3045966680335098,
+      0.30459666803351015,
+      0.9999999999980438,
+      0.9999999999980445
+    ],
+    "window": [
+      -12.787631637507566,
+      12.787631637507568
+    ]
+  },
+  "shadows": {
+    "Z0": {
+      "abs_error": 0.02355033646421889,
+      "ci": [
+        -0.8428860049160085,
+        -0.7677389950839908
+      ],
+      "covered": true,
+      "estimate": -0.7837499999999997,
+      "exact": -0.8073003364642186,
+      "observable": "Z0"
+    },
+    "Z1": {
+      "abs_error": 0.012142398041050662,
+      "ci": [
+        -0.2420186162653971,
+        -0.09735638373460265
+      ],
+      "covered": true,
+      "estimate": -0.14999999999999983,
+      "exact": -0.1621423980410505,
+      "observable": "Z1"
+    },
+    "Z2": {
+      "abs_error": 0.03747099675908789,
+      "ci": [
+        -0.07919737942154367,
+        0.0360723794215437
+      ],
+      "covered": true,
+      "estimate": 6.938893903907228e-18,
+      "exact": -0.03747099675908788,
+      "observable": "Z2"
+    }
+  },
+  "temple_bracket": {
+    "claim_boundary": "rigorous trial-state bracket on a finite-matrix ground energy (Temple lower + variational upper); not a continuum/Millennium claim",
+    "contains_exact": true,
+    "interval_kernel_lower": -12.787631637507566,
+    "kind": "temple_kato_bracket",
+    "lower": -12.787631637507566,
+    "mu_E1_lower": -7.057529328283951,
+    "upper": -12.772149791305583,
+    "valid": true,
+    "width": 0.015481846201982563
+  },
+  "validation": {
+    "esprit": {
+      "all_certified": true,
+      "max_abs_residual": 1.5987211554602254e-14,
+      "method": "esprit",
+      "n_basis": 8,
+      "n_estimates": 8,
+      "n_in_enclosure": "8/8",
+      "operator": "berry_keating_xp",
+      "results": [
+        {
+          "abs_residual_vs_classical": 3.6637359812630166e-15,
+          "certified_enclosure": [
+            0.9959593295662867,
+            0.9959593295662986
+          ],
+          "enclosure_halfwidth": 5.9396931817445875e-15,
+          "estimate": 0.9959593295662932,
+          "in_certified_enclosure": true,
+          "method": "esprit",
+          "nearest_classical": 0.9959593295662895
+        },
+        {
+          "abs_residual_vs_classical": 8.881784197001252e-16,
+          "certified_enclosure": [
+            7.057529328270672,
+            7.0575293282707
+          ],
+          "enclosure_halfwidth": 1.4210854715202004e-14,
+          "estimate": 7.057529328270688,
+          "in_certified_enclosure": true,
+          "method": "esprit",
+          "nearest_classical": 7.057529328270687
+        },
+        {
+          "abs_residual_vs_classical": 1.5987211554602254e-14,
+          "certified_enclosure": [
+            -12.787631637495085,
+            -12.787631637495045
+          ],
+          "enclosure_halfwidth": 2.042810365310288e-14,
+          "estimate": -12.787631637495071,
+          "in_certified_enclosure": true,
+          "method": "esprit",
+          "nearest_classical": -12.787631637495055
+        },
+        {
+          "abs_residual_vs_classical": 7.771561172376096e-16,
+          "certified_enclosure": [
+            -0.9959593295662943,
+            -0.9959593295662863
+          ],
+          "enclosure_halfwidth": 3.9968028886505635e-15,
+          "estimate": -0.9959593295662901,
+          "in_certified_enclosure": true,
+          "method": "esprit",
+          "nearest_classical": -0.9959593295662909
+        },
+        {
+          "abs_residual_vs_classical": 5.329070518200751e-15,
+          "certified_enclosure": [
+            12.787631637495046,
+            12.787631637495094
+          ],
+          "enclosure_halfwidth": 2.398081733190338e-14,
+          "estimate": 12.787631637495064,
+          "in_certified_enclosure": true,
+          "method": "esprit",
+          "nearest_classical": 12.787631637495059
+        },
+        {
+          "abs_residual_vs_classical": 8.881784197001252e-16,
+          "certified_enclosure": [
+            3.460359403921312,
+            3.460359403921326
+          ],
+          "enclosure_halfwidth": 7.105427357601002e-15,
+          "estimate": 3.4603594039213212,
+          "in_certified_enclosure": true,
+          "method": "esprit",
+          "nearest_classical": 3.4603594039213204
+        },
+        {
+          "abs_residual_vs_classical": 5.329070518200751e-15,
+          "certified_enclosure": [
+            -3.460359403921322,
+            -3.460359403921307
+          ],
+          "enclosure_halfwidth": 7.549516567451064e-15,
+          "estimate": -3.460359403921315,
+          "in_certified_enclosure": true,
+          "method": "esprit",
+          "nearest_classical": -3.4603594039213204
+        },
+        {
+          "abs_residual_vs_classical": 0.0,
+          "certified_enclosure": [
+            -7.057529328270699,
+            -7.057529328270667
+          ],
+          "enclosure_halfwidth": 1.5987211554602254e-14,
+          "estimate": -7.057529328270689,
+          "in_certified_enclosure": true,
+          "method": "esprit",
+          "nearest_classical": -7.057529328270689
+        }
+      ]
+    },
+    "krylov": {
+      "all_certified": true,
+      "max_abs_residual": 4.1744385725905886e-14,
+      "method": "krylov",
+      "n_basis": 8,
+      "n_estimates": 4,
+      "n_in_enclosure": "4/4",
+      "operator": "berry_keating_xp",
+      "results": [
+        {
+          "abs_residual_vs_classical": 1.7763568394002505e-15,
+          "certified_enclosure": [
+            -12.787631637495085,
+            -12.787631637495045
+          ],
+          "enclosure_halfwidth": 2.042810365310288e-14,
+          "estimate": -12.787631637495053,
+          "in_certified_enclosure": true,
+          "method": "krylov",
+          "nearest_classical": -12.787631637495055
+        },
+        {
+          "abs_residual_vs_classical": 4.1744385725905886e-14,
+          "certified_enclosure": [
+            -7.057529328270699,
+            -7.057529328270667
+          ],
+          "enclosure_halfwidth": 1.5987211554602254e-14,
+          "estimate": -7.057529328270647,
+          "in_certified_enclosure": true,
+          "method": "krylov",
+          "nearest_classical": -7.057529328270689
+        },
+        {
+          "abs_residual_vs_classical": 1.1102230246251565e-14,
+          "certified_enclosure": [
+            -3.460359403921322,
+            -3.460359403921307
+          ],
+          "enclosure_halfwidth": 7.549516567451064e-15,
+          "estimate": -3.4603594039213093,
+          "in_certified_enclosure": true,
+          "method": "krylov",
+          "nearest_classical": -3.4603594039213204
+        },
+        {
+          "abs_residual_vs_classical": 7.771561172376096e-16,
+          "certified_enclosure": [
+            -0.9959593295662943,
+            -0.9959593295662863
+          ],
+          "enclosure_halfwidth": 3.9968028886505635e-15,
+          "estimate": -0.9959593295662916,
+          "in_certified_enclosure": true,
+          "method": "krylov",
+          "nearest_classical": -0.9959593295662909
+        }
+      ]
+    }
+  }
+}
