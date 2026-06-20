@@ -132,3 +132,4 @@ geometry-figures:
 		--output-dir figures/geometry
 	python scripts/generate_geometry_html.py \
 		--output figures/geometry/geometry_explorer.html
+	python scripts/generate_geometry_extra.py --output-dir figures/geometry

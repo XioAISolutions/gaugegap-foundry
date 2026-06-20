@@ -52,6 +52,22 @@ Produces (byte-deterministic, in `figures/geometry/`):
   (`su4_dynkin_diagram.svg`). The "generations ~ |χ|/2" remark is the standard
   string-compactification heuristic, labelled as such — not a result of this repo.
 
+## Animated reels, the full A-G Dynkin atlas, and mirror pairs
+
+`scripts/generate_geometry_extra.py` (also run by `make geometry-figures`) adds:
+- **Animated "flatten" reels** (`octet_flatten_reel.svg`, `root_flatten_reel.svg`)
+  — SMIL-animated SVGs that rotate the exact 3D structure and ease it to its 2D
+  shadow on a loop; they render inline in a browser, no JS.
+- **The full finite-type Dynkin atlas** `dynkin_{A4,B4,C4,D5,E6,E7,E8,F4,G2}.svg`
+  with correct bond multiplicities/branches; `cartan_matrix(typ, n)` builds any
+  finite-type Cartan matrix and `dynkin_diagram` reports its determinant (verified
+  against the known value: A_n→n+1, B/C→2, D→4, E6→3, E7→2, E8/F4/G2→1) and
+  positive-definiteness of the symmetrised form.
+- **Calabi-Yau mirror pair** (`calabi_yau_mirror_pair.svg`): the quintic and its
+  mirror (h^{1,1}↔h^{2,1}, χ→−χ), with `is_mirror_pair` verifying the relation.
+
+Data: `geometry_atlas.json` (Dynkin atlas + mirror pair).
+
 ## Verified symmetry invariant (the "prove" layer)
 
 The weight diagram's balance is a *first-class verified claim*, in the same honest
