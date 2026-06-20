@@ -29,10 +29,28 @@ make geometry-figures SACRED=1  # + decorative golden-ratio / Vesica overlay
 python scripts/generate_geometry_figures.py --sacred-overlay
 ```
 
-Produces `su3_fundamental_weight.svg`, `su3_octet_weight.svg`,
-`su3_decuplet_weight.svg`, `su3_root_system.svg`, and
-`calabi_yau_cross_section.svg`. Output is byte-deterministic (rounded coordinates),
-matching the repo's hashed-artifact discipline.
+Produces (byte-deterministic, in `figures/geometry/`):
+- su(3) weight diagrams: `su3_fundamental_weight.svg`, `su3_octet_weight.svg`,
+  `su3_decuplet_weight.svg`; the `su3_root_system.svg`;
+- the **su(2) weight ladder** (`su2_weight_ladder.svg`) and the **su(4) root
+  system** (`su4_root_system.svg`) — the rank-1 and rank-3 cases of the same
+  A_{N-1} construction (closed under the S_N Weyl group);
+- **`lattice_wilson_loop.svg`** — a 3D cubic lattice projected to 2D with a
+  highlighted closed **Wilson loop** (geometry only);
+- `calabi_yau_cross_section.svg`;
+- `geometry_data.json` (exact weights/roots + symmetry invariants);
+- **discharged symmetry certificates** `weight_symmetry_<rep>.lean` / `.coq` +
+  `weight_symmetry_certificates.json` (see below).
+
+## Verified symmetry invariant (the "prove" layer)
+
+The weight diagram's balance is a *first-class verified claim*, in the same honest
+style as the separation proofs: in the sum-zero R^3 embedding each weight
+coordinate is a multiple of 1/3, so the multiplicity-weighted balance
+`Σ mult·(3·coord) = 0` is an **exact integer identity**, emitted as discharged
+Lean 4 (`norm_num`) and Coq (`lia`) proofs (no holes, no floating point). The
+S_N Weyl-orbit closure is reported with a witness. `gaugegap.visualization.
+weight_certificate.weight_symmetry_certificate(p, q)` returns these.
 
 ## Interactive explorer (flatten the higher-dimensional form)
 

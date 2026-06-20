@@ -34,8 +34,13 @@ warnings.filterwarnings("ignore")
 from gaugegap.visualization.svg import SVGCanvas, golden_overlay, vesica_overlay
 from gaugegap.visualization.weight_diagrams import (
     su3_weights, su3_dimension, su3_root_system, NAMED_IRREPS, geometry_dataset,
+    su2_weights, suN_root_system_2d,
 )
 from gaugegap.visualization.cy_projection import fermat_patches, orthographic
+from gaugegap.visualization.lattice_projection import (
+    cubic_lattice, wilson_loop, project as lattice_project,
+)
+from gaugegap.visualization.weight_certificate import weight_symmetry_certificate
 
 _SIZE = 600
 _PAD = 70
@@ -134,6 +139,65 @@ def cy_svg(n: int, n_grid: int, sacred: bool) -> SVGCanvas:
     return c
 
 
+def su2_ladder_svg(dim: int, sacred: bool) -> SVGCanvas:
+    ws = su2_weights(dim)
+    pts = [(w["m"], 0.0) for w in ws]
+    tf, scale = _fit(pts + [(0, 0)], pad=120)
+    c = SVGCanvas(_SIZE, _SIZE)
+    ax_y = _SIZE / 2
+    c.line(_PAD, ax_y, _SIZE - _PAD, ax_y, stroke="#30363d")
+    for w in ws:
+        X, _ = tf(w["m"], 0.0)
+        c.circle(X, ax_y, 10, fill=_POINT, stroke="#0b0e14", stroke_width=1.0)
+        c.text(X, ax_y - 18, f"{w['m']:+.1f}", size=11, fill="#8b949e")
+    c.text(_SIZE / 2, _SIZE - 24, f"su(2) weight ladder — spin j={(dim-1)/2:g} "
+           f"(dim {dim})", size=15)
+    c.text(_SIZE / 2, _SIZE - 8, "1D weights m = -j..+j", size=10, fill="#8b949e")
+    return c
+
+
+def suN_root_svg(N: int, sacred: bool) -> SVGCanvas:
+    roots = suN_root_system_2d(N)
+    pts = [(r["x"], r["y"]) for r in roots]
+    tf, scale = _fit(pts + [(0, 0)])
+    c = SVGCanvas(_SIZE, _SIZE)
+    if sacred:
+        vesica_overlay(c, _SIZE / 2, _SIZE / 2, (_SIZE - 2 * _PAD) / 3)
+    ox, oy = tf(0, 0)
+    for r in roots:
+        X, Y = tf(r["x"], r["y"])
+        c.line(ox, oy, X, Y, stroke=_ACCENT, stroke_width=1.2, opacity=0.5)
+        c.circle(X, Y, 6, fill=_POINT, stroke="#0b0e14", stroke_width=1.0)
+    c.circle(ox, oy, 4, fill="#e6edf3")
+    c.text(_SIZE / 2, _SIZE - 20,
+           f"su({N}) root system (A{N-1}) — {N*(N-1)} roots, 2D projection", size=15)
+    return c
+
+
+def lattice_wilson_svg(sacred: bool) -> SVGCanvas:
+    lat = cubic_lattice(3, 3, 3)
+    loop = wilson_loop(lat, (0, 0, 0), R=2, T=2, plane="xy")
+    xy = lattice_project(lat.sites)
+    allpts = [tuple(p) for p in xy]
+    tf, scale = _fit(allpts)
+    c = SVGCanvas(_SIZE, _SIZE)
+    for (a, b) in lat.links:
+        xa, ya = tf(*xy[a])
+        xb, yb = tf(*xy[b])
+        c.line(xa, ya, xb, yb, stroke="#30363d", stroke_width=0.8, opacity=0.7)
+    loop_xy = [tf(*xy[i]) for i in loop]
+    c.polyline(loop_xy, stroke=_POINT, stroke_width=3.0, opacity=0.95)
+    for i in set(loop):
+        X, Y = tf(*xy[i])
+        c.circle(X, Y, 4, fill=_ACCENT, stroke="#0b0e14", stroke_width=1.0)
+    c.text(_SIZE / 2, _SIZE - 24,
+           "Lattice + Wilson loop — 3D grid projected to 2D", size=15)
+    c.text(_SIZE / 2, _SIZE - 8,
+           "highlighted closed path = a gauge-invariant Wilson loop (geometry only)",
+           size=10, fill="#8b949e")
+    return c
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -151,6 +215,9 @@ def main() -> int:
         "su3_octet_weight.svg": weight_diagram_svg(1, 1, "octet 8", args.sacred_overlay),
         "su3_decuplet_weight.svg": weight_diagram_svg(3, 0, "decuplet 10", args.sacred_overlay),
         "su3_root_system.svg": root_system_svg(args.sacred_overlay),
+        "su2_weight_ladder.svg": su2_ladder_svg(5, args.sacred_overlay),
+        "su4_root_system.svg": suN_root_svg(4, args.sacred_overlay),
+        "lattice_wilson_loop.svg": lattice_wilson_svg(args.sacred_overlay),
         "calabi_yau_cross_section.svg": cy_svg(args.cy_n, args.cy_grid, args.sacred_overlay),
     }
     for name, canvas in figs.items():
@@ -161,7 +228,17 @@ def main() -> int:
     (out / "geometry_data.json").write_text(
         json.dumps(geometry_dataset(), indent=2, sort_keys=True))
     print(f"  wrote {out / 'geometry_data.json'}")
-    print(f"\n{len(figs)} figures + data -> {out}"
+    # Discharged symmetry-invariant certificates (Lean/Coq) for the named irreps.
+    certs = {}
+    for nm, (p, q) in NAMED_IRREPS.items():
+        cert = weight_symmetry_certificate(p, q)
+        (out / f"weight_symmetry_{nm}.lean").write_text(cert.lean4)
+        (out / f"weight_symmetry_{nm}.coq").write_text(cert.coq)
+        certs[nm] = cert.to_dict()
+    (out / "weight_symmetry_certificates.json").write_text(
+        json.dumps(certs, indent=2, sort_keys=True))
+    print(f"  wrote {len(certs)} symmetry certificates (.lean/.coq) + json")
+    print(f"\n{len(figs)} figures + data + certificates -> {out}"
           + ("  (with decorative sacred-geometry overlay)" if args.sacred_overlay else ""))
     return 0
 

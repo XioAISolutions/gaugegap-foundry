@@ -1,0 +1,62 @@
+{
+  "adjoint": {
+    "balanced_about_origin": true,
+    "coq": "Require Import ZArith.\nRequire Import Lia.\nOpen Scope Z_scope.\n\nSection WeightSymmetry_P1Q1.\n\nTheorem balanced_coord0 : (-3) + (0) + (-3) + (0) + (3) + (0) + (3) = 0%Z.\nProof. lia. Qed.\nTheorem balanced_coord1 : (0) + (-3) + (3) + (0) + (-3) + (3) + (0) = 0%Z.\nProof. lia. Qed.\nTheorem balanced_coord2 : (3) + (3) + (0) + (0) + (0) + (-3) + (-3) = 0%Z.\nProof. lia. Qed.\n\nEnd WeightSymmetry_P1Q1.\n",
+    "dimension": 8,
+    "dynkin": [
+      1,
+      1
+    ],
+    "kind": "weight_symmetry_certificate",
+    "lean4": "import Mathlib.Tactic\n\nnamespace WeightSymmetry.P1Q1\n\n/-- su(3) irrep (p,q)=(1,1), dim 8. The multiplicity-weighted\n    weights sum to zero (balanced about the origin) \u2014 exact integer identity\n    (3*coord), discharged by norm_num. A verifiable symmetry invariant. -/\ntheorem balanced_coord0 : ((-3) + (0) + (-3) + (0) + (3) + (0) + (3) : \u2124) = 0 := by norm_num\ntheorem balanced_coord1 : ((0) + (-3) + (3) + (0) + (-3) + (3) + (0) : \u2124) = 0 := by norm_num\ntheorem balanced_coord2 : ((3) + (3) + (0) + (0) + (0) + (-3) + (-3) : \u2124) = 0 := by norm_num\n\nend WeightSymmetry.P1Q1\n",
+    "weyl_orbit_closed": true
+  },
+  "antifundamental": {
+    "balanced_about_origin": true,
+    "coq": "Require Import ZArith.\nRequire Import Lia.\nOpen Scope Z_scope.\n\nSection WeightSymmetry_P0Q1.\n\nTheorem balanced_coord0 : (-2) + (1) + (1) = 0%Z.\nProof. lia. Qed.\nTheorem balanced_coord1 : (1) + (-2) + (1) = 0%Z.\nProof. lia. Qed.\nTheorem balanced_coord2 : (1) + (1) + (-2) = 0%Z.\nProof. lia. Qed.\n\nEnd WeightSymmetry_P0Q1.\n",
+    "dimension": 3,
+    "dynkin": [
+      0,
+      1
+    ],
+    "kind": "weight_symmetry_certificate",
+    "lean4": "import Mathlib.Tactic\n\nnamespace WeightSymmetry.P0Q1\n\n/-- su(3) irrep (p,q)=(0,1), dim 3. The multiplicity-weighted\n    weights sum to zero (balanced about the origin) \u2014 exact integer identity\n    (3*coord), discharged by norm_num. A verifiable symmetry invariant. -/\ntheorem balanced_coord0 : ((-2) + (1) + (1) : \u2124) = 0 := by norm_num\ntheorem balanced_coord1 : ((1) + (-2) + (1) : \u2124) = 0 := by norm_num\ntheorem balanced_coord2 : ((1) + (1) + (-2) : \u2124) = 0 := by norm_num\n\nend WeightSymmetry.P0Q1\n",
+    "weyl_orbit_closed": true
+  },
+  "decuplet": {
+    "balanced_about_origin": true,
+    "coq": "Require Import ZArith.\nRequire Import Lia.\nOpen Scope Z_scope.\n\nSection WeightSymmetry_P3Q0.\n\nTheorem balanced_coord0 : (-3) + (-3) + (0) + (-3) + (0) + (3) + (-3) + (0) + (3) + (6) = 0%Z.\nProof. lia. Qed.\nTheorem balanced_coord1 : (-3) + (0) + (-3) + (3) + (0) + (-3) + (6) + (3) + (0) + (-3) = 0%Z.\nProof. lia. Qed.\nTheorem balanced_coord2 : (6) + (3) + (3) + (0) + (0) + (0) + (-3) + (-3) + (-3) + (-3) = 0%Z.\nProof. lia. Qed.\n\nEnd WeightSymmetry_P3Q0.\n",
+    "dimension": 10,
+    "dynkin": [
+      3,
+      0
+    ],
+    "kind": "weight_symmetry_certificate",
+    "lean4": "import Mathlib.Tactic\n\nnamespace WeightSymmetry.P3Q0\n\n/-- su(3) irrep (p,q)=(3,0), dim 10. The multiplicity-weighted\n    weights sum to zero (balanced about the origin) \u2014 exact integer identity\n    (3*coord), discharged by norm_num. A verifiable symmetry invariant. -/\ntheorem balanced_coord0 : ((-3) + (-3) + (0) + (-3) + (0) + (3) + (-3) + (0) + (3) + (6) : \u2124) = 0 := by norm_num\ntheorem balanced_coord1 : ((-3) + (0) + (-3) + (3) + (0) + (-3) + (6) + (3) + (0) + (-3) : \u2124) = 0 := by norm_num\ntheorem balanced_coord2 : ((6) + (3) + (3) + (0) + (0) + (0) + (-3) + (-3) + (-3) + (-3) : \u2124) = 0 := by norm_num\n\nend WeightSymmetry.P3Q0\n",
+    "weyl_orbit_closed": true
+  },
+  "fundamental": {
+    "balanced_about_origin": true,
+    "coq": "Require Import ZArith.\nRequire Import Lia.\nOpen Scope Z_scope.\n\nSection WeightSymmetry_P1Q0.\n\nTheorem balanced_coord0 : (-1) + (-1) + (2) = 0%Z.\nProof. lia. Qed.\nTheorem balanced_coord1 : (-1) + (2) + (-1) = 0%Z.\nProof. lia. Qed.\nTheorem balanced_coord2 : (2) + (-1) + (-1) = 0%Z.\nProof. lia. Qed.\n\nEnd WeightSymmetry_P1Q0.\n",
+    "dimension": 3,
+    "dynkin": [
+      1,
+      0
+    ],
+    "kind": "weight_symmetry_certificate",
+    "lean4": "import Mathlib.Tactic\n\nnamespace WeightSymmetry.P1Q0\n\n/-- su(3) irrep (p,q)=(1,0), dim 3. The multiplicity-weighted\n    weights sum to zero (balanced about the origin) \u2014 exact integer identity\n    (3*coord), discharged by norm_num. A verifiable symmetry invariant. -/\ntheorem balanced_coord0 : ((-1) + (-1) + (2) : \u2124) = 0 := by norm_num\ntheorem balanced_coord1 : ((-1) + (2) + (-1) : \u2124) = 0 := by norm_num\ntheorem balanced_coord2 : ((2) + (-1) + (-1) : \u2124) = 0 := by norm_num\n\nend WeightSymmetry.P1Q0\n",
+    "weyl_orbit_closed": true
+  },
+  "sextet": {
+    "balanced_about_origin": true,
+    "coq": "Require Import ZArith.\nRequire Import Lia.\nOpen Scope Z_scope.\n\nSection WeightSymmetry_P2Q0.\n\nTheorem balanced_coord0 : (-2) + (-2) + (1) + (-2) + (1) + (4) = 0%Z.\nProof. lia. Qed.\nTheorem balanced_coord1 : (-2) + (1) + (-2) + (4) + (1) + (-2) = 0%Z.\nProof. lia. Qed.\nTheorem balanced_coord2 : (4) + (1) + (1) + (-2) + (-2) + (-2) = 0%Z.\nProof. lia. Qed.\n\nEnd WeightSymmetry_P2Q0.\n",
+    "dimension": 6,
+    "dynkin": [
+      2,
+      0
+    ],
+    "kind": "weight_symmetry_certificate",
+    "lean4": "import Mathlib.Tactic\n\nnamespace WeightSymmetry.P2Q0\n\n/-- su(3) irrep (p,q)=(2,0), dim 6. The multiplicity-weighted\n    weights sum to zero (balanced about the origin) \u2014 exact integer identity\n    (3*coord), discharged by norm_num. A verifiable symmetry invariant. -/\ntheorem balanced_coord0 : ((-2) + (-2) + (1) + (-2) + (1) + (4) : \u2124) = 0 := by norm_num\ntheorem balanced_coord1 : ((-2) + (1) + (-2) + (4) + (1) + (-2) : \u2124) = 0 := by norm_num\ntheorem balanced_coord2 : ((4) + (1) + (1) + (-2) + (-2) + (-2) : \u2124) = 0 := by norm_num\n\nend WeightSymmetry.P2Q0\n",
+    "weyl_orbit_closed": true
+  }
+}

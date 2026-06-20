@@ -75,6 +75,52 @@ class TestWeightDiagrams(unittest.TestCase):
         self.assertGreater(len(s), 0)
 
 
+class TestGroupsAndLatticeAndCertificate(unittest.TestCase):
+    def test_su2_ladder(self):
+        from gaugegap.visualization.weight_diagrams import su2_weights
+        ws = su2_weights(5)
+        self.assertEqual([w["m"] for w in ws], [-2.0, -1.0, 0.0, 1.0, 2.0])
+        self.assertTrue(all(w["mult"] == 1 for w in ws))
+
+    def test_suN_root_counts_and_weyl_closure(self):
+        from gaugegap.visualization.weight_diagrams import (
+            an_roots, suN_root_system_2d, weyl_orbit_closed_AN,
+        )
+        for N in (2, 3, 4, 5):
+            roots = an_roots(N)
+            self.assertEqual(len(roots), N * (N - 1))
+            self.assertEqual(len(suN_root_system_2d(N)), N * (N - 1))
+            self.assertTrue(weyl_orbit_closed_AN([tuple(r) for r in roots]))
+
+    def test_wilson_loop_is_closed(self):
+        from gaugegap.visualization.lattice_projection import (
+            cubic_lattice, wilson_loop,
+        )
+        lat = cubic_lattice(3, 3, 3)
+        self.assertEqual(len(lat.sites), 27)
+        loop = wilson_loop(lat, (0, 0, 0), R=2, T=2, plane="xy")
+        self.assertEqual(loop[0], loop[-1])           # closed
+        self.assertEqual(len(loop) - 1, 2 * (2 + 2))  # perimeter steps
+        # every loop step is a real lattice link
+        link_set = {tuple(sorted(e)) for e in lat.links}
+        for a, b in zip(loop[:-1], loop[1:]):
+            self.assertIn(tuple(sorted((a, b))), link_set)
+
+    def test_weight_symmetry_certificate_is_balanced_and_hole_free(self):
+        from gaugegap.visualization.weight_certificate import (
+            weight_symmetry_certificate,
+        )
+        for (p, q) in [(1, 0), (1, 1), (3, 0)]:
+            cert = weight_symmetry_certificate(p, q)
+            self.assertTrue(cert.to_dict()["balanced_about_origin"])
+            self.assertTrue(cert.weyl_orbit_closed)
+            self.assertTrue(all(sum(t) == 0 for t in cert.coord_terms))
+            self.assertIn("norm_num", cert.lean4)
+            self.assertIn("lia", cert.coq)
+            self.assertNotIn("sorry", cert.lean4)
+            self.assertNotIn("Admitted", cert.coq)
+
+
 class TestCYProjection(unittest.TestCase):
     def test_patch_count_and_shape(self):
         patches = fermat_patches(n=5, n_grid=8)
@@ -155,7 +201,7 @@ class TestSVGAndFigures(unittest.TestCase):
                     _sys.argv = old
             a = sorted(Path(d1).glob("*.svg"))
             b = sorted(Path(d2).glob("*.svg"))
-            self.assertEqual(len(a), 5)
+            self.assertEqual(len(a), 8)
             for fa, fb in zip(a, b):
                 self.assertEqual(fa.read_text(), fb.read_text(), msg=fa.name)
 
