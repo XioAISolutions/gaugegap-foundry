@@ -1,7 +1,7 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
 	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget \
-	certify-scaling
+	certify-scaling geometry-figures
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -123,3 +123,12 @@ error-budget:
 certify-scaling:
 	python scripts/run_certify_scaling.py --sizes 4,8,16,32 \
 		--output-dir results/certify-scaling
+
+# Geometry-of-GaugeGap figures: exact 2D projections of higher-dim structures
+# (su(3) weight diagrams + root system, Calabi-Yau cross-section). Deterministic
+# SVG. Add SACRED=1 for the decorative golden-ratio/Vesica overlay.
+geometry-figures:
+	python scripts/generate_geometry_figures.py $(if $(SACRED),--sacred-overlay,) \
+		--output-dir figures/geometry
+	python scripts/generate_geometry_html.py \
+		--output figures/geometry/geometry_explorer.html
