@@ -1,7 +1,7 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
 	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget \
-	certify-scaling geometry-figures
+	certify-scaling geometry-figures certified-bracket
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -123,6 +123,12 @@ error-budget:
 certify-scaling:
 	python scripts/run_certify_scaling.py --sizes 4,8,16,32 \
 		--output-dir results/certify-scaling
+
+# Certified energy/gap bracket: rigorous interval LOWER bound + quantum variational
+# (Ritz) UPPER bound + discharged Lean/Coq certificate. Two-sided, machine-checked.
+certified-bracket:
+	python scripts/run_certified_bracket.py --operator berry_keating_xp \
+		--n-basis 8 --output-dir results/certified-bracket
 
 # Geometry-of-GaugeGap figures: exact 2D projections of higher-dim structures
 # (su(3) weight diagrams + root system, Calabi-Yau cross-section). Deterministic

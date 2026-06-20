@@ -1,0 +1,55 @@
+{
+  "bracket_certificate": {
+    "coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Bracket_E0.\n\nVariable E : R.\n\n(* TRUST INPUT 1: certified interval lower bound. *)\nHypothesis certified_lower : E >= -12.787631637507566.\n(* TRUST INPUT 2: variational (Ritz) upper bound. *)\nHypothesis variational_upper : E <= -12.787631637495053.\n\nTheorem bracket : -12.787631637507566 <= E /\\ E <= -12.787631637495053.\nProof. lra. Qed.\n\nEnd Bracket_E0.\n",
+    "kind": "eigenvalue_bracket_certificate",
+    "label": "E0",
+    "lean4": "import Mathlib.Tactic\n\nnamespace Bracket.E0\n\n/-- The eigenvalue E (abstract); the only used facts are the two certified bounds. -/\naxiom E : \u211d\n\n/-- TRUST INPUT 1 -- certified lower bound from the interval-arithmetic kernel. -/\naxiom certified_lower : E \u2265 -12.787631637507566\n\n/-- TRUST INPUT 2 -- variational (Ritz) upper bound: <psi|H|psi> >= E by\n    Courant-Fischer, supplied by the quantum subspace eigensolver. -/\naxiom variational_upper : E \u2264 -12.787631637495053\n\n/-- Two-sided certified bracket, discharged by linarith (no holes). -/\ntheorem bracket : -12.787631637507566 \u2264 E \u2227 E \u2264 -12.787631637495053 := by\n  constructor\n  \u00b7 linarith [certified_lower]\n  \u00b7 linarith [variational_upper]\n\nend Bracket.E0\n",
+    "lower": -12.787631637507566,
+    "trust_inputs": "certified interval lower bound; variational (Ritz) upper bound",
+    "upper": -12.787631637495053
+  },
+  "exact_E0": -12.787631637495055,
+  "exact_gap": 5.730102309224367,
+  "exact_inside_bracket": true,
+  "gap": {
+    "E0": {
+      "claim_boundary": "rigorous two-sided bracket on a finite-matrix eigenvalue (certified lower + variational upper); not a continuum or Millennium claim",
+      "index": 0,
+      "label": "E0",
+      "lower": -12.787631637507566,
+      "method": "quantum_krylov",
+      "upper": -12.787631637495053,
+      "valid": true,
+      "width": 1.2512657576735364e-11
+    },
+    "E1": {
+      "claim_boundary": "rigorous two-sided bracket on a finite-matrix eigenvalue (certified lower + variational upper); not a continuum or Millennium claim",
+      "index": 1,
+      "label": "E1",
+      "lower": -7.057529328283951,
+      "method": "quantum_krylov",
+      "upper": -7.057529328270647,
+      "valid": true,
+      "width": 1.3304024548688176e-11
+    },
+    "claim_boundary": "rigorous finite-matrix energy/gap bracket: certified interval lower bounds + quantum variational (Ritz) upper bounds; simulation-level; not a continuum/Millennium claim",
+    "gap_bracket": {
+      "lower": 5.7301023092111025,
+      "note": "gap = E1 - E0; lower = E1.lower - E0.upper, upper = E1.upper - E0.lower",
+      "upper": 5.730102309236919,
+      "width": 2.581668212542354e-11
+    }
+  },
+  "ground": {
+    "claim_boundary": "rigorous two-sided bracket on a finite-matrix eigenvalue (certified lower + variational upper); not a continuum or Millennium claim",
+    "index": 0,
+    "label": "E0",
+    "lower": -12.787631637507566,
+    "method": "quantum_krylov",
+    "upper": -12.787631637495053,
+    "valid": true,
+    "width": 1.2512657576735364e-11
+  },
+  "n_basis": 8,
+  "operator": "berry_keating_xp"
+}
