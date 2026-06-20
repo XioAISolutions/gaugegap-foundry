@@ -116,6 +116,10 @@ jobs:
         run: python scripts/run_error_budget.py --n-basis 8 --n-runs 4 --output-dir results/error-budget
       - name: Certify scaling smoke
         run: python scripts/run_certify_scaling.py --sizes 4,8 --output-dir results/certify-scaling
+      - name: Certified bracket smoke
+        run: python scripts/run_certified_bracket.py --operator berry_keating_xp --n-basis 8 --output-dir results/certified-bracket
+      - name: Certified shadows smoke
+        run: python scripts/run_certified_shadows.py --operator berry_keating_xp --n-basis 8 --n-snapshots 300 --n-batches 8 --output-dir results/certified-shadows
 
   packaging:
     runs-on: ubuntu-latest
