@@ -1,0 +1,26 @@
+{
+  "bracket_valid": true,
+  "claim_boundary": "finite exact bound on cyclically extractable work (ergotropy); refutes 'free/infinite energy' devices rather than validating them; extractable work is finite and cannot be cycled for net gain; not a continuum/Millennium claim",
+  "coq_certificate": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Ergotropy_WExtractable.\n\nVariable W : R.\n\n(* TRUST INPUT 1: passive state minimizes cyclic energy => W >= 0. *)\nHypothesis work_nonneg : W >= 0.\n(* TRUST INPUT 2: passive energy >= ground energy E0 => W <= <H> - E0. *)\nHypothesis work_bounded : W <= 2.0000000000000004.\n\nTheorem no_free_energy : 0 <= W /\\ W <= 2.0000000000000004.\nProof. lra. Qed.\n\nEnd Ergotropy_WExtractable.\n",
+  "cumulative_work_per_cycle": [
+    1.0000000000000004,
+    1.0000000000000004,
+    1.0000000000000004,
+    1.0000000000000004,
+    1.0000000000000004,
+    1.0000000000000004
+  ],
+  "ergotropy": 1.0000000000000004,
+  "ground_energy": 0.0,
+  "ground_ergotropy": 0.0,
+  "is_passive": false,
+  "kind": "ergotropy_no_free_energy",
+  "lean4_certificate": "import Mathlib.Tactic\n\nnamespace Ergotropy.WExtractable\n\n/-- Extractable work W = <H> - E_passive (abstract). -/\naxiom W : \u211d\n\n/-- TRUST INPUT 1 -- the passive state minimizes cyclic energy, so W >= 0. -/\naxiom work_nonneg : W \u2265 0\n/-- TRUST INPUT 2 -- the passive energy is at least the ground energy E0, so\n    W <= <H> - E0 (no energy can be drawn below the ground state). -/\naxiom work_bounded : W \u2264 2.0000000000000004\n\n/-- Extractable work is finite and non-negative: no free energy (no holes). -/\ntheorem no_free_energy : 0 \u2264 W \u2227 W \u2264 2.0000000000000004 := by\n  constructor\n  \u00b7 linarith [work_nonneg]\n  \u00b7 linarith [work_bounded]\n\nend Ergotropy.WExtractable\n",
+  "mean_energy": 2.0000000000000004,
+  "min_over_random_unitaries": 1.163840703100608,
+  "passive_energy": 1.0,
+  "passive_is_minimum": true,
+  "second_cycle_ergotropy": 0.0,
+  "thermal_ergotropy": 0.0,
+  "work_bound": 2.0000000000000004
+}

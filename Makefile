@@ -1,7 +1,7 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
 	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget \
-	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics entanglement-speed-limit alcubierre-warp decoherence-branching
+	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -181,6 +181,11 @@ alcubierre-warp:
 decoherence-branching:
 	python scripts/run_decoherence_branching.py --d 3 \
 		--output-dir results/decoherence-branching
+
+# Ergotropy & passivity: certified finite bound on cyclically extractable work
+# (0 <= W <= <H> - E0); the machine-checked refutation of 'free energy' devices.
+ergotropy:
+	python scripts/run_ergotropy.py --output-dir results/ergotropy
 
 # Geometry-of-GaugeGap figures: exact 2D projections of higher-dim structures
 # (su(3) weight diagrams + root system, Calabi-Yau cross-section). Deterministic

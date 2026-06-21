@@ -136,6 +136,8 @@ jobs:
         run: python scripts/run_alcubierre_warp.py --n-grid 50 --output-dir results/alcubierre-warp
       - name: Decoherence-branching smoke
         run: python scripts/run_decoherence_branching.py --d 3 --n-env-max 16 --output-dir results/decoherence-branching
+      - name: Ergotropy no-free-energy smoke
+        run: python scripts/run_ergotropy.py --random-unitaries 400 --output-dir results/ergotropy
 
   packaging:
     runs-on: ubuntu-latest
