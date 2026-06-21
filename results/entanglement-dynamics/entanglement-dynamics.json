@@ -1,0 +1,10 @@
+{
+  "buildup_time": 19.648593464148448,
+  "claim_boundary": "finite-model entanglement-formation dynamics inspired by attosecond-entanglement work; NOT a reproduction of the helium experiment or the 232 as figure; physical time is illustrative; not a continuum/Millennium claim",
+  "energy_scale_eV": 10.0,
+  "fraction": 0.9,
+  "kind": "entanglement_buildup",
+  "n_samples": 300,
+  "s_asymptote": 0.6931415395329565,
+  "time_unit": "attoseconds"
+}
