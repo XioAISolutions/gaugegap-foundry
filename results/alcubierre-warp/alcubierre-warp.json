@@ -1,0 +1,30 @@
+{
+  "R": 1.0,
+  "claim_boundary": "classical-GR + semiclassical-QFT analysis of a toy metric; the negative-energy (weak-energy-condition) violation is exact and machine-checked; NOT a buildable warp drive and NOT a claim that FTL travel is achievable; quantum-inequality obstruction is the standard literature result; not a continuum/Millennium claim",
+  "coq_certificate": "Require Import Reals.\nRequire Import Lra.\nRequire Import Rdefinitions.\nOpen Scope R_scope.\n\nSection WarpEnergy_Warp.\n\n(* K = v_s^2 (y^2+z^2) / (4 r_s^2); s = f'(r_s)^2. *)\nVariable K s : R.\n\n(* TRUST INPUT 1: K is a ratio of squares, hence non-negative. *)\nHypothesis K_nonneg : K >= 0.\n(* TRUST INPUT 2: s = f'(r_s)^2 is a square, hence non-negative. *)\nHypothesis s_nonneg : s >= 0.\n(* PI > 0 (so the positive coefficient 1/(8*PI) is well defined). *)\nHypothesis pi_pos : PI > 0.\n\nTheorem rho_nonpos : - (1 / (8 * PI)) * K * s <= 0.\nProof.\n  assert (Hco : 1 / (8 * PI) > 0) by (apply Rlt_gt; apply Rdiv_lt_0_compat; lra).\n  assert (Hks : K * s >= 0) by (apply Rle_ge; apply Rmult_le_pos; lra).\n  nra.\nQed.\n\nEnd WarpEnergy_Warp.\n",
+  "ford_roman_allowed_magnitude": 38.907334518657706,
+  "ford_roman_sampling_time": 0.125,
+  "kind": "alcubierre_warp_energy_condition",
+  "lean4_certificate": "import Mathlib.Tactic\n\nnamespace WarpEnergy.Warp\n\n/-- Prefactor K = v_s^2 (y^2+z^2) / (4 r_s^2) and s = f'(r_s)^2 (abstract reals);\n    the Alcubierre Eulerian energy density is rho = -(1/(8*pi)) * K * s. -/\nvariable (K s : \u211d)\n\n/-- TRUST INPUT 1 -- K is a ratio of squares, hence non-negative. -/\naxiom K_nonneg : K \u2265 0\n/-- TRUST INPUT 2 -- s = f'(r_s)^2 is a square, hence non-negative. -/\naxiom s_nonneg : s \u2265 0\n\n/-- The weak energy condition is violated: rho = -(1/(8*pi)) * K * s \u2264 0. -/\ntheorem rho_nonpos : -(1 / (8 * Real.pi)) * K * s \u2264 0 := by\n  have hpi : (0:\u211d) < Real.pi := Real.pi_pos\n  have hKs : K * s \u2265 0 := mul_nonneg K_nonneg s_nonneg\n  have hcoef : (0:\u211d) < 1 / (8 * Real.pi) := by positivity\n  nlinarith [mul_nonneg (le_of_lt hcoef) hKs]\n\nend WarpEnergy.Warp\n",
+  "quantum_inequality_violation_factor": 0.004066242776759197,
+  "rho_min": -0.15820666794944568,
+  "ring_radius": 0.9948848769417231,
+  "scaling_v_s_total_negative_energy": [
+    [
+      1.0,
+      -0.2231926354697259
+    ],
+    [
+      2.0,
+      -0.8927705418789036
+    ],
+    [
+      4.0,
+      -3.5710821675156144
+    ]
+  ],
+  "sigma": 8.0,
+  "total_negative_energy": -0.2231926354697259,
+  "v_s": 1.0,
+  "wec_violated": true
+}
