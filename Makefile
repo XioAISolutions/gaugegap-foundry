@@ -1,7 +1,7 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
 	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget \
-	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum
+	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -158,6 +158,12 @@ open-system:
 certified-quantum:
 	python scripts/run_certified_quantum_report.py --operator berry_keating_xp \
 		--n-basis 8 --output-dir results/certified-quantum
+
+# Entanglement-formation dynamics: finite-model entanglement build-up over time
+# (inspired by attosecond-entanglement work; not a reproduction of the experiment).
+entanglement-dynamics:
+	python scripts/run_entanglement_dynamics.py --coupling 1.0 \
+		--output-dir results/entanglement-dynamics
 
 # Geometry-of-GaugeGap figures: exact 2D projections of higher-dim structures
 # (su(3) weight diagrams + root system, Calabi-Yau cross-section). Deterministic
