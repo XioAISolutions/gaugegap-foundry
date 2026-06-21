@@ -132,6 +132,8 @@ jobs:
         run: python scripts/run_entanglement_dynamics.py --coupling 1.0 --samples 80 --output-dir results/entanglement-dynamics
       - name: Entanglement speed-limit smoke
         run: python scripts/run_entanglement_speed_limit.py --samples 120 --sweep 0.5,1.0,2.0 --output-dir results/entanglement-speed-limit
+      - name: Alcubierre warp energy-condition smoke
+        run: python scripts/run_alcubierre_warp.py --n-grid 50 --output-dir results/alcubierre-warp
 
   packaging:
     runs-on: ubuntu-latest
