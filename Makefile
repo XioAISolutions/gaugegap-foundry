@@ -1,7 +1,7 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
 	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget \
-	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics entanglement-speed-limit alcubierre-warp
+	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics entanglement-speed-limit alcubierre-warp decoherence-branching
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -175,6 +175,12 @@ entanglement-speed-limit:
 # energy density (weak-energy-condition violation); report the Ford-Roman obstruction.
 alcubierre-warp:
 	python scripts/run_alcubierre_warp.py --output-dir results/alcubierre-warp
+
+# Decoherence and branching: how a superposition becomes effectively-classical
+# branches via environment entanglement; certify (Lean/Coq) 1 <= N_eff <= d.
+decoherence-branching:
+	python scripts/run_decoherence_branching.py --d 3 \
+		--output-dir results/decoherence-branching
 
 # Geometry-of-GaugeGap figures: exact 2D projections of higher-dim structures
 # (su(3) weight diagrams + root system, Calabi-Yau cross-section). Deterministic
