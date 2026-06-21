@@ -1,0 +1,107 @@
+{
+  "all_checks_pass": true,
+  "bekenstein": {
+    "bound": 12.566370614359172,
+    "claim_boundary": "universal semiclassical Bekenstein bound applied to a finite system as an info-energy-geometry consistency relation; NOT holography, a black-hole result, or a quantum-gravity claim; not a continuum/Millennium claim",
+    "energy": 1.0,
+    "entropy_nats": 1.0986075537137112,
+    "kind": "bekenstein_bound",
+    "minimal_radius": 0.17484882269163207,
+    "radius": 2.0,
+    "respects_bound": true
+  },
+  "branching": {
+    "born_weights": [
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333
+    ],
+    "branch_bracket_valid": true,
+    "claim_boundary": "finite exact model of decoherence/einselection: how classical branch structure emerges from entanglement with an environment; makes NO metaphysical claim and says nothing about any creator/deity; not a continuum/Millennium claim",
+    "coherence_l1": 0.004353564671999877,
+    "d": 3,
+    "decohered": false,
+    "effective_branches": 2.999971569981395,
+    "kind": "decoherence_branching",
+    "n_env": 12,
+    "overlap": 0.6,
+    "purity": 0.3333364922542255,
+    "weights_sum": 1.0
+  },
+  "certificates": {
+    "bekenstein_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Bekenstein_SRegion.\n\n(* entropy Sent, energy E, radius Rad (Rad avoids shadowing the type R). *)\nVariable Sent E Rad : R.\n\n(* TRUST INPUT 1: positive energy. *)\nHypothesis E_pos : E > 0.\n(* TRUST INPUT 2: region at least the minimal Bekenstein radius, denominator\n   cleared: Rad * (2 * PI * E) >= Sent  (i.e. Rad >= Sent / (2 PI E)). *)\nHypothesis geom : Rad * (2 * PI * E) >= Sent.\n\nTheorem bekenstein : Sent <= 2 * PI * Rad * E.\nProof. nra. Qed.\n\nEnd Bekenstein_SRegion.\n",
+    "bekenstein_lean": "import Mathlib.Tactic\n\nnamespace Bekenstein.SRegion\n\n/-- Entropy S, energy E, radius R (abstract reals). -/\naxiom S : \u211d\naxiom E : \u211d\naxiom R : \u211d\n\n/-- TRUST INPUT 1 -- positive energy. -/\naxiom E_pos : E > 0\n/-- TRUST INPUT 2 -- the region is at least the minimal Bekenstein radius, written\n    with the denominator cleared: R * (2 pi E) >= S  (i.e. R >= S / (2 pi E)). -/\naxiom geom : R * (2 * Real.pi * E) \u2265 S\n\n/-- The entropy respects the Bekenstein bound: S <= 2 pi R E (no holes). -/\ntheorem bekenstein : S \u2264 2 * Real.pi * R * E := by\n  nlinarith [geom]\n\nend Bekenstein.SRegion\n",
+    "branching_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Branching_D3.\n\nVariable Neff : R.\n\n(* TRUST INPUT 1: Tr(rho^2) <= 1  =>  N_eff >= 1. *)\nHypothesis neff_lower : Neff >= 1.\n(* TRUST INPUT 2: Tr(rho^2) >= 1/d  =>  N_eff <= d. *)\nHypothesis neff_upper : Neff <= 3.0.\n\nTheorem branch_bracket : 1 <= Neff /\\ Neff <= 3.0.\nProof. lra. Qed.\n\nEnd Branching_D3.\n",
+    "branching_lean": "import Mathlib.Tactic\n\nnamespace Branching.D3\n\n/-- The effective branch count N_eff = 1 / Tr(rho^2) (abstract). -/\naxiom Neff : \u211d\n\n/-- TRUST INPUT 1 -- Tr(rho^2) <= 1, so the participation ratio N_eff >= 1. -/\naxiom neff_lower : Neff \u2265 1\n/-- TRUST INPUT 2 -- Tr(rho^2) >= 1/d, so N_eff <= d. -/\naxiom neff_upper : Neff \u2264 3.0\n\n/-- The system occupies between 1 and d effective branches (no holes). -/\ntheorem branch_bracket : 1 \u2264 Neff \u2227 Neff \u2264 3.0 := by\n  constructor\n  \u00b7 linarith [neff_lower]\n  \u00b7 linarith [neff_upper]\n\nend Branching.D3\n",
+    "ergotropy_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Ergotropy_WExtractable.\n\nVariable W : R.\n\n(* TRUST INPUT 1: passive state minimizes cyclic energy => W >= 0. *)\nHypothesis work_nonneg : W >= 0.\n(* TRUST INPUT 2: passive energy >= ground energy E0 => W <= <H> - E0. *)\nHypothesis work_bounded : W <= 0.42478961739555854.\n\nTheorem no_free_energy : 0 <= W /\\ W <= 0.42478961739555854.\nProof. lra. Qed.\n\nEnd Ergotropy_WExtractable.\n",
+    "ergotropy_lean": "import Mathlib.Tactic\n\nnamespace Ergotropy.WExtractable\n\n/-- Extractable work W = <H> - E_passive (abstract). -/\naxiom W : \u211d\n\n/-- TRUST INPUT 1 -- the passive state minimizes cyclic energy, so W >= 0. -/\naxiom work_nonneg : W \u2265 0\n/-- TRUST INPUT 2 -- the passive energy is at least the ground energy E0, so\n    W <= <H> - E0 (no energy can be drawn below the ground state). -/\naxiom work_bounded : W \u2264 0.42478961739555854\n\n/-- Extractable work is finite and non-negative: no free energy (no holes). -/\ntheorem no_free_energy : 0 \u2264 W \u2227 W \u2264 0.42478961739555854 := by\n  constructor\n  \u00b7 linarith [work_nonneg]\n  \u00b7 linarith [work_bounded]\n\nend Ergotropy.WExtractable\n",
+    "landauer_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Landauer_WErase.\n\n(* kB, T, entropy drop dS, one-bit entropy b = ln 2 (nats). *)\nVariable kB T dS b : R.\n\n(* TRUST INPUT 1: positive Boltzmann constant. *)\nHypothesis kB_pos : kB > 0.\n(* TRUST INPUT 2: positive temperature. *)\nHypothesis T_pos : T > 0.\n(* TRUST INPUT 3: at least one bit erased: dS >= b (b = ln 2). *)\nHypothesis dS_bit : dS >= b.\n\nTheorem landauer_floor : kB * T * dS >= kB * T * b.\nProof.\n  assert (Hkt : 0 <= kB * T) by (apply Rlt_le; apply Rmult_lt_0_compat; lra).\n  nra.\nQed.\n\nEnd Landauer_WErase.\n",
+    "landauer_lean": "import Mathlib.Tactic\n\nnamespace Landauer.WErase\n\n/-- Boltzmann constant kB, temperature T, entropy drop dS, and one-bit entropy\n    b = ln 2 (nats) -- abstract reals; only the labelled trust facts are used. -/\naxiom kB : \u211d\naxiom T : \u211d\naxiom dS : \u211d\naxiom b : \u211d\n\n/-- TRUST INPUT 1 -- positive Boltzmann constant. -/\naxiom kB_pos : kB > 0\n/-- TRUST INPUT 2 -- positive temperature. -/\naxiom T_pos : T > 0\n/-- TRUST INPUT 3 -- at least one bit erased: dS >= b (b = ln 2). -/\naxiom dS_bit : dS \u2265 b\n\n/-- Erasing at least one bit costs at least kB*T*b = k_B T ln 2 (no holes). -/\ntheorem landauer_floor : kB * T * dS \u2265 kB * T * b := by\n  have hkt : (0:\u211d) \u2264 kB * T := le_of_lt (mul_pos kB_pos T_pos)\n  nlinarith [mul_le_mul_of_nonneg_left dS_bit hkt]\n\nend Landauer.WErase\n",
+    "speed_limit_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection SpeedLimit_TBuildup.\n\nVariable t : R.\n\n(* TRUST INPUT 1: Mandelstam-Tamm quantum speed limit. *)\nHypothesis mandelstam_tamm : t >= 0.2986155060581427.\n(* TRUST INPUT 2: Margolus-Levitin quantum speed limit. *)\nHypothesis margolus_levitin : t >= 0.2986155060581427.\n\nTheorem respects_qsl : t >= 0.2986155060581427.\nProof. lra. Qed.\n\nEnd SpeedLimit_TBuildup.\n",
+    "speed_limit_lean": "import Mathlib.Tactic\n\nnamespace SpeedLimit.TBuildup\n\n/-- The entanglement build-up time t (abstract); only the QSL facts are used. -/\naxiom t : \u211d\n\n/-- TRUST INPUT 1 -- Mandelstam-Tamm quantum speed limit. -/\naxiom mandelstam_tamm : t \u2265 0.2986155060581427\n\n/-- TRUST INPUT 2 -- Margolus-Levitin quantum speed limit. -/\naxiom margolus_levitin : t \u2265 0.2986155060581427\n\n/-- The build-up time respects the tighter QSL floor (no holes). -/\ntheorem respects_qsl : t \u2265 0.2986155060581427 := by\n  linarith [mandelstam_tamm, margolus_levitin]\n\nend SpeedLimit.TBuildup\n",
+    "warp_coq": "Require Import Reals.\nRequire Import Lra.\nRequire Import Rdefinitions.\nOpen Scope R_scope.\n\nSection WarpEnergy_Warp.\n\n(* K = v_s^2 (y^2+z^2) / (4 r_s^2); s = f'(r_s)^2. *)\nVariable K s : R.\n\n(* TRUST INPUT 1: K is a ratio of squares, hence non-negative. *)\nHypothesis K_nonneg : K >= 0.\n(* TRUST INPUT 2: s = f'(r_s)^2 is a square, hence non-negative. *)\nHypothesis s_nonneg : s >= 0.\n(* PI > 0 (so the positive coefficient 1/(8*PI) is well defined). *)\nHypothesis pi_pos : PI > 0.\n\nTheorem rho_nonpos : - (1 / (8 * PI)) * K * s <= 0.\nProof.\n  assert (Hco : 1 / (8 * PI) > 0) by (apply Rlt_gt; apply Rdiv_lt_0_compat; lra).\n  assert (Hks : K * s >= 0) by (apply Rle_ge; apply Rmult_le_pos; lra).\n  nra.\nQed.\n\nEnd WarpEnergy_Warp.\n",
+    "warp_lean": "import Mathlib.Tactic\n\nnamespace WarpEnergy.Warp\n\n/-- Prefactor K = v_s^2 (y^2+z^2) / (4 r_s^2) and s = f'(r_s)^2 (abstract reals);\n    the Alcubierre Eulerian energy density is rho = -(1/(8*pi)) * K * s. -/\nvariable (K s : \u211d)\n\n/-- TRUST INPUT 1 -- K is a ratio of squares, hence non-negative. -/\naxiom K_nonneg : K \u2265 0\n/-- TRUST INPUT 2 -- s = f'(r_s)^2 is a square, hence non-negative. -/\naxiom s_nonneg : s \u2265 0\n\n/-- The weak energy condition is violated: rho = -(1/(8*pi)) * K * s \u2264 0. -/\ntheorem rho_nonpos : -(1 / (8 * Real.pi)) * K * s \u2264 0 := by\n  have hpi : (0:\u211d) < Real.pi := Real.pi_pos\n  have hKs : K * s \u2265 0 := mul_nonneg K_nonneg s_nonneg\n  have hcoef : (0:\u211d) < 1 / (8 * Real.pi) := by positivity\n  nlinarith [mul_nonneg (le_of_lt hcoef) hKs]\n\nend WarpEnergy.Warp\n"
+  },
+  "checks": {
+    "bekenstein_respected": true,
+    "branch_count_bracketed": true,
+    "ergotropy_no_free_energy": true,
+    "landauer_cost_positive": true,
+    "speed_limit_respected": true,
+    "warp_needs_negative_energy": true
+  },
+  "claim_boundary": "finite-system / semiclassical demonstrations of established physical bounds, each bracketed or machine-checked; not continuum/Millennium claims, not a buildable warp drive or free-energy device",
+  "ergotropy": {
+    "bracket_valid": true,
+    "claim_boundary": "finite exact bound on cyclically extractable work (ergotropy); refutes 'free/infinite energy' devices rather than validating them; extractable work is finite and cannot be cycled for net gain; not a continuum/Millennium claim",
+    "ergotropy": 0.0,
+    "ground_energy": 0.0,
+    "is_passive": true,
+    "kind": "ergotropy_no_free_energy",
+    "mean_energy": 0.42478961739555854,
+    "passive_energy": 0.42478961739555854,
+    "second_cycle_ergotropy": 0.0,
+    "work_bound": 0.42478961739555854
+  },
+  "landauer": {
+    "above_bit_floor": true,
+    "bit_floor": 0.6931471805599453,
+    "bits_erased": 1.5849556696259268,
+    "claim_boundary": "exact finite-system Landauer bound: erasing entropy Delta_S costs >= k_B T Delta_S; a lower bound on dissipated energy, not a device or over-unity claim; not a continuum/Millennium claim",
+    "entropy_nats": 1.0986075537137112,
+    "erasure_cost": 1.0986075537137112,
+    "erasure_cost_eV": null,
+    "k_B": 1.0,
+    "kind": "landauer_erasure_cost",
+    "temperature": 1.0
+  },
+  "speed_limit": {
+    "buildup_time": 0.2986155060581428,
+    "claim_boundary": "finite-model entanglement build-up bounded below by the Mandelstam-Tamm / Margolus-Levitin quantum speed limit (machine-checked inequality); NOT a reproduction of the helium experiment or the 232 as figure; physical time illustrative; not a continuum/Millennium claim",
+    "energy_scale_eV": null,
+    "energy_uncertainty": 2.0,
+    "fubini_study_angle": 0.5972310121162854,
+    "kind": "entanglement_speed_limit",
+    "max_entangling_rate": 2.648385660197034,
+    "respects_qsl": true,
+    "s_asymptote": 0.6931333809953402,
+    "tau_mandelstam_tamm": 0.2986155060581427,
+    "tau_margolus_levitin": 0.2986155060581427,
+    "tau_qsl": 0.2986155060581427,
+    "time_unit": "model"
+  },
+  "warp_energy_condition": {
+    "R": 1.0,
+    "claim_boundary": "classical-GR + semiclassical-QFT analysis of a toy metric; the negative-energy (weak-energy-condition) violation is exact and machine-checked; NOT a buildable warp drive and NOT a claim that FTL travel is achievable; quantum-inequality obstruction is the standard literature result; not a continuum/Millennium claim",
+    "ford_roman_allowed_magnitude": 38.907334518657706,
+    "ford_roman_sampling_time": 0.125,
+    "kind": "alcubierre_warp_energy_condition",
+    "quantum_inequality_violation_factor": 0.004045929024461849,
+    "rho_min": -0.1574163139934836,
+    "ring_radius": 0.9912503476962927,
+    "sigma": 8.0,
+    "total_negative_energy": -0.22472373258113593,
+    "v_s": 1.0,
+    "wec_violated": true
+  }
+}

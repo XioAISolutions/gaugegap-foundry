@@ -1,7 +1,7 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
 	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget \
-	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy
+	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy landauer bekenstein physical-limits
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -186,6 +186,16 @@ decoherence-branching:
 # (0 <= W <= <H> - E0); the machine-checked refutation of 'free energy' devices.
 ergotropy:
 	python scripts/run_ergotropy.py --output-dir results/ergotropy
+
+# Landauer's principle: certified energy cost of erasing information
+# (info <-> energy keystone tying decoherence -> entropy -> work).
+landauer:
+	python scripts/run_physical_limits.py --output-dir results/physical-limits
+
+# Bekenstein bound + the consolidated physical-limits capstone: the web of
+# fundamental bounds (energy/time/information/geometry) on one audited report.
+bekenstein physical-limits:
+	python scripts/run_physical_limits.py --output-dir results/physical-limits
 
 # Geometry-of-GaugeGap figures: exact 2D projections of higher-dim structures
 # (su(3) weight diagrams + root system, Calabi-Yau cross-section). Deterministic

@@ -138,6 +138,8 @@ jobs:
         run: python scripts/run_decoherence_branching.py --d 3 --n-env-max 16 --output-dir results/decoherence-branching
       - name: Ergotropy no-free-energy smoke
         run: python scripts/run_ergotropy.py --random-unitaries 400 --output-dir results/ergotropy
+      - name: Physical-limits capstone smoke
+        run: python scripts/run_physical_limits.py --d 3 --output-dir results/physical-limits
 
   packaging:
     runs-on: ubuntu-latest
