@@ -1,0 +1,28 @@
+{
+  "buildup_time": 0.2986002796261353,
+  "claim_boundary": "finite-model entanglement build-up bounded below by the Mandelstam-Tamm / Margolus-Levitin quantum speed limit (machine-checked inequality); NOT a reproduction of the helium experiment or the 232 as figure; physical time illustrative; not a continuum/Millennium claim",
+  "coq_certificate": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection SpeedLimit_TBuildup.\n\nVariable t : R.\n\n(* TRUST INPUT 1: Mandelstam-Tamm quantum speed limit. *)\nHypothesis mandelstam_tamm : t >= 0.29860027962613517.\n(* TRUST INPUT 2: Margolus-Levitin quantum speed limit. *)\nHypothesis margolus_levitin : t >= 0.29860027962613517.\n\nTheorem respects_qsl : t >= 0.29860027962613517.\nProof. lra. Qed.\n\nEnd SpeedLimit_TBuildup.\n",
+  "coupling": 1.0,
+  "energy_scale_eV": null,
+  "energy_uncertainty": 2.0,
+  "fubini_study_angle": 0.5972005592522703,
+  "kind": "entanglement_speed_limit",
+  "lean4_certificate": "import Mathlib.Tactic\n\nnamespace SpeedLimit.TBuildup\n\n/-- The entanglement build-up time t (abstract); only the QSL facts are used. -/\naxiom t : \u211d\n\n/-- TRUST INPUT 1 -- Mandelstam-Tamm quantum speed limit. -/\naxiom mandelstam_tamm : t \u2265 0.29860027962613517\n\n/-- TRUST INPUT 2 -- Margolus-Levitin quantum speed limit. -/\naxiom margolus_levitin : t \u2265 0.29860027962613517\n\n/-- The build-up time respects the tighter QSL floor (no holes). -/\ntheorem respects_qsl : t \u2265 0.29860027962613517 := by\n  linarith [mandelstam_tamm, margolus_levitin]\n\nend SpeedLimit.TBuildup\n",
+  "max_entangling_rate": 2.646727806760355,
+  "respects_qsl": true,
+  "s_asymptote": 0.6930852159931407,
+  "sweep_couplings": [
+    0.5,
+    1.0,
+    2.0
+  ],
+  "sweep_qsl_floors_model": [
+    0.5970168322616783,
+    0.29860027962613517,
+    0.14942542187934998
+  ],
+  "tau_mandelstam_tamm": 0.29860027962613517,
+  "tau_margolus_levitin": 0.29860027962613517,
+  "tau_qsl": 0.29860027962613517,
+  "time_unit": "model"
+}

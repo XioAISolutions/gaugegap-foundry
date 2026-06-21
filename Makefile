@@ -1,7 +1,7 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
 	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget \
-	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics
+	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics entanglement-speed-limit
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -164,6 +164,12 @@ certified-quantum:
 entanglement-dynamics:
 	python scripts/run_entanglement_dynamics.py --coupling 1.0 \
 		--output-dir results/entanglement-dynamics
+
+# Quantum speed limit on entanglement formation: certify (Lean/Coq) that the
+# entanglement build-up time respects the Mandelstam-Tamm / Margolus-Levitin floor.
+entanglement-speed-limit:
+	python scripts/run_entanglement_speed_limit.py --energy-scale-ev 10 \
+		--output-dir results/entanglement-speed-limit
 
 # Geometry-of-GaugeGap figures: exact 2D projections of higher-dim structures
 # (su(3) weight diagrams + root system, Calabi-Yau cross-section). Deterministic
