@@ -75,9 +75,15 @@ sdp = [
 open-quantum = [
   "qutip>=5.0",
 ]
+# Optional SMT backend: z3 independently machine-verifies the certified-inequality
+# schemas (an automated witness alongside the discharged Lean/Coq certificates).
+smt = [
+  "z3-solver>=4.12",
+]
 dev = [
   "pytest>=8",
   "scipy>=1.11",
+  "z3-solver>=4.12",
 ]
 all = [
   "gaugegap-foundry[quantum,quantinuum,braket,ionq,flow,spectral,crosscheck,dev]",

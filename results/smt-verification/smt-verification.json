@@ -1,0 +1,49 @@
+{
+  "all_valid": true,
+  "claim_boundary": "automated real-arithmetic cross-check (z3) of the certified-inequality schemas; an independent witness for the discharged Lean/Coq certificates, not a new physical claim",
+  "n_total": 8,
+  "n_verified": 8,
+  "schemas": [
+    {
+      "description": "interval lower <= E0 <= variational upper",
+      "name": "eigenvalue_bracket",
+      "valid": true
+    },
+    {
+      "description": "build-up time >= max(Mandelstam-Tamm, Margolus-Levitin)",
+      "name": "speed_limit",
+      "valid": true
+    },
+    {
+      "description": "Fourier uncertainty: sigma_t sigma_omega >= 1/2",
+      "name": "time_bandwidth",
+      "valid": true
+    },
+    {
+      "description": "0 <= extractable work W <= <H> - E0 (no free energy)",
+      "name": "ergotropy",
+      "valid": true
+    },
+    {
+      "description": "1 <= effective branches N_eff <= d",
+      "name": "branching",
+      "valid": true
+    },
+    {
+      "description": "erasure cost >= k_B T ln 2 (info <-> energy)",
+      "name": "landauer",
+      "valid": true
+    },
+    {
+      "description": "S <= 2 pi R E (info <-> energy <-> geometry)",
+      "name": "bekenstein",
+      "valid": true
+    },
+    {
+      "description": "Alcubierre rho <= 0 (needs negative energy)",
+      "name": "warp_energy_condition",
+      "valid": true
+    }
+  ],
+  "tool": "z3"
+}
