@@ -1,7 +1,7 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
 	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget \
-	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy landauer bekenstein physical-limits temporal-double-slit
+	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy landauer bekenstein physical-limits temporal-double-slit physical-limits-figures
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -201,6 +201,13 @@ bekenstein physical-limits:
 # spectrum + certified time-bandwidth bound (time<->frequency duality).
 temporal-double-slit:
 	python scripts/run_temporal_double_slit.py --output-dir results/temporal-double-slit
+
+# Synthesis figures: the unifying web diagram, the certificate ladder, and a
+# self-contained HTML gallery embedding every module's figure (see
+# docs/physical-limits-web.md).
+physical-limits-figures:
+	python scripts/generate_physical_limits_figures.py \
+		--output-dir figures/physical-limits
 
 # Geometry-of-GaugeGap figures: exact 2D projections of higher-dim structures
 # (su(3) weight diagrams + root system, Calabi-Yau cross-section). Deterministic
