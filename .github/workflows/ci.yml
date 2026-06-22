@@ -142,6 +142,8 @@ jobs:
         run: python scripts/run_temporal_double_slit.py --n 4096 --output-dir results/temporal-double-slit
       - name: Physical-limits capstone smoke
         run: python scripts/run_physical_limits.py --d 3 --output-dir results/physical-limits
+      - name: Physical-limits figures smoke
+        run: python scripts/generate_physical_limits_figures.py --output-dir /tmp/physical-limits-figures
 
   packaging:
     runs-on: ubuntu-latest
