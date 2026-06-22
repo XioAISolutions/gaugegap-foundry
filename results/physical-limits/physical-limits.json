@@ -39,6 +39,8 @@
     "landauer_lean": "import Mathlib.Tactic\n\nnamespace Landauer.WErase\n\n/-- Boltzmann constant kB, temperature T, entropy drop dS, and one-bit entropy\n    b = ln 2 (nats) -- abstract reals; only the labelled trust facts are used. -/\naxiom kB : \u211d\naxiom T : \u211d\naxiom dS : \u211d\naxiom b : \u211d\n\n/-- TRUST INPUT 1 -- positive Boltzmann constant. -/\naxiom kB_pos : kB > 0\n/-- TRUST INPUT 2 -- positive temperature. -/\naxiom T_pos : T > 0\n/-- TRUST INPUT 3 -- at least one bit erased: dS >= b (b = ln 2). -/\naxiom dS_bit : dS \u2265 b\n\n/-- Erasing at least one bit costs at least kB*T*b = k_B T ln 2 (no holes). -/\ntheorem landauer_floor : kB * T * dS \u2265 kB * T * b := by\n  have hkt : (0:\u211d) \u2264 kB * T := le_of_lt (mul_pos kB_pos T_pos)\n  nlinarith [mul_le_mul_of_nonneg_left dS_bit hkt]\n\nend Landauer.WErase\n",
     "speed_limit_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection SpeedLimit_TBuildup.\n\nVariable t : R.\n\n(* TRUST INPUT 1: Mandelstam-Tamm quantum speed limit. *)\nHypothesis mandelstam_tamm : t >= 0.2986155060581427.\n(* TRUST INPUT 2: Margolus-Levitin quantum speed limit. *)\nHypothesis margolus_levitin : t >= 0.2986155060581427.\n\nTheorem respects_qsl : t >= 0.2986155060581427.\nProof. lra. Qed.\n\nEnd SpeedLimit_TBuildup.\n",
     "speed_limit_lean": "import Mathlib.Tactic\n\nnamespace SpeedLimit.TBuildup\n\n/-- The entanglement build-up time t (abstract); only the QSL facts are used. -/\naxiom t : \u211d\n\n/-- TRUST INPUT 1 -- Mandelstam-Tamm quantum speed limit. -/\naxiom mandelstam_tamm : t \u2265 0.2986155060581427\n\n/-- TRUST INPUT 2 -- Margolus-Levitin quantum speed limit. -/\naxiom margolus_levitin : t \u2265 0.2986155060581427\n\n/-- The build-up time respects the tighter QSL floor (no holes). -/\ntheorem respects_qsl : t \u2265 0.2986155060581427 := by\n  linarith [mandelstam_tamm, margolus_levitin]\n\nend SpeedLimit.TBuildup\n",
+    "temporal_double_slit_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection TimeBandwidth_Tb.\n\n(* Temporal width st and spectral width sw. *)\nVariable st sw : R.\n\n(* TRUST INPUT: Fourier uncertainty (Gabor), denominator cleared:\n   sw * (2 * st) >= 1  (i.e. sw >= 1 / (2 st)). *)\nHypothesis fourier_uncertainty : sw * (2 * st) >= 1.\n\nTheorem time_bandwidth : st * sw >= 1 / 2.\nProof. nra. Qed.\n\nEnd TimeBandwidth_Tb.\n",
+    "temporal_double_slit_lean": "import Mathlib.Tactic\n\nnamespace TimeBandwidth.Tb\n\n/-- Temporal width sigma_t and spectral width sigma_omega (abstract reals). -/\naxiom sigma_t : \u211d\naxiom sigma_omega : \u211d\n\n/-- TRUST INPUT -- Fourier uncertainty (Gabor), denominator cleared:\n    sigma_omega * (2 * sigma_t) >= 1  (i.e. sigma_omega >= 1 / (2 sigma_t)). -/\naxiom fourier_uncertainty : sigma_omega * (2 * sigma_t) \u2265 1\n\n/-- The time-bandwidth product respects the 1/2 floor (no holes). -/\ntheorem time_bandwidth : sigma_t * sigma_omega \u2265 1 / 2 := by\n  nlinarith [fourier_uncertainty]\n\nend TimeBandwidth.Tb\n",
     "warp_coq": "Require Import Reals.\nRequire Import Lra.\nRequire Import Rdefinitions.\nOpen Scope R_scope.\n\nSection WarpEnergy_Warp.\n\n(* K = v_s^2 (y^2+z^2) / (4 r_s^2); s = f'(r_s)^2. *)\nVariable K s : R.\n\n(* TRUST INPUT 1: K is a ratio of squares, hence non-negative. *)\nHypothesis K_nonneg : K >= 0.\n(* TRUST INPUT 2: s = f'(r_s)^2 is a square, hence non-negative. *)\nHypothesis s_nonneg : s >= 0.\n(* PI > 0 (so the positive coefficient 1/(8*PI) is well defined). *)\nHypothesis pi_pos : PI > 0.\n\nTheorem rho_nonpos : - (1 / (8 * PI)) * K * s <= 0.\nProof.\n  assert (Hco : 1 / (8 * PI) > 0) by (apply Rlt_gt; apply Rdiv_lt_0_compat; lra).\n  assert (Hks : K * s >= 0) by (apply Rle_ge; apply Rmult_le_pos; lra).\n  nra.\nQed.\n\nEnd WarpEnergy_Warp.\n",
     "warp_lean": "import Mathlib.Tactic\n\nnamespace WarpEnergy.Warp\n\n/-- Prefactor K = v_s^2 (y^2+z^2) / (4 r_s^2) and s = f'(r_s)^2 (abstract reals);\n    the Alcubierre Eulerian energy density is rho = -(1/(8*pi)) * K * s. -/\nvariable (K s : \u211d)\n\n/-- TRUST INPUT 1 -- K is a ratio of squares, hence non-negative. -/\naxiom K_nonneg : K \u2265 0\n/-- TRUST INPUT 2 -- s = f'(r_s)^2 is a square, hence non-negative. -/\naxiom s_nonneg : s \u2265 0\n\n/-- The weak energy condition is violated: rho = -(1/(8*pi)) * K * s \u2264 0. -/\ntheorem rho_nonpos : -(1 / (8 * Real.pi)) * K * s \u2264 0 := by\n  have hpi : (0:\u211d) < Real.pi := Real.pi_pos\n  have hKs : K * s \u2265 0 := mul_nonneg K_nonneg s_nonneg\n  have hcoef : (0:\u211d) < 1 / (8 * Real.pi) := by positivity\n  nlinarith [mul_nonneg (le_of_lt hcoef) hKs]\n\nend WarpEnergy.Warp\n"
   },
@@ -48,6 +50,7 @@
     "ergotropy_no_free_energy": true,
     "landauer_cost_positive": true,
     "speed_limit_respected": true,
+    "time_frequency_duality": true,
     "warp_needs_negative_energy": true
   },
   "claim_boundary": "finite-system / semiclassical demonstrations of established physical bounds, each bracketed or machine-checked; not continuum/Millennium claims, not a buildable warp drive or free-energy device",
@@ -89,6 +92,20 @@
     "tau_margolus_levitin": 0.2986155060581427,
     "tau_qsl": 0.2986155060581427,
     "time_unit": "model"
+  },
+  "temporal_double_slit": {
+    "claim_boundary": "finite exact Fourier simulation of the time-diffraction principle (time<->frequency duality); NOT a reproduction of the ITO thin-film experiment or its numbers; the time-bandwidth bound is an exact Fourier theorem; not a continuum/Millennium claim",
+    "dt": 8.0,
+    "fringe_relative_error": 0.001219512195079575,
+    "fringe_spacing_recovered": 0.784440360759192,
+    "fringe_spacing_theory": 0.7853981633974483,
+    "kind": "temporal_double_slit",
+    "separation_recovered": 8.00976800976767,
+    "sigma_omega": 1.1785113019775824,
+    "sigma_t": 0.42426406871192773,
+    "tau": 0.6,
+    "time_bandwidth_product": 0.5000000000000004,
+    "uncertainty_respected": true
   },
   "warp_energy_condition": {
     "R": 1.0,

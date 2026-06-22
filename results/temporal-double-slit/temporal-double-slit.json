@@ -1,0 +1,42 @@
+{
+  "claim_boundary": "finite exact Fourier simulation of the time-diffraction principle (time<->frequency duality); NOT a reproduction of the ITO thin-film experiment or its numbers; the time-bandwidth bound is an exact Fourier theorem; not a continuum/Millennium claim",
+  "coq_certificate": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection TimeBandwidth_Tb.\n\n(* Temporal width st and spectral width sw. *)\nVariable st sw : R.\n\n(* TRUST INPUT: Fourier uncertainty (Gabor), denominator cleared:\n   sw * (2 * st) >= 1  (i.e. sw >= 1 / (2 st)). *)\nHypothesis fourier_uncertainty : sw * (2 * st) >= 1.\n\nTheorem time_bandwidth : st * sw >= 1 / 2.\nProof. nra. Qed.\n\nEnd TimeBandwidth_Tb.\n",
+  "dt": 8.0,
+  "fringe_relative_error": 0.001219512195079575,
+  "fringe_spacing_recovered": 0.784440360759192,
+  "fringe_spacing_theory": 0.7853981633974483,
+  "kind": "temporal_double_slit",
+  "lean4_certificate": "import Mathlib.Tactic\n\nnamespace TimeBandwidth.Tb\n\n/-- Temporal width sigma_t and spectral width sigma_omega (abstract reals). -/\naxiom sigma_t : \u211d\naxiom sigma_omega : \u211d\n\n/-- TRUST INPUT -- Fourier uncertainty (Gabor), denominator cleared:\n    sigma_omega * (2 * sigma_t) >= 1  (i.e. sigma_omega >= 1 / (2 sigma_t)). -/\naxiom fourier_uncertainty : sigma_omega * (2 * sigma_t) \u2265 1\n\n/-- The time-bandwidth product respects the 1/2 floor (no holes). -/\ntheorem time_bandwidth : sigma_t * sigma_omega \u2265 1 / 2 := by\n  nlinarith [fourier_uncertainty]\n\nend TimeBandwidth.Tb\n",
+  "separation_recovered": 8.00976800976767,
+  "sigma_omega": 1.1785113019775824,
+  "sigma_t": 0.42426406871192773,
+  "sweep": [
+    {
+      "dt": 6.0,
+      "fringe_spacing": 1.0471975511965976,
+      "recovered_separation": 5.997557997557744,
+      "rel_error": 0.0004071661238207732
+    },
+    {
+      "dt": 8.0,
+      "fringe_spacing": 0.7853981633974483,
+      "recovered_separation": 8.00976800976767,
+      "rel_error": 0.001219512195079575
+    },
+    {
+      "dt": 12.0,
+      "fringe_spacing": 0.5235987755982988,
+      "recovered_separation": 11.995115995115489,
+      "rel_error": 0.0004071661238207732
+    },
+    {
+      "dt": 16.0,
+      "fringe_spacing": 0.39269908169872414,
+      "recovered_separation": 15.999999999999323,
+      "rel_error": 4.226603776700407e-14
+    }
+  ],
+  "tau": 0.6,
+  "time_bandwidth_product": 0.5000000000000004,
+  "uncertainty_respected": true
+}

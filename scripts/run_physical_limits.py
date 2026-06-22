@@ -29,6 +29,7 @@ from gaugegap.quantum.entanglement_speed_limit import certified_buildup_speed_li
 from gaugegap.quantum.ergotropy import analyze_ergotropy, thermal_state
 from gaugegap.quantum.decoherence_branching import analyze_branching, branch_density_matrix
 from gaugegap.quantum.landauer import analyze_landauer
+from gaugegap.quantum.temporal_double_slit import analyze_time_diffraction
 from gaugegap.relativity.bekenstein import analyze_bekenstein
 from gaugegap.relativity.alcubierre import analyze_warp_bubble
 
@@ -55,6 +56,13 @@ def main() -> int:
     checks.append(("speed_limit_respected", qsl.respects_qsl))
     print(f"  [time<->energy ] QSL: build-up {qsl.buildup_time:.4f} >= floor "
           f"{qsl.tau_qsl:.4f}  ok={qsl.respects_qsl}")
+
+    # [time <-> frequency] temporal double slit: fringe spacing = 2 pi / dt
+    tds = analyze_time_diffraction(dt=8.0, tau=0.6, n=4096)
+    tds_ok = tds.uncertainty_respected and tds.fringe_relative_error < 1e-2
+    checks.append(("time_frequency_duality", tds_ok))
+    print(f"  [time<->freq   ] time slits: fringe 2pi/dt={tds.fringe_spacing_theory:.4f}"
+          f", sep recovered {tds.separation_recovered:.3f}  ok={tds_ok}")
 
     # [work <-> entropy] ergotropy of a thermal state (passive: no free energy)
     Hladder = np.diag(np.arange(args.d, dtype=float)).astype(complex)
@@ -100,6 +108,7 @@ def main() -> int:
         "all_checks_pass": all_ok,
         "checks": {name: ok for name, ok in checks},
         "speed_limit": qsl.to_dict(),
+        "temporal_double_slit": tds.to_dict(),
         "ergotropy": erg.to_dict(),
         "branching": br.to_dict(),
         "landauer": lan.to_dict(),
@@ -107,6 +116,7 @@ def main() -> int:
         "warp_energy_condition": warp.to_dict(),
         "certificates": {
             "speed_limit_lean": qsl.lean4, "speed_limit_coq": qsl.coq,
+            "temporal_double_slit_lean": tds.lean4, "temporal_double_slit_coq": tds.coq,
             "ergotropy_lean": erg.lean4, "ergotropy_coq": erg.coq,
             "branching_lean": br.lean4, "branching_coq": br.coq,
             "landauer_lean": lan.lean4, "landauer_coq": lan.coq,
@@ -156,6 +166,8 @@ def _write_md(path, p, checks):
         "|---|---|---|---|",
         f"| Quantum speed limit | time ↔ energy | build-up ≥ MT/ML floor | "
         f"{p['checks']['speed_limit_respected']} |",
+        f"| Temporal double slit | time ↔ frequency | fringe spacing = 2π/Δt, "
+        f"σ_t σ_ω ≥ 1/2 | {p['checks']['time_frequency_duality']} |",
         f"| Ergotropy / passivity | work ↔ entropy | 0 ≤ W ≤ ⟨H⟩−E0, no free energy | "
         f"{p['checks']['ergotropy_no_free_energy']} |",
         f"| Decoherence / branching | information | 1 ≤ N_eff ≤ d | "

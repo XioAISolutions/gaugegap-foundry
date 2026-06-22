@@ -2,11 +2,12 @@
 
 Every reel-derived module is a trade-off among the same currencies — **energy, time, information/entropy, geometry**. This capstone runs them together and emits one consolidated, claim-boundary-audited report with all certificates. **Claim boundary:** finite-system / semiclassical demonstrations of established bounds, each bracketed or machine-checked; not continuum/Millennium claims, not a buildable warp drive or free-energy device.
 
-**All checks pass: True**  (6/6)
+**All checks pass: True**  (7/7)
 
 | Member | Currencies | Check | Pass |
 |---|---|---|---|
 | Quantum speed limit | time ↔ energy | build-up ≥ MT/ML floor | True |
+| Temporal double slit | time ↔ frequency | fringe spacing = 2π/Δt, σ_t σ_ω ≥ 1/2 | True |
 | Ergotropy / passivity | work ↔ entropy | 0 ≤ W ≤ ⟨H⟩−E0, no free energy | True |
 | Decoherence / branching | information | 1 ≤ N_eff ≤ d | True |
 | Landauer's principle | info ↔ energy | erase ≥ k_B T ln 2 | True |
