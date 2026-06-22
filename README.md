@@ -56,6 +56,34 @@ flowchart TD
 
 ---
 
+## 🌐 The web of physical limits — gallery
+
+A set of finite-system modules, each built by stripping a viral "physics" reel down to
+the one genuine, exactly computable statement it contains, and certifying it with a
+discharged Lean 4 / Coq inequality (independently re-checked by z3). They turn out to be
+**one structure**: trade-offs among four currencies — **energy, time, information, geometry**.
+
+<p align="center">
+  <img src="figures/physical-limits/web.svg" alt="The web of physical limits" width="640"/>
+</p>
+
+| Member | Currencies | Certified inequality |
+|---|---|---|
+| Quantum speed limit | time ↔ energy | `t ≥ τ_QSL` |
+| Temporal double slit | time ↔ frequency | `Δω = 2π/Δt`, `σ_t σ_ω ≥ ½` |
+| Sonification / sampling | time ↔ frequency | aliasing fold `0 < f_s − f < f_s/2` |
+| Ergotropy / passivity | work ↔ entropy | `0 ≤ W ≤ ⟨H⟩ − E₀` (no free energy) |
+| Decoherence / branching | information | `1 ≤ N_eff ≤ d` |
+| Landauer's principle | info ↔ energy | `W ≥ k_B T ln 2` |
+| Bekenstein bound | info ↔ energy ↔ geometry | `S ≤ 2π R E` |
+| Alcubierre energy cond. | energy ↔ geometry | `ρ ≤ 0` (needs negative energy) |
+
+📖 Full synthesis: [`docs/physical-limits-web.md`](docs/physical-limits-web.md) · 🖼️ gallery + certificate ladder: [`figures/physical-limits/`](figures/physical-limits/) (open `index.html`) · ▶️ reproduce: `make physical-limits` · `make physical-limits-figures` · `make verify-certificates`
+
+> 🧭 **Boundary:** finite-system / semiclassical demonstrations of *established* bounds, each bracketed or machine-checked — not continuum/Millennium claims, not a buildable warp drive or free-energy device.
+
+---
+
 ## ⚛️ GaugeGap Track — finite gauge-system benchmarks
 
 **Natural progression:**
@@ -310,9 +338,9 @@ flowchart LR
 docs/           roadmap and methods notes
 hypotheses/     registered finite-system hypotheses
 scripts/        reproducible experiment entrypoints
-src/gaugegap/   package code (incl. spectra_lang, verdict_lang, rigorous/)
+src/gaugegap/   package code (incl. spectra_lang, verdict_lang, rigorous/, relativity/)
 examples/       Spectra (.spectra) and Verdict (.verdict) programs
-figures/        weight diagrams and static figures
+figures/        weight diagrams, static figures, physical-limits web gallery
 tests/          unit tests and smoke coverage (492)
 results/        small checked-in baseline artifacts
 ```
