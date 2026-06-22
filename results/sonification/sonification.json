@@ -1,0 +1,15 @@
+{
+  "alias_example_alias": 2800.0,
+  "alias_example_freq": 5200.0,
+  "claim_boundary": "finite exact signal-processing demo; sonification is a data-to-audio mapping and auditory similarity is not physical correspondence (independent datasets already score high spectral similarity; no LHC<->Saturn link); the sampling/aliasing statements are exact Fourier theorems; not a continuum/Millennium claim",
+  "coq_certificate": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Nyquist_Alias.\n\nVariable fs f : R.\n\n(* TRUST INPUT 1: tone above the Nyquist frequency. *)\nHypothesis over_nyquist : f > fs / 2.\n(* TRUST INPUT 2: but below the sampling rate. *)\nHypothesis below_rate : f < fs.\n\nTheorem aliasing_fold : 0 < fs - f /\\ fs - f < fs / 2.\nProof. split; lra. Qed.\n\nEnd Nyquist_Alias.\n",
+  "f_max_used": 2000.0,
+  "kind": "sonification_sampling_limit",
+  "lean4_certificate": "import Mathlib.Tactic\n\nnamespace Nyquist.Alias\n\n/-- Sampling rate fs and a tone frequency f (abstract reals). -/\naxiom fs : \u211d\naxiom f : \u211d\n\n/-- TRUST INPUT 1 -- the tone is above the Nyquist frequency: f > fs/2. -/\naxiom over_nyquist : f > fs / 2\n/-- TRUST INPUT 2 -- but below the sampling rate: f < fs. -/\naxiom below_rate : f < fs\n\n/-- The alias folds strictly into the band: 0 < fs - f < fs/2 (no holes). -/\ntheorem aliasing_fold : 0 < fs - f \u2227 fs - f < fs / 2 := by\n  constructor\n  \u00b7 linarith [below_rate]\n  \u00b7 linarith [over_nyquist]\n\nend Nyquist.Alias\n",
+  "nyquist": 4000.0,
+  "sample_rate": 8000.0,
+  "self_similarity": 1.0000000000000002,
+  "similarity_is_spurious": true,
+  "unrelated_similarity": 0.32718643830611777,
+  "within_band": true
+}

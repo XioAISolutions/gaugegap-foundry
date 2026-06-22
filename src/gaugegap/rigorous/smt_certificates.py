@@ -101,6 +101,13 @@ def _warp(s):
     s.add(z3.Not(rho <= 0))
 
 
+def _nyquist(s):
+    # fs/2 < f < fs  =>  0 < fs - f < fs/2   (the aliasing fold)
+    fs, f = z3.Reals("fs f")
+    s.add(f > fs / 2, f < fs)
+    s.add(z3.Not(z3.And(0 < fs - f, fs - f < fs / 2)))
+
+
 _SCHEMAS = [
     ("eigenvalue_bracket", "interval lower <= E0 <= variational upper", _bracket),
     ("speed_limit", "build-up time >= max(Mandelstam-Tamm, Margolus-Levitin)",
@@ -112,6 +119,7 @@ _SCHEMAS = [
     ("landauer", "erasure cost >= k_B T ln 2 (info <-> energy)", _landauer),
     ("bekenstein", "S <= 2 pi R E (info <-> energy <-> geometry)", _bekenstein),
     ("warp_energy_condition", "Alcubierre rho <= 0 (needs negative energy)", _warp),
+    ("nyquist_aliasing", "aliasing fold: fs/2 < f < fs => 0 < fs-f < fs/2", _nyquist),
 ]
 
 
