@@ -21,9 +21,10 @@ class TestPhysicalLimitsCapstone(unittest.TestCase):
             payload = json.loads((Path(d) / "physical-limits.json").read_text())
             self.assertTrue(payload["all_checks_pass"])
             # all six currency members present and passing
-            for name in ("speed_limit_respected", "ergotropy_no_free_energy",
-                         "branch_count_bracketed", "landauer_cost_positive",
-                         "bekenstein_respected", "warp_needs_negative_energy"):
+            for name in ("speed_limit_respected", "time_frequency_duality",
+                         "ergotropy_no_free_energy", "branch_count_bracketed",
+                         "landauer_cost_positive", "bekenstein_respected",
+                         "warp_needs_negative_energy"):
                 self.assertTrue(payload["checks"][name], name)
             # every certificate is hole-free
             for k, cert in payload["certificates"].items():

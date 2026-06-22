@@ -9,6 +9,7 @@ claim-boundary-audited report with all certificates.
 | Member | Currencies | Certified statement |
 |---|---|---|
 | Quantum speed limit | time ↔ energy | build-up time ≥ Mandelstam–Tamm/Margolus–Levitin floor |
+| Temporal double slit | time ↔ frequency | fringe spacing `= 2π/Δt`, `σ_t σ_ω ≥ 1/2` |
 | Ergotropy / passivity | work ↔ entropy | `0 ≤ W ≤ ⟨H⟩−E₀` (no free energy) |
 | Decoherence / branching | information | `1 ≤ N_eff ≤ d` |
 | **Landauer's principle** | **info ↔ energy** | erasing a bit costs `≥ k_B T ln 2` |
