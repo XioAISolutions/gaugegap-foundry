@@ -58,6 +58,11 @@ def _fresh_emitted_certs() -> list[tuple[str, str]]:
     out.append(("cherenkov", emit_cherenkov_certificate("cone", 1.33, 0.9)[1]))
     from gaugegap.quantum.lieb_robinson import emit_lightcone_certificate
     out.append(("lieb_robinson", emit_lightcone_certificate("front", 2.718)[1]))
+    from gaugegap.relativity.compton_schwarzschild import (
+        emit_compton_schwarzschild_certificate,
+    )
+    out.append(("compton_schwarzschild",
+                emit_compton_schwarzschild_certificate("planck", 1.0, 2.0)[1]))
     return out
 
 

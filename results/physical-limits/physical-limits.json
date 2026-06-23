@@ -35,6 +35,8 @@
     "branching_lean": "import Mathlib.Tactic\n\nnamespace Branching.D3\n\n/-- The effective branch count N_eff = 1 / Tr(rho^2) (abstract). -/\naxiom Neff : \u211d\n\n/-- TRUST INPUT 1 -- Tr(rho^2) <= 1, so the participation ratio N_eff >= 1. -/\naxiom neff_lower : Neff \u2265 1\n/-- TRUST INPUT 2 -- Tr(rho^2) >= 1/d, so N_eff <= d. -/\naxiom neff_upper : Neff \u2264 3.0\n\n/-- The system occupies between 1 and d effective branches (no holes). -/\ntheorem branch_bracket : 1 \u2264 Neff \u2227 Neff \u2264 3.0 := by\n  constructor\n  \u00b7 linarith [neff_lower]\n  \u00b7 linarith [neff_upper]\n\nend Branching.D3\n",
     "cherenkov_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Cherenkov_Cone.\n\n(* c = cos(theta_c), nb = n*beta. *)\nVariable c nb : R.\n\n(* TRUST INPUT 1: at/above threshold n*beta >= 1. *)\nHypothesis above_threshold : nb >= 1.\n(* TRUST INPUT 2: the cone cosine is positive. *)\nHypothesis cos_pos : c > 0.\n(* TRUST INPUT 3: the Cherenkov relation cos(theta_c) * (n beta) = 1. *)\nHypothesis cherenkov_relation : c * nb = 1.\n\nTheorem cone_valid : 0 < c /\\ c <= 1.\nProof. split; nra. Qed.\n\nEnd Cherenkov_Cone.\n",
     "cherenkov_lean": "import Mathlib.Tactic\n\nnamespace Cherenkov.Cone\n\n/-- c = cos(theta_c) and nb = n*beta (abstract reals). -/\naxiom c : \u211d\naxiom nb : \u211d\n\n/-- TRUST INPUT 1 -- at/above threshold: n*beta >= 1. -/\naxiom above_threshold : nb \u2265 1\n/-- TRUST INPUT 2 -- the cone cosine is positive. -/\naxiom cos_pos : c > 0\n/-- TRUST INPUT 3 -- the Cherenkov relation cos(theta_c) * (n beta) = 1. -/\naxiom cherenkov_relation : c * nb = 1\n\n/-- The cone cosine is a valid cosine: 0 < c <= 1 (theta_c is a real angle). -/\ntheorem cone_valid : 0 < c \u2227 c \u2264 1 := by\n  refine \u27e8cos_pos, ?_\u27e9\n  nlinarith [cherenkov_relation, above_threshold, cos_pos]\n\nend Cherenkov.Cone\n",
+    "compton_schwarzschild_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection ComptonSchwarzschild_Planck.\n\n(* object radius Rad, Schwarzschild radius Rs, Compton wavelength Lc\n   (Rad avoids shadowing the type R). *)\nVariable Rad Rs Lc : R.\n\n(* TRUST INPUT 1: positive Schwarzschild radius. *)\nHypothesis Rs_pos : Rs > 0.\n(* TRUST INPUT 2: positive Compton wavelength. *)\nHypothesis Lc_pos : Lc > 0.\n(* TRUST INPUT 3: not inside its own horizon. *)\nHypothesis not_bh : Rad >= Rs.\n(* TRUST INPUT 4: not localized below its Compton wavelength. *)\nHypothesis localizable : Rad >= Lc.\n\n(* R^2 >= Rs * Lc  (= 2 l_P^2): the Planck-length floor on object size. *)\nTheorem planck_floor : Rad * Rad >= Rs * Lc.\nProof. nra. Qed.\n\nEnd ComptonSchwarzschild_Planck.\n",
+    "compton_schwarzschild_lean": "import Mathlib.Tactic\n\nnamespace ComptonSchwarzschild.Planck\n\n/-- Object radius R, Schwarzschild radius Rs, Compton wavelength Lc (abstract reals). -/\naxiom R : \u211d\naxiom Rs : \u211d\naxiom Lc : \u211d\n\n/-- TRUST INPUT 1 -- the Schwarzschild radius is positive. -/\naxiom Rs_pos : Rs > 0\n/-- TRUST INPUT 2 -- the Compton wavelength is positive. -/\naxiom Lc_pos : Lc > 0\n/-- TRUST INPUT 3 -- the object is not inside its own horizon. -/\naxiom not_bh : R \u2265 Rs\n/-- TRUST INPUT 4 -- the object is not localized below its Compton wavelength. -/\naxiom localizable : R \u2265 Lc\n\n/-- The radius-squared dominates the product of the two limit lengths:\n    R^2 \u2265 Rs * Lc  (= 2 l_P^2, the Planck-length floor). -/\ntheorem planck_floor : R * R \u2265 Rs * Lc := by\n  nlinarith [Rs_pos, Lc_pos, not_bh, localizable]\n\nend ComptonSchwarzschild.Planck\n",
     "ergotropy_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Ergotropy_WExtractable.\n\nVariable W : R.\n\n(* TRUST INPUT 1: passive state minimizes cyclic energy => W >= 0. *)\nHypothesis work_nonneg : W >= 0.\n(* TRUST INPUT 2: passive energy >= ground energy E0 => W <= <H> - E0. *)\nHypothesis work_bounded : W <= 0.42478961739555854.\n\nTheorem no_free_energy : 0 <= W /\\ W <= 0.42478961739555854.\nProof. lra. Qed.\n\nEnd Ergotropy_WExtractable.\n",
     "ergotropy_lean": "import Mathlib.Tactic\n\nnamespace Ergotropy.WExtractable\n\n/-- Extractable work W = <H> - E_passive (abstract). -/\naxiom W : \u211d\n\n/-- TRUST INPUT 1 -- the passive state minimizes cyclic energy, so W >= 0. -/\naxiom work_nonneg : W \u2265 0\n/-- TRUST INPUT 2 -- the passive energy is at least the ground energy E0, so\n    W <= <H> - E0 (no energy can be drawn below the ground state). -/\naxiom work_bounded : W \u2264 0.42478961739555854\n\n/-- Extractable work is finite and non-negative: no free energy (no holes). -/\ntheorem no_free_energy : 0 \u2264 W \u2227 W \u2264 0.42478961739555854 := by\n  constructor\n  \u00b7 linarith [work_nonneg]\n  \u00b7 linarith [work_bounded]\n\nend Ergotropy.WExtractable\n",
     "landauer_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Landauer_WErase.\n\n(* kB, T, entropy drop dS, one-bit entropy b = ln 2 (nats). *)\nVariable kB T dS b : R.\n\n(* TRUST INPUT 1: positive Boltzmann constant. *)\nHypothesis kB_pos : kB > 0.\n(* TRUST INPUT 2: positive temperature. *)\nHypothesis T_pos : T > 0.\n(* TRUST INPUT 3: at least one bit erased: dS >= b (b = ln 2). *)\nHypothesis dS_bit : dS >= b.\n\nTheorem landauer_floor : kB * T * dS >= kB * T * b.\nProof.\n  assert (Hkt : 0 <= kB * T) by (apply Rlt_le; apply Rmult_lt_0_compat; lra).\n  nra.\nQed.\n\nEnd Landauer_WErase.\n",
@@ -52,6 +54,7 @@
     "bekenstein_respected": true,
     "branch_count_bracketed": true,
     "cherenkov_cone_valid": true,
+    "compton_schwarzschild_planck_floor": true,
     "ergotropy_no_free_energy": true,
     "landauer_cost_positive": true,
     "lieb_robinson_lightcone": true,
@@ -73,6 +76,20 @@
     "threshold_beta": 0.7518796992481203
   },
   "claim_boundary": "finite-system / semiclassical demonstrations of established physical bounds, each bracketed or machine-checked; not continuum/Millennium claims, not a buildable warp drive or free-energy device",
+  "compton_schwarzschild": {
+    "claim_boundary": "standard order-of-magnitude Compton-Schwarzschild / minimal-length bound expressed as an exact inequality R^2 >= R_s*lambda_C = 2 l_P^2; NOT a derivation of quantum gravity, NOT a claim that spacetime is discrete or that the Planck length is operationally reachable",
+    "compton_wavelength": 2.2857297750934063e-35,
+    "identity_holds": true,
+    "is_gravity_dominated": true,
+    "kind": "compton_schwarzschild_bound",
+    "mass": 1.5389714820716337e-08,
+    "min_allowed_radius": 2.2857297750934068e-35,
+    "planck_length": 1.61625502392855e-35,
+    "planck_mass": 2.176434342051127e-08,
+    "rs_times_compton": 5.224560604748555e-70,
+    "schwarzschild_radius": 2.2857297750934068e-35,
+    "two_planck_length_sq": 5.2245606047485554e-70
+  },
   "ergotropy": {
     "bracket_valid": true,
     "claim_boundary": "finite exact bound on cyclically extractable work (ergotropy); refutes 'free/infinite energy' devices rather than validating them; extractable work is finite and cannot be cycled for net gain; not a continuum/Millennium claim",

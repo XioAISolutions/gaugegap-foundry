@@ -15,6 +15,7 @@ claim-boundary-audited report with all certificates.
 | **Landauer's principle** | **info ↔ energy** | erasing a bit costs `≥ k_B T ln 2` |
 | **Bekenstein bound** | **info ↔ energy ↔ geometry** | `S ≤ 2πRE` |
 | Alcubierre energy condition | energy ↔ geometry | warp bubble needs negative energy (`ρ ≤ 0`) |
+| **Compton–Schwarzschild** | **mass ↔ geometry** | object size floored at the Planck scale: `R² ≥ R_s·λ_C = 2 ℓ_P²` |
 
 ## The two new keystones
 
@@ -29,6 +30,27 @@ dissipates at least `k_B T · ΔS` (one bit = `k_B T ln 2`). Ergotropy is the wo
 *quantum-information* side to the *relativity* side: the entropy in a region is capped
 by `S ≤ 2πRE` — **geometry limits information**. Certificate: `S ≤ 2πRE` whenever the
 region is at least the minimal radius `R ≥ S/(2πE)`.
+
+**The mass–radius keystone** (`gaugegap.relativity.compton_schwarzschild`) is the
+*global map* the other geometry members live inside. Plot every object by its mass and
+radius and the lower-left of the plane is sealed off by two limits in the same
+currencies the web already trades in:
+
+- **Forbidden by gravity** — the Schwarzschild radius `R_s = 2GM/c²` (pack tighter and
+  you are inside your own horizon). Same energy↔geometry currency as Bekenstein /
+  Alcubierre.
+- **Forbidden by quantum uncertainty** — the reduced Compton wavelength
+  `λ_C = ℏ/(Mc)` (localize tighter and the vacuum pair-produces). Same mass↔quantum
+  scale as the speed-limit members.
+
+The two boundaries cross at the **Planck point**, and the product is *mass-independent*:
+`R_s·λ_C = 2Gℏ/c³ = 2 ℓ_P²`. So any allowed object (`R ≥ R_s` and `R ≥ λ_C`) obeys
+`R² ≥ R_s·λ_C = 2 ℓ_P²`, i.e. `R ≥ √2 ℓ_P` — **the Planck length is a floor on object
+size**, reached exactly at the crossing. Certificate: `R·R ≥ R_s·λ_C` from the two
+trust inputs `R ≥ R_s` and `R ≥ λ_C`. *Claim boundary:* the standard
+order-of-magnitude Compton–Schwarzschild / minimal-length bound; NOT a quantum-gravity
+derivation, NOT a claim that spacetime is discrete or that the Planck length is
+operationally reachable.
 
 ```bash
 make physical-limits
@@ -45,4 +67,4 @@ holography. Dependency-light (numpy).
 
 References: Mandelstam & Tamm (1945); Margolus & Levitin (1998); Allahverdyan–Balian–
 Nieuwenhuizen (2004); Zurek (2003); Landauer (1961); Bekenstein (1981); Alcubierre
-(1994).
+(1994); Schwarzschild (1916); Compton (1923); Carr, Mureika & Nicolini (2015).

@@ -28,8 +28,8 @@
 <body>
 <header>
   <h1>The web of physical limits</h1>
-  <p class="sub">Five "mind-blowing physics" reels, reduced to their rigorous,
-  certifiable cores &mdash; and shown to be one structure.</p>
+  <p class="sub">"Mind-blowing physics" reduced to its rigorous, certifiable
+  cores &mdash; a family of fundamental bounds shown to be one structure.</p>
 </header>
 <main>
   <section class="hero"><img src="web.svg" alt="web of physical limits"/></section>
@@ -42,8 +42,18 @@
   <h2>The certificate ladder</h2>
   <p class="sub">Every label above is a discharged Lean&nbsp;4 / Coq inequality
   (single labelled trust input, no holes).</p>
-  <table><tbody><tr><td><span class='dot' style='background:#58a6ff'></span>Quantum speed limit</td><td class='cur'>time ↔ energy</td><td class='ineq' style='color:#58a6ff'>t ≥ τ_QSL</td></tr><tr><td><span class='dot' style='background:#58a6ff'></span>Temporal double slit</td><td class='cur'>time ↔ frequency</td><td class='ineq' style='color:#58a6ff'>Δω = 2π/Δt,  σ_tσ_ω ≥ ½</td></tr><tr><td><span class='dot' style='background:#f0c674'></span>Ergotropy / passivity</td><td class='cur'>work ↔ entropy</td><td class='ineq' style='color:#f0c674'>0 ≤ W ≤ ⟨H⟩ − E₀</td></tr><tr><td><span class='dot' style='background:#7ee787'></span>Decoherence / branching</td><td class='cur'>information</td><td class='ineq' style='color:#7ee787'>1 ≤ N_eff ≤ d</td></tr><tr><td><span class='dot' style='background:#7ee787'></span>Landauer's principle</td><td class='cur'>info ↔ energy</td><td class='ineq' style='color:#7ee787'>W_erase ≥ k_B T ln 2</td></tr><tr><td><span class='dot' style='background:#d2a8ff'></span>Bekenstein bound</td><td class='cur'>info ↔ energy ↔ geometry</td><td class='ineq' style='color:#d2a8ff'>S ≤ 2π R E</td></tr><tr><td><span class='dot' style='background:#d2a8ff'></span>Alcubierre energy cond.</td><td class='cur'>energy ↔ geometry</td><td class='ineq' style='color:#d2a8ff'>ρ ≤ 0  (needs neg. energy)</td></tr><tr><td><span class='dot' style='background:#d2a8ff'></span>Cherenkov cone</td><td class='cur'>velocity ↔ geometry</td><td class='ineq' style='color:#d2a8ff'>cos θc = 1/(nβ),  β > 1/n</td></tr><tr><td><span class='dot' style='background:#7ee787'></span>Lieb–Robinson cone</td><td class='cur'>information ↔ time</td><td class='ineq' style='color:#7ee787'>x(t) ≤ v_LR·t + ξ</td></tr></tbody></table>
+  <table><tbody><tr><td><span class='dot' style='background:#58a6ff'></span>Quantum speed limit</td><td class='cur'>time ↔ energy</td><td class='ineq' style='color:#58a6ff'>t ≥ τ_QSL</td></tr><tr><td><span class='dot' style='background:#58a6ff'></span>Temporal double slit</td><td class='cur'>time ↔ frequency</td><td class='ineq' style='color:#58a6ff'>Δω = 2π/Δt,  σ_tσ_ω ≥ ½</td></tr><tr><td><span class='dot' style='background:#f0c674'></span>Ergotropy / passivity</td><td class='cur'>work ↔ entropy</td><td class='ineq' style='color:#f0c674'>0 ≤ W ≤ ⟨H⟩ − E₀</td></tr><tr><td><span class='dot' style='background:#7ee787'></span>Decoherence / branching</td><td class='cur'>information</td><td class='ineq' style='color:#7ee787'>1 ≤ N_eff ≤ d</td></tr><tr><td><span class='dot' style='background:#7ee787'></span>Landauer's principle</td><td class='cur'>info ↔ energy</td><td class='ineq' style='color:#7ee787'>W_erase ≥ k_B T ln 2</td></tr><tr><td><span class='dot' style='background:#d2a8ff'></span>Bekenstein bound</td><td class='cur'>info ↔ energy ↔ geometry</td><td class='ineq' style='color:#d2a8ff'>S ≤ 2π R E</td></tr><tr><td><span class='dot' style='background:#d2a8ff'></span>Alcubierre energy cond.</td><td class='cur'>energy ↔ geometry</td><td class='ineq' style='color:#d2a8ff'>ρ ≤ 0  (needs neg. energy)</td></tr><tr><td><span class='dot' style='background:#d2a8ff'></span>Cherenkov cone</td><td class='cur'>velocity ↔ geometry</td><td class='ineq' style='color:#d2a8ff'>cos θc = 1/(nβ),  β > 1/n</td></tr><tr><td><span class='dot' style='background:#7ee787'></span>Lieb–Robinson cone</td><td class='cur'>information ↔ time</td><td class='ineq' style='color:#7ee787'>x(t) ≤ v_LR·t + ξ</td></tr><tr><td><span class='dot' style='background:#d2a8ff'></span>Compton–Schwarzschild</td><td class='cur'>mass ↔ geometry</td><td class='ineq' style='color:#d2a8ff'>R² ≥ R_s·λ_C = 2 l_P²</td></tr></tbody></table>
   <p class="hero"><img src="ladder.svg" alt="certificate ladder"/></p>
+
+  <h2>The cosmic mass–radius diagram</h2>
+  <p class="sub">The whole web has a global shape. Plot every object by mass and size:
+  the lower-left is sealed off by two certified limits — the <b style="color:#ff7b72">
+  Schwarzschild radius</b> (pack tighter and you are a black hole) and the
+  <b style="color:#58a6ff">Compton wavelength</b> (localize tighter and the quantum
+  vacuum pair-produces). They cross at the <b style="color:#f0c674">Planck point</b>,
+  and the identity <code>R_s·λ_C = 2 ℓ_P²</code> holds for <em>every</em> mass — a
+  machine-checked inequality (<code>R² ≥ R_s·λ_C</code>).</p>
+  <p class="hero"><img src="mass_radius.svg" alt="cosmic mass-radius diagram"/></p>
 
   <h2>The phenomena, one figure each</h2>
   <div class="gallery"><figure><img src="entanglement-dynamics__entanglement_buildup.svg" alt="Entanglement build-up S(t): 0 → ln 2 over a finite time."/><figcaption>Entanglement build-up S(t): 0 → ln 2 over a finite time.</figcaption></figure>

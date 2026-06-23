@@ -3,10 +3,10 @@
 
 Produces (deterministic, dependency-free SVG + a self-contained HTML gallery):
   * web.svg      -- the unifying diagram: four currencies (energy, time,
-                    information, geometry) as nodes, the seven phenomena as the
+                    information, geometry) as nodes, the certified phenomena as the
                     edges/faces connecting them, each labelled with its certified
                     inequality.
-  * ladder.svg   -- a certificate "ladder": the seven machine-checked inequalities
+  * ladder.svg   -- a certificate "ladder": the machine-checked inequalities
                     stacked as a one-glance reference card.
   * index.html   -- a self-contained explainer embedding the web, the ladder, and
                     every module's own result figure with narrative captions.
@@ -30,7 +30,7 @@ C_EDGE = "#8b949e"
 C_TXT = "#e6edf3"
 C_MUTED = "#8b949e"
 
-# The seven members: (name, inequality, currencies, color)
+# The web members: (name, inequality, currencies, color)
 MEMBERS = [
     ("Quantum speed limit", "t ≥ τ_QSL", "time ↔ energy", C_TIME),
     ("Temporal double slit", "Δω = 2π/Δt,  σ_tσ_ω ≥ ½",
@@ -45,6 +45,8 @@ MEMBERS = [
     ("Cherenkov cone", "cos θc = 1/(nβ),  β > 1/n",
      "velocity ↔ geometry", C_GEOM),
     ("Lieb–Robinson cone", "x(t) ≤ v_LR·t + ξ", "information ↔ time", C_INFO),
+    ("Compton–Schwarzschild", "R² ≥ R_s·λ_C = 2 l_P²",
+     "mass ↔ geometry", C_GEOM),
 ]
 
 # module result SVGs to pull into the gallery: (results path, caption)
@@ -84,7 +86,7 @@ def build_web(path: Path):
     # nodes (diamond): Energy top, Geometry bottom, Time left, Information right
     E = (460, 150); G = (460, 600); T = (175, 375); I = (745, 375)
     c.text(W / 2, 44, "The web of physical limits", size=22, fill=C_TXT)
-    c.text(W / 2, 70, "four currencies · seven certified phenomena", size=13,
+    c.text(W / 2, 70, f"four currencies · {len(MEMBERS)} certified phenomena", size=13,
            fill=C_MUTED)
 
     # Bekenstein face: the Energy-Information-Geometry triangle (translucent)
@@ -133,7 +135,7 @@ def build_ladder(path: Path):
     W = 920; row_h = 70; H = 120 + row_h * len(MEMBERS)
     c = SVGCanvas(W, H)
     c.text(W / 2, 48, "Certificate ladder", size=22, fill=C_TXT)
-    c.text(W / 2, 74, "seven machine-checked inequalities (discharged Lean 4 / Coq)",
+    c.text(W / 2, 74, f"{len(MEMBERS)} machine-checked inequalities (discharged Lean 4 / Coq)",
            size=13, fill=C_MUTED)
     y0 = 110
     for i, (name, ineq, cur, color) in enumerate(MEMBERS):
@@ -145,6 +147,91 @@ def build_ladder(path: Path):
         c.text(W - 80, y + 40, ineq, size=16, fill=color, anchor="end")
     c.line(60, y0 + row_h * len(MEMBERS), W - 60, y0 + row_h * len(MEMBERS),
            stroke="#222831", stroke_width=1.0)
+    c.write(path)
+
+
+def build_mass_radius(path: Path):
+    """The cosmic mass-radius diagram: every object lives in the wedge to the right of
+    BOTH the Schwarzschild line (forbidden by gravity) and the Compton line (forbidden
+    by quantum uncertainty); the two cross at the Planck point."""
+    import math
+
+    from gaugegap.relativity.compton_schwarzschild import (
+        NAMED_OBJECTS,
+        compton_wavelength,
+        planck_length,
+        planck_mass,
+        schwarzschild_radius,
+    )
+
+    W, H = 920, 720
+    c = SVGCanvas(W, H)
+    # plot box in log10 space: x = log10(radius/m), y = log10(mass/kg)
+    PX0, PX1, PY0, PY1 = 92, W - 40, H - 70, 96
+    xlo, xhi = -37.0, 28.0      # radius decades
+    ylo, yhi = -34.0, 40.0      # mass decades
+
+    def sx(logr):
+        return PX0 + (logr - xlo) / (xhi - xlo) * (PX1 - PX0)
+
+    def sy(logm):
+        return PY0 + (logm - ylo) / (yhi - ylo) * (PY1 - PY0)
+
+    c.text(W / 2, 44, "The cosmic mass–radius diagram", size=22, fill=C_TXT)
+    c.text(W / 2, 70, "every object sits between two certified limits — they meet at "
+           "the Planck point", size=13, fill=C_MUTED)
+
+    # boundary lines, sampled from the real formulae (log-log → straight lines)
+    sch = [(sx(math.log10(schwarzschild_radius(10.0 ** lm))), sy(lm))
+           for lm in (ylo, yhi)]
+    com = [(sx(math.log10(compton_wavelength(10.0 ** lm))), sy(lm))
+           for lm in (ylo, yhi)]
+
+    # forbidden-by-gravity wedge (left of Schwarzschild, upper region): shade
+    c.polygon([(sx(xlo), sy(yhi)), sch[1], sch[0], (sx(xlo), sy(ylo))],
+              fill="#8b2f2f", stroke="none", opacity=0.18)
+    # forbidden-by-quantum wedge (left of Compton, lower region): shade
+    c.polygon([(sx(xlo), sy(ylo)), com[1], com[0], (sx(xlo), sy(yhi))],
+              fill="#2f4b8b", stroke="none", opacity=0.16)
+
+    c.line(*sch[0], *sch[1], stroke="#ff7b72", stroke_width=2.4)
+    c.line(*com[0], *com[1], stroke=C_TIME, stroke_width=2.4)
+
+    # Planck point (crossing) and its length floor
+    lp = planck_length()
+    mp = planck_mass()
+    px, py = sx(math.log10(lp * math.sqrt(2))), sy(math.log10(mp / math.sqrt(2)))
+    c.circle(px, py, 6, fill="#f0c674", stroke="#0b0e14", stroke_width=1.5)
+    c.text(px + 10, py + 4, "Planck point  (√2 l_P)", size=12, fill=C_ENERGY,
+           anchor="start")
+
+    # axis frame + decade ticks
+    c.line(PX0, PY0, PX1, PY0, stroke=C_EDGE, stroke_width=1.2)
+    c.line(PX0, PY0, PX0, PY1, stroke=C_EDGE, stroke_width=1.2)
+    for lr in range(-36, 28, 8):
+        c.line(sx(lr), PY0, sx(lr), PY0 + 5, stroke=C_EDGE, stroke_width=1.0)
+        c.text(sx(lr), PY0 + 18, f"1e{lr}", size=10, fill=C_MUTED)
+    for lm in range(-32, 40, 8):
+        c.line(PX0 - 5, sy(lm), PX0, sy(lm), stroke=C_EDGE, stroke_width=1.0)
+        c.text(PX0 - 8, sy(lm) + 3, f"1e{lm}", size=10, fill=C_MUTED, anchor="end")
+    c.text(W / 2, H - 30, "radius  [m]", size=13, fill=C_TXT)
+
+    # named objects
+    for name, m, r in NAMED_OBJECTS:
+        x, y = sx(math.log10(r)), sy(math.log10(m))
+        c.circle(x, y, 3.4, fill=C_INFO, stroke="none")
+        c.text(x + 7, y + 3, name, size=10, fill=C_TXT, anchor="start")
+
+    # boundary labels
+    c.text(sx(-30), sy(28), "forbidden by gravity", size=14, fill="#ff7b72")
+    c.text(sx(-30), sy(30.5), "(R < R_s : black hole)", size=10, fill=C_MUTED)
+    c.text(sx(-22), sy(-30), "forbidden by quantum uncertainty", size=13, fill=C_TIME)
+    c.text(sx(-22), sy(-32.2), "(R < λ_C)", size=10, fill=C_MUTED)
+    c.text(sx(14), sy(2), "allowed", size=15, fill=C_INFO)
+
+    c.text(W / 2, H - 12,
+           "R_s·λ_C = 2 l_P² for every mass — a machine-checked identity", size=10,
+           fill=C_MUTED)
     c.write(path)
 
 
@@ -187,8 +274,8 @@ def build_gallery_html(path: Path, copied):
 <body>
 <header>
   <h1>The web of physical limits</h1>
-  <p class="sub">Five "mind-blowing physics" reels, reduced to their rigorous,
-  certifiable cores &mdash; and shown to be one structure.</p>
+  <p class="sub">"Mind-blowing physics" reduced to its rigorous, certifiable
+  cores &mdash; a family of fundamental bounds shown to be one structure.</p>
 </header>
 <main>
   <section class="hero"><img src="web.svg" alt="web of physical limits"/></section>
@@ -203,6 +290,16 @@ def build_gallery_html(path: Path, copied):
   (single labelled trust input, no holes).</p>
   <table><tbody>{ladder_rows}</tbody></table>
   <p class="hero"><img src="ladder.svg" alt="certificate ladder"/></p>
+
+  <h2>The cosmic mass–radius diagram</h2>
+  <p class="sub">The whole web has a global shape. Plot every object by mass and size:
+  the lower-left is sealed off by two certified limits — the <b style="color:#ff7b72">
+  Schwarzschild radius</b> (pack tighter and you are a black hole) and the
+  <b style="color:#58a6ff">Compton wavelength</b> (localize tighter and the quantum
+  vacuum pair-produces). They cross at the <b style="color:#f0c674">Planck point</b>,
+  and the identity <code>R_s·λ_C = 2 ℓ_P²</code> holds for <em>every</em> mass — a
+  machine-checked inequality (<code>R² ≥ R_s·λ_C</code>).</p>
+  <p class="hero"><img src="mass_radius.svg" alt="cosmic mass-radius diagram"/></p>
 
   <h2>The phenomena, one figure each</h2>
   <div class="gallery">{panels}</div>
@@ -226,6 +323,7 @@ def main() -> int:
 
     build_web(out / "web.svg")
     build_ladder(out / "ladder.svg")
+    build_mass_radius(out / "mass_radius.svg")
 
     copied = []
     for rel, cap in GALLERY:
@@ -236,8 +334,8 @@ def main() -> int:
             copied.append((dst_name, cap))
     build_gallery_html(out / "index.html", copied)
 
-    print(f"Wrote web.svg, ladder.svg, index.html (+ {len(copied)} module figures) "
-          f"to {out}")
+    print(f"Wrote web.svg, ladder.svg, mass_radius.svg, index.html "
+          f"(+ {len(copied)} module figures) to {out}")
     return 0
 
 
