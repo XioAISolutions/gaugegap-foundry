@@ -4,8 +4,9 @@
 
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![Tests](https://img.shields.io/badge/tests-492%20passing-brightgreen?logo=pytest&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-695%20passing-brightgreen?logo=pytest&logoColor=white)
 ![Claim-boundary audit](https://img.shields.io/badge/claim--boundary%20audit-0%20high-success)
+![Maturity audit](https://img.shields.io/badge/maturity%20audit-0%20high--unbounded-success)
 ![Reproducible](https://img.shields.io/badge/builds-byte--reproducible-blueviolet)
 ![Quantum](https://img.shields.io/badge/quantum-Qiskit%202.4%20%7C%20IBM%20Runtime-6929c4?logo=qiskit&logoColor=white)
 
@@ -79,8 +80,20 @@ discharged Lean 4 / Coq inequality (independently re-checked by z3). They turn o
 | Alcubierre energy cond. | energy ↔ geometry | `ρ ≤ 0` (needs negative energy) |
 | Cherenkov cone | velocity ↔ geometry | `cos θc = 1/(nβ)`, `β > 1/n` |
 | Lieb–Robinson cone | information ↔ time | `x(t) ≤ v_LR·t + ξ` |
+| Compton–Schwarzschild | mass ↔ geometry | `R² ≥ R_s·λ_C = 2 ℓ_P²` |
 
-📖 Full synthesis: [`docs/physical-limits-web.md`](docs/physical-limits-web.md) · 🖼️ gallery + certificate ladder: [`figures/physical-limits/`](figures/physical-limits/) (open `index.html`) · ▶️ reproduce: `make physical-limits` · `make physical-limits-figures` · `make verify-certificates`
+These bounds also have a **global shape**. Plot every object — electron to
+supermassive black hole — by mass and radius, and the lower-left is sealed off by two
+of the web's own limits: the **Schwarzschild radius** (pack tighter → black hole) and
+the **Compton wavelength** (localize tighter → the vacuum pair-produces). They cross at
+the **Planck point**, where `R_s·λ_C = 2 ℓ_P²` — a machine-checked identity that holds
+for *every* mass.
+
+<p align="center">
+  <img src="figures/physical-limits/mass_radius.svg" alt="The cosmic mass–radius diagram" width="640"/>
+</p>
+
+📖 Full synthesis: [`docs/physical-limits-web.md`](docs/physical-limits-web.md) · 🧭 why we draw the line where we do: [`docs/epistemics-and-claim-boundaries.md`](docs/epistemics-and-claim-boundaries.md) · 🖼️ gallery + certificate ladder: [`figures/physical-limits/`](figures/physical-limits/) (open `index.html`) · ▶️ reproduce: `make physical-limits` · `make physical-limits-figures` · `make verify-certificates`
 
 > 🧭 **Boundary:** finite-system / semiclassical demonstrations of *established* bounds, each bracketed or machine-checked — not continuum/Millennium claims, not a buildable warp drive or free-energy device.
 
