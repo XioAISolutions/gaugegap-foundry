@@ -102,6 +102,40 @@ for *every* mass.
   <img src="figures/physical-limits/mass_radius.svg" alt="The cosmic mass–radius diagram" width="640"/>
 </p>
 
+### 🪜 The certificate ladder
+
+Every label above is a **discharged Lean 4 / Coq inequality** (single labelled trust input, no `Admitted`, no `sorry`) — re-checked independently by z3 and *compiled* by `coqc` in CI. Twelve of them, stacked:
+
+<p align="center">
+  <img src="figures/physical-limits/ladder.svg" alt="Certificate ladder — twelve machine-checked inequalities" width="720"/>
+</p>
+
+<details>
+<summary>📜 <strong>What a machine-checked certificate actually looks like</strong> (the Compton–Schwarzschild Planck floor, emitted Coq)</summary>
+
+```coq
+Require Import Reals. Require Import Lra. Open Scope R_scope.
+Section ComptonSchwarzschild_Planck.
+Variable Rad Rs Lc : R.
+Hypothesis Rs_pos : Rs > 0.            (* TRUST INPUT 1: positive Schwarzschild radius *)
+Hypothesis Lc_pos : Lc > 0.            (* TRUST INPUT 2: positive Compton wavelength   *)
+Hypothesis not_bh : Rad >= Rs.         (* TRUST INPUT 3: not inside its own horizon    *)
+Hypothesis localizable : Rad >= Lc.    (* TRUST INPUT 4: not below its Compton length  *)
+(* R^2 >= Rs * Lc  (= 2 l_P^2): the Planck-length floor on object size. *)
+Theorem planck_floor : Rad * Rad >= Rs * Lc.
+Proof. nra. Qed.
+End ComptonSchwarzschild_Planck.
+```
+</details>
+
+### 🖼️ The phenomena, one figure each
+
+| | | |
+|:---:|:---:|:---:|
+| <img src="figures/physical-limits/entanglement-dynamics__entanglement_buildup.svg" width="240"/><br/>**Entanglement build-up** `S(t): 0→ln 2` | <img src="figures/physical-limits/entanglement-speed-limit__qsl_floor_vs_coupling.svg" width="240"/><br/>**Quantum speed-limit floor** ∝ 1/coupling | <img src="figures/physical-limits/temporal-double-slit__spectral_fringes.svg" width="240"/><br/>**Time diffraction** → spectral fringes |
+| <img src="figures/physical-limits/decoherence-branching__decoherence_branching.svg" width="240"/><br/>**Decoherence** → `N_eff` branches | <img src="figures/physical-limits/ergotropy__extracted_work.svg" width="240"/><br/>**Ergotropy** saturates (no perpetual motion) | <img src="figures/physical-limits/alcubierre-warp__energy_density_profile.svg" width="240"/><br/>**Warp bubble** needs `ρ ≤ 0` |
+| <img src="figures/physical-limits/cherenkov__cherenkov_cone.svg" width="240"/><br/>**Cherenkov cone** `cos θc = 1/(nβ)` | <img src="figures/physical-limits/lieb-robinson__light_cone.svg" width="240"/><br/>**Lieb–Robinson** linear light cone | <img src="figures/physical-limits/mass_radius.svg" width="240"/><br/>**Mass–radius** Planck-point floor |
+
 📖 Full synthesis: [`docs/physical-limits-web.md`](docs/physical-limits-web.md) · 🧭 why we draw the line where we do: [`docs/epistemics-and-claim-boundaries.md`](docs/epistemics-and-claim-boundaries.md) · 🖼️ gallery + certificate ladder: [`figures/physical-limits/`](figures/physical-limits/) (open `index.html`) · ▶️ reproduce: `make physical-limits` · `make physical-limits-figures` · `make verify-certificates`
 
 > 🧭 **Boundary:** finite-system / semiclassical demonstrations of *established* bounds, each bracketed or machine-checked — not continuum/Millennium claims, not a buildable warp drive or free-energy device.
@@ -115,6 +149,10 @@ probability puzzles and classic inference traps, each reduced to an **exact, bou
 certifiable core** (closed-form, not Monte-Carlo). These live in
 [`gaugegap.decision`](src/gaugegap/decision/) and are deliberately **not** physical-limits members.
 
+<p align="center">
+  <img src="figures/inference-traps/web.svg" alt="The web of inference traps" width="720"/>
+</p>
+
 | Trap | Family | Exactly-computable core |
 |---|---|---|
 | St. Petersburg paradox | heavy tail | naive EV diverges (EVₙ = `n`); bounded-utility CE = `$4`; finite-bankroll EV = `N+1` |
@@ -125,9 +163,28 @@ certifiable core** (closed-form, not Monte-Carlo). These live in
 | Simpson's paradox | confounding | every subgroup favours A, the aggregate favours B |
 | Bayes' theorem | the fix | base-rate fallacy: 99%-accurate test, 0.1% prevalence ⇒ `P(disease\|+) ≈ 1.9%` |
 
+<details>
+<summary>🎲 <strong>Worked example</strong> — run the traps yourself</summary>
+
+```python
+>>> from gaugegap.decision.bayes import analyze_bayes
+>>> analyze_bayes().posterior_positive          # 99% test, 0.1% prevalence
+0.0194...                                        # ~1.9% — not 99%! (base-rate fallacy)
+
+>>> from gaugegap.decision.st_petersburg import analyze_st_petersburg
+>>> r = analyze_st_petersburg()
+>>> r.truncated_ev_sample[40], round(r.log_utility_certainty_equivalent, 6)
+(40.0, 4.0)                                      # naive EV → ∞, but worth exactly $4
+
+>>> from gaugegap.decision.berksons_paradox import selected_correlation
+>>> selected_correlation(0.5, 0.5)               # two independent traits...
+-0.5                                             # ...anti-correlate once you select
+```
+</details>
+
 📖 Synthesis: [`docs/inference-traps.md`](docs/inference-traps.md) · 🧭 the discipline behind it: [`docs/epistemics-and-claim-boundaries.md`](docs/epistemics-and-claim-boundaries.md)
 
-> 🧭 **Boundary:** exact decision-theory / statistics demonstrations; the divergences and resolutions are standard textbook results — not physical bounds, not financial/medical advice. *Excluded:* plain expected value (a building block) and the Hawthorne effect (no exact core; its "quantum observer effect" analogy is a category error).
+> 🧭 **Boundary:** exact decision-theory / statistics demonstrations; the divergences and resolutions are standard textbook results — not physical bounds, not financial/medical advice. *Excluded:* plain expected value (a building block); the **Hawthorne effect** keeps only its certifiable physics cousin — the [quantum Zeno effect](#-the-web-of-physical-limits--gallery) — while the sociological version stays out.
 
 ---
 
