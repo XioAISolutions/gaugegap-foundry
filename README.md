@@ -2,6 +2,12 @@
 
 > **Verification-first AI-for-science infrastructure for Millennium Prize-adjacent finite-system benchmarks.**
 
+<p align="center">
+  <img src="figures/physical-limits/web.svg" alt="The web of physical limits — four currencies, eleven certified phenomena" width="720"/>
+  <br/>
+  <em>Eleven fundamental bounds, each reduced to a single machine-checked inequality, shown to be one structure — trade-offs among <strong>energy · time · information · geometry · mass</strong>. <a href="#-the-web-of-physical-limits--gallery">Jump to the gallery ↓</a></em>
+</p>
+
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![Tests](https://img.shields.io/badge/tests-695%20passing-brightgreen?logo=pytest&logoColor=white)

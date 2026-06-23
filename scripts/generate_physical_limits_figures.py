@@ -35,6 +35,8 @@ MEMBERS = [
     ("Quantum speed limit", "t ≥ τ_QSL", "time ↔ energy", C_TIME),
     ("Temporal double slit", "Δω = 2π/Δt,  σ_tσ_ω ≥ ½",
      "time ↔ frequency", C_TIME),
+    ("Sonification / sampling", "0 < f_s − f < f_s/2  (aliasing fold)",
+     "time ↔ frequency", C_TIME),
     ("Ergotropy / passivity", "0 ≤ W ≤ ⟨H⟩ − E₀",
      "work ↔ entropy", C_ENERGY),
     ("Decoherence / branching", "1 ≤ N_eff ≤ d", "information", C_INFO),
