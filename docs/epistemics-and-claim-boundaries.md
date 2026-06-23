@@ -71,6 +71,35 @@ strip the claim down to the one thing that can be exactly computed and certified
 nothing certifiable here, so the honest output is "out of scope," not a fabricated
 coefficient. That refusal is the system working as designed.
 
+## A worked example of the inner band
+
+The contrast is instructive. Take another viral clip — a "ragebait" explainer of the
+**St. Petersburg paradox**: flip a fair coin until the first tails on flip `k`, win
+`2^k` dollars; the expected value is `Σ (1/2^k)·2^k = Σ 1 = ∞`, so "you should pay any
+price to play." Superficially it is the same genre as the consciousness poster: a short,
+provocative, counter-intuitive hook. But measured against the same bar it lands in the
+**projected/probable** band, because every piece of it is *exactly computable*:
+
+- **The divergence is a real theorem.** The EV truncated at `n` rounds is exactly `n`
+  (each round contributes exactly $1) — it genuinely grows without bound.
+- **Bounded utility gives a finite, exact value.** The log-utility certainty-equivalent
+  is the geometric mean `2^(Σ k/2^k) = 2² = $4` — Bernoulli's own resolution.
+- **A finite bankroll gives a finite, exact EV.** Cap the payout at `2^N` and the EV is
+  exactly `N + 1` dollars.
+
+So this puzzle *earns* a place — not in the physical-limits web (it is decision theory,
+not a physical bound), but as a certified vignette in
+[`gaugegap.decision.st_petersburg`](../src/gaugegap/decision/st_petersburg.py), with
+its claim boundary stated explicitly. The lesson it carries is exactly the epistemic one
+above: naive expected value is not a safe decision rule for unbounded, heavy-tailed
+payoffs — the gap between the infinite naive EV and the finite, exact regularized values
+*is* the paradox.
+
+The two examples are the test in miniature. Same viral genre, opposite verdicts: the
+consciousness poster has no certifiable core and is rejected; the St. Petersburg puzzle
+reduces to exact bounded statements and is kept (in its proper domain, with its
+boundary). **The domain and the boundary are the price of admission, not the hook.**
+
 ## The rule, in one line
 
 > If it can be bracketed, enclosed, or discharged, certify it and state its boundary.
