@@ -122,6 +122,20 @@ def _lieb_robinson(s):
     s.add(z3.Not(vf * t <= vlr * t))
 
 
+def _compton_schwarzschild(s):
+    # Rs>0, Lc>0, R>=Rs, R>=Lc  =>  R^2 >= Rs*Lc   (Planck-length floor on object size)
+    R, Rs, Lc = z3.Reals("R Rs Lc")
+    s.add(Rs > 0, Lc > 0, R >= Rs, R >= Lc)
+    s.add(z3.Not(R * R >= Rs * Lc))
+
+
+def _quantum_zeno(s):
+    # S>=0, Nb>=Na  =>  Na*(Nb-S) >= Nb*(Na-S)   (Zeno survival floor non-decreasing in N)
+    S, Na, Nb = z3.Reals("S Na Nb")
+    s.add(S >= 0, Nb >= Na)
+    s.add(z3.Not(Na * (Nb - S) >= Nb * (Na - S)))
+
+
 _SCHEMAS = [
     ("eigenvalue_bracket", "interval lower <= E0 <= variational upper", _bracket),
     ("speed_limit", "build-up time >= max(Mandelstam-Tamm, Margolus-Levitin)",
@@ -138,6 +152,10 @@ _SCHEMAS = [
      _cherenkov),
     ("lieb_robinson_lightcone", "linear light cone: vf<=vlr, t>=0 => vf*t<=vlr*t",
      _lieb_robinson),
+    ("compton_schwarzschild", "Planck floor: Rs>0,Lc>0,R>=Rs,R>=Lc => R^2>=Rs*Lc",
+     _compton_schwarzschild),
+    ("quantum_zeno", "Zeno floor monotone: S>=0,Nb>=Na => Na*(Nb-S)>=Nb*(Na-S)",
+     _quantum_zeno),
 ]
 
 

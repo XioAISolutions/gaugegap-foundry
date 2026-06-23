@@ -1,8 +1,8 @@
 {
   "all_valid": true,
   "claim_boundary": "automated real-arithmetic cross-check (z3) of the certified-inequality schemas; an independent witness for the discharged Lean/Coq certificates, not a new physical claim",
-  "n_total": 8,
-  "n_verified": 8,
+  "n_total": 13,
+  "n_verified": 13,
   "schemas": [
     {
       "description": "interval lower <= E0 <= variational upper",
@@ -42,6 +42,31 @@
     {
       "description": "Alcubierre rho <= 0 (needs negative energy)",
       "name": "warp_energy_condition",
+      "valid": true
+    },
+    {
+      "description": "aliasing fold: fs/2 < f < fs => 0 < fs-f < fs/2",
+      "name": "nyquist_aliasing",
+      "valid": true
+    },
+    {
+      "description": "cos theta_c = 1/(n beta) valid: nb>=1, c*nb=1 => 0<c<=1",
+      "name": "cherenkov_cone",
+      "valid": true
+    },
+    {
+      "description": "linear light cone: vf<=vlr, t>=0 => vf*t<=vlr*t",
+      "name": "lieb_robinson_lightcone",
+      "valid": true
+    },
+    {
+      "description": "Planck floor: Rs>0,Lc>0,R>=Rs,R>=Lc => R^2>=Rs*Lc",
+      "name": "compton_schwarzschild",
+      "valid": true
+    },
+    {
+      "description": "Zeno floor monotone: S>=0,Nb>=Na => Na*(Nb-S)>=Nb*(Na-S)",
+      "name": "quantum_zeno",
       "valid": true
     }
   ],
