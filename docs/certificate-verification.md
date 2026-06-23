@@ -6,8 +6,25 @@ a proof assistant. This layer adds a second, **automated** witness: an SMT solve
 (z3) independently proves each certified inequality valid over the reals — the negated
 conclusion is unsatisfiable.
 
-So each statement in the [physical-limits web](physical-limits-web.md) now has two
-independent backings: the discharged proof-assistant text *and* an automated z3 proof.
+So each statement in the [physical-limits web](physical-limits-web.md) now has
+**three** independent backings: the discharged proof-assistant text, an automated z3
+proof of the inequality schema, *and* — on the Coq side — the proof actually compiled
+by `coqc`.
+
+## Coq certificates are compiled (not just grep-checked)
+
+`scripts/compile_coq_certificates.py` runs the real Coq compiler `coqc` over every
+emitted `.coq` certificate (both the checked-in artifacts under `results/` and a fresh
+certificate re-emitted from each emitter via `--emit`). The emitted Coq proofs use only
+the Coq standard library (`Reals`, `Lra`; `lra`/`nra`), so a plain `coqc` suffices — no
+Mathlib or opam project. The `compile-coq` CI job installs Coq and runs it on every
+push; `make compile-coq` does the same locally. This turns "discharged-style text,
+grep-checked for `Admitted`" into "the Coq proof compiles." (The Lean certificates stay
+grep + z3, since compiling them needs Mathlib — too heavy for CI.)
+
+```bash
+make compile-coq        # apt-get install coq first; stdlib only
+```
 
 ## What is checked
 
