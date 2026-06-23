@@ -374,11 +374,14 @@ class GaugeGapCompleteWorkflow:
                 print("Hardware submission cancelled.")
                 return []
         
+        # KNOWN LIMITATION / prototype: in-line hardware integration is
+        # explicitly not implemented in this orchestration demo. roadmap: wire
+        # to the provider adapter; for now use provider-specific scripts.
         print("\nNote: Hardware submission requires provider credentials.")
         print("This is a placeholder for actual hardware integration.")
         print("Use provider-specific scripts for real hardware submission.")
-        
-        # Placeholder for hardware results
+
+        # KNOWN LIMITATION / prototype: returns empty results (not real runs).
         hardware_results = []
         self.results["hardware_results"] = hardware_results
         self._save_checkpoint()

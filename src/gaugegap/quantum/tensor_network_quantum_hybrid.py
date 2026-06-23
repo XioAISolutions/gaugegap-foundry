@@ -363,8 +363,13 @@ def hybrid_vqe(
     for _ in range(10):
         # Apply random perturbation
         trial_params = best_params + rng.standard_normal(n_params) * 0.01
-        # Would apply quantum circuit here
-        trial_energy = best_energy  # Placeholder
+        # PROTOTYPE scaffold (known limitation): a real trial energy requires
+        # building the parameterised quantum circuit from trial_params, applying
+        # it to the state, and measuring <H>. That circuit evaluation is not
+        # implemented here, so trial_energy is set equal to best_energy as a
+        # scaffold -- meaning this loop performs no actual optimisation.
+        # Roadmap: implement circuit application + expectation value here.
+        trial_energy = best_energy  # scaffold: no circuit evaluated yet
         if trial_energy < best_energy:
             best_energy = trial_energy
             best_params = trial_params

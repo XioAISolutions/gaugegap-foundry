@@ -93,9 +93,10 @@ class IonQProvider(QuantumProvider):
     
     def _load_backend(self):
         """Lazy-load IonQ backend.
-        
-        Note: This is a placeholder. Actual implementation depends on
-        access method (Qiskit provider, Braket, or direct IonQ API).
+
+        Known limitation: the available access method depends on which optional
+        package is installed (Qiskit IonQ provider preferred, Braket fallback);
+        direct IonQ API access is explicitly not implemented (roadmap).
         """
         if self._backend is not None:
             return self._backend

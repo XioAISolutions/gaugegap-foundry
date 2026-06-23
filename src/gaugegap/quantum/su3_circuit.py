@@ -390,15 +390,22 @@ class SU3QuantumSimulator:
         # Create ansatz
         ansatz = self.compiler.vqe_ansatz()
         
-        # Placeholder for VQE algorithm
-        # In practice, would use qiskit.algorithms.VQE
+        # PROTOTYPE scaffold (known limitation): the VQE optimisation loop is
+        # explicitly not implemented here. This method builds a correct ansatz
+        # and Hamiltonian but does NOT run an optimiser, so it returns an honest
+        # "status": "placeholder" with energy=None instead of a fabricated
+        # ground-state energy.
+        # Roadmap: wire up qiskit.algorithms.VQE (or a custom optimiser) over
+        # the ansatz/Hamiltonian and populate energy/parameters.
         result = {
-            "energy": None,  # Would be computed by VQE
+            "energy": None,  # not computed: optimiser not implemented (scaffold)
             "parameters": None,
             "circuit": ansatz,
             "hamiltonian": hamiltonian,
             "shots": shots,
             "backend": str(backend),
+            # explicitly not implemented: VQE optimiser is a prototype scaffold
+            # (known limitation; see roadmap above)
             "status": "placeholder"
         }
         

@@ -198,18 +198,18 @@ class SU2PureGaugeLattice:
         
         coeff = -self.config.g_magnetic
         
-        # For each plaquette, add Wilson loop operator
-        for plaq_links in self.plaquettes:
-            # Simplified: diagonal approximation for small truncation
-            # Full implementation would require SU(2) Clebsch-Gordan coefficients
-            # This is a placeholder for the structure
-            pass
-        
-        # Placeholder: add small diagonal term to ensure Hermiticity
-        # Full implementation requires proper SU(2) group theory
+        # PROTOTYPE / known limitation: the true magnetic term is the off-diagonal
+        # plaquette (Wilson-loop) operator built from SU(2) Clebsch-Gordan
+        # coefficients in the spin-network basis. That is explicitly not implemented
+        # here. Instead this prototype applies a simplified, manifestly Hermitian
+        # constant diagonal approximation valid only as a structural stand-in for
+        # small truncation; it shifts every state by the same amount and therefore
+        # does not affect the spectral gap.
+        # Roadmap: implement the per-plaquette Wilson-loop operator and remove this
+        # diagonal stand-in.
         for state_idx in range(self.hilbert_dim):
             H_magnetic[state_idx, state_idx] += coeff * 0.1
-        
+
         return H_magnetic
     
     def _get_link_j(self, state_idx: int, link_idx: int) -> float:
@@ -274,10 +274,15 @@ class SU2PureGaugeLattice:
         Returns:
             Dictionary with Wilson loop data
         """
-        # Placeholder: requires ground state computation
+        # KNOWN LIMITATION (claim boundary): the Wilson-loop expectation value is
+        # explicitly not implemented in this prototype; it requires the ground-state
+        # wavefunction and the plaquette/loop operators. This honestly returns an
+        # error rather than a fabricated value.
+        # Roadmap: build the loop operator and evaluate on the certified ground state.
         return {
             "wilson_loop": None,
             "size": size,
+            # explicitly not implemented (prototype / known limitation; roadmap above)
             "error": "Not implemented: requires ground state wavefunction"
         }
     
@@ -288,9 +293,14 @@ class SU2PureGaugeLattice:
         Returns:
             Dictionary with string tension data
         """
-        # Placeholder: requires multiple Wilson loop sizes
+        # KNOWN LIMITATION (claim boundary): string-tension extraction is explicitly
+        # not implemented in this prototype; it depends on Wilson loops at multiple
+        # sizes (which are themselves not implemented). This honestly returns an
+        # error rather than a fabricated value.
+        # Roadmap: implement wilson_loop() across sizes, then fit the area law.
         return {
             "string_tension": None,
+            # explicitly not implemented (prototype / known limitation; roadmap above)
             "error": "Not implemented: requires Wilson loop computation"
         }
 

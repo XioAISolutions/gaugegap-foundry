@@ -324,8 +324,9 @@ class CurveRankCompleteWorkflow:
 
         qpe_results: List[Dict[str, Any]] = []
 
-        # QPE needs a quantum backend; degrade gracefully (no placeholder
-        # success) when the optional qiskit stack is not installed.
+        # KNOWN LIMITATION (prototype): QPE needs a quantum backend; this path
+        # degrades gracefully (no placeholder success) and honestly skips QPE
+        # when the optional qiskit stack is not installed.
         try:
             from qiskit_aer import AerSimulator  # noqa: F401
 

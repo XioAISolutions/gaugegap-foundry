@@ -239,6 +239,8 @@ def main():
         print("    2. Provider credentials")
         print("    3. Hardware readiness verification")
         print()
+        # KNOWN LIMITATION / prototype: hardware integration is explicitly not
+        # implemented in this demo path. roadmap: use the provider adapter.
         print("  This is a placeholder for future hardware integration.")
         print("  Use existing provider adapters for actual submission.")
         print()

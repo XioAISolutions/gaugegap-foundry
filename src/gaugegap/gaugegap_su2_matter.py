@@ -76,7 +76,11 @@ class SU2GaugeMatterLattice:
         if config.matter_type == "staggered_fermion":
             self.dim_matter = 2 ** self.n_sites  # Fermion occupation: 0 or 1 per site
         else:  # scalar
-            self.dim_matter = 3 ** self.n_sites  # Simplified: 3 states per site
+            # PROTOTYPE / known limitation: scalar matter Fock space is truncated to a
+            # toy 3-state-per-site basis (e.g. {-1, 0, +1} occupation). This is a
+            # deliberate truncation, not the full bosonic Fock space.
+            # Roadmap: replace with an occupation cutoff parameter and basis builder.
+            self.dim_matter = 3 ** self.n_sites  # simplified 3-state truncation per site
         
         self.hilbert_dim = self.dim_gauge * self.dim_matter
         
@@ -190,7 +194,11 @@ class SU2GaugeMatterLattice:
                 H_gauge[state_idx, state_idx] += g_sq_half * casimir
         
         # Magnetic term: -1/g^2 sum_p Tr(U_p + U_p^dag)
-        # Simplified diagonal approximation
+        # PROTOTYPE / known limitation: this is a simplified constant diagonal
+        # approximation (a per-plaquette c-number shift), NOT the true off-diagonal
+        # plaquette operator built from SU(2) Clebsch-Gordan coefficients. It only
+        # contributes a uniform energy offset and does not split states.
+        # Roadmap: implement the Wilson-loop operator in the spin-network basis.
         coeff = -1.0 / (self.config.g_gauge ** 2)
         for state_idx in range(self.hilbert_dim):
             H_gauge[state_idx, state_idx] += coeff * 0.1 * self.n_plaquettes
@@ -209,18 +217,24 @@ class SU2GaugeMatterLattice:
                 occupation = self._get_site_occupation(state_idx, site_idx)
                 H_matter[state_idx, state_idx] += m * occupation
         
-        # Kinetic term: hopping between sites (simplified)
-        # Full implementation requires proper fermion/boson statistics
-        
+        # Kinetic (hopping) term: KNOWN LIMITATION (claim boundary): the
+        # nearest-neighbour hopping term is explicitly not implemented in this
+        # prototype; only the diagonal mass term above is present. A correct
+        # implementation requires proper fermion (Jordan-Wigner) / boson statistics.
+        # Roadmap: add gauge-covariant hopping once the link operators are wired in.
+
         return H_matter
     
     def _interaction_term_dense(self) -> np.ndarray:
         """Build gauge-matter interaction term."""
         H_int = np.zeros((self.hilbert_dim, self.hilbert_dim), dtype=complex)
         
-        # Minimal coupling: psi^dag U psi (simplified)
-        # Full implementation requires proper gauge covariant derivative
-        
+        # Minimal coupling psi^dag U psi: KNOWN LIMITATION (claim boundary): the
+        # gauge-matter interaction is explicitly not implemented in this prototype;
+        # this returns a zero operator. A correct term requires the gauge-covariant
+        # derivative built from the link parallel-transport operators.
+        # Roadmap: implement once link U operators exist in the spin-network basis.
+
         return H_int
     
     def _get_link_j(self, state_idx: int, link_idx: int) -> float:
@@ -294,9 +308,14 @@ class SU2GaugeMatterLattice:
         Returns:
             Dictionary with string-breaking data
         """
-        # Placeholder: requires ground state wavefunction
+        # KNOWN LIMITATION (claim boundary): the string-breaking observable is
+        # explicitly not implemented in this prototype; it requires the ground-state
+        # wavefunction. This honestly returns an error rather than a fabricated value.
+        # Roadmap: wire to the certified eigensolver and evaluate the static-charge
+        # potential on the computed ground state.
         return {
             "string_breaking": None,
+            # explicitly not implemented (prototype / known limitation; roadmap above)
             "error": "Not implemented: requires ground state computation"
         }
     
@@ -307,9 +326,14 @@ class SU2GaugeMatterLattice:
         Returns:
             Dictionary with meson masses
         """
-        # Placeholder: requires excited state computation
+        # KNOWN LIMITATION (claim boundary): the meson spectrum is explicitly not
+        # implemented in this prototype; it requires excited-state / two-point
+        # correlator computation. This honestly returns an error rather than a
+        # fabricated value.
+        # Roadmap: compute correlators from the certified eigenstates and fit masses.
         return {
             "meson_masses": None,
+            # explicitly not implemented (prototype / known limitation; roadmap above)
             "error": "Not implemented: requires excited state computation"
         }
 

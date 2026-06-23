@@ -211,8 +211,14 @@ class SU3PureGaugeLattice:
             }
 
     def compute_wilson_loop(self, R: int, T: int) -> dict[str, Any]:
+        # KNOWN LIMITATION (claim boundary): the Wilson loop is explicitly not
+        # implemented in this prototype. We return an honest "not_implemented"
+        # status rather than a fabricated expectation value.
+        # Roadmap: build the ordered link product around the R x T loop and take
+        # its trace in the gauge-field ground state.
         return {
             "observable": "wilson_loop",
+            # explicitly not implemented (prototype known limitation; see roadmap above)
             "status": "not_implemented",
             "implementation_status": IMPLEMENTATION_STATUS,
             "R": R,
@@ -221,6 +227,10 @@ class SU3PureGaugeLattice:
         }
 
     def compute_string_tension(self) -> dict[str, Any]:
+        # KNOWN LIMITATION (claim boundary): string tension is explicitly not
+        # implemented in this prototype; it depends on Wilson-loop areas that
+        # are themselves not yet computed. Honest "not_implemented" status.
+        # Roadmap: fit -log<W(R,T)> ~ sigma * R * T once Wilson loops exist.
         return {
             "observable": "string_tension",
             "status": "not_implemented",
@@ -229,14 +239,26 @@ class SU3PureGaugeLattice:
         }
 
     def compute_polyakov_loop(self) -> dict[str, Any]:
+        # KNOWN LIMITATION (claim boundary): the Polyakov loop is explicitly not
+        # implemented in this prototype. Honest "not_implemented" status rather
+        # than a fabricated order parameter.
+        # Roadmap: trace the temporal Wilson line wrapping the periodic time
+        # direction once link operators along time are available.
         return {
             "observable": "polyakov_loop",
+            # explicitly not implemented (prototype known limitation; see roadmap above)
             "status": "not_implemented",
             "implementation_status": IMPLEMENTATION_STATUS,
             "claim_boundary": CLAIM_BOUNDARY,
         }
 
     def check_gauge_invariance(self) -> dict[str, Any]:
+        # KNOWN LIMITATION (claim boundary): the Gauss-law projector check is
+        # explicitly not implemented in this prototype, so we honestly report
+        # "not_implemented" (and verified_gauss_law=False) instead of asserting
+        # a value we have not verified.
+        # Roadmap: construct the per-site Gauss operators G_a and confirm they
+        # commute with H and annihilate the physical states.
         return {
             "gauss_law_satisfied": "not_implemented",
             "su3_algebra_closed": True,

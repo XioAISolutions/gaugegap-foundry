@@ -368,9 +368,14 @@ def adaptive_ansatz_step(
         # Compute gradient via parameter shift
         shift = np.pi / 2
         
-        # This is a simplified version - full implementation would
-        # properly extend the ansatz
-        gradient = abs(current_energy)  # Placeholder
+        # PROTOTYPE scaffold (known limitation): real ADAPT-VQE operator
+        # selection requires the parameter-shift gradient of the energy with
+        # respect to a newly appended operator, |dE/dtheta| evaluated at
+        # theta=0, i.e. the commutator <psi|[H, A]|psi|. That is not implemented
+        # here; we substitute |current_energy| purely as a scaffold so the
+        # selection loop runs and returns a well-formed result.
+        # Roadmap: compute per-operator parameter-shift gradients and pool them.
+        gradient = abs(current_energy)  # scaffold proxy, not the true gradient
         
         if abs(gradient) > abs(best_gradient):
             best_gradient = gradient
