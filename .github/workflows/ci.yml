@@ -148,6 +148,8 @@ jobs:
         run: python scripts/run_sonification.py --output-dir results/sonification
       - name: Cherenkov cone smoke
         run: python scripts/run_cherenkov.py --n-sources 200 --output-dir results/cherenkov
+      - name: Lieb-Robinson light-cone smoke
+        run: python scripts/run_lieb_robinson.py --n-sites 31 --output-dir results/lieb-robinson
 
   packaging:
     runs-on: ubuntu-latest

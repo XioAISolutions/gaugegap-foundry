@@ -78,6 +78,7 @@ discharged Lean 4 / Coq inequality (independently re-checked by z3). They turn o
 | Bekenstein bound | info ↔ energy ↔ geometry | `S ≤ 2π R E` |
 | Alcubierre energy cond. | energy ↔ geometry | `ρ ≤ 0` (needs negative energy) |
 | Cherenkov cone | velocity ↔ geometry | `cos θc = 1/(nβ)`, `β > 1/n` |
+| Lieb–Robinson cone | information ↔ time | `x(t) ≤ v_LR·t + ξ` |
 
 📖 Full synthesis: [`docs/physical-limits-web.md`](docs/physical-limits-web.md) · 🖼️ gallery + certificate ladder: [`figures/physical-limits/`](figures/physical-limits/) (open `index.html`) · ▶️ reproduce: `make physical-limits` · `make physical-limits-figures` · `make verify-certificates`
 
