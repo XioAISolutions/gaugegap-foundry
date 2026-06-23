@@ -137,6 +137,32 @@ jobs:
       - name: z3-verify every certified-inequality schema
         run: python scripts/verify_certificates.py --output-dir /tmp/smt-verification
 
+  compile-coq:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Coq (standard library only; no Mathlib)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y coq
+          coqc --version
+
+      - name: Install package (for the certificate emitters used by --emit)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+
+      - name: Compile every emitted Coq certificate with coqc
+        run: python scripts/compile_coq_certificates.py --emit
+
   test-quantum-infrastructure:
     runs-on: ubuntu-latest
 
