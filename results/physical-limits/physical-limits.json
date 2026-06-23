@@ -108,6 +108,7 @@
     "respects_cone": true,
     "v_lr": 2.718281828459045
   },
+  "operator_bridge": null,
   "speed_limit": {
     "buildup_time": 0.2986155060581428,
     "claim_boundary": "finite-model entanglement build-up bounded below by the Mandelstam-Tamm / Margolus-Levitin quantum speed limit (machine-checked inequality); NOT a reproduction of the helium experiment or the 232 as figure; physical time illustrative; not a continuum/Millennium claim",

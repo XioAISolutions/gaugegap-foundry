@@ -240,6 +240,7 @@ def main():
         print("    3. Hardware readiness verification")
         print()
         print("  This is a placeholder for future hardware integration.")
+        # prototype scaffold; known limitation (hardware path is not implemented here)
         print("  Use existing provider adapters for actual submission.")
         print()
     

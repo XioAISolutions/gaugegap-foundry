@@ -76,7 +76,7 @@ class SU2GaugeMatterLattice:
         if config.matter_type == "staggered_fermion":
             self.dim_matter = 2 ** self.n_sites  # Fermion occupation: 0 or 1 per site
         else:  # scalar
-            self.dim_matter = 3 ** self.n_sites  # Simplified: 3 states per site
+            self.dim_matter = 3 ** self.n_sites  # Simplified: 3 states/site (prototype scaffold; known limitation)
         
         self.hilbert_dim = self.dim_gauge * self.dim_matter
         
@@ -190,7 +190,7 @@ class SU2GaugeMatterLattice:
                 H_gauge[state_idx, state_idx] += g_sq_half * casimir
         
         # Magnetic term: -1/g^2 sum_p Tr(U_p + U_p^dag)
-        # Simplified diagonal approximation
+        # Simplified diagonal approximation (prototype scaffold; known limitation)
         coeff = -1.0 / (self.config.g_gauge ** 2)
         for state_idx in range(self.hilbert_dim):
             H_gauge[state_idx, state_idx] += coeff * 0.1 * self.n_plaquettes
@@ -209,8 +209,8 @@ class SU2GaugeMatterLattice:
                 occupation = self._get_site_occupation(state_idx, site_idx)
                 H_matter[state_idx, state_idx] += m * occupation
         
-        # Kinetic term: hopping between sites (simplified)
-        # Full implementation requires proper fermion/boson statistics
+        # Kinetic term: hopping between sites (simplified; prototype scaffold)
+        # Full implementation requires proper fermion/boson statistics (known limitation)
         
         return H_matter
     
@@ -218,8 +218,8 @@ class SU2GaugeMatterLattice:
         """Build gauge-matter interaction term."""
         H_int = np.zeros((self.hilbert_dim, self.hilbert_dim), dtype=complex)
         
-        # Minimal coupling: psi^dag U psi (simplified)
-        # Full implementation requires proper gauge covariant derivative
+        # Minimal coupling: psi^dag U psi (simplified; prototype scaffold)
+        # Full implementation requires proper gauge covariant derivative (known limitation)
         
         return H_int
     
@@ -294,7 +294,7 @@ class SU2GaugeMatterLattice:
         Returns:
             Dictionary with string-breaking data
         """
-        # Placeholder: requires ground state wavefunction
+        # Placeholder: requires ground state wavefunction (prototype scaffold; known limitation)
         return {
             "string_breaking": None,
             "error": "Not implemented: requires ground state computation"
@@ -307,7 +307,7 @@ class SU2GaugeMatterLattice:
         Returns:
             Dictionary with meson masses
         """
-        # Placeholder: requires excited state computation
+        # Placeholder: requires excited state computation (prototype scaffold; known limitation)
         return {
             "meson_masses": None,
             "error": "Not implemented: requires excited state computation"

@@ -200,12 +200,12 @@ class SU2PureGaugeLattice:
         
         # For each plaquette, add Wilson loop operator
         for plaq_links in self.plaquettes:
-            # Simplified: diagonal approximation for small truncation
+            # Simplified: diagonal approximation for small truncation (prototype scaffold; known limitation)
             # Full implementation would require SU(2) Clebsch-Gordan coefficients
             # This is a placeholder for the structure
             pass
-        
-        # Placeholder: add small diagonal term to ensure Hermiticity
+
+        # Placeholder: add small diagonal term to ensure Hermiticity (prototype scaffold; known limitation)
         # Full implementation requires proper SU(2) group theory
         for state_idx in range(self.hilbert_dim):
             H_magnetic[state_idx, state_idx] += coeff * 0.1
@@ -274,11 +274,11 @@ class SU2PureGaugeLattice:
         Returns:
             Dictionary with Wilson loop data
         """
-        # Placeholder: requires ground state computation
+        # Placeholder: requires ground state computation (prototype scaffold; known limitation)
         return {
             "wilson_loop": None,
             "size": size,
-            "error": "Not implemented: requires ground state wavefunction"
+            "error": "Not implemented: requires ground state wavefunction",  # known limitation
         }
     
     def string_tension(self) -> Dict:
@@ -288,7 +288,7 @@ class SU2PureGaugeLattice:
         Returns:
             Dictionary with string tension data
         """
-        # Placeholder: requires multiple Wilson loop sizes
+        # Placeholder: requires multiple Wilson loop sizes (prototype scaffold; known limitation)
         return {
             "string_tension": None,
             "error": "Not implemented: requires Wilson loop computation"

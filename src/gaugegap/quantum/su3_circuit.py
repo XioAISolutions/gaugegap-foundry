@@ -390,7 +390,7 @@ class SU3QuantumSimulator:
         # Create ansatz
         ansatz = self.compiler.vqe_ansatz()
         
-        # Placeholder for VQE algorithm
+        # Placeholder for VQE algorithm (prototype scaffold; known limitation)
         # In practice, would use qiskit.algorithms.VQE
         result = {
             "energy": None,  # Would be computed by VQE
@@ -399,7 +399,7 @@ class SU3QuantumSimulator:
             "hamiltonian": hamiltonian,
             "shots": shots,
             "backend": str(backend),
-            "status": "placeholder"
+            "status": "placeholder",  # prototype scaffold; known limitation
         }
         
         return result

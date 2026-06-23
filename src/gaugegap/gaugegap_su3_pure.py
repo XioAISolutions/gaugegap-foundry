@@ -213,7 +213,7 @@ class SU3PureGaugeLattice:
     def compute_wilson_loop(self, R: int, T: int) -> dict[str, Any]:
         return {
             "observable": "wilson_loop",
-            "status": "not_implemented",
+            "status": "not_implemented",  # explicitly not implemented (prototype scaffold; known limitation)
             "implementation_status": IMPLEMENTATION_STATUS,
             "R": R,
             "T": T,
@@ -223,7 +223,7 @@ class SU3PureGaugeLattice:
     def compute_string_tension(self) -> dict[str, Any]:
         return {
             "observable": "string_tension",
-            "status": "not_implemented",
+            "status": "not_implemented",  # explicitly not implemented (prototype scaffold; known limitation)
             "implementation_status": IMPLEMENTATION_STATUS,
             "claim_boundary": CLAIM_BOUNDARY,
         }
@@ -231,14 +231,14 @@ class SU3PureGaugeLattice:
     def compute_polyakov_loop(self) -> dict[str, Any]:
         return {
             "observable": "polyakov_loop",
-            "status": "not_implemented",
+            "status": "not_implemented",  # explicitly not implemented (prototype scaffold; known limitation)
             "implementation_status": IMPLEMENTATION_STATUS,
             "claim_boundary": CLAIM_BOUNDARY,
         }
 
     def check_gauge_invariance(self) -> dict[str, Any]:
         return {
-            "gauss_law_satisfied": "not_implemented",
+            "gauss_law_satisfied": "not_implemented",  # explicitly not implemented (prototype scaffold; known limitation)
             "su3_algebra_closed": True,
             "hermiticity_checked_in_compute_gap": True,
             "verified_gauss_law": False,

@@ -511,44 +511,26 @@ def quantum_speed_limit(
     -------
     dict
         Speed limit bounds
+
+    Notes
+    -----
+    Single source of truth: this delegates to
+    ``gaugegap.quantum.entanglement_speed_limit.quantum_speed_limit`` (the canonical
+    Mandelstam-Tamm / Margolus-Levitin implementation used by the physical-limits web)
+    and re-keys the result to this module's historical dict shape.
     """
-    # Distance between states
-    fidelity = abs(np.vdot(target_state, initial_state))**2
-    distance = np.arccos(np.sqrt(fidelity))
-    
-    # Energy expectation and variance
-    H_psi = hamiltonian @ initial_state
-    E_avg = np.real(np.vdot(initial_state, H_psi))
-    E2_avg = np.real(np.vdot(initial_state, hamiltonian @ H_psi))
-    Delta_E = np.sqrt(E2_avg - E_avg**2)
-    
-    # Ground state energy
-    eigenvalues = np.linalg.eigvalsh(hamiltonian)
-    E_min = eigenvalues[0]
-    E_above_ground = E_avg - E_min
-    
-    # Mandelstam-Tamm bound
-    if Delta_E > 1e-10:
-        tau_MT = distance / Delta_E
-    else:
-        tau_MT = np.inf
-    
-    # Margolus-Levitin bound
-    if E_above_ground > 1e-10:
-        tau_ML = distance / E_above_ground
-    else:
-        tau_ML = np.inf
-    
-    # Actual bound
-    tau_QSL = max(tau_MT, tau_ML)
-    
+    from gaugegap.quantum.entanglement_speed_limit import (
+        quantum_speed_limit as _canonical_qsl,
+    )
+
+    r = _canonical_qsl(hamiltonian, initial_state, target_state)
     return {
-        "mandelstam_tamm_bound": float(tau_MT),
-        "margolus_levitin_bound": float(tau_ML),
-        "quantum_speed_limit": float(tau_QSL),
-        "state_distance": float(distance),
-        "energy_uncertainty": float(Delta_E),
-        "energy_above_ground": float(E_above_ground),
+        "mandelstam_tamm_bound": float(r["tau_mandelstam_tamm"]),
+        "margolus_levitin_bound": float(r["tau_margolus_levitin"]),
+        "quantum_speed_limit": float(r["tau_qsl"]),
+        "state_distance": float(r["angle"]),
+        "energy_uncertainty": float(r["energy_uncertainty"]),
+        "energy_above_ground": float(r["energy_above_ground"]),
     }
 
 

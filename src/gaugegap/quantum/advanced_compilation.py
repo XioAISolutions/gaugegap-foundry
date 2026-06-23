@@ -170,7 +170,7 @@ def solovay_kitaev_single_qubit(
         
         # Find V such that U ≈ U_n V U_n^† V^†
         # Simplified: use random group commutator
-        V_seq = [0]  # Placeholder
+        V_seq = [0]  # Placeholder (prototype scaffold; known limitation)
         
         return U_n_seq + V_seq + U_n_seq + V_seq
     
@@ -234,7 +234,8 @@ def kak_decomposition(
     (real, non-negative) SVD singular values, which is identically 0 -- and bogus
     single-qubit blocks. Rather than ship a coordinate solver that is wrong at
     chamber corners (e.g. SWAP), this exposes only the robustly-correct local
-    invariants and flags the rest as not implemented.
+    invariants and flags the rest as explicitly not implemented (known limitation;
+    prototype scaffold).
 
     Parameters
     ----------
@@ -273,7 +274,7 @@ def kak_decomposition(
         "makhlin_invariants": {"G1": complex(g1), "G2": complex(g2)},
         "is_entangling": not is_local,
         # Honest about scope: the local-equivalence class is exact; the canonical
-        # coordinates / local gates are not extracted here.
+        # coordinates / local gates are not extracted here (known limitation; prototype scaffold).
         "canonical_coordinates": {"status": "not_implemented"},
         "single_qubit_unitaries": {"status": "not_implemented"},
     }
