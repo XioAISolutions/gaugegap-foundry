@@ -264,7 +264,7 @@ def partial_trace(
 def _permute_qubits(rho: np.ndarray, perm: List[int], n_qubits: int) -> np.ndarray:
     """Permute qubits in density matrix."""
     # This is a simplified version - full implementation would use tensor reshaping
-    return rho  # Placeholder
+    return rho  # Placeholder (prototype scaffold; known limitation)
 
 
 def negativity(rho: np.ndarray, subsystem_qubits: List[int], total_qubits: int) -> EntanglementResult:

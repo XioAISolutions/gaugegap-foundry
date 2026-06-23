@@ -364,7 +364,7 @@ def hybrid_vqe(
         # Apply random perturbation
         trial_params = best_params + rng.standard_normal(n_params) * 0.01
         # Would apply quantum circuit here
-        trial_energy = best_energy  # Placeholder
+        trial_energy = best_energy  # Placeholder (prototype scaffold; known limitation)
         if trial_energy < best_energy:
             best_energy = trial_energy
             best_params = trial_params

@@ -370,7 +370,7 @@ def adaptive_ansatz_step(
         
         # This is a simplified version - full implementation would
         # properly extend the ansatz
-        gradient = abs(current_energy)  # Placeholder
+        gradient = abs(current_energy)  # Placeholder (prototype scaffold; known limitation)
         
         if abs(gradient) > abs(best_gradient):
             best_gradient = gradient

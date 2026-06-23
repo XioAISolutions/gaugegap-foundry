@@ -377,7 +377,7 @@ class GaugeGapCompleteWorkflow:
         print("\nNote: Hardware submission requires provider credentials.")
         print("This is a placeholder for actual hardware integration.")
         print("Use provider-specific scripts for real hardware submission.")
-        
+        # prototype scaffold; known limitation (hardware path is not implemented here)
         # Placeholder for hardware results
         hardware_results = []
         self.results["hardware_results"] = hardware_results

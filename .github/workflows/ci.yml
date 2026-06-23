@@ -27,6 +27,8 @@ jobs:
         run: python -m pytest
       - name: Claim boundary audit
         run: python scripts/claim_boundary_audit.py --strict --output-dir /tmp/gaugegap-claim-audit
+      - name: Research maturity audit (no unbounded prototype/placeholder claims)
+        run: python scripts/research_maturity_audit.py --strict --output-dir /tmp/gaugegap-maturity-audit
       - name: gaugegap-search-0001 smoke
         run: |
           python scripts/search_gap_candidates.py \

@@ -270,7 +270,7 @@ def build_qpe_circuit_trotter(
     is ``controlled-exp(-i H * tau * 2^k)`` realised with a
     :class:`~qiskit.circuit.library.PauliEvolutionGate` (Lie-Trotter synthesis)
     instead of a dense controlled unitary. The Trotter step count is scaled with
-    the evolution time (``reps * 2^k``) so the approximation error stays roughly
+    the evolution time (``reps * 2^k``) so the Trotter synthesis error stays roughly
     uniform across the precision register -- the higher-order bits, which use the
     longest evolutions, get proportionally more steps.
 

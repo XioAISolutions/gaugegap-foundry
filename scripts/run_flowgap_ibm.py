@@ -105,7 +105,7 @@ def classical_intermediate_velocity(
     Returns:
         (u_star, v_star): Intermediate velocity fields
     """
-    # Simplified: just add viscous diffusion
+    # Simplified: just add viscous diffusion (prototype scaffold; known limitation)
     u_star = u.copy()
     v_star = v.copy()
     
@@ -175,7 +175,7 @@ def build_vqls_circuit(
     
     qc = QuantumCircuit(n_qubits)
     
-    # Initial state preparation (simplified)
+    # Initial state preparation (simplified; prototype scaffold, known limitation)
     for i in range(n_qubits):
         qc.h(i)
     
@@ -183,7 +183,7 @@ def build_vqls_circuit(
     for layer in range(n_layers):
         # Rotation layer
         for i in range(n_qubits):
-            qc.ry(0.1 * (layer + 1), i)  # Placeholder parameters
+            qc.ry(0.1 * (layer + 1), i)  # Placeholder parameters (prototype scaffold; known limitation)
             qc.rz(0.1 * (layer + 1), i)
         
         # Entangling layer
@@ -332,7 +332,7 @@ def run_flowgap_benchmark(
     # 2. Compute residual and divergence
     # 3. Compare with classical solution
     
-    # Placeholder metrics
+    # Placeholder metrics (prototype scaffold; known limitation)
     metrics = {
         "nx": nx,
         "ny": ny,
