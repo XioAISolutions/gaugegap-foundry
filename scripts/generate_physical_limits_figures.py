@@ -49,6 +49,8 @@ MEMBERS = [
     ("Lieb–Robinson cone", "x(t) ≤ v_LR·t + ξ", "information ↔ time", C_INFO),
     ("Compton–Schwarzschild", "R² ≥ R_s·λ_C = 2 l_P²",
      "mass ↔ geometry", C_GEOM),
+    ("Quantum Zeno", "survival ≥ 1 − (ΔE·T)²/N → 1",
+     "measurement ↔ time", C_TIME),
 ]
 
 # module result SVGs to pull into the gallery: (results path, caption)

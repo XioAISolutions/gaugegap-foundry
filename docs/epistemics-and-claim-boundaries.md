@@ -105,9 +105,15 @@ a companion to the physical-limits web, collecting the decision-theory and stati
 "mind-benders" (power laws, survivorship bias / Wald's bombers, Berkson's and Simpson's
 paradoxes, regression to the mean, with Bayes as the corrective) that each reduce to an
 exact, bounded, certifiable core in [`gaugegap.decision`](../src/gaugegap/decision/).
-Two viral puzzles are *excluded* and documented as such: plain **expected value** (a
-building block, not a trap) and the **Hawthorne effect** (no exact core, and its
-"quantum observer effect" analogy is a category error the claim-boundary audit rejects).
+Plain **expected value** is *excluded* as a standalone (a building block, not a trap).
+The **Hawthorne effect** ("being observed changes behaviour") is a more interesting case
+of the boundary at work: as *sociology* it has no exact core and is not certified — and
+naively equating it with quantum measurement would be a category error. But its rigorous
+*physical cousin* does exist and now lives in the physics web as the **quantum Zeno
+effect** ([`gaugegap.quantum.quantum_zeno`](../src/gaugegap/quantum/quantum_zeno.py)):
+frequent measurement provably freezes a quantum system, survival `≥ 1 − (ΔE·T)²/N → 1`.
+The lesson is the discipline itself — keep the certifiable physics, in its own domain,
+with the analogy to the human-behaviour effect explicitly bounded rather than asserted.
 
 ## The rule, in one line
 

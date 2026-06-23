@@ -3,9 +3,9 @@
 > **Verification-first AI-for-science infrastructure for Millennium Prize-adjacent finite-system benchmarks.**
 
 <p align="center">
-  <img src="figures/physical-limits/web.svg" alt="The web of physical limits — four currencies, eleven certified phenomena" width="720"/>
+  <img src="figures/physical-limits/web.svg" alt="The web of physical limits — twelve certified phenomena" width="720"/>
   <br/>
-  <em>Eleven fundamental bounds, each reduced to a single machine-checked inequality, shown to be one structure — trade-offs among <strong>energy · time · information · geometry · mass</strong>. <a href="#-the-web-of-physical-limits--gallery">Jump to the gallery ↓</a></em>
+  <em>Twelve fundamental bounds, each reduced to a single machine-checked inequality, shown to be one structure — trade-offs among <strong>energy · time · information · geometry · mass · measurement</strong>. <a href="#-the-web-of-physical-limits--gallery">Jump to the gallery ↓</a></em>
 </p>
 
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)
@@ -87,6 +87,9 @@ discharged Lean 4 / Coq inequality (independently re-checked by z3). They turn o
 | Cherenkov cone | velocity ↔ geometry | `cos θc = 1/(nβ)`, `β > 1/n` |
 | Lieb–Robinson cone | information ↔ time | `x(t) ≤ v_LR·t + ξ` |
 | Compton–Schwarzschild | mass ↔ geometry | `R² ≥ R_s·λ_C = 2 ℓ_P²` |
+| Quantum Zeno effect | measurement ↔ time | survival `≥ 1 − (ΔE·T)²/N → 1` |
+
+> 👁️ **"A watched quantum pot never boils."** The Zeno member is the rigorous *physical cousin* of the Hawthorne effect ("being observed changes behaviour"): frequent measurement provably freezes a quantum system's evolution. The sociological Hawthorne effect itself stays out (no exact core); only its certifiable physics counterpart earns a place — see [`gaugegap.quantum.quantum_zeno`](src/gaugegap/quantum/quantum_zeno.py).
 
 These bounds also have a **global shape**. Plot every object — electron to
 supermassive black hole — by mass and radius, and the lower-left is sealed off by two

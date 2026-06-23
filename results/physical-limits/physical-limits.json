@@ -43,6 +43,8 @@
     "landauer_lean": "import Mathlib.Tactic\n\nnamespace Landauer.WErase\n\n/-- Boltzmann constant kB, temperature T, entropy drop dS, and one-bit entropy\n    b = ln 2 (nats) -- abstract reals; only the labelled trust facts are used. -/\naxiom kB : \u211d\naxiom T : \u211d\naxiom dS : \u211d\naxiom b : \u211d\n\n/-- TRUST INPUT 1 -- positive Boltzmann constant. -/\naxiom kB_pos : kB > 0\n/-- TRUST INPUT 2 -- positive temperature. -/\naxiom T_pos : T > 0\n/-- TRUST INPUT 3 -- at least one bit erased: dS >= b (b = ln 2). -/\naxiom dS_bit : dS \u2265 b\n\n/-- Erasing at least one bit costs at least kB*T*b = k_B T ln 2 (no holes). -/\ntheorem landauer_floor : kB * T * dS \u2265 kB * T * b := by\n  have hkt : (0:\u211d) \u2264 kB * T := le_of_lt (mul_pos kB_pos T_pos)\n  nlinarith [mul_le_mul_of_nonneg_left dS_bit hkt]\n\nend Landauer.WErase\n",
     "lieb_robinson_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection LiebRobinson_Front.\n\nVariable vf vlr t : R.\n\n(* TRUST INPUT 1: front velocity respects the Lieb-Robinson speed. *)\nHypothesis front_bounded : vf <= vlr.\n(* TRUST INPUT 2: time is non-negative. *)\nHypothesis time_nonneg : t >= 0.\n\nTheorem light_cone : vf * t <= vlr * t.\nProof. nra. Qed.\n\nEnd LiebRobinson_Front.\n",
     "lieb_robinson_lean": "import Mathlib.Tactic\n\nnamespace LiebRobinson.Front\n\n/-- Measured front velocity vf, Lieb-Robinson speed vlr, and time t (abstract). -/\naxiom vf : \u211d\naxiom vlr : \u211d\naxiom t : \u211d\n\n/-- TRUST INPUT 1 -- the front velocity respects the Lieb-Robinson speed. -/\naxiom front_bounded : vf \u2264 vlr\n/-- TRUST INPUT 2 -- time is non-negative. -/\naxiom time_nonneg : t \u2265 0\n\n/-- The information front stays inside the linear light cone (no holes). -/\ntheorem light_cone : vf * t \u2264 vlr * t := by\n  nlinarith [front_bounded, time_nonneg]\n\nend LiebRobinson.Front\n",
+    "quantum_zeno_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection QuantumZeno_Watched.\n\n(* disturbance scale Sdist = (dE T)^2, measurement counts Na, Nb. *)\nVariable Sdist Na Nb : R.\n\n(* TRUST INPUT 1: non-negative disturbance scale. *)\nHypothesis Sdist_nonneg : Sdist >= 0.\n(* TRUST INPUT 2: Nb measures at least as often as Na. *)\nHypothesis more_often : Nb >= Na.\n\n(* The Zeno survival floor is non-decreasing in N (denominators cleared):\n   Na*(Nb - Sdist) >= Nb*(Na - Sdist), i.e. B(Nb) >= B(Na). *)\nTheorem zeno_floor_monotone : Na * (Nb - Sdist) >= Nb * (Na - Sdist).\nProof. nra. Qed.\n\nEnd QuantumZeno_Watched.\n",
+    "quantum_zeno_lean": "import Mathlib.Tactic\n\nnamespace QuantumZeno.Watched\n\n/-- Disturbance scale S = (dE T)^2 and two measurement counts N1, N2 (abstract reals). -/\naxiom S : \u211d\naxiom N1 : \u211d\naxiom N2 : \u211d\n\n/-- TRUST INPUT 1 -- the disturbance scale is non-negative. -/\naxiom S_nonneg : S \u2265 0\n/-- TRUST INPUT 2 -- N2 measures at least as often as N1. -/\naxiom more_often : N2 \u2265 N1\n\n/-- The Zeno survival floor is non-decreasing in N (denominators cleared):\n    N1*(N2 - S) \u2265 N2*(N1 - S), i.e. B(N2) \u2265 B(N1). -/\ntheorem zeno_floor_monotone : N1 * (N2 - S) \u2265 N2 * (N1 - S) := by\n  nlinarith [S_nonneg, more_often]\n\nend QuantumZeno.Watched\n",
     "speed_limit_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection SpeedLimit_TBuildup.\n\nVariable t : R.\n\n(* TRUST INPUT 1: Mandelstam-Tamm quantum speed limit. *)\nHypothesis mandelstam_tamm : t >= 0.2986155060581427.\n(* TRUST INPUT 2: Margolus-Levitin quantum speed limit. *)\nHypothesis margolus_levitin : t >= 0.2986155060581427.\n\nTheorem respects_qsl : t >= 0.2986155060581427.\nProof. lra. Qed.\n\nEnd SpeedLimit_TBuildup.\n",
     "speed_limit_lean": "import Mathlib.Tactic\n\nnamespace SpeedLimit.TBuildup\n\n/-- The entanglement build-up time t (abstract); only the QSL facts are used. -/\naxiom t : \u211d\n\n/-- TRUST INPUT 1 -- Mandelstam-Tamm quantum speed limit. -/\naxiom mandelstam_tamm : t \u2265 0.2986155060581427\n\n/-- TRUST INPUT 2 -- Margolus-Levitin quantum speed limit. -/\naxiom margolus_levitin : t \u2265 0.2986155060581427\n\n/-- The build-up time respects the tighter QSL floor (no holes). -/\ntheorem respects_qsl : t \u2265 0.2986155060581427 := by\n  linarith [mandelstam_tamm, margolus_levitin]\n\nend SpeedLimit.TBuildup\n",
     "temporal_double_slit_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection TimeBandwidth_Tb.\n\n(* Temporal width st and spectral width sw. *)\nVariable st sw : R.\n\n(* TRUST INPUT: Fourier uncertainty (Gabor), denominator cleared:\n   sw * (2 * st) >= 1  (i.e. sw >= 1 / (2 st)). *)\nHypothesis fourier_uncertainty : sw * (2 * st) >= 1.\n\nTheorem time_bandwidth : st * sw >= 1 / 2.\nProof. nra. Qed.\n\nEnd TimeBandwidth_Tb.\n",
@@ -58,6 +60,7 @@
     "ergotropy_no_free_energy": true,
     "landauer_cost_positive": true,
     "lieb_robinson_lightcone": true,
+    "quantum_zeno_freezes": true,
     "speed_limit_respected": true,
     "time_frequency_duality": true,
     "warp_needs_negative_energy": true
@@ -124,6 +127,37 @@
     "n_sites": 41,
     "respects_cone": true,
     "v_lr": 2.718281828459045
+  },
+  "quantum_zeno": {
+    "approaches_unity": true,
+    "bound_increases": true,
+    "bound_respected": true,
+    "claim_boundary": "quantum Zeno effect for a finite-dimensional system under ideal projective measurement; the rigorous PHYSICAL namesake of the sociological Hawthorne effect, NOT an identification with it; not continuous weak measurement, a specific experiment, or apparatus noise",
+    "energy_uncertainty": 1.0,
+    "kind": "quantum_zeno_effect",
+    "lower_bound": [
+      0.0,
+      0.5,
+      0.8,
+      0.96,
+      0.992
+    ],
+    "n_measurements": [
+      4,
+      8,
+      20,
+      100,
+      500
+    ],
+    "survival": [
+      0.351806516497099,
+      0.6033264695089973,
+      0.8184571585734236,
+      0.9607868767772434,
+      0.9920318936736318
+    ],
+    "survival_increases": true,
+    "total_time": 2.0
   },
   "speed_limit": {
     "buildup_time": 0.2986155060581428,

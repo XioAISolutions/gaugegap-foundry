@@ -26,7 +26,8 @@ class TestPhysicalLimitsCapstone(unittest.TestCase):
                          "landauer_cost_positive", "bekenstein_respected",
                          "warp_needs_negative_energy", "cherenkov_cone_valid",
                          "lieb_robinson_lightcone",
-                         "compton_schwarzschild_planck_floor"):
+                         "compton_schwarzschild_planck_floor",
+                         "quantum_zeno_freezes"):
                 self.assertTrue(payload["checks"][name], name)
             # every certificate is hole-free
             for k, cert in payload["certificates"].items():

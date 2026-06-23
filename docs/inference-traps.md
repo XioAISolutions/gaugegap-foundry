@@ -63,8 +63,13 @@ note as the negative control: no certifiable core, so no place here.
 
 - **Expected value** as such is a *building block*, not a trap; it appears throughout
   (and is precisely what St. Petersburg stress-tests), so it gets no standalone module.
-- **The Hawthorne effect** (being observed changes behaviour) has no clean exact core,
-  and the tempting analogy to quantum measurement back-action is a *category error* —
-  one is a psychological/Heisenberg-of-sociology effect, the other a physical property
-  of non-commuting observables. Conflating them would be exactly the kind of false
-  analogy the claim-boundary audit exists to stop, so it is discussed, not certified.
+- **The Hawthorne effect** (being observed changes behaviour) has no clean exact core
+  *as sociology*, so it is not certified here. Its tempting equation with quantum
+  measurement is a *category error* — one is a study-design effect on human behaviour,
+  the other a physical property of non-commuting observables. The honest resolution is
+  to certify the **physics**, not the metaphor: the rigorous cousin of "observation
+  changes the system" lives in the physical-limits web as the
+  [quantum Zeno effect](physical-limits-web.md) — frequent measurement provably freezes
+  evolution (`survival ≥ 1 − (ΔE·T)²/N → 1`,
+  [`gaugegap.quantum.quantum_zeno`](../src/gaugegap/quantum/quantum_zeno.py)) — with the
+  analogy to the human-behaviour effect explicitly bounded, never asserted.

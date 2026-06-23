@@ -63,6 +63,8 @@ def _fresh_emitted_certs() -> list[tuple[str, str]]:
     )
     out.append(("compton_schwarzschild",
                 emit_compton_schwarzschild_certificate("planck", 1.0, 2.0)[1]))
+    from gaugegap.quantum.quantum_zeno import emit_zeno_certificate
+    out.append(("quantum_zeno", emit_zeno_certificate("watched", 1.0, 1.0, 5.0)[1]))
     return out
 
 
