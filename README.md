@@ -105,6 +105,29 @@ for *every* mass.
 
 ---
 
+## 🎲 The web of inference traps — decision theory, certified
+
+The same move, applied to the *statistics* genre instead of physics: viral "mind-bender"
+probability puzzles and classic inference traps, each reduced to an **exact, bounded,
+certifiable core** (closed-form, not Monte-Carlo). These live in
+[`gaugegap.decision`](src/gaugegap/decision/) and are deliberately **not** physical-limits members.
+
+| Trap | Family | Exactly-computable core |
+|---|---|---|
+| St. Petersburg paradox | heavy tail | naive EV diverges (EVₙ = `n`); bounded-utility CE = `$4`; finite-bankroll EV = `N+1` |
+| Power law | heavy tail | scale-free tail `P(X>cx)/P(X>x)=c^{−α}`; `E[Xᵐ]=∞ ⟺ m≥α` |
+| Regression to the mean | conditioning | `E[Y\|X=x]=ρx`: selected extremes regress by `1−ρ` |
+| Survivorship bias (Wald) | selection | survivor hit-rate `p(1−kill)`: "armor the holes" is exactly backwards |
+| Berkson's paradox | collider | independent traits → corr `−1/2` once you condition on selection |
+| Simpson's paradox | confounding | every subgroup favours A, the aggregate favours B |
+| Bayes' theorem | the fix | base-rate fallacy: 99%-accurate test, 0.1% prevalence ⇒ `P(disease\|+) ≈ 1.9%` |
+
+📖 Synthesis: [`docs/inference-traps.md`](docs/inference-traps.md) · 🧭 the discipline behind it: [`docs/epistemics-and-claim-boundaries.md`](docs/epistemics-and-claim-boundaries.md)
+
+> 🧭 **Boundary:** exact decision-theory / statistics demonstrations; the divergences and resolutions are standard textbook results — not physical bounds, not financial/medical advice. *Excluded:* plain expected value (a building block) and the Hawthorne effect (no exact core; its "quantum observer effect" analogy is a category error).
+
+---
+
 ## ⚛️ GaugeGap Track — finite gauge-system benchmarks
 
 **Natural progression:**

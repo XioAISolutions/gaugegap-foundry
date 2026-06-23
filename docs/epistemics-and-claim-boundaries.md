@@ -100,6 +100,15 @@ consciousness poster has no certifiable core and is rejected; the St. Petersburg
 reduces to exact bounded statements and is kept (in its proper domain, with its
 boundary). **The domain and the boundary are the price of admission, not the hook.**
 
+St. Petersburg is the first of a whole **[web of inference traps](inference-traps.md)** —
+a companion to the physical-limits web, collecting the decision-theory and statistics
+"mind-benders" (power laws, survivorship bias / Wald's bombers, Berkson's and Simpson's
+paradoxes, regression to the mean, with Bayes as the corrective) that each reduce to an
+exact, bounded, certifiable core in [`gaugegap.decision`](../src/gaugegap/decision/).
+Two viral puzzles are *excluded* and documented as such: plain **expected value** (a
+building block, not a trap) and the **Hawthorne effect** (no exact core, and its
+"quantum observer effect" analogy is a category error the claim-boundary audit rejects).
+
 ## The rule, in one line
 
 > If it can be bracketed, enclosed, or discharged, certify it and state its boundary.
