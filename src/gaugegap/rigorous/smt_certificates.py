@@ -108,6 +108,13 @@ def _nyquist(s):
     s.add(z3.Not(z3.And(0 < fs - f, fs - f < fs / 2)))
 
 
+def _cherenkov(s):
+    # nb>=1, c>0, c*nb=1  =>  0 < c <= 1   (cos theta_c valid at/above threshold)
+    c, nb = z3.Reals("c nb")
+    s.add(nb >= 1, c > 0, c * nb == 1)
+    s.add(z3.Not(z3.And(0 < c, c <= 1)))
+
+
 _SCHEMAS = [
     ("eigenvalue_bracket", "interval lower <= E0 <= variational upper", _bracket),
     ("speed_limit", "build-up time >= max(Mandelstam-Tamm, Margolus-Levitin)",
@@ -120,6 +127,8 @@ _SCHEMAS = [
     ("bekenstein", "S <= 2 pi R E (info <-> energy <-> geometry)", _bekenstein),
     ("warp_energy_condition", "Alcubierre rho <= 0 (needs negative energy)", _warp),
     ("nyquist_aliasing", "aliasing fold: fs/2 < f < fs => 0 < fs-f < fs/2", _nyquist),
+    ("cherenkov_cone", "cos theta_c = 1/(n beta) valid: nb>=1, c*nb=1 => 0<c<=1",
+     _cherenkov),
 ]
 
 

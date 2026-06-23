@@ -1,0 +1,15 @@
+{
+  "beta": 0.9,
+  "claim_boundary": "finite exact EM/geometry demo of the Cherenkov cone (local speed limit c/n; cos theta_c = 1/(n beta)); NOT a detector reproduction and spectral 'blue' weighting not modelled; the cone relation and threshold are exact theorems; not a continuum/Millennium claim",
+  "cone_valid": true,
+  "coq_certificate": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Cherenkov_Cone.\n\n(* c = cos(theta_c), nb = n*beta. *)\nVariable c nb : R.\n\n(* TRUST INPUT 1: at/above threshold n*beta >= 1. *)\nHypothesis above_threshold : nb >= 1.\n(* TRUST INPUT 2: the cone cosine is positive. *)\nHypothesis cos_pos : c > 0.\n(* TRUST INPUT 3: the Cherenkov relation cos(theta_c) * (n beta) = 1. *)\nHypothesis cherenkov_relation : c * nb = 1.\n\nTheorem cone_valid : 0 < c /\\ c <= 1.\nProof. split; nra. Qed.\n\nEnd Cherenkov_Cone.\n",
+  "cos_theta_c": 0.835421888053467,
+  "cos_theta_c_recovered": 0.83541865275702,
+  "emits": true,
+  "kind": "cherenkov_cone",
+  "lean4_certificate": "import Mathlib.Tactic\n\nnamespace Cherenkov.Cone\n\n/-- c = cos(theta_c) and nb = n*beta (abstract reals). -/\naxiom c : \u211d\naxiom nb : \u211d\n\n/-- TRUST INPUT 1 -- at/above threshold: n*beta >= 1. -/\naxiom above_threshold : nb \u2265 1\n/-- TRUST INPUT 2 -- the cone cosine is positive. -/\naxiom cos_pos : c > 0\n/-- TRUST INPUT 3 -- the Cherenkov relation cos(theta_c) * (n beta) = 1. -/\naxiom cherenkov_relation : c * nb = 1\n\n/-- The cone cosine is a valid cosine: 0 < c <= 1 (theta_c is a real angle). -/\ntheorem cone_valid : 0 < c \u2227 c \u2264 1 := by\n  refine \u27e8cos_pos, ?_\u27e9\n  nlinarith [cherenkov_relation, above_threshold, cos_pos]\n\nend Cherenkov.Cone\n",
+  "n": 1.33,
+  "recovery_error": 3.2352964469684053e-06,
+  "theta_c_deg": 33.340206352725644,
+  "threshold_beta": 0.7518796992481203
+}

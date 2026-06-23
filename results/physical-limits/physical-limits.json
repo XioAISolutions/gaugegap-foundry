@@ -33,6 +33,8 @@
     "bekenstein_lean": "import Mathlib.Tactic\n\nnamespace Bekenstein.SRegion\n\n/-- Entropy S, energy E, radius R (abstract reals). -/\naxiom S : \u211d\naxiom E : \u211d\naxiom R : \u211d\n\n/-- TRUST INPUT 1 -- positive energy. -/\naxiom E_pos : E > 0\n/-- TRUST INPUT 2 -- the region is at least the minimal Bekenstein radius, written\n    with the denominator cleared: R * (2 pi E) >= S  (i.e. R >= S / (2 pi E)). -/\naxiom geom : R * (2 * Real.pi * E) \u2265 S\n\n/-- The entropy respects the Bekenstein bound: S <= 2 pi R E (no holes). -/\ntheorem bekenstein : S \u2264 2 * Real.pi * R * E := by\n  nlinarith [geom]\n\nend Bekenstein.SRegion\n",
     "branching_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Branching_D3.\n\nVariable Neff : R.\n\n(* TRUST INPUT 1: Tr(rho^2) <= 1  =>  N_eff >= 1. *)\nHypothesis neff_lower : Neff >= 1.\n(* TRUST INPUT 2: Tr(rho^2) >= 1/d  =>  N_eff <= d. *)\nHypothesis neff_upper : Neff <= 3.0.\n\nTheorem branch_bracket : 1 <= Neff /\\ Neff <= 3.0.\nProof. lra. Qed.\n\nEnd Branching_D3.\n",
     "branching_lean": "import Mathlib.Tactic\n\nnamespace Branching.D3\n\n/-- The effective branch count N_eff = 1 / Tr(rho^2) (abstract). -/\naxiom Neff : \u211d\n\n/-- TRUST INPUT 1 -- Tr(rho^2) <= 1, so the participation ratio N_eff >= 1. -/\naxiom neff_lower : Neff \u2265 1\n/-- TRUST INPUT 2 -- Tr(rho^2) >= 1/d, so N_eff <= d. -/\naxiom neff_upper : Neff \u2264 3.0\n\n/-- The system occupies between 1 and d effective branches (no holes). -/\ntheorem branch_bracket : 1 \u2264 Neff \u2227 Neff \u2264 3.0 := by\n  constructor\n  \u00b7 linarith [neff_lower]\n  \u00b7 linarith [neff_upper]\n\nend Branching.D3\n",
+    "cherenkov_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Cherenkov_Cone.\n\n(* c = cos(theta_c), nb = n*beta. *)\nVariable c nb : R.\n\n(* TRUST INPUT 1: at/above threshold n*beta >= 1. *)\nHypothesis above_threshold : nb >= 1.\n(* TRUST INPUT 2: the cone cosine is positive. *)\nHypothesis cos_pos : c > 0.\n(* TRUST INPUT 3: the Cherenkov relation cos(theta_c) * (n beta) = 1. *)\nHypothesis cherenkov_relation : c * nb = 1.\n\nTheorem cone_valid : 0 < c /\\ c <= 1.\nProof. split; nra. Qed.\n\nEnd Cherenkov_Cone.\n",
+    "cherenkov_lean": "import Mathlib.Tactic\n\nnamespace Cherenkov.Cone\n\n/-- c = cos(theta_c) and nb = n*beta (abstract reals). -/\naxiom c : \u211d\naxiom nb : \u211d\n\n/-- TRUST INPUT 1 -- at/above threshold: n*beta >= 1. -/\naxiom above_threshold : nb \u2265 1\n/-- TRUST INPUT 2 -- the cone cosine is positive. -/\naxiom cos_pos : c > 0\n/-- TRUST INPUT 3 -- the Cherenkov relation cos(theta_c) * (n beta) = 1. -/\naxiom cherenkov_relation : c * nb = 1\n\n/-- The cone cosine is a valid cosine: 0 < c <= 1 (theta_c is a real angle). -/\ntheorem cone_valid : 0 < c \u2227 c \u2264 1 := by\n  refine \u27e8cos_pos, ?_\u27e9\n  nlinarith [cherenkov_relation, above_threshold, cos_pos]\n\nend Cherenkov.Cone\n",
     "ergotropy_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Ergotropy_WExtractable.\n\nVariable W : R.\n\n(* TRUST INPUT 1: passive state minimizes cyclic energy => W >= 0. *)\nHypothesis work_nonneg : W >= 0.\n(* TRUST INPUT 2: passive energy >= ground energy E0 => W <= <H> - E0. *)\nHypothesis work_bounded : W <= 0.42478961739555854.\n\nTheorem no_free_energy : 0 <= W /\\ W <= 0.42478961739555854.\nProof. lra. Qed.\n\nEnd Ergotropy_WExtractable.\n",
     "ergotropy_lean": "import Mathlib.Tactic\n\nnamespace Ergotropy.WExtractable\n\n/-- Extractable work W = <H> - E_passive (abstract). -/\naxiom W : \u211d\n\n/-- TRUST INPUT 1 -- the passive state minimizes cyclic energy, so W >= 0. -/\naxiom work_nonneg : W \u2265 0\n/-- TRUST INPUT 2 -- the passive energy is at least the ground energy E0, so\n    W <= <H> - E0 (no energy can be drawn below the ground state). -/\naxiom work_bounded : W \u2264 0.42478961739555854\n\n/-- Extractable work is finite and non-negative: no free energy (no holes). -/\ntheorem no_free_energy : 0 \u2264 W \u2227 W \u2264 0.42478961739555854 := by\n  constructor\n  \u00b7 linarith [work_nonneg]\n  \u00b7 linarith [work_bounded]\n\nend Ergotropy.WExtractable\n",
     "landauer_coq": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection Landauer_WErase.\n\n(* kB, T, entropy drop dS, one-bit entropy b = ln 2 (nats). *)\nVariable kB T dS b : R.\n\n(* TRUST INPUT 1: positive Boltzmann constant. *)\nHypothesis kB_pos : kB > 0.\n(* TRUST INPUT 2: positive temperature. *)\nHypothesis T_pos : T > 0.\n(* TRUST INPUT 3: at least one bit erased: dS >= b (b = ln 2). *)\nHypothesis dS_bit : dS >= b.\n\nTheorem landauer_floor : kB * T * dS >= kB * T * b.\nProof.\n  assert (Hkt : 0 <= kB * T) by (apply Rlt_le; apply Rmult_lt_0_compat; lra).\n  nra.\nQed.\n\nEnd Landauer_WErase.\n",
@@ -47,11 +49,25 @@
   "checks": {
     "bekenstein_respected": true,
     "branch_count_bracketed": true,
+    "cherenkov_cone_valid": true,
     "ergotropy_no_free_energy": true,
     "landauer_cost_positive": true,
     "speed_limit_respected": true,
     "time_frequency_duality": true,
     "warp_needs_negative_energy": true
+  },
+  "cherenkov": {
+    "beta": 0.9,
+    "claim_boundary": "finite exact EM/geometry demo of the Cherenkov cone (local speed limit c/n; cos theta_c = 1/(n beta)); NOT a detector reproduction and spectral 'blue' weighting not modelled; the cone relation and threshold are exact theorems; not a continuum/Millennium claim",
+    "cone_valid": true,
+    "cos_theta_c": 0.835421888053467,
+    "cos_theta_c_recovered": 0.83541865275702,
+    "emits": true,
+    "kind": "cherenkov_cone",
+    "n": 1.33,
+    "recovery_error": 3.2352964469684053e-06,
+    "theta_c_deg": 33.340206352725644,
+    "threshold_beta": 0.7518796992481203
   },
   "claim_boundary": "finite-system / semiclassical demonstrations of established physical bounds, each bracketed or machine-checked; not continuum/Millennium claims, not a buildable warp drive or free-energy device",
   "ergotropy": {

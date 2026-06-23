@@ -146,6 +146,8 @@ jobs:
         run: python scripts/generate_physical_limits_figures.py --output-dir /tmp/physical-limits-figures
       - name: Sonification & sampling-limit smoke
         run: python scripts/run_sonification.py --output-dir results/sonification
+      - name: Cherenkov cone smoke
+        run: python scripts/run_cherenkov.py --n-sources 200 --output-dir results/cherenkov
 
   packaging:
     runs-on: ubuntu-latest

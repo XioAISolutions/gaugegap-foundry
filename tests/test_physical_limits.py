@@ -24,7 +24,7 @@ class TestPhysicalLimitsCapstone(unittest.TestCase):
             for name in ("speed_limit_respected", "time_frequency_duality",
                          "ergotropy_no_free_energy", "branch_count_bracketed",
                          "landauer_cost_positive", "bekenstein_respected",
-                         "warp_needs_negative_energy"):
+                         "warp_needs_negative_energy", "cherenkov_cone_valid"):
                 self.assertTrue(payload["checks"][name], name)
             # every certificate is hole-free
             for k, cert in payload["certificates"].items():

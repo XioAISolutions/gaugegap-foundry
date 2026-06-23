@@ -42,6 +42,8 @@ MEMBERS = [
     ("Bekenstein bound", "S ≤ 2π R E", "info ↔ energy ↔ geometry", C_GEOM),
     ("Alcubierre energy cond.", "ρ ≤ 0  (needs neg. energy)",
      "energy ↔ geometry", C_GEOM),
+    ("Cherenkov cone", "cos θc = 1/(nβ),  β > 1/n",
+     "velocity ↔ geometry", C_GEOM),
 ]
 
 # module result SVGs to pull into the gallery: (results path, caption)
@@ -58,6 +60,8 @@ GALLERY = [
      "Ergotropy: cumulative extracted work saturates — no perpetual motion."),
     ("alcubierre-warp/energy_density_profile.svg",
      "Alcubierre metric: energy density ≤ 0 — the warp bubble needs negative energy."),
+    ("cherenkov/cherenkov_cone.svg",
+     "Cherenkov: wavefronts pile into a cone, cos θc = 1/(nβ) (local speed limit)."),
 ]
 
 
