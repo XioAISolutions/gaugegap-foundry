@@ -1,7 +1,7 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
 	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget \
-	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy landauer bekenstein physical-limits temporal-double-slit physical-limits-figures verify-certificates sonification cherenkov
+	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy landauer bekenstein physical-limits temporal-double-slit physical-limits-figures verify-certificates sonification cherenkov lieb-robinson
 
 # Pin the proofpack clock to the HEAD commit date so the same commit produces a
 # byte-for-byte identical proofpack from a fresh clone (reproducible builds).
@@ -223,6 +223,11 @@ sonification:
 # 1/(n beta)), recovered from a wavefront-pile-up simulation.
 cherenkov:
 	python scripts/run_cherenkov.py --output-dir results/cherenkov
+
+# Lieb-Robinson light cone: certified many-body information speed limit
+# (x(t) <= v_LR t + xi), cross-checked against the quantum_walks CTQW.
+lieb-robinson:
+	python scripts/run_lieb_robinson.py --output-dir results/lieb-robinson
 
 # Geometry-of-GaugeGap figures: exact 2D projections of higher-dim structures
 # (su(3) weight diagrams + root system, Calabi-Yau cross-section). Deterministic

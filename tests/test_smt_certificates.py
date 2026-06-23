@@ -17,7 +17,7 @@ class TestSMTCertificates(unittest.TestCase):
     def test_all_schemas_machine_verified(self):
         from gaugegap.rigorous.smt_certificates import verify_all
         results = verify_all()
-        self.assertGreaterEqual(len(results), 10)
+        self.assertGreaterEqual(len(results), 11)
         for r in results:
             self.assertTrue(r.valid, f"z3 failed to verify schema: {r.name}")
 
@@ -26,7 +26,8 @@ class TestSMTCertificates(unittest.TestCase):
         names = {r.name for r in verify_all()}
         for expected in ("speed_limit", "time_bandwidth", "ergotropy", "branching",
                          "landauer", "bekenstein", "warp_energy_condition",
-                         "nyquist_aliasing", "cherenkov_cone"):
+                         "nyquist_aliasing", "cherenkov_cone",
+                         "lieb_robinson_lightcone"):
             self.assertIn(expected, names)
 
 

@@ -44,6 +44,7 @@ MEMBERS = [
      "energy ↔ geometry", C_GEOM),
     ("Cherenkov cone", "cos θc = 1/(nβ),  β > 1/n",
      "velocity ↔ geometry", C_GEOM),
+    ("Lieb–Robinson cone", "x(t) ≤ v_LR·t + ξ", "information ↔ time", C_INFO),
 ]
 
 # module result SVGs to pull into the gallery: (results path, caption)
@@ -62,6 +63,8 @@ GALLERY = [
      "Alcubierre metric: energy density ≤ 0 — the warp bubble needs negative energy."),
     ("cherenkov/cherenkov_cone.svg",
      "Cherenkov: wavefronts pile into a cone, cos θc = 1/(nβ) (local speed limit)."),
+    ("lieb-robinson/light_cone.svg",
+     "Lieb–Robinson: the information front stays inside a linear light cone v_LR·t."),
 ]
 
 

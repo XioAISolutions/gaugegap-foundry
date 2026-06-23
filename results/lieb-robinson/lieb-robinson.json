@@ -1,0 +1,39 @@
+{
+  "J": 1.0,
+  "claim_boundary": "finite exact lattice demo of the Lieb-Robinson light cone for a free-hopping chain (v_LR = 2J exact); not the general interacting LR constant; numpy core, optional SciPy cross-check; not a continuum/Millennium claim",
+  "coq_certificate": "Require Import Reals.\nRequire Import Lra.\nOpen Scope R_scope.\n\nSection LiebRobinson_Front.\n\nVariable vf vlr t : R.\n\n(* TRUST INPUT 1: front velocity respects the Lieb-Robinson speed. *)\nHypothesis front_bounded : vf <= vlr.\n(* TRUST INPUT 2: time is non-negative. *)\nHypothesis time_nonneg : t >= 0.\n\nTheorem light_cone : vf * t <= vlr * t.\nProof. nra. Qed.\n\nEnd LiebRobinson_Front.\n",
+  "crosscheck_error": 5.898059818321144e-16,
+  "front_velocity": 2.204828594194559,
+  "fronts": [
+    3.0,
+    4.0,
+    5.0,
+    7.0,
+    8.0,
+    9.0,
+    11.0,
+    12.0,
+    13.0,
+    15.0,
+    16.0
+  ],
+  "group_velocity": 2.0,
+  "kind": "lieb_robinson_lightcone",
+  "lean4_certificate": "import Mathlib.Tactic\n\nnamespace LiebRobinson.Front\n\n/-- Measured front velocity vf, Lieb-Robinson speed vlr, and time t (abstract). -/\naxiom vf : \u211d\naxiom vlr : \u211d\naxiom t : \u211d\n\n/-- TRUST INPUT 1 -- the front velocity respects the Lieb-Robinson speed. -/\naxiom front_bounded : vf \u2264 vlr\n/-- TRUST INPUT 2 -- time is non-negative. -/\naxiom time_nonneg : t \u2265 0\n\n/-- The information front stays inside the linear light cone (no holes). -/\ntheorem light_cone : vf * t \u2264 vlr * t := by\n  nlinarith [front_bounded, time_nonneg]\n\nend LiebRobinson.Front\n",
+  "n_sites": 41,
+  "respects_cone": true,
+  "times": [
+    0.6019845400987238,
+    1.2039690801974476,
+    1.8059536202961715,
+    2.4079381603948953,
+    3.009922700493619,
+    3.611907240592343,
+    4.213891780691067,
+    4.8158763207897906,
+    5.417860860888514,
+    6.019845400987238,
+    6.621829941085962
+  ],
+  "v_lr": 2.718281828459045
+}

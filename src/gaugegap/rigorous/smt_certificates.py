@@ -115,6 +115,13 @@ def _cherenkov(s):
     s.add(z3.Not(z3.And(0 < c, c <= 1)))
 
 
+def _lieb_robinson(s):
+    # vf <= vlr, t >= 0  =>  vf*t <= vlr*t   (linear light cone)
+    vf, vlr, t = z3.Reals("vf vlr t")
+    s.add(vf <= vlr, t >= 0)
+    s.add(z3.Not(vf * t <= vlr * t))
+
+
 _SCHEMAS = [
     ("eigenvalue_bracket", "interval lower <= E0 <= variational upper", _bracket),
     ("speed_limit", "build-up time >= max(Mandelstam-Tamm, Margolus-Levitin)",
@@ -129,6 +136,8 @@ _SCHEMAS = [
     ("nyquist_aliasing", "aliasing fold: fs/2 < f < fs => 0 < fs-f < fs/2", _nyquist),
     ("cherenkov_cone", "cos theta_c = 1/(n beta) valid: nb>=1, c*nb=1 => 0<c<=1",
      _cherenkov),
+    ("lieb_robinson_lightcone", "linear light cone: vf<=vlr, t>=0 => vf*t<=vlr*t",
+     _lieb_robinson),
 ]
 
 
