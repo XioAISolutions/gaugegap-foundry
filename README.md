@@ -188,6 +188,33 @@ certifiable core** (closed-form, not Monte-Carlo). These live in
 
 ---
 
+## 🧊 Superconducting qubits — certified from first principles
+
+The device physics under this repo's hardware adapters (IBM / Braket / IonQ / Quantinuum), made certifiable. A plain `LC` circuit is a harmonic oscillator with **equally spaced** levels — useless as a qubit, since a pulse resonant with `0→1` also drives `1→2`. The **Josephson junction** adds the nonlinear `−E_J cos φ` term that breaks the degeneracy:
+
+```
+H = 4 E_C (n − n_g)²  −  E_J cos(φ)        # transmon, charge basis
+```
+
+| Certified quantity | Result |
+|---|---|
+| Anharmonicity `α = ω₁₂ − ω₀₁` | `→ −E_C` (qubit `0↔1` is **addressable**) |
+| Certified `α` enclosure | rigorous interval **strictly < 0** ⇒ *provably* anharmonic |
+| Charge dispersion `ε₀₁` | `~exp(−√(8E_J/E_C))`: `0.25 → 4·10⁻⁵ → 3·10⁻⁸` (transmon noise-resistance) |
+
+```python
+>>> from gaugegap.quantum.transmon import analyze_transmon
+>>> r = analyze_transmon(EJ=50, EC=1)
+>>> round(r.anharmonicity_over_EC, 3), r.is_anharmonic_certified
+(-1.149, True)                            # nonlinearity ⇒ a real, addressable qubit
+```
+
+The Coq/Lean certificate (re-checked by z3, compiled by `coqc`) records the core: `E_C > 0 ⇒ ω₀₁ > ω₁₂` — the harmonic limit `E_C → 0` closes the gap. 📖 [`docs/transmon.md`](docs/transmon.md)
+
+> 🧭 **Boundary:** the standard Cooper-pair-box / transmon model (Koch et al. 2007), a finite charge-basis diagonalization with a rigorous interval enclosure of the anharmonicity; energies in units of `E_C` — not a fabrication, materials, coherence-time, or specific-device claim, and not a physical-limits-web member.
+
+---
+
 ## ⚛️ GaugeGap Track — finite gauge-system benchmarks
 
 **Natural progression:**

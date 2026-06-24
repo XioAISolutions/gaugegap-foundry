@@ -1,8 +1,8 @@
 {
   "all_valid": true,
   "claim_boundary": "automated real-arithmetic cross-check (z3) of the certified-inequality schemas; an independent witness for the discharged Lean/Coq certificates, not a new physical claim",
-  "n_total": 13,
-  "n_verified": 13,
+  "n_total": 14,
+  "n_verified": 14,
   "schemas": [
     {
       "description": "interval lower <= E0 <= variational upper",
@@ -67,6 +67,11 @@
     {
       "description": "Zeno floor monotone: S>=0,Nb>=Na => Na*(Nb-S)>=Nb*(Na-S)",
       "name": "quantum_zeno",
+      "valid": true
+    },
+    {
+      "description": "Josephson anharmonicity: Ec>0,w01=wt-Ec,w12=wt-2Ec => w01>w12",
+      "name": "transmon",
       "valid": true
     }
   ],

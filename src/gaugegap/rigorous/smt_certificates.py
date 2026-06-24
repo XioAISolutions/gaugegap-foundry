@@ -136,6 +136,13 @@ def _quantum_zeno(s):
     s.add(z3.Not(Na * (Nb - S) >= Nb * (Na - S)))
 
 
+def _transmon(s):
+    # Ec>0, w01=wt-Ec, w12=wt-2Ec  =>  w01 > w12   (Josephson anharmonicity opens the gap)
+    wt, Ec, w01, w12 = z3.Reals("wt Ec w01 w12")
+    s.add(Ec > 0, w01 == wt - Ec, w12 == wt - 2 * Ec)
+    s.add(z3.Not(w01 > w12))
+
+
 _SCHEMAS = [
     ("eigenvalue_bracket", "interval lower <= E0 <= variational upper", _bracket),
     ("speed_limit", "build-up time >= max(Mandelstam-Tamm, Margolus-Levitin)",
@@ -156,6 +163,8 @@ _SCHEMAS = [
      _compton_schwarzschild),
     ("quantum_zeno", "Zeno floor monotone: S>=0,Nb>=Na => Na*(Nb-S)>=Nb*(Na-S)",
      _quantum_zeno),
+    ("transmon", "Josephson anharmonicity: Ec>0,w01=wt-Ec,w12=wt-2Ec => w01>w12",
+     _transmon),
 ]
 
 
