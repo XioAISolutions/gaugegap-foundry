@@ -169,8 +169,14 @@ def solovay_kitaev_single_qubit(
             U_n = gate_set[idx] @ U_n
         
         # Find V such that U ≈ U_n V U_n^† V^†
-        # Simplified: use random group commutator
-        V_seq = [0]  # Placeholder (prototype scaffold; known limitation)
+        # PROTOTYPE scaffold (known limitation): the Solovay-Kitaev group-
+        # commutator decomposition (balanced commutator U = V W V^† W^†, solved
+        # via the group-commutator/"V,W from epsilon-net" construction) is not
+        # implemented. As a scaffold we emit a single identity-set gate index so
+        # the recursion still returns a well-formed sequence.
+        # Roadmap: implement the GC decomposition (e.g. Dawson-Nielsen) to make
+        # the recursive precision guarantee actually hold.
+        V_seq = [0]  # scaffold value, not a real commutator solution
         
         return U_n_seq + V_seq + U_n_seq + V_seq
     
@@ -234,8 +240,10 @@ def kak_decomposition(
     (real, non-negative) SVD singular values, which is identically 0 -- and bogus
     single-qubit blocks. Rather than ship a coordinate solver that is wrong at
     chamber corners (e.g. SWAP), this exposes only the robustly-correct local
-    invariants and flags the rest as explicitly not implemented (known limitation;
-    prototype scaffold).
+    invariants and flags the rest as not implemented. This is a deliberate
+    claim boundary / known limitation, not an oversight: the Makhlin invariants
+    returned here are exact, and the canonical-coordinate extraction is on the
+    roadmap rather than shipped as a fabricated value.
 
     Parameters
     ----------
@@ -273,8 +281,11 @@ def kak_decomposition(
     return {
         "makhlin_invariants": {"G1": complex(g1), "G2": complex(g2)},
         "is_entangling": not is_local,
-        # Honest about scope: the local-equivalence class is exact; the canonical
-        # coordinates / local gates are not extracted here (known limitation; prototype scaffold).
+        # KNOWN LIMITATION (claim boundary): the local-equivalence class
+        # (Makhlin invariants above) is exact; the canonical coordinates /
+        # local gates are a deliberate prototype scope boundary, returned as an
+        # honest "not_implemented" status rather than the previous bogus zeros.
+        # Roadmap: Weyl-chamber reduction with corner-stable handling.
         "canonical_coordinates": {"status": "not_implemented"},
         "single_qubit_unitaries": {"status": "not_implemented"},
     }

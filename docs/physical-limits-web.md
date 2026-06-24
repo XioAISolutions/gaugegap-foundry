@@ -44,6 +44,11 @@ machine-checked certificate.
 | 5 | Landauer's principle | (keystone) | info ↔ energy | `W ≥ k_B T ln 2` | [`landauer`](physical-limits.md) |
 | 6 | Bekenstein bound | (keystone) | info ↔ energy ↔ geometry | `S ≤ 2π R E` | [`bekenstein`](physical-limits.md) |
 | 7 | Alcubierre energy cond. | warp drive | energy ↔ geometry | `ρ ≤ 0` | [`relativity.alcubierre`](alcubierre-warp.md) |
+| 8 | Sonification / sampling | "hearing" data | time ↔ frequency | aliasing fold `0 < f_s − f < f_s/2` | [`sonification`](../src/gaugegap/quantum/sonification.py) |
+| 9 | Cherenkov cone | faster-than-light-in-medium | velocity ↔ geometry | `cos θc = 1/(nβ)`, `β > 1/n` | [`cherenkov`](cherenkov.md) |
+| 10 | Lieb–Robinson cone | "instant" entanglement | information ↔ time | `x(t) ≤ v_LR·t + ξ` | [`lieb_robinson`](lieb-robinson.md) |
+| 11 | Compton–Schwarzschild | cosmic mass–radius diagram | mass ↔ geometry | `R² ≥ R_s·λ_C = 2 ℓ_P²` | [`relativity.compton_schwarzschild`](physical-limits.md) |
+| 12 | Quantum Zeno effect | "a watched pot never boils" / Hawthorne | measurement ↔ time | survival `≥ 1 − (ΔE·T)²/N → 1` | [`quantum.quantum_zeno`](../src/gaugegap/quantum/quantum_zeno.py) |
 
 ### How the edges connect
 
@@ -61,6 +66,23 @@ machine-checked certificate.
   can hold given its energy and size: geometry limits information.
 - **Energy ↔ Geometry** — the Alcubierre metric shows that bending spacetime into a
   warp bubble *requires* negative energy density (`ρ ≤ 0` everywhere in the wall).
+- **Mass ↔ Geometry** — the cosmic mass–radius diagram: every object is hemmed in by
+  the Schwarzschild radius (`R ≥ 2GM/c²`, or it is a black hole) and the Compton
+  wavelength (`R ≥ ℏ/Mc`, or the vacuum pair-produces). The two cross at the Planck
+  point, with the *mass-independent* identity `R_s·λ_C = 2 ℓ_P²` — so `R ≥ √2 ℓ_P` is a
+  floor on the size of anything. This is the global map the other geometry members live
+  inside.
+
+![Cosmic mass–radius diagram](../figures/physical-limits/mass_radius.svg)
+
+- **Measurement ↔ Time** — the quantum Zeno effect: interrupting evolution with `N`
+  projective measurements over time `T` bounds the survival probability below by
+  `1 − (ΔE·T)²/N`, which rises to 1 as measurements become frequent. Observation
+  *physically* freezes the system. This is the rigorous, certifiable cousin of the
+  folk/sociological **Hawthorne effect** ("being observed changes behaviour") — offered
+  as an analogue, **not** an identification: the Hawthorne effect is a human-study
+  design phenomenon with no exact core; this is measurement back-action, a different
+  domain.
 
 ## What stayed honest
 

@@ -105,7 +105,9 @@ def classical_intermediate_velocity(
     Returns:
         (u_star, v_star): Intermediate velocity fields
     """
-    # Simplified: just add viscous diffusion (prototype scaffold; known limitation)
+    # PROTOTYPE / toy (known limitation): simplified momentum step that adds
+    # viscous diffusion only; advection/pressure-gradient terms are explicitly
+    # not implemented here. roadmap: full operator-split discretization.
     u_star = u.copy()
     v_star = v.copy()
     
@@ -175,7 +177,8 @@ def build_vqls_circuit(
     
     qc = QuantumCircuit(n_qubits)
     
-    # Initial state preparation (simplified; prototype scaffold, known limitation)
+    # PROTOTYPE scaffold (known limitation): simplified uniform-superposition
+    # state prep; amplitude encoding of b is explicitly not implemented (toy).
     for i in range(n_qubits):
         qc.h(i)
     
@@ -183,7 +186,9 @@ def build_vqls_circuit(
     for layer in range(n_layers):
         # Rotation layer
         for i in range(n_qubits):
-            qc.ry(0.1 * (layer + 1), i)  # Placeholder parameters (prototype scaffold; known limitation)
+            # PROTOTYPE scaffold (known limitation): fixed demo angles, not
+            # variationally optimized; roadmap: bind trainable parameters.
+            qc.ry(0.1 * (layer + 1), i)
             qc.rz(0.1 * (layer + 1), i)
         
         # Entangling layer
@@ -332,7 +337,9 @@ def run_flowgap_benchmark(
     # 2. Compute residual and divergence
     # 3. Compare with classical solution
     
-    # Placeholder metrics (prototype scaffold; known limitation)
+    # PROTOTYPE / toy (known limitation): result decoding to a pressure field
+    # is explicitly not implemented; the metrics below report circuit/run
+    # bookkeeping only, not a solved flow. roadmap: implement steps 1-3 above.
     metrics = {
         "nx": nx,
         "ny": ny,

@@ -272,7 +272,9 @@ def build_qpe_circuit_trotter(
     instead of a dense controlled unitary. The Trotter step count is scaled with
     the evolution time (``reps * 2^k``) so the Trotter synthesis error stays roughly
     uniform across the precision register -- the higher-order bits, which use the
-    longest evolutions, get proportionally more steps.
+    longest evolutions, get proportionally more steps. (Known limitation: this is
+    a Trotter prototype; the per-bit step scaling is a heuristic and the residual
+    Trotter error is bounded only approximately, not certified.)
 
     Parameters
     ----------

@@ -246,13 +246,12 @@ def partial_trace(
     dim_keep = 2 ** len(keep_qubits)
     dim_trace = 2 ** len(trace_qubits)
     
-    # Reorder qubits: keep qubits first, then trace qubits
-    all_qubits = list(range(total_qubits))
+    # Reorder qubits: keep qubits first, then trace qubits. ``perm[i]`` is the
+    # source qubit that should occupy output position ``i`` (see _permute_qubits).
     perm = keep_qubits + trace_qubits
-    inv_perm = [perm.index(i) for i in all_qubits]
-    
+
     # Permute density matrix
-    rho_perm = _permute_qubits(rho, inv_perm, total_qubits)
+    rho_perm = _permute_qubits(rho, perm, total_qubits)
     
     # Reshape and trace
     rho_reshaped = rho_perm.reshape(dim_keep, dim_trace, dim_keep, dim_trace)
@@ -262,9 +261,26 @@ def partial_trace(
 
 
 def _permute_qubits(rho: np.ndarray, perm: List[int], n_qubits: int) -> np.ndarray:
-    """Permute qubits in density matrix."""
-    # This is a simplified version - full implementation would use tensor reshaping
-    return rho  # Placeholder (prototype scaffold; known limitation)
+    """Permute qubits in a density matrix.
+
+    ``perm[i]`` gives the source qubit that should end up at output position
+    ``i`` (i.e. ``perm`` is applied as ``output_axis i <- input axis perm[i]``).
+    The density matrix is reshaped into ``2*n_qubits`` axes (n row axes followed
+    by n column axes), both index groups are permuted identically, and the result
+    is reshaped back to ``(2**n, 2**n)``.
+    """
+    if len(perm) != n_qubits:
+        raise ValueError("perm length must equal n_qubits")
+    dim = 2 ** n_qubits
+    if rho.shape != (dim, dim):
+        raise ValueError(f"rho must be ({dim}, {dim}) for {n_qubits} qubits")
+
+    tensor = rho.reshape([2] * (2 * n_qubits))
+    # Row axes 0..n-1, column axes n..2n-1; apply the same permutation to each.
+    row_axes = [perm[i] for i in range(n_qubits)]
+    col_axes = [n_qubits + perm[i] for i in range(n_qubits)]
+    tensor = np.transpose(tensor, row_axes + col_axes)
+    return tensor.reshape(dim, dim)
 
 
 def negativity(rho: np.ndarray, subsystem_qubits: List[int], total_qubits: int) -> EntanglementResult:

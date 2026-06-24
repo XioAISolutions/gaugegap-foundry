@@ -2,10 +2,17 @@
 
 > **Verification-first AI-for-science infrastructure for Millennium Prize-adjacent finite-system benchmarks.**
 
+<p align="center">
+  <img src="figures/physical-limits/web.svg" alt="The web of physical limits — twelve certified phenomena" width="720"/>
+  <br/>
+  <em>Twelve fundamental bounds, each reduced to a single machine-checked inequality, shown to be one structure — trade-offs among <strong>energy · time · information · geometry · mass · measurement</strong>. <a href="#-the-web-of-physical-limits--gallery">Jump to the gallery ↓</a></em>
+</p>
+
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![Tests](https://img.shields.io/badge/tests-492%20passing-brightgreen?logo=pytest&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-754%20passing-brightgreen?logo=pytest&logoColor=white)
 ![Claim-boundary audit](https://img.shields.io/badge/claim--boundary%20audit-0%20high-success)
+![Maturity audit](https://img.shields.io/badge/maturity%20audit-0%20high--unbounded-success)
 ![Reproducible](https://img.shields.io/badge/builds-byte--reproducible-blueviolet)
 ![Quantum](https://img.shields.io/badge/quantum-Qiskit%202.4%20%7C%20IBM%20Runtime-6929c4?logo=qiskit&logoColor=white)
 
@@ -79,10 +86,132 @@ discharged Lean 4 / Coq inequality (independently re-checked by z3). They turn o
 | Alcubierre energy cond. | energy ↔ geometry | `ρ ≤ 0` (needs negative energy) |
 | Cherenkov cone | velocity ↔ geometry | `cos θc = 1/(nβ)`, `β > 1/n` |
 | Lieb–Robinson cone | information ↔ time | `x(t) ≤ v_LR·t + ξ` |
+| Compton–Schwarzschild | mass ↔ geometry | `R² ≥ R_s·λ_C = 2 ℓ_P²` |
+| Quantum Zeno effect | measurement ↔ time | survival `≥ 1 − (ΔE·T)²/N → 1` |
 
-📖 Full synthesis: [`docs/physical-limits-web.md`](docs/physical-limits-web.md) · 🖼️ gallery + certificate ladder: [`figures/physical-limits/`](figures/physical-limits/) (open `index.html`) · ▶️ reproduce: `make physical-limits` · `make physical-limits-figures` · `make verify-certificates`
+> 👁️ **"A watched quantum pot never boils."** The Zeno member is the rigorous *physical cousin* of the Hawthorne effect ("being observed changes behaviour"): frequent measurement provably freezes a quantum system's evolution. The sociological Hawthorne effect itself stays out (no exact core); only its certifiable physics counterpart earns a place — see [`gaugegap.quantum.quantum_zeno`](src/gaugegap/quantum/quantum_zeno.py).
+
+These bounds also have a **global shape**. Plot every object — electron to
+supermassive black hole — by mass and radius, and the lower-left is sealed off by two
+of the web's own limits: the **Schwarzschild radius** (pack tighter → black hole) and
+the **Compton wavelength** (localize tighter → the vacuum pair-produces). They cross at
+the **Planck point**, where `R_s·λ_C = 2 ℓ_P²` — a machine-checked identity that holds
+for *every* mass.
+
+<p align="center">
+  <img src="figures/physical-limits/mass_radius.svg" alt="The cosmic mass–radius diagram" width="640"/>
+</p>
+
+### 🪜 The certificate ladder
+
+Every label above is a **discharged Lean 4 / Coq inequality** (single labelled trust input, no `Admitted`, no `sorry`) — re-checked independently by z3 and *compiled* by `coqc` in CI. Twelve of them, stacked:
+
+<p align="center">
+  <img src="figures/physical-limits/ladder.svg" alt="Certificate ladder — twelve machine-checked inequalities" width="720"/>
+</p>
+
+<details>
+<summary>📜 <strong>What a machine-checked certificate actually looks like</strong> (the Compton–Schwarzschild Planck floor, emitted Coq)</summary>
+
+```coq
+Require Import Reals. Require Import Lra. Open Scope R_scope.
+Section ComptonSchwarzschild_Planck.
+Variable Rad Rs Lc : R.
+Hypothesis Rs_pos : Rs > 0.            (* TRUST INPUT 1: positive Schwarzschild radius *)
+Hypothesis Lc_pos : Lc > 0.            (* TRUST INPUT 2: positive Compton wavelength   *)
+Hypothesis not_bh : Rad >= Rs.         (* TRUST INPUT 3: not inside its own horizon    *)
+Hypothesis localizable : Rad >= Lc.    (* TRUST INPUT 4: not below its Compton length  *)
+(* R^2 >= Rs * Lc  (= 2 l_P^2): the Planck-length floor on object size. *)
+Theorem planck_floor : Rad * Rad >= Rs * Lc.
+Proof. nra. Qed.
+End ComptonSchwarzschild_Planck.
+```
+</details>
+
+### 🖼️ The phenomena, one figure each
+
+| | | |
+|:---:|:---:|:---:|
+| <img src="figures/physical-limits/entanglement-dynamics__entanglement_buildup.svg" width="240"/><br/>**Entanglement build-up** `S(t): 0→ln 2` | <img src="figures/physical-limits/entanglement-speed-limit__qsl_floor_vs_coupling.svg" width="240"/><br/>**Quantum speed-limit floor** ∝ 1/coupling | <img src="figures/physical-limits/temporal-double-slit__spectral_fringes.svg" width="240"/><br/>**Time diffraction** → spectral fringes |
+| <img src="figures/physical-limits/decoherence-branching__decoherence_branching.svg" width="240"/><br/>**Decoherence** → `N_eff` branches | <img src="figures/physical-limits/ergotropy__extracted_work.svg" width="240"/><br/>**Ergotropy** saturates (no perpetual motion) | <img src="figures/physical-limits/alcubierre-warp__energy_density_profile.svg" width="240"/><br/>**Warp bubble** needs `ρ ≤ 0` |
+| <img src="figures/physical-limits/cherenkov__cherenkov_cone.svg" width="240"/><br/>**Cherenkov cone** `cos θc = 1/(nβ)` | <img src="figures/physical-limits/lieb-robinson__light_cone.svg" width="240"/><br/>**Lieb–Robinson** linear light cone | <img src="figures/physical-limits/mass_radius.svg" width="240"/><br/>**Mass–radius** Planck-point floor |
+
+📖 Full synthesis: [`docs/physical-limits-web.md`](docs/physical-limits-web.md) · 🧭 why we draw the line where we do: [`docs/epistemics-and-claim-boundaries.md`](docs/epistemics-and-claim-boundaries.md) · 🖼️ gallery + certificate ladder: [`figures/physical-limits/`](figures/physical-limits/) (open `index.html`) · ▶️ reproduce: `make physical-limits` · `make physical-limits-figures` · `make verify-certificates`
 
 > 🧭 **Boundary:** finite-system / semiclassical demonstrations of *established* bounds, each bracketed or machine-checked — not continuum/Millennium claims, not a buildable warp drive or free-energy device.
+
+---
+
+## 🎲 The web of inference traps — decision theory, certified
+
+The same move, applied to the *statistics* genre instead of physics: viral "mind-bender"
+probability puzzles and classic inference traps, each reduced to an **exact, bounded,
+certifiable core** (closed-form, not Monte-Carlo). These live in
+[`gaugegap.decision`](src/gaugegap/decision/) and are deliberately **not** physical-limits members.
+
+<p align="center">
+  <img src="figures/inference-traps/web.svg" alt="The web of inference traps" width="720"/>
+</p>
+
+| Trap | Family | Exactly-computable core |
+|---|---|---|
+| St. Petersburg paradox | heavy tail | naive EV diverges (EVₙ = `n`); bounded-utility CE = `$4`; finite-bankroll EV = `N+1` |
+| Power law | heavy tail | scale-free tail `P(X>cx)/P(X>x)=c^{−α}`; `E[Xᵐ]=∞ ⟺ m≥α` |
+| Regression to the mean | conditioning | `E[Y\|X=x]=ρx`: selected extremes regress by `1−ρ` |
+| Survivorship bias (Wald) | selection | survivor hit-rate `p(1−kill)`: "armor the holes" is exactly backwards |
+| Berkson's paradox | collider | independent traits → corr `−1/2` once you condition on selection |
+| Simpson's paradox | confounding | every subgroup favours A, the aggregate favours B |
+| Bayes' theorem | the fix | base-rate fallacy: 99%-accurate test, 0.1% prevalence ⇒ `P(disease\|+) ≈ 1.9%` |
+
+<details>
+<summary>🎲 <strong>Worked example</strong> — run the traps yourself</summary>
+
+```python
+>>> from gaugegap.decision.bayes import analyze_bayes
+>>> analyze_bayes().posterior_positive          # 99% test, 0.1% prevalence
+0.0194...                                        # ~1.9% — not 99%! (base-rate fallacy)
+
+>>> from gaugegap.decision.st_petersburg import analyze_st_petersburg
+>>> r = analyze_st_petersburg()
+>>> r.truncated_ev_sample[40], round(r.log_utility_certainty_equivalent, 6)
+(40.0, 4.0)                                      # naive EV → ∞, but worth exactly $4
+
+>>> from gaugegap.decision.berksons_paradox import selected_correlation
+>>> selected_correlation(0.5, 0.5)               # two independent traits...
+-0.5                                             # ...anti-correlate once you select
+```
+</details>
+
+📖 Synthesis: [`docs/inference-traps.md`](docs/inference-traps.md) · 🧭 the discipline behind it: [`docs/epistemics-and-claim-boundaries.md`](docs/epistemics-and-claim-boundaries.md)
+
+> 🧭 **Boundary:** exact decision-theory / statistics demonstrations; the divergences and resolutions are standard textbook results — not physical bounds, not financial/medical advice. *Excluded:* plain expected value (a building block); the **Hawthorne effect** keeps only its certifiable physics cousin — the [quantum Zeno effect](#-the-web-of-physical-limits--gallery) — while the sociological version stays out.
+
+---
+
+## 🧊 Superconducting qubits — certified from first principles
+
+The device physics under this repo's hardware adapters (IBM / Braket / IonQ / Quantinuum), made certifiable. A plain `LC` circuit is a harmonic oscillator with **equally spaced** levels — useless as a qubit, since a pulse resonant with `0→1` also drives `1→2`. The **Josephson junction** adds the nonlinear `−E_J cos φ` term that breaks the degeneracy:
+
+```
+H = 4 E_C (n − n_g)²  −  E_J cos(φ)        # transmon, charge basis
+```
+
+| Certified quantity | Result |
+|---|---|
+| Anharmonicity `α = ω₁₂ − ω₀₁` | `→ −E_C` (qubit `0↔1` is **addressable**) |
+| Certified `α` enclosure | rigorous interval **strictly < 0** ⇒ *provably* anharmonic |
+| Charge dispersion `ε₀₁` | `~exp(−√(8E_J/E_C))`: `0.25 → 4·10⁻⁵ → 3·10⁻⁸` (transmon noise-resistance) |
+
+```python
+>>> from gaugegap.quantum.transmon import analyze_transmon
+>>> r = analyze_transmon(EJ=50, EC=1)
+>>> round(r.anharmonicity_over_EC, 3), r.is_anharmonic_certified
+(-1.149, True)                            # nonlinearity ⇒ a real, addressable qubit
+```
+
+The Coq/Lean certificate (re-checked by z3, compiled by `coqc`) records the core: `E_C > 0 ⇒ ω₀₁ > ω₁₂` — the harmonic limit `E_C → 0` closes the gap. 📖 [`docs/transmon.md`](docs/transmon.md)
+
+> 🧭 **Boundary:** the standard Cooper-pair-box / transmon model (Koch et al. 2007), a finite charge-basis diagonalization with a rigorous interval enclosure of the anharmonicity; energies in units of `E_C` — not a fabrication, materials, coherence-time, or specific-device claim, and not a physical-limits-web member.
 
 ---
 

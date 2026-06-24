@@ -482,55 +482,63 @@ def quantum_speed_limit(
     hamiltonian: np.ndarray,
 ) -> Dict[str, float]:
     """
-    Compute quantum speed limits.
-    
+    Compute quantum speed limits for evolving ``initial_state`` to
+    ``target_state`` under ``hamiltonian``.
+
     Mathematical Framework
     ----------------------
-    Two fundamental bounds on evolution time:
-    
+    Two fundamental bounds on evolution time (hbar = 1):
+
     1. Mandelstam-Tamm bound:
-       τ ≥ ℏπ/(2ΔE)
-       where ΔE = √(⟨H²⟩ - ⟨H⟩²) is energy uncertainty
-    
+       τ ≥ L/ΔE
+       where L = arccos|⟨ψ_target|ψ_0⟩| is the Fubini-Study distance and
+       ΔE = √(⟨H²⟩ - ⟨H⟩²) is the energy uncertainty.
+
     2. Margolus-Levitin bound:
-       τ ≥ ℏπ/(2E)
-       where E = ⟨H⟩ - E_min is energy above ground state
-    
-    Actual bound: τ ≥ max(τ_MT, τ_ML)
-    
+       τ ≥ L/(⟨H⟩ - E_min)
+       where ⟨H⟩ - E_min is the mean energy above the ground state.
+
+    Actual bound: τ ≥ max(τ_MT, τ_ML).
+
+    Implementation
+    --------------
+    This is a thin adapter over the *canonical* speed-limit routine in
+    :mod:`gaugegap.quantum.entanglement_speed_limit`, which is the web
+    member that owns the Mandelstam-Tamm / Margolus-Levitin maths and
+    emits the discharged Lean4/Coq certificates. Keeping a single
+    implementation removes the duplicated bound computation; this wrapper
+    only remaps the canonical ``tau_*`` keys to the field names this module
+    has historically exposed.
+
     Parameters
     ----------
     initial_state : array
-        Initial state
+        Initial state.
     target_state : array
-        Target state
+        Target state.
     hamiltonian : array
-        Hamiltonian
-    
+        Hamiltonian.
+
     Returns
     -------
     dict
-        Speed limit bounds
-
-    Notes
-    -----
-    Single source of truth: this delegates to
-    ``gaugegap.quantum.entanglement_speed_limit.quantum_speed_limit`` (the canonical
-    Mandelstam-Tamm / Margolus-Levitin implementation used by the physical-limits web)
-    and re-keys the result to this module's historical dict shape.
+        Speed limit bounds.
     """
+    # Delegate the actual bound computation to the canonical web member so
+    # there is exactly one Mandelstam-Tamm / Margolus-Levitin implementation.
     from gaugegap.quantum.entanglement_speed_limit import (
         quantum_speed_limit as _canonical_qsl,
     )
 
-    r = _canonical_qsl(hamiltonian, initial_state, target_state)
+    canonical = _canonical_qsl(hamiltonian, initial_state, target_state)
+
     return {
-        "mandelstam_tamm_bound": float(r["tau_mandelstam_tamm"]),
-        "margolus_levitin_bound": float(r["tau_margolus_levitin"]),
-        "quantum_speed_limit": float(r["tau_qsl"]),
-        "state_distance": float(r["angle"]),
-        "energy_uncertainty": float(r["energy_uncertainty"]),
-        "energy_above_ground": float(r["energy_above_ground"]),
+        "mandelstam_tamm_bound": float(canonical["tau_mandelstam_tamm"]),
+        "margolus_levitin_bound": float(canonical["tau_margolus_levitin"]),
+        "quantum_speed_limit": float(canonical["tau_qsl"]),
+        "state_distance": float(canonical["angle"]),
+        "energy_uncertainty": float(canonical["energy_uncertainty"]),
+        "energy_above_ground": float(canonical["energy_above_ground"]),
     }
 
 
@@ -578,14 +586,18 @@ def pontryagin_maximum_principle(
     dict
         Optimal control analysis
     """
-    # Simplified analysis
-    # Full implementation would solve coupled ODEs
-    
+    # KNOWN LIMITATION (claim boundary): this routine reports the *structure*
+    # of the Pontryagin necessary conditions rather than numerically solving the
+    # coupled state/costate ODEs. A full implementation would integrate the
+    # forward state and backward costate equations and update the control toward
+    # the optimality condition. Returned values are descriptive metadata, not a
+    # converged optimal trajectory.
+    #
     # Optimal control satisfies:
     # u*(t) = arg max_u ℋ(ψ(t), λ(t), u)
-    
+    #
     # For quadratic cost: u*(t) ∝ ⟨λ(t)|H_control|ψ(t)⟩
-    
+
     return {
         "method": "pontryagin_maximum_principle",
         "evolution_time": float(T),
@@ -644,8 +656,11 @@ def robust_control_optimization(
     ControlResult
         Robust control result
     """
-    # Simplified: optimize average fidelity over noise
-    
+    # KNOWN LIMITATION (claim boundary): this routine optimizes against the
+    # nominal (noise-free) Hamiltonian and records the requested noise models as
+    # metadata; it does not yet average the fidelity over an ensemble of noisy
+    # realizations. Robustness here means the controls are tagged for downstream
+    # noise-aware evaluation, not that they were trained against the noise.
     if method == "GRAPE":
         result = grape_optimization(
             H_drift,
