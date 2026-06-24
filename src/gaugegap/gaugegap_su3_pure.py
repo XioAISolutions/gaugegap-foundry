@@ -233,7 +233,7 @@ class SU3PureGaugeLattice:
         # Roadmap: fit -log<W(R,T)> ~ sigma * R * T once Wilson loops exist.
         return {
             "observable": "string_tension",
-            "status": "not_implemented",
+            "status": "not_implemented",  # explicitly not implemented (prototype scaffold; known limitation)
             "implementation_status": IMPLEMENTATION_STATUS,
             "claim_boundary": CLAIM_BOUNDARY,
         }
@@ -260,7 +260,7 @@ class SU3PureGaugeLattice:
         # Roadmap: construct the per-site Gauss operators G_a and confirm they
         # commute with H and annihilate the physical states.
         return {
-            "gauss_law_satisfied": "not_implemented",
+            "gauss_law_satisfied": "not_implemented",  # explicitly not implemented (prototype scaffold; known limitation)
             "su3_algebra_closed": True,
             "hermiticity_checked_in_compute_gap": True,
             "verified_gauss_law": False,

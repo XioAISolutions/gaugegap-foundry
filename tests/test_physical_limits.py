@@ -33,6 +33,26 @@ class TestPhysicalLimitsCapstone(unittest.TestCase):
             for k, cert in payload["certificates"].items():
                 self.assertNotIn("sorry", cert, k)
                 self.assertNotIn("Admitted", cert, k)
+            # no operator bridge unless requested
+            self.assertIsNone(payload["operator_bridge"])
+
+    def test_operator_registry_bridge(self):
+        # --operator ties the certified-spectral registry to the QSL web member
+        with tempfile.TemporaryDirectory() as d:
+            proc = subprocess.run(
+                [sys.executable, str(ROOT / "scripts" / "run_physical_limits.py"),
+                 "--operator", "berry_keating_xp", "--operator-size", "6",
+                 "--output-dir", d, "--skip-audit"],
+                capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            payload = json.loads((Path(d) / "physical-limits.json").read_text())
+            self.assertTrue(payload["all_checks_pass"])
+            self.assertTrue(payload["checks"]["operator_qsl_respected"])
+            bridge = payload["operator_bridge"]
+            self.assertEqual(bridge["operator"], "berry_keating_xp")
+            self.assertTrue(bridge["respects_qsl"])
+            self.assertGreaterEqual(bridge["evolution_time"], bridge["tau_qsl"])
+            self.assertNotIn("Admitted", bridge["coq"])
 
 
 if __name__ == "__main__":

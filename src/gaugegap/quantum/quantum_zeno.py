@@ -81,8 +81,11 @@ def emit_zeno_certificate(label: str, S: float, N1: float, N2: float):
     The floor is B(N) = 1 - S/N with S = (dE T)^2 >= 0.  For measurement counts
     N2 >= N1 > 0 we have B(N2) >= B(N1); written with denominators cleared
     (multiply by N1*N2 > 0) this is ``N1*(N2 - S) >= N2*(N1 - S)``, which reduces to
-    S*(N2 - N1) >= 0.  Trust inputs: S >= 0 and N2 >= N1.  Interpretation: observing
-    more often raises the survival floor -- continuous observation freezes the system.
+    S*(N2 - N1) >= 0.  Trust inputs: S >= 0, N1 > 0, N2 > 0 and N2 >= N1.  The
+    positivity of N1, N2 is essential: it is what makes N1*N2 > 0, so the cleared
+    inequality is equivalent to (not merely implied by) the fractional statement
+    B(N2) >= B(N1).  Interpretation: observing more often raises the survival floor --
+    continuous observation freezes the system.
     """
     base = "".join(ch for ch in label.title() if ch.isalnum()) or "Z"
     ns = base if not base[0].isdigit() else "Z" + base
@@ -97,13 +100,17 @@ axiom N2 : ℝ
 
 /-- TRUST INPUT 1 -- the disturbance scale is non-negative. -/
 axiom S_nonneg : S ≥ 0
-/-- TRUST INPUT 2 -- N2 measures at least as often as N1. -/
+/-- TRUST INPUT 2 -- measurement counts are positive (so N1*N2 > 0; this is what
+    licenses clearing the denominators in B(N) = 1 - S/N). -/
+axiom N1_pos : N1 > 0
+axiom N2_pos : N2 > 0
+/-- TRUST INPUT 3 -- N2 measures at least as often as N1. -/
 axiom more_often : N2 ≥ N1
 
-/-- The Zeno survival floor is non-decreasing in N (denominators cleared):
-    N1*(N2 - S) ≥ N2*(N1 - S), i.e. B(N2) ≥ B(N1). -/
+/-- The Zeno survival floor is non-decreasing in N (denominators cleared, valid
+    because N1, N2 > 0): N1*(N2 - S) ≥ N2*(N1 - S), i.e. B(N2) ≥ B(N1). -/
 theorem zeno_floor_monotone : N1 * (N2 - S) ≥ N2 * (N1 - S) := by
-  nlinarith [S_nonneg, more_often]
+  nlinarith [S_nonneg, N1_pos, N2_pos, more_often]
 
 end QuantumZeno.{ns}
 """
@@ -118,11 +125,15 @@ Variable Sdist Na Nb : R.
 
 (* TRUST INPUT 1: non-negative disturbance scale. *)
 Hypothesis Sdist_nonneg : Sdist >= 0.
-(* TRUST INPUT 2: Nb measures at least as often as Na. *)
+(* TRUST INPUT 2: positive measurement counts (so Na*Nb > 0; this licenses clearing
+   the denominators in B(N) = 1 - Sdist/N). *)
+Hypothesis Na_pos : Na > 0.
+Hypothesis Nb_pos : Nb > 0.
+(* TRUST INPUT 3: Nb measures at least as often as Na. *)
 Hypothesis more_often : Nb >= Na.
 
-(* The Zeno survival floor is non-decreasing in N (denominators cleared):
-   Na*(Nb - Sdist) >= Nb*(Na - Sdist), i.e. B(Nb) >= B(Na). *)
+(* The Zeno survival floor is non-decreasing in N (denominators cleared, valid
+   because Na, Nb > 0): Na*(Nb - Sdist) >= Nb*(Na - Sdist), i.e. B(Nb) >= B(Na). *)
 Theorem zeno_floor_monotone : Na * (Nb - Sdist) >= Nb * (Na - Sdist).
 Proof. nra. Qed.
 

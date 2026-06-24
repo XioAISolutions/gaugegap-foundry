@@ -65,7 +65,7 @@
       "valid": true
     },
     {
-      "description": "Zeno floor monotone: S>=0,Nb>=Na => Na*(Nb-S)>=Nb*(Na-S)",
+      "description": "Zeno floor monotone: S>=0,Na>0,Nb>=Na => 1-S/Nb >= 1-S/Na",
       "name": "quantum_zeno",
       "valid": true
     },

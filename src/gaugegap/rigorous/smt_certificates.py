@@ -130,10 +130,12 @@ def _compton_schwarzschild(s):
 
 
 def _quantum_zeno(s):
-    # S>=0, Nb>=Na  =>  Na*(Nb-S) >= Nb*(Na-S)   (Zeno survival floor non-decreasing in N)
+    # S>=0, Na>0, Nb>=Na  =>  1 - S/Nb >= 1 - S/Na   (Zeno survival floor B(N)=1-S/N
+    # non-decreasing in N).  The fractional statement is checked directly, so the
+    # positivity of the measurement counts is essential and explicit.
     S, Na, Nb = z3.Reals("S Na Nb")
-    s.add(S >= 0, Nb >= Na)
-    s.add(z3.Not(Na * (Nb - S) >= Nb * (Na - S)))
+    s.add(S >= 0, Na > 0, Nb >= Na)
+    s.add(z3.Not(1 - S / Nb >= 1 - S / Na))
 
 
 def _transmon(s):
@@ -161,7 +163,7 @@ _SCHEMAS = [
      _lieb_robinson),
     ("compton_schwarzschild", "Planck floor: Rs>0,Lc>0,R>=Rs,R>=Lc => R^2>=Rs*Lc",
      _compton_schwarzschild),
-    ("quantum_zeno", "Zeno floor monotone: S>=0,Nb>=Na => Na*(Nb-S)>=Nb*(Na-S)",
+    ("quantum_zeno", "Zeno floor monotone: S>=0,Na>0,Nb>=Na => 1-S/Nb >= 1-S/Na",
      _quantum_zeno),
     ("transmon", "Josephson anharmonicity: Ec>0,w01=wt-Ec,w12=wt-2Ec => w01>w12",
      _transmon),

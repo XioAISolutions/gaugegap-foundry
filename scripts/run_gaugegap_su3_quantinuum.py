@@ -242,6 +242,7 @@ def main():
         # KNOWN LIMITATION / prototype: hardware integration is explicitly not
         # implemented in this demo path. roadmap: use the provider adapter.
         print("  This is a placeholder for future hardware integration.")
+        # prototype scaffold; known limitation (hardware path is not implemented here)
         print("  Use existing provider adapters for actual submission.")
         print()
     

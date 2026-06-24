@@ -36,6 +36,7 @@ from gaugegap.relativity.compton_schwarzschild import analyze_compton_schwarzsch
 from gaugegap.quantum.quantum_zeno import analyze_quantum_zeno
 from gaugegap.quantum.cherenkov import analyze_cherenkov
 from gaugegap.quantum.lieb_robinson import analyze_lieb_robinson
+from gaugegap.curverank_registry import get_operator, list_operators
 
 
 def main() -> int:
@@ -46,6 +47,12 @@ def main() -> int:
     ap.add_argument("--radius", type=float, default=2.0, help="Bekenstein region radius")
     ap.add_argument("--output-dir", type=Path,
                     default=ROOT / "results" / "physical-limits")
+    ap.add_argument("--operator", choices=list_operators(), default=None,
+                    help="also apply the quantum speed limit to a registered "
+                         "certified-spectral operator (bridges the two halves of the "
+                         "repo: the operator registry and the physical-limits web)")
+    ap.add_argument("--operator-size", type=int, default=6,
+                    help="matrix size for --operator")
     ap.add_argument("--skip-audit", action="store_true")
     args = ap.parse_args()
 
@@ -137,6 +144,34 @@ def main() -> int:
     print(f"  [measure<->time] Zeno: survival {zeno.survival[0]:.3f}->{zeno.survival[-1]:.3f} "
           f"as measurements rise, floor 1-(dE T)^2/N monotone  ok={zeno_ok}")
 
+    # [bridge] apply the quantum speed limit to a registered certified-spectral
+    # operator, tying the operator registry (the certified/spectral half of the repo)
+    # to the web of bounds. Dimension-agnostic: evolve a generic state for a fixed time
+    # and check it respects the Mandelstam-Tamm / Margolus-Levitin floor tau_qsl.
+    op_payload = None
+    if args.operator:
+        from gaugegap.quantum.entanglement_speed_limit import (
+            quantum_speed_limit as _qsl_floor, evolve_state,
+            emit_speed_limit_certificate)
+        spec = get_operator(args.operator)
+        H_op = np.asarray(spec.build(args.operator_size), dtype=complex)
+        H_op = (H_op + H_op.conj().T) / 2.0
+        # generic (non-eigenstate) start so the energy uncertainty is nonzero
+        psi0 = np.arange(1, H_op.shape[0] + 1, dtype=complex)
+        psi0 /= np.linalg.norm(psi0)
+        t_evolve = 1.0  # model units (hbar = 1)
+        psi_t = evolve_state(H_op, psi0, t_evolve)
+        q = _qsl_floor(H_op, psi0, psi_t)
+        respects = bool(t_evolve >= q["tau_qsl"] - 1e-9)
+        checks.append(("operator_qsl_respected", respects))
+        op_lean, op_coq = emit_speed_limit_certificate(
+            "operator", q["tau_mandelstam_tamm"], q["tau_margolus_levitin"])
+        op_payload = {"operator": spec.name, "size": int(H_op.shape[0]),
+                      "evolution_time": t_evolve, "respects_qsl": respects,
+                      "lean4": op_lean, "coq": op_coq, **q}
+        print(f"  [registry<->web] {spec.name}: evolve t={t_evolve} >= QSL floor "
+              f"{q['tau_qsl']:.4f}  ok={respects}")
+
     all_ok = all(ok for _, ok in checks)
     print("-" * 72)
     print(f"  ALL PHYSICAL-LIMIT CHECKS PASS: {all_ok}  "
@@ -156,6 +191,7 @@ def main() -> int:
         "lieb_robinson": lr.to_dict(),
         "compton_schwarzschild": cs.to_dict(),
         "quantum_zeno": zeno.to_dict(),
+        "operator_bridge": op_payload,
         "certificates": {
             "speed_limit_lean": qsl.lean4, "speed_limit_coq": qsl.coq,
             "temporal_double_slit_lean": tds.lean4, "temporal_double_slit_coq": tds.coq,
