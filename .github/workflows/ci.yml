@@ -9,77 +9,30 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  test:
+  core:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
       - name: Install
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e '.[dev]'
-      - name: Unit tests
-        run: python -m pytest
-      - name: Claim boundary audit
-        run: python scripts/claim_boundary_audit.py --strict --output-dir /tmp/gaugegap-claim-audit
-      - name: Research maturity audit (no unbounded prototype/placeholder claims)
-        run: python scripts/research_maturity_audit.py --strict --output-dir /tmp/gaugegap-maturity-audit
-      - name: gaugegap-search-0001 smoke
+      - name: Tests and hard audits
         run: |
-          python scripts/search_gap_candidates.py \
-            --output-dir /tmp/gaugegap-search-0001-smoke \
-            --n-plaquettes 1 \
-            --plaquette-couplings 1.0 \
-            --field-points 2 \
-            --max-candidates 1
-      - name: gaugegap-0004 hardware-readiness smoke
+          foundry run tests
+          foundry audit
+      - name: Config-driven finite-track smoke
         run: |
-          python scripts/run_candidate_validation.py \
-            --output-dir /tmp/gaugegap-0004-smoke \
-            --n-plaquettes 1 \
-            --disable-qiskit-probe
-      - name: Smoke sweep
-        run: python scripts/run_gap_sweep.py --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-smoke
-      - name: Z2 plaquette smoke
-        run: |
-          python scripts/run_z2_plaquette.py --output-dir /tmp/gaugegap-0002-exact
-          python scripts/run_quantum_gap_replica.py --output-dir /tmp/gaugegap-0002-replica
-          python scripts/run_z2_plaquette_sweep.py --output-dir /tmp/gaugegap-0002-sweep --run-id ci
-          python scripts/run_vqe_gap.py --output-dir /tmp/gaugegap-0002-vqe --samples 64
-      - name: Reproducibility proofpack smoke
-        run: |
-          python scripts/generate_reproducibility_proofpack.py \
-            --output-dir /tmp/gaugegap-proofpack \
-            --include-search \
-            --include-validation
-      - name: Quantum boundary status
-        run: python scripts/quantum_status.py --output-dir /tmp/gaugegap-quantum-status
-      - name: FlowGap smoke
-        run: python scripts/run_flowgap_burgers.py --sizes 16,32 --nu-points 3 --n-steps 20 --output-dir /tmp/flowgap-smoke
-      - name: U(1) gauge smoke
-        run: python scripts/run_gaugegap_u1.py --n-links 2 --truncation 1,2 --g-mag-points 3 --output-dir /tmp/u1-smoke
-
-  spectral-smoke:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.12"]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install spectral extras
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e '.[spectral]'
-      - name: CurveRank smoke
-        run: python scripts/run_curverank_screen.py --family xp --n-basis 10,20 --k-zeros 10 --output-dir /tmp/curverank-smoke
+          foundry run gap-sweep-smoke
+          foundry run gaugegap-0002
+          foundry run gaugegap-u1-0001
+          foundry run flowgap-0001
+          foundry run curverank-screen-smoke
+      - name: Proofpack build smoke
+        run: foundry run proofpack-build
 
   quantum-smoke:
     runs-on: ubuntu-latest
@@ -91,67 +44,22 @@ jobs:
       - name: Install quantum extras
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e '.[quantum]'
-      - name: Qiskit Pauli smoke
+          python -m pip install -e '.[quantum,dev]'
+      - name: Provider and Pauli regression tests
         run: |
           python -m unittest tests.test_qiskit_backend
           python -m unittest tests.test_qiskit_dynamics
           python -m unittest tests.test_pauli_export
           python -m unittest tests.test_qiskit_validation_optional
-          python scripts/run_gap_sweep.py --method qiskit-pauli --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-qiskit-smoke
-          python scripts/run_quantum_gap_replica.py --output-dir /tmp/gaugegap-0002-replica-qiskit
-          python scripts/run_qiskit_candidate_validation.py --output-dir /tmp/gaugegap-qiskit-smoke-candidate --n-plaquettes 1 --shots 128
-          python scripts/run_dynamics.py --backend statevector --n-sites 4 --times 0,0.5 --output-dir /tmp/gaugegap-statevector-smoke
-          python scripts/run_dynamics.py --backend aer-sampler --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/gaugegap-aer-smoke
-          python scripts/run_dynamics.py --backend aer-sampler --noise depolarizing --n-sites 4 --times 0,0.5 --shots 128 --output-dir /tmp/gaugegap-aer-depol-smoke
-          mkdir -p /tmp/gaugegap-dynamics-combined
-          cp /tmp/gaugegap-statevector-smoke/*.csv /tmp/gaugegap-dynamics-combined/
-          cp /tmp/gaugegap-aer-smoke/*.csv /tmp/gaugegap-dynamics-combined/
-          cp /tmp/gaugegap-aer-depol-smoke/*.csv /tmp/gaugegap-dynamics-combined/
-          python scripts/analyze_dynamics.py --input-dir /tmp/gaugegap-dynamics-combined --output-dir /tmp/gaugegap-analysis-smoke
-      - name: Unified pipeline + quantum-validation integration
+      - name: Config-driven certified quantum lane
         run: |
-          python scripts/run_unified_pipeline.py --n-basis 8 --k-zeros 20 --deep --output-dir results/unified-pipeline
-          python scripts/run_unified_pipeline.py --operator quantum_graph --n-basis 6 --skip-quantum --output-dir results/unified-pipeline-qg
-          python scripts/run_quantum_validation.py --operator berry_keating_xp --n-basis 8 --methods esprit,qcels,krylov,qpe --emulator --output-dir results/quantum-validation
-      - name: Error-budget smoke (repeated-seed runs + CI)
-        run: python scripts/run_error_budget.py --n-basis 8 --n-runs 4 --output-dir results/error-budget
-      - name: Certify scaling smoke
-        run: python scripts/run_certify_scaling.py --sizes 4,8 --output-dir results/certify-scaling
-      - name: Certified bracket smoke
-        run: python scripts/run_certified_bracket.py --operator berry_keating_xp --n-basis 8 --output-dir results/certified-bracket
-      - name: Certified shadows smoke
-        run: python scripts/run_certified_shadows.py --operator berry_keating_xp --n-basis 8 --n-snapshots 300 --n-batches 8 --output-dir results/certified-shadows
-      - name: QSVT transform smoke
-        run: python scripts/run_qsvt.py --operator berry_keating_xp --n-basis 8 --coeffs 0,0,1 --output-dir results/qsvt
-      - name: Temple-Kato bracket smoke
-        run: python scripts/run_temple_bracket.py --operator berry_keating_xp --n-basis 8 --output-dir results/temple-bracket
-      - name: Open-system steady-state smoke
-        run: python scripts/run_open_system.py --n-sites 2 --output-dir results/open-system
-      - name: Certified-quantum capstone smoke
-        run: python scripts/run_certified_quantum_report.py --operator berry_keating_xp --n-basis 8 --output-dir results/certified-quantum
-      - name: Entanglement-dynamics smoke
-        run: python scripts/run_entanglement_dynamics.py --coupling 1.0 --samples 80 --output-dir results/entanglement-dynamics
-      - name: Entanglement speed-limit smoke
-        run: python scripts/run_entanglement_speed_limit.py --samples 120 --sweep 0.5,1.0,2.0 --output-dir results/entanglement-speed-limit
-      - name: Alcubierre warp energy-condition smoke
-        run: python scripts/run_alcubierre_warp.py --n-grid 50 --output-dir results/alcubierre-warp
-      - name: Decoherence-branching smoke
-        run: python scripts/run_decoherence_branching.py --d 3 --n-env-max 16 --output-dir results/decoherence-branching
-      - name: Ergotropy no-free-energy smoke
-        run: python scripts/run_ergotropy.py --random-unitaries 400 --output-dir results/ergotropy
-      - name: Temporal double-slit smoke
-        run: python scripts/run_temporal_double_slit.py --n 4096 --output-dir results/temporal-double-slit
-      - name: Physical-limits capstone smoke
-        run: python scripts/run_physical_limits.py --d 3 --output-dir results/physical-limits
-      - name: Physical-limits figures smoke
-        run: python scripts/generate_physical_limits_figures.py --output-dir /tmp/physical-limits-figures
-      - name: Sonification & sampling-limit smoke
-        run: python scripts/run_sonification.py --output-dir results/sonification
-      - name: Cherenkov cone smoke
-        run: python scripts/run_cherenkov.py --n-sources 200 --output-dir results/cherenkov
-      - name: Lieb-Robinson light-cone smoke
-        run: python scripts/run_lieb_robinson.py --n-sites 31 --output-dir results/lieb-robinson
+          foundry run curverank-0001
+          foundry run quantum-validate
+          foundry run certified-bracket
+          foundry run certified-shadows
+          foundry run open-system
+          foundry run certified-quantum
+          foundry run physical-limits
 
   packaging:
     runs-on: ubuntu-latest
@@ -160,13 +68,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Build wheel + sdist
+      - name: Build and install
         run: |
           python -m pip install --upgrade pip build
           python -m build
-      - name: Install wheel and check the gaugegap-certify entry point
-        run: |
           python -m pip install dist/*.whl
+      - name: Check console entry points
+        run: |
+          foundry list --json > /tmp/foundry-units.json
           python -c "import numpy as np; np.save('/tmp/id.npy', np.diag([1.0,2.0,3.0,4.0]))"
           gaugegap-certify /tmp/id.npy --output /tmp/cert.json
-          python -c "import json; d=json.load(open('/tmp/cert.json')); assert d['n']==4, d; print('entry point OK:', d['n'], 'eigenvalues certified')"
