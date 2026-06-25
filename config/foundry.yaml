@@ -1,0 +1,446 @@
+version: 1
+
+# Canonical orchestration parameters. Compatibility surfaces call these IDs;
+# they do not own independent scientific parameter sets.
+discovery:
+  enabled: true
+  glob: scripts/run_*.py
+
+units:
+  tests:
+    track: integrity
+    status: production
+    description: Full Python test suite.
+    command: ["{python}", "-m", "pytest"]
+
+  claim-boundary:
+    track: integrity
+    status: production
+    description: Hard claim-boundary audit.
+    command: ["{python}", "scripts/claim_boundary_audit.py", "--strict"]
+
+  research-maturity:
+    track: integrity
+    status: production
+    description: Hard maturity audit for unbounded placeholders/prototypes.
+    command: ["{python}", "scripts/research_maturity_audit.py", "--strict"]
+
+  gap-sweep-smoke:
+    track: gaugegap
+    hypothesis: gaugegap-0001
+    status: production
+    command:
+      ["{python}", "scripts/run_gap_sweep.py", "--sizes", "4,6", "--field-points", "3",
+       "--output-dir", "/tmp/gaugegap-smoke"]
+
+  gaugegap-0001:
+    track: gaugegap
+    hypothesis: gaugegap-0001
+    status: production
+    description: Finite Z2 dual-chain gap sweep.
+    command:
+      ["{python}", "scripts/run_gap_sweep.py", "--sizes", "4,6,8",
+       "--field-points", "9", "--output-dir", "results/gaugegap-0001"]
+
+  gaugegap-0002:
+    track: gaugegap
+    hypothesis: gaugegap-0002
+    status: production
+    description: Finite Z2 plaquette sweep.
+    command:
+      ["{python}", "scripts/run_z2_plaquette_sweep.py",
+       "--output-dir", "results/gaugegap-0002", "--run-id", "foundry"]
+
+  gaugegap-u1-0001:
+    track: gaugegap
+    hypothesis: gaugegap-u1-0001
+    status: production
+    command:
+      ["{python}", "scripts/run_gaugegap_u1.py", "--n-links", "2",
+       "--truncation", "1,2", "--g-mag-points", "3",
+       "--output-dir", "results/gaugegap-u1-0001"]
+
+  gaugegap-0003:
+    track: gaugegap
+    hypothesis: gaugegap-0003
+    status: production
+    command:
+      ["{python}", "scripts/run_gaugegap_su2_pure.py",
+       "--output-dir", "results/gaugegap-0003"]
+
+  gaugegap-0004:
+    track: gaugegap
+    hypothesis: gaugegap-0004
+    status: production
+    command:
+      ["{python}", "scripts/run_candidate_validation.py",
+       "--output-dir", "results/gaugegap-0004", "--n-plaquettes", "1",
+       "--disable-qiskit-probe"]
+
+  gaugegap-search-0001:
+    track: gaugegap
+    hypothesis: gaugegap-search-0001
+    status: production
+    command:
+      ["{python}", "scripts/search_gap_candidates.py",
+       "--output-dir", "results/gaugegap-search-0001", "--n-plaquettes", "1",
+       "--plaquette-couplings", "1.0", "--field-points", "2",
+       "--max-candidates", "1"]
+
+  su3-prototype-smoke:
+    track: gaugegap
+    hypothesis: gaugegap-0005
+    status: prototype_scaffold
+    command:
+      ["{python}", "scripts/run_gaugegap_su3_pure.py",
+       "--lattice-sizes", "2x2", "--g-coupling-points", "2",
+       "--output-dir", "/tmp/su3-prototype-smoke"]
+
+  flowgap-0001:
+    track: flowgap
+    hypothesis: flowgap-0001
+    status: production
+    description: Viscous Burgers finite-difference benchmark.
+    command:
+      ["{python}", "scripts/run_flowgap_burgers.py", "--sizes", "16,32,64",
+       "--nu-points", "5", "--n-steps", "50",
+       "--output-dir", "results/flowgap-0001"]
+
+  curverank-screen-smoke:
+    track: curverank
+    hypothesis: curverank-0001
+    status: production
+    command:
+      ["{python}", "scripts/run_curverank_screen.py", "--family", "xp",
+       "--n-basis", "10,20", "--k-zeros", "10",
+       "--output-dir", "/tmp/curverank-smoke"]
+
+  curverank-proof-reproduction:
+    track: curverank
+    hypothesis: curverank-0001
+    status: production
+    command:
+      ["{python}", "scripts/run_curverank_screen.py", "--family", "xp",
+       "--n-basis", "10,15,20", "--k-zeros", "20",
+       "--output-dir", "/tmp/verify-proof"]
+
+  curverank-0001:
+    track: curverank
+    hypothesis: curverank-0001
+    status: production
+    description: Full finite-truncation unified CurveRank pipeline.
+    command:
+      ["{python}", "scripts/run_unified_pipeline.py", "--n-basis", "8",
+       "--k-zeros", "20", "--deep",
+       "--output-dir", "results/unified-pipeline"]
+
+  curverank-formal:
+    track: curverank
+    status: production
+    command:
+      ["{python}", "scripts/run_curverank_formal_proof.py",
+       "--n-panel", "10,15,20,25,30", "--k-zeros", "20",
+       "--output-dir", "results/curverank-formal"]
+
+  curverank-ibm:
+    track: curverank
+    status: hardware_gated
+    command:
+      ["{python}", "scripts/run_curverank_ibm.py", "--emulator",
+       "--n-basis", "4,8,16", "--n-precision", "6", "--shots", "4096", "--yes",
+       "--output-dir", "results/curverank-ibm"]
+
+  curverank-hardware:
+    track: curverank
+    status: evidence_only
+    command:
+      ["{python}", "scripts/run_curverank_hardware_report.py",
+       "--output-dir", "results/curverank-hardware"]
+
+  curverank-signal:
+    track: curverank
+    status: production
+    command:
+      ["{python}", "scripts/run_curverank_signal.py", "--n-basis", "8",
+       "--method", "esprit", "--output-dir", "results/curverank-signal"]
+
+  curverank-noise-study:
+    track: curverank
+    status: evidence_only
+    command:
+      ["{python}", "scripts/run_curverank_noise_study.py",
+       "--output-dir", "results/curverank-noise"]
+
+  cudaq-benchmark:
+    track: quantum
+    status: optional_backend
+    command:
+      ["{python}", "scripts/run_cudaq_benchmark.py", "--max-qubits", "12",
+       "--output-dir", "results/cudaq-benchmark"]
+
+  quantum-validate:
+    track: quantum
+    status: production
+    command:
+      ["{python}", "scripts/run_quantum_validation.py",
+       "--operator", "berry_keating_xp", "--n-basis", "8",
+       "--methods", "esprit,qcels,krylov",
+       "--output-dir", "results/quantum-validation"]
+
+  error-budget:
+    track: integrity
+    status: production
+    command:
+      ["{python}", "scripts/run_error_budget.py", "--n-basis", "8",
+       "--n-runs", "20", "--output-dir", "results/error-budget"]
+
+  certify-scaling:
+    track: integrity
+    status: production
+    command:
+      ["{python}", "scripts/run_certify_scaling.py", "--sizes", "4,8,16,32",
+       "--output-dir", "results/certify-scaling"]
+
+  certified-bracket:
+    track: quantum
+    status: production
+    command:
+      ["{python}", "scripts/run_certified_bracket.py",
+       "--operator", "berry_keating_xp", "--n-basis", "8",
+       "--output-dir", "results/certified-bracket"]
+
+  certified-shadows:
+    track: quantum
+    status: production
+    command:
+      ["{python}", "scripts/run_certified_shadows.py",
+       "--operator", "berry_keating_xp", "--n-basis", "8",
+       "--output-dir", "results/certified-shadows"]
+
+  qsvt:
+    track: quantum
+    status: production
+    command:
+      ["{python}", "scripts/run_qsvt.py", "--operator", "berry_keating_xp",
+       "--n-basis", "8", "--coeffs", "0,0,1",
+       "--output-dir", "results/qsvt"]
+
+  temple-bracket:
+    track: quantum
+    status: production
+    command:
+      ["{python}", "scripts/run_temple_bracket.py",
+       "--operator", "berry_keating_xp", "--n-basis", "8",
+       "--output-dir", "results/temple-bracket"]
+
+  open-system:
+    track: quantum
+    status: production
+    command:
+      ["{python}", "scripts/run_open_system.py", "--n-sites", "2",
+       "--output-dir", "results/open-system"]
+
+  certified-quantum:
+    track: quantum
+    status: production
+    command:
+      ["{python}", "scripts/run_certified_quantum_report.py",
+       "--operator", "berry_keating_xp", "--n-basis", "8",
+       "--output-dir", "results/certified-quantum"]
+
+  entanglement-dynamics:
+    track: physical-limits
+    status: production
+    command:
+      ["{python}", "scripts/run_entanglement_dynamics.py", "--coupling", "1.0",
+       "--output-dir", "results/entanglement-dynamics"]
+
+  entanglement-speed-limit:
+    track: physical-limits
+    status: production
+    command:
+      ["{python}", "scripts/run_entanglement_speed_limit.py",
+       "--energy-scale-ev", "10",
+       "--output-dir", "results/entanglement-speed-limit"]
+
+  alcubierre-warp:
+    track: physical-limits
+    status: production
+    command:
+      ["{python}", "scripts/run_alcubierre_warp.py",
+       "--output-dir", "results/alcubierre-warp"]
+
+  decoherence-branching:
+    track: physical-limits
+    status: production
+    command:
+      ["{python}", "scripts/run_decoherence_branching.py", "--d", "3",
+       "--output-dir", "results/decoherence-branching"]
+
+  ergotropy:
+    track: physical-limits
+    status: production
+    command:
+      ["{python}", "scripts/run_ergotropy.py",
+       "--output-dir", "results/ergotropy"]
+
+  physical-limits:
+    track: physical-limits
+    status: production
+    command:
+      ["{python}", "scripts/run_physical_limits.py",
+       "--output-dir", "results/physical-limits"]
+
+  temporal-double-slit:
+    track: physical-limits
+    status: production
+    command:
+      ["{python}", "scripts/run_temporal_double_slit.py",
+       "--output-dir", "results/temporal-double-slit"]
+
+  physical-limits-figures:
+    track: physical-limits
+    status: production
+    command:
+      ["{python}", "scripts/generate_physical_limits_figures.py",
+       "--output-dir", "figures/physical-limits"]
+
+  verify-certificates:
+    track: integrity
+    status: production
+    command:
+      ["{python}", "scripts/verify_certificates.py",
+       "--output-dir", "results/smt-verification"]
+
+  compile-coq:
+    track: integrity
+    status: production
+    command:
+      ["{python}", "scripts/compile_coq_certificates.py", "--emit"]
+
+  sonification:
+    track: physical-limits
+    status: production
+    command:
+      ["{python}", "scripts/run_sonification.py",
+       "--output-dir", "results/sonification"]
+
+  cherenkov:
+    track: physical-limits
+    status: production
+    command:
+      ["{python}", "scripts/run_cherenkov.py",
+       "--output-dir", "results/cherenkov"]
+
+  lieb-robinson:
+    track: physical-limits
+    status: production
+    command:
+      ["{python}", "scripts/run_lieb_robinson.py",
+       "--output-dir", "results/lieb-robinson"]
+
+  geometry-core:
+    track: geometry
+    status: production
+    command:
+      ["{python}", "scripts/generate_geometry_figures.py",
+       "--output-dir", "figures/geometry"]
+
+  geometry-html:
+    track: geometry
+    status: production
+    command:
+      ["{python}", "scripts/generate_geometry_html.py",
+       "--output", "figures/geometry/geometry_explorer.html"]
+
+  geometry-extra:
+    track: geometry
+    status: production
+    command:
+      ["{python}", "scripts/generate_geometry_extra.py",
+       "--output-dir", "figures/geometry"]
+
+  spectra-curverank:
+    track: dsl
+    status: production
+    command:
+      ["{python}", "scripts/run_spectra.py", "examples/curverank_screen.spectra"]
+
+  verdict-sentiment-f1:
+    track: dsl
+    status: production
+    command:
+      ["{python}", "scripts/run_verdict.py", "examples/sentiment_f1.verdict"]
+
+  proofpack-build:
+    track: integrity
+    status: production
+    command:
+      ["{python}", "scripts/generate_reproducibility_proofpack.py",
+       "--output-dir", "results/proofpack", "--include-search", "--include-validation"]
+
+  proofpack-verify:
+    track: integrity
+    status: production
+    command: ["{python}", "scripts/verify_proofpack.py"]
+
+  reviewer-packet:
+    track: integrity
+    status: production
+    command:
+      ["{python}", "scripts/build_reviewer_packet.py",
+       "--output-dir", "results/reviewer-packet"]
+
+  quantum-status:
+    track: quantum
+    status: production
+    command:
+      ["{python}", "scripts/quantum_status.py",
+       "--output-dir", "/tmp/gaugegap-quantum-status"]
+
+groups:
+  audit:
+    - claim-boundary
+    - research-maturity
+
+  smoke:
+    - tests
+    - gap-sweep-smoke
+    - curverank-screen-smoke
+    - su3-prototype-smoke
+
+  curverank:
+    - curverank-formal
+    - curverank-ibm
+    - curverank-hardware
+    - curverank-signal
+    - curverank-noise-study
+
+  geometry-figures:
+    - geometry-core
+    - geometry-html
+    - geometry-extra
+
+  proofpack:
+    - audit
+    - smoke
+    - proofpack-build
+    - proofpack-verify
+    - reviewer-packet
+
+  all:
+    - gaugegap-0001
+    - gaugegap-0002
+    - gaugegap-u1-0001
+    - gaugegap-0003
+    - gaugegap-0004
+    - gaugegap-search-0001
+    - flowgap-0001
+    - curverank-0001
+    - physical-limits
+    - spectra-curverank
+    - verdict-sentiment-f1
+    - audit
+    - proofpack-build
+    - proofpack-verify
+    - reviewer-packet
