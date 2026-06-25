@@ -1,0 +1,55 @@
+version: 1
+
+units:
+  flowgap-attractor-smoke:
+    track: flowgap
+    hypothesis: flowgap-0002
+    status: production
+    description: Short deterministic Attractor Forge CI smoke.
+    command:
+      ["{python}", "scripts/run_attractor_forge.py", "--system", "rossler",
+       "--steps", "1800", "--transient", "300", "--sample-every", "2",
+       "--lyapunov-steps", "1800", "--skip-audit",
+       "--output-dir", "/tmp/flowgap-attractor-smoke"]
+
+  flowgap-0002-rossler:
+    track: flowgap
+    hypothesis: flowgap-0002
+    status: production
+    description: Rössler Attractor Forge with finite-time diagnostics and divergence certificate.
+    command:
+      ["{python}", "scripts/run_attractor_forge.py", "--system", "rossler",
+       "--params", "a=0.2,b=0.2,c=5.7", "--dt", "0.01",
+       "--steps", "30000", "--transient", "5000", "--sample-every", "2",
+       "--lyapunov-steps", "30000", "--bifurcation-points", "24",
+       "--output-dir", "results/flowgap-0002-attractor-forge"]
+
+  flowgap-0003-lorenz:
+    track: flowgap
+    hypothesis: flowgap-0003
+    status: production
+    description: Lorenz finite-time attractor diagnostics with global divergence certificate.
+    command:
+      ["{python}", "scripts/run_attractor_forge.py", "--system", "lorenz",
+       "--dt", "0.005", "--steps", "40000", "--transient", "5000",
+       "--sample-every", "4", "--lyapunov-steps", "40000",
+       "--bifurcation-points", "24",
+       "--output-dir", "results/flowgap-0003-lorenz"]
+
+  flowgap-0004-thomas:
+    track: flowgap
+    hypothesis: flowgap-0004
+    status: production
+    description: Thomas cyclic flow diagnostics with global divergence certificate.
+    command:
+      ["{python}", "scripts/run_attractor_forge.py", "--system", "thomas",
+       "--dt", "0.02", "--steps", "50000", "--transient", "8000",
+       "--sample-every", "4", "--lyapunov-steps", "50000",
+       "--bifurcation-points", "20",
+       "--output-dir", "results/flowgap-0004-thomas"]
+
+groups:
+  attractor-forge:
+    - flowgap-0002-rossler
+    - flowgap-0003-lorenz
+    - flowgap-0004-thomas
