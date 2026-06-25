@@ -5,10 +5,12 @@
 	temple-bracket open-system certified-quantum entanglement-dynamics \
 	entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy \
 	landauer bekenstein physical-limits temporal-double-slit physical-limits-figures \
-	verify-certificates compile-coq sonification cherenkov lieb-robinson
+	verify-certificates compile-coq sonification cherenkov lieb-robinson \
+	attractor-forge rossler lorenz thomas
 
 # Pin proof artifacts to the HEAD commit time so a fixed commit remains
-# byte-reproducible. The orchestration parameters live only in config/foundry.yaml.
+# byte-reproducible. The orchestration parameters live in config/foundry.yaml
+# and deterministic config/foundry.d fragments.
 SOURCE_DATE_EPOCH := $(shell git -C . log -1 --format=%ct 2>/dev/null || echo 1700000000)
 export SOURCE_DATE_EPOCH
 
@@ -127,3 +129,15 @@ lieb-robinson:
 
 geometry-figures:
 	$(FOUNDRY) run geometry-figures
+
+attractor-forge:
+	$(FOUNDRY) run attractor-forge
+
+rossler:
+	$(FOUNDRY) run flowgap-0002-rossler
+
+lorenz:
+	$(FOUNDRY) run flowgap-0003-lorenz
+
+thomas:
+	$(FOUNDRY) run flowgap-0004-thomas
