@@ -3,6 +3,10 @@
 The CLI intentionally starts as a thin, auditable process orchestrator. Scientific
 stage generalization belongs in ``unified_orchestrator`` (Phase 2); this module
 eliminates parameter drift now without rewriting working science code.
+
+The base ``config/foundry.yaml`` may be extended by sorted YAML fragments in
+``config/foundry.d/``.  Duplicate unit or group IDs fail closed, so modularity
+does not create a second ambiguous source of truth.
 """
 from __future__ import annotations
 
@@ -55,6 +59,7 @@ class FoundryConfig:
     groups: Mapping[str, tuple[str, ...]]
     discovery_enabled: bool = True
     discovery_glob: str = "scripts/run_*.py"
+    sources: tuple[Path, ...] = ()
 
 
 def _as_string_list(value: Any, *, field: str) -> tuple[str, ...]:
@@ -63,23 +68,66 @@ def _as_string_list(value: Any, *, field: str) -> tuple[str, ...]:
     return tuple(value)
 
 
-def load_config(path: Path | str = DEFAULT_CONFIG) -> FoundryConfig:
-    """Load and validate the orchestration source of truth."""
-    config_path = Path(path).resolve()
+def _read_yaml_mapping(path: Path, *, require_version: bool) -> dict[str, Any]:
     try:
-        raw = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+        raw = yaml.safe_load(path.read_text(encoding="utf-8"))
     except FileNotFoundError as exc:
-        raise FoundryConfigError(f"config not found: {config_path}") from exc
+        raise FoundryConfigError(f"config not found: {path}") from exc
     except yaml.YAMLError as exc:
-        raise FoundryConfigError(f"invalid YAML in {config_path}: {exc}") from exc
-
+        raise FoundryConfigError(f"invalid YAML in {path}: {exc}") from exc
     if not isinstance(raw, dict):
-        raise FoundryConfigError("top-level config must be a mapping")
-    if raw.get("version") != 1:
-        raise FoundryConfigError("config version must be 1")
+        raise FoundryConfigError(f"top-level config must be a mapping: {path}")
+    if require_version and raw.get("version") != 1:
+        raise FoundryConfigError(f"config version must be 1: {path}")
+    if not require_version and "version" in raw and raw.get("version") != 1:
+        raise FoundryConfigError(f"fragment version must be 1 when present: {path}")
+    return raw
 
-    raw_units = raw.get("units")
-    if not isinstance(raw_units, dict) or not raw_units:
+
+def _merge_named_mapping(
+    target: dict[str, Any],
+    incoming: Any,
+    *,
+    field: str,
+    source: Path,
+) -> None:
+    if incoming is None:
+        return
+    if not isinstance(incoming, dict):
+        raise FoundryConfigError(f"{field} must be a mapping: {source}")
+    duplicates = sorted(set(target) & set(incoming))
+    if duplicates:
+        raise FoundryConfigError(
+            f"duplicate {field} IDs in {source}: {', '.join(duplicates)}"
+        )
+    target.update(incoming)
+
+
+def load_config(path: Path | str = DEFAULT_CONFIG) -> FoundryConfig:
+    """Load the base configuration plus deterministic ``foundry.d`` fragments."""
+    config_path = Path(path).resolve()
+    raw = _read_yaml_mapping(config_path, require_version=True)
+    sources = [config_path]
+
+    raw_units: dict[str, Any] = {}
+    raw_groups: dict[str, Any] = {}
+    _merge_named_mapping(raw_units, raw.get("units"), field="units", source=config_path)
+    _merge_named_mapping(raw_groups, raw.get("groups", {}), field="groups", source=config_path)
+
+    fragment_dir = config_path.parent / "foundry.d"
+    fragments = sorted((*fragment_dir.glob("*.yaml"), *fragment_dir.glob("*.yml")))
+    for fragment in fragments:
+        payload = _read_yaml_mapping(fragment, require_version=False)
+        unknown = set(payload) - {"version", "units", "groups"}
+        if unknown:
+            raise FoundryConfigError(
+                f"unsupported fragment fields in {fragment}: {sorted(unknown)}"
+            )
+        _merge_named_mapping(raw_units, payload.get("units"), field="units", source=fragment)
+        _merge_named_mapping(raw_groups, payload.get("groups"), field="groups", source=fragment)
+        sources.append(fragment)
+
+    if not raw_units:
         raise FoundryConfigError("units must be a non-empty mapping")
 
     units: dict[str, UnitSpec] = {}
@@ -112,9 +160,6 @@ def load_config(path: Path | str = DEFAULT_CONFIG) -> FoundryConfig:
             environment=environment,
         )
 
-    raw_groups = raw.get("groups", {})
-    if not isinstance(raw_groups, dict):
-        raise FoundryConfigError("groups must be a mapping")
     groups = {
         name: _as_string_list(items, field=f"groups.{name}")
         for name, items in raw_groups.items()
@@ -129,6 +174,7 @@ def load_config(path: Path | str = DEFAULT_CONFIG) -> FoundryConfig:
         groups=groups,
         discovery_enabled=bool(discovery.get("enabled", True)),
         discovery_glob=str(discovery.get("glob", "scripts/run_*.py")),
+        sources=tuple(sources),
     )
 
 
@@ -228,6 +274,7 @@ def _list_payload(config: FoundryConfig, root: Path) -> dict[str, Any]:
     units = all_units(config, root)
     return {
         "config": str(config.path),
+        "config_sources": [str(path) for path in config.sources],
         "units": [
             {
                 "id": unit.id,
