@@ -24,9 +24,9 @@ experimental artifacts and do not constitute mathematical proof.
 
 ## One Foundry workflow
 
-All supported invocation surfaces now converge on `config/foundry.yaml` and the
-`foundry` CLI. Make, CI, and Docker remain convenient wrappers, but they do not
-own independent parameter sets.
+All supported invocation surfaces now converge on `config/foundry.yaml`, sorted
+fragments in `config/foundry.d/`, and the `foundry` CLI. Make, CI, and Docker
+remain convenient wrappers, but they do not own independent parameter sets.
 
 <details open>
 <summary><strong>Master architecture</strong></summary>
@@ -34,7 +34,7 @@ own independent parameter sets.
 ```mermaid
 flowchart TB
     subgraph ENTRY["① One entry point"]
-        CFG["config/foundry.yaml<br/>track · hypothesis · parameters"]
+        CFG["config/foundry.yaml + foundry.d<br/>track · hypothesis · parameters"]
         CLI["foundry CLI<br/>run · list · audit · proofpack · all"]
         MK["Makefile"]:::thin
         CI["GitHub workflows"]:::thin
@@ -93,11 +93,24 @@ migration plan live in **[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)**.
 | Track | Finite scope | Main boundary |
 |---|---|---|
 | **GaugeGap** | Z₂ → U(1) → SU(2) → bounded SU(3) scaffold | no continuum mass-gap claim |
-| **FlowGap** | deterministic finite PDE and nonlinear-system benchmarks | no Navier–Stokes regularity claim |
+| **FlowGap** | deterministic finite PDE and nonlinear-system benchmarks, including Attractor Forge | no Navier–Stokes regularity or formal chaos claim |
 | **CurveRank** | certified screening of specified finite operator truncations | no RH or Hilbert–Pólya proof |
 | **Physical limits** | established bounds reduced to exactly computable finite cores | no exotic-device or free-energy claim |
 | **Spectra DSL** | assertions backed by certified interval evidence | certification fails closed |
 | **Verdict DSL** | assertions backed by logged reproducible evaluations | model claims fail closed |
+
+### Attractor Forge
+
+Attractor Forge turns Rössler, Lorenz, and Thomas systems into reproducible
+finite-time evidence bundles: RK4 trajectories, fixed-point stability, Poincaré
+return maps, the full finite-time Lyapunov spectrum, short-horizon step-halving,
+sensitivity, FFT peaks, recurrence/correlation estimates, parameter sweeps,
+SVGs, a self-contained rotating HTML explorer, ledger hashes, and hole-free
+Lean/Coq divergence bounds.
+
+The visual and numerical diagnostics are not presented as formal proofs of chaos,
+global attraction, ergodicity, or a fractal invariant. See
+[`docs/attractor-forge.md`](docs/attractor-forge.md).
 
 ## One entry point
 
@@ -110,6 +123,8 @@ foundry list
 foundry run curverank-0001
 foundry run gaugegap-0002
 foundry run flowgap-0001
+foundry run flowgap-0002-rossler
+foundry run attractor-forge
 foundry audit
 foundry proofpack
 ```
@@ -125,6 +140,10 @@ Existing commands remain available:
 make smoke
 make audit
 make unified
+make attractor-forge
+make rossler
+make lorenz
+make thomas
 make proofpack
 make reviewer-packet
 
@@ -174,6 +193,7 @@ Riemann Hypothesis.
 ## Documentation
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — master system architecture and migration spec
+- [`docs/attractor-forge.md`](docs/attractor-forge.md) — nonlinear-dynamics evidence ladder and formal boundaries
 - [`docs/solution-gap-audit.md`](docs/solution-gap-audit.md) — honest gap to stronger scientific claims
 - [`docs/agent-work-orders.md`](docs/agent-work-orders.md) — execution-ready hardening tasks
 - [`docs/physical-limits-web.md`](docs/physical-limits-web.md) — certified physical-limits synthesis
