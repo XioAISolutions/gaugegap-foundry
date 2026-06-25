@@ -268,11 +268,6 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser = sub.add_parser("run", help="Run a configured unit or group.")
     run_parser.add_argument("id")
     run_parser.add_argument("--dry-run", action="store_true")
-    run_parser.add_argument(
-        "extra",
-        nargs=argparse.REMAINDER,
-        help="Extra arguments passed after '--' to a single unit.",
-    )
 
     for verb in ("audit", "proofpack", "all"):
         command_parser = sub.add_parser(verb, help=f"Run the configured {verb} group.")
@@ -283,7 +278,9 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
-    args = parser.parse_args(argv)
+    args, extra = parser.parse_known_args(argv)
+    if args.verb != "run" and extra:
+        parser.error("unrecognized arguments: " + " ".join(extra))
     try:
         config = load_config(args.config)
         root = args.root.resolve()
@@ -305,14 +302,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 0
 
         if args.verb == "run":
-            extra = list(args.extra)
-            if extra[:1] == ["--"]:
-                extra = extra[1:]
+            forwarded = list(extra)
+            if forwarded[:1] == ["--"]:
+                forwarded = forwarded[1:]
             return run_named(
                 args.id,
                 config,
                 root=root,
-                extra_args=extra,
+                extra_args=forwarded,
                 dry_run=args.dry_run,
             )
 
