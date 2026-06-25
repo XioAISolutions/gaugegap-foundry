@@ -1,245 +1,129 @@
 .PHONY: install-dev smoke audit audit-strict proofpack proofpack-verify reviewer-packet \
 	curverank curverank-formal curverank-ibm curverank-hardware curverank-signal \
 	curverank-noise-study cudaq-benchmark unified quantum-validate error-budget \
-	certify-scaling geometry-figures certified-bracket certified-shadows qsvt temple-bracket open-system certified-quantum entanglement-dynamics entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy landauer bekenstein physical-limits temporal-double-slit physical-limits-figures verify-certificates compile-coq sonification cherenkov lieb-robinson
+	certify-scaling geometry-figures certified-bracket certified-shadows qsvt \
+	temple-bracket open-system certified-quantum entanglement-dynamics \
+	entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy \
+	landauer bekenstein physical-limits temporal-double-slit physical-limits-figures \
+	verify-certificates compile-coq sonification cherenkov lieb-robinson
 
-# Pin the proofpack clock to the HEAD commit date so the same commit produces a
-# byte-for-byte identical proofpack from a fresh clone (reproducible builds).
+# Pin proof artifacts to the HEAD commit time so a fixed commit remains
+# byte-reproducible. The orchestration parameters live only in config/foundry.yaml.
 SOURCE_DATE_EPOCH := $(shell git -C . log -1 --format=%ct 2>/dev/null || echo 1700000000)
 export SOURCE_DATE_EPOCH
+
+FOUNDRY ?= foundry
 
 install-dev:
 	python -m pip install --upgrade pip
 	python -m pip install -e '.[dev]'
 
 smoke:
-	python -m pytest
-	python scripts/run_gap_sweep.py --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-smoke
-	python scripts/run_curverank_screen.py --family xp --n-basis 10,20 --k-zeros 10 --output-dir /tmp/curverank-smoke
-	python scripts/run_gaugegap_su3_pure.py --lattice-sizes 2x2 --g-coupling-points 2 --output-dir /tmp/su3-prototype-smoke
-	python scripts/run_su3_link.py --cutoff 2 --output-dir /tmp/su3-link-smoke
+	$(FOUNDRY) run smoke
 
-# Both audits are now hard gates (matches CI): the claim-boundary audit and the
-# research maturity audit (every prototype/placeholder is bounded by a stated
-# scaffold/known-limitation/roadmap clause -> high_unbounded == 0).
 audit:
-	python scripts/claim_boundary_audit.py --strict
-	python scripts/research_maturity_audit.py --strict
+	$(FOUNDRY) audit
 
-# Retained alias for callers that referenced the strict target explicitly.
 audit-strict: audit
 
-proofpack: audit smoke
-	python scripts/generate_reproducibility_proofpack.py \
-		--output-dir results/proofpack \
-		--include-search \
-		--include-validation
+proofpack:
+	$(FOUNDRY) proofpack
 
-# Assert the proofpack is deterministic: two fresh builds under the same
-# SOURCE_DATE_EPOCH must produce an identical reproducible_digest (issue #12 A4).
 proofpack-verify:
-	python scripts/verify_proofpack.py
+	$(FOUNDRY) run proofpack-verify
 
-# Self-contained packet for outside experts (issue #12 A7): runs the audits,
-# curates the review docs, and writes an INDEX.md with provenance, audit status,
-# reproduction commands, and a reviewer checklist.
 reviewer-packet:
-	python scripts/build_reviewer_packet.py --output-dir results/reviewer-packet
+	$(FOUNDRY) run reviewer-packet
 
-# --- CurveRank (Hilbert-Polya / Riemann spectral screening) reproduction -------
-# One-command regeneration of the CurveRank result bundles. Honest scope: these
-# produce a certified finite-truncation NEGATIVE result plus a quantum benchmark;
-# they are not a proof of the Riemann Hypothesis (see docs/curverank-formal-proof.md
-# and docs/riemann-operator-landscape.md).
+curverank:
+	$(FOUNDRY) run curverank
 
-# Machine-checkable formal proof of the finite-truncation separation theorem:
-# verified interval certificate exported to Lean 4 / Coq / Isabelle, plus the
-# discharged (no-`sorry`) Lean/Coq proofs for all three operator families.
 curverank-formal:
-	python scripts/run_curverank_formal_proof.py \
-		--n-panel 10,15,20,25,30 --k-zeros 20 \
-		--output-dir results/curverank-formal
+	$(FOUNDRY) run curverank-formal
 
-# Windowed QPE eigenvalue recovery on the local IBM/Aer emulator (no credentials,
-# no cost). The real-hardware path stays staged behind a credential check; see
-# docs/curverank-ibm-runbook.md.
 curverank-ibm:
-	python scripts/run_curverank_ibm.py --emulator \
-		--n-basis 4,8,16 --n-precision 6 --shots 4096 --yes \
-		--output-dir results/curverank-ibm
+	$(FOUNDRY) run curverank-ibm
 
-# Hardware-feasibility report: dense vs Trotter vs iterative circuit cost
-# (width/depth/CX), evidence rather than assertion.
 curverank-hardware:
-	python scripts/run_curverank_hardware_report.py \
-		--output-dir results/curverank-hardware
+	$(FOUNDRY) run curverank-hardware
 
-# Quantum signal extraction: recover eigenvalues from the correlation signal
-# g(t)=<psi|exp(-iHt)|psi> (Hadamard test -> Prony/ESPRIT) and validate them
-# against the certified enclosures. Exact statevector mode, no credentials.
 curverank-signal:
-	python scripts/run_curverank_signal.py --n-basis 8 --method esprit \
-		--output-dir results/curverank-signal
+	$(FOUNDRY) run curverank-signal
 
-# Noise study: QCELS (dominant eigenvalue) vs ESPRIT (full spectrum) accuracy
-# under modelled dephasing + shot noise. Exact statevector envelopes, no creds.
 curverank-noise-study:
-	python scripts/run_curverank_noise_study.py --output-dir results/curverank-noise
+	$(FOUNDRY) run curverank-noise-study
 
-# Benchmark the simulation backends (numpy vs CUDA-Q) across qubit counts.
-# CUDA-Q rows populate only where CUDA-Q + a GPU are present; numpy always runs.
 cudaq-benchmark:
-	python scripts/run_cudaq_benchmark.py --max-qubits 12 --output-dir results/cudaq-benchmark
+	$(FOUNDRY) run cudaq-benchmark
 
-# Regenerate all CurveRank bundles.
-curverank: curverank-formal curverank-ibm curverank-hardware curverank-signal \
-	curverank-noise-study
-
-# Unified pipeline: one truncation threaded through every depth of the repo
-# (classical -> certified -> QPE -> signal -> advanced quantum -> cross-validated
-# -> formal Lean/Coq -> Spectra DSL -> claim-boundary-audited report). Honest
-# scope: certified NEGATIVE result + method benchmark; not a proof of RH.
 unified:
-	python scripts/run_unified_pipeline.py --n-basis 8 --k-zeros 20 --deep \
-		--output-dir results/unified-pipeline
+	$(FOUNDRY) run curverank-0001
 
-# Quantum-validation harness: check each quantum method's eigenvalue estimates
-# against the certified interval kernel (ESPRIT/QCELS/Krylov are pure-numpy; QPE
-# uses the local Aer emulator). Honest scope: certified screening + benchmark.
 quantum-validate:
-	python scripts/run_quantum_validation.py --operator berry_keating_xp \
-		--n-basis 8 --methods esprit,qcels,krylov \
-		--output-dir results/quantum-validation
+	$(FOUNDRY) run quantum-validate
 
-# Hardened error budget (A6): repeated-seed runs + confidence intervals +
-# source-separated components (statistical / truncation / numerical). Honest
-# scope: the CI is a fixed-truncation statistical interval, no continuum claim.
 error-budget:
-	python scripts/run_error_budget.py --n-basis 8 --n-runs 20 \
-		--output-dir results/error-budget
+	$(FOUNDRY) run error-budget
 
-# Scaling benchmark of the rigorous certified-eigenvalue kernel (~O(n^3) exact
-# arithmetic): wall-time + max enclosure width vs truncation size.
 certify-scaling:
-	python scripts/run_certify_scaling.py --sizes 4,8,16,32 \
-		--output-dir results/certify-scaling
+	$(FOUNDRY) run certify-scaling
 
-# Certified energy/gap bracket: rigorous interval LOWER bound + quantum variational
-# (Ritz) UPPER bound + discharged Lean/Coq certificate. Two-sided, machine-checked.
 certified-bracket:
-	python scripts/run_certified_bracket.py --operator berry_keating_xp \
-		--n-basis 8 --output-dir results/certified-bracket
+	$(FOUNDRY) run certified-bracket
 
-# Certified classical shadows: median-of-means observable estimates with confidence
-# bands, cross-validated vs exact. Statistical band at a fixed shot budget.
 certified-shadows:
-	python scripts/run_certified_shadows.py --operator berry_keating_xp \
-		--n-basis 8 --output-dir results/certified-shadows
+	$(FOUNDRY) run certified-shadows
 
-# QSVT eigenvalue transform: apply a polynomial P to the spectrum and certify the
-# transformed eigenvalues against P evaluated (interval arithmetic) over the
-# certified enclosures.
 qsvt:
-	python scripts/run_qsvt.py --operator berry_keating_xp --coeffs 0,0,1 \
-		--output-dir results/qsvt
+	$(FOUNDRY) run qsvt
 
-# Temple-Kato certified ground-energy bracket from a quantum trial state (rigorous
-# lower + variational upper + Lean/Coq), dependency-light.
 temple-bracket:
-	python scripts/run_temple_bracket.py --operator berry_keating_xp --n-basis 8 \
-		--output-dir results/temple-bracket
+	$(FOUNDRY) run temple-bracket
 
-# Finite Lindbladian open-system steady state (numpy), cross-validated.
 open-system:
-	python scripts/run_open_system.py --n-sites 2 --output-dir results/open-system
+	$(FOUNDRY) run open-system
 
-# Capstone: run every certified-quantum primitive on one operator and emit a single
-# consolidated, claim-boundary-audited report (all checks pass).
 certified-quantum:
-	python scripts/run_certified_quantum_report.py --operator berry_keating_xp \
-		--n-basis 8 --output-dir results/certified-quantum
+	$(FOUNDRY) run certified-quantum
 
-# Entanglement-formation dynamics: finite-model entanglement build-up over time
-# (inspired by attosecond-entanglement work; not a reproduction of the experiment).
 entanglement-dynamics:
-	python scripts/run_entanglement_dynamics.py --coupling 1.0 \
-		--output-dir results/entanglement-dynamics
+	$(FOUNDRY) run entanglement-dynamics
 
-# Quantum speed limit on entanglement formation: certify (Lean/Coq) that the
-# entanglement build-up time respects the Mandelstam-Tamm / Margolus-Levitin floor.
 entanglement-speed-limit:
-	python scripts/run_entanglement_speed_limit.py --energy-scale-ev 10 \
-		--output-dir results/entanglement-speed-limit
+	$(FOUNDRY) run entanglement-speed-limit
 
-# Alcubierre warp metric: certify (Lean/Coq) that the warp bubble requires negative
-# energy density (weak-energy-condition violation); report the Ford-Roman obstruction.
 alcubierre-warp:
-	python scripts/run_alcubierre_warp.py --output-dir results/alcubierre-warp
+	$(FOUNDRY) run alcubierre-warp
 
-# Decoherence and branching: how a superposition becomes effectively-classical
-# branches via environment entanglement; certify (Lean/Coq) 1 <= N_eff <= d.
 decoherence-branching:
-	python scripts/run_decoherence_branching.py --d 3 \
-		--output-dir results/decoherence-branching
+	$(FOUNDRY) run decoherence-branching
 
-# Ergotropy & passivity: certified finite bound on cyclically extractable work
-# (0 <= W <= <H> - E0); the machine-checked refutation of 'free energy' devices.
 ergotropy:
-	python scripts/run_ergotropy.py --output-dir results/ergotropy
+	$(FOUNDRY) run ergotropy
 
-# Landauer's principle: certified energy cost of erasing information
-# (info <-> energy keystone tying decoherence -> entropy -> work).
-landauer:
-	python scripts/run_physical_limits.py --output-dir results/physical-limits
+landauer bekenstein physical-limits:
+	$(FOUNDRY) run physical-limits
 
-# Bekenstein bound + the consolidated physical-limits capstone: the web of
-# fundamental bounds (energy/time/information/geometry) on one audited report.
-bekenstein physical-limits:
-	python scripts/run_physical_limits.py --output-dir results/physical-limits
-
-# Temporal double-slit (time diffraction): fringe spacing 2pi/dt in the frequency
-# spectrum + certified time-bandwidth bound (time<->frequency duality).
 temporal-double-slit:
-	python scripts/run_temporal_double_slit.py --output-dir results/temporal-double-slit
+	$(FOUNDRY) run temporal-double-slit
 
-# Synthesis figures: the unifying web diagram, the certificate ladder, and a
-# self-contained HTML gallery embedding every module's figure (see
-# docs/physical-limits-web.md).
 physical-limits-figures:
-	python scripts/generate_physical_limits_figures.py \
-		--output-dir figures/physical-limits
+	$(FOUNDRY) run physical-limits-figures
 
-# Independently machine-verify every certified-inequality schema with z3 (an
-# automated witness alongside the discharged Lean/Coq certificates).
 verify-certificates:
-	python scripts/verify_certificates.py --output-dir results/smt-verification
+	$(FOUNDRY) run verify-certificates
 
-# Compile every emitted Coq certificate with coqc (a real proof-assistant check, not
-# just grep + z3). Requires Coq (apt-get install coq); stdlib only, no Mathlib.
 compile-coq:
-	python scripts/compile_coq_certificates.py --emit
+	$(FOUNDRY) run compile-coq
 
-# Sonification & the sampling limit: spurious-similarity debunk + certified Nyquist
-# aliasing fold (the honest core of the "LHC sounds like Saturn" reel).
 sonification:
-	python scripts/run_sonification.py --output-dir results/sonification
+	$(FOUNDRY) run sonification
 
-# Cherenkov radiation: certified local speed limit + cone geometry (cos theta_c =
-# 1/(n beta)), recovered from a wavefront-pile-up simulation.
 cherenkov:
-	python scripts/run_cherenkov.py --output-dir results/cherenkov
+	$(FOUNDRY) run cherenkov
 
-# Lieb-Robinson light cone: certified many-body information speed limit
-# (x(t) <= v_LR t + xi), cross-checked against the quantum_walks CTQW.
 lieb-robinson:
-	python scripts/run_lieb_robinson.py --output-dir results/lieb-robinson
+	$(FOUNDRY) run lieb-robinson
 
-# Geometry-of-GaugeGap figures: exact 2D projections of higher-dim structures
-# (su(3) weight diagrams + root system, Calabi-Yau cross-section). Deterministic
-# SVG. Add SACRED=1 for the decorative golden-ratio/Vesica overlay.
 geometry-figures:
-	python scripts/generate_geometry_figures.py $(if $(SACRED),--sacred-overlay,) \
-		--output-dir figures/geometry
-	python scripts/generate_geometry_html.py \
-		--output figures/geometry/geometry_explorer.html
-	python scripts/generate_geometry_extra.py --output-dir figures/geometry
+	$(FOUNDRY) run geometry-figures
