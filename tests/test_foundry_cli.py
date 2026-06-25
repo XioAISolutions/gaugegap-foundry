@@ -9,6 +9,7 @@ import yaml
 from gaugegap.cli import (
     FoundryConfigError,
     all_units,
+    build_parser,
     load_config,
     resolve_command,
     run_named,
@@ -40,6 +41,22 @@ def test_run_script_discovery_surfaces_unregistered_scripts():
     units = all_units(config, ROOT)
     assert "curverank-0001" in units
     assert any(unit.id.startswith("script:") for unit in units.values())
+
+
+def test_run_dry_run_is_not_forwarded_to_child():
+    parser = build_parser()
+    args, extra = parser.parse_known_args(["run", "curverank-0001", "--dry-run"])
+    assert args.dry_run is True
+    assert extra == []
+
+
+def test_child_arguments_are_forwardable_after_separator():
+    parser = build_parser()
+    args, extra = parser.parse_known_args(
+        ["run", "curverank-0001", "--", "--output-dir", "/tmp/custom"]
+    )
+    assert args.dry_run is False
+    assert extra == ["--output-dir", "/tmp/custom"]
 
 
 def test_unknown_unit_fails_closed():
