@@ -30,6 +30,7 @@ jobs:
           foundry run gaugegap-0002
           foundry run gaugegap-u1-0001
           foundry run flowgap-0001
+          foundry run flowgap-attractor-smoke
           foundry run curverank-screen-smoke
       - name: Proofpack build smoke
         run: foundry run proofpack-build
