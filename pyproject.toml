@@ -37,6 +37,7 @@ Repository = "https://github.com/XioAISolutions/gaugegap-foundry"
 
 [project.scripts]
 gaugegap-certify = "gaugegap.certify:main"
+foundry = "gaugegap.cli:main"
 
 [project.optional-dependencies]
 quantum = [
