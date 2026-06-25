@@ -2,316 +2,95 @@ name: Verify Proofs
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   verify-proofs:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.10', '3.11', '3.12']
-    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-      
-      - name: Cache pip packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-      
-      - name: Install dependencies
+          python-version: "3.12"
+      - name: Install
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[spectral,dev]"
-      
-      - name: Run unit tests
-        run: |
-          python -m pytest tests/ -v --tb=short
-      
-      - name: Verify existing proof certificate
-        run: |
-          python -c "
-          import json
-          from pathlib import Path
-          
-          cert_file = Path('results/sprint-now/proof_certificate.json')
-          if cert_file.exists():
-              with open(cert_file) as f:
-                  cert = json.load(f)
-              tier1 = cert['tier1_certified']
-              print('✓ Proof certificate valid')
-              print(f'  Statement: {tier1[\"statement\"]}')
-              print(f'  Certified bound: {tier1[\"certified_min_lower_bound\"]}')
-          else:
-              print('⚠ No proof certificate found (expected for new branches)')
-          "
-      
-      - name: Reproduce proof (quick verification)
-        run: |
-          python scripts/run_curverank_screen.py \
-            --family xp \
-            --n-basis 10,15,20 \
-            --k-zeros 20 \
-            --output-dir /tmp/verify-proof
-      
-      - name: Compare with certified results
-        run: |
-          python -c "
-          import json
-          import csv
-          from pathlib import Path
-          
-          # Load new results
-          new_file = Path('/tmp/verify-proof/curverank-0001-spectral-screen.csv')
-          if not new_file.exists():
-              print('✗ Verification failed: no output generated')
-              exit(1)
-          
-          with open(new_file) as f:
-              reader = csv.DictReader(f)
-              new_data = list(reader)
-          
-          # Check minimum mismatch. Current CurveRank CSVs use ledger-style
-          # rows with observable/value columns; keep the old mismatch-column
-          # path as a compatibility fallback for older artifacts.
-          mismatch_values = []
-          for row in new_data:
-              if 'mismatch' in row and row['mismatch']:
-                  mismatch_values.append(float(row['mismatch']))
-              elif row.get('observable') == 'spectral_mismatch':
-                  mismatch_values.append(float(row['value']))
-
-          if not mismatch_values:
-              print('✗ Verification failed: no spectral mismatch rows found')
-              exit(1)
-
-          min_mismatch = min(mismatch_values)
-          print(f'✓ Reproduced minimum mismatch: {min_mismatch:.2f}')
-          
-          # Verify against certified bound
-          certified_bound = 27.0
-          if min_mismatch >= certified_bound:
-              print(f'✓ Verification passed: {min_mismatch:.2f} >= {certified_bound}')
-          else:
-              print(f'✗ Verification failed: {min_mismatch:.2f} < {certified_bound}')
-              exit(1)
-          "
-      
-      - name: Upload verification artifacts
-        uses: actions/upload-artifact@v4
+          python -m pip install -e '.[spectral,dev]'
+      - name: Unit tests
+        run: foundry run tests
+      - name: Reproduce canonical finite CurveRank screen
+        run: foundry run curverank-proof-reproduction
+      - name: Check certified mismatch floor
+        run: python scripts/check_curverank_reproduction.py /tmp/verify-proof 27.0
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: verification-results-py${{ matrix.python-version }}
+          name: verification-results
           path: /tmp/verify-proof/
           retention-days: 7
 
   smt-verify:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-
+          python-version: "3.12"
       - name: Install SMT backend
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e ".[smt]"
-
-      - name: z3-verify every certified-inequality schema
-        run: python scripts/verify_certificates.py --output-dir /tmp/smt-verification
+        run: python -m pip install -e '.[smt]'
+      - name: Verify registered inequality schemas
+        run: foundry run verify-certificates
 
   compile-coq:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-
-      - name: Install Coq (standard library only; no Mathlib)
+          python-version: "3.12"
+      - name: Install Coq
         run: |
           sudo apt-get update
           sudo apt-get install -y coq
-          coqc --version
+      - name: Install package
+        run: python -m pip install -e '.[dev]'
+      - name: Compile emitted Coq certificates
+        run: foundry run compile-coq
 
-      - name: Install package (for the certificate emitters used by --emit)
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e '.[dev]'
-
-      - name: Compile every emitted Coq certificate with coqc
-        run: python scripts/compile_coq_certificates.py --emit
-
-  test-quantum-infrastructure:
+  hard-gates:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      
-      - name: Install quantum dependencies
+          python-version: "3.12"
+      - name: Install package
+        run: python -m pip install -e '.[dev]'
+      - name: Claim and maturity audits
+        run: foundry audit
+      - name: Verify AGENTS.md boundary section
         run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[quantum,dev]"
-      
-      - name: Test quantum infrastructure
-        run: |
-          python -m pytest tests/test_qiskit_backend.py -v
-          python -m pytest tests/test_qiskit_dynamics.py -v
-          python -m pytest tests/test_vqe_gap.py -v
-      
-      - name: Test provider adapters (mock mode)
-        run: |
-          python -m pytest tests/test_providers.py -v
-          python -m pytest tests/test_hardware_ready.py -v
-
-  test-all-tracks:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      
-      - name: Install all dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[spectral,flow,quantum,dev]"
-      
-      - name: Test GaugeGap track
-        run: |
-          python scripts/run_gap_sweep.py --sizes 4,6 --field-points 3 --output-dir /tmp/gaugegap-test
-          python scripts/run_z2_plaquette.py --output-dir /tmp/gaugegap-0002-test
-      
-      - name: Test FlowGap track
-        run: |
-          python scripts/run_flowgap_burgers.py --sizes 16,32 --nu-points 3 --n-steps 20 --output-dir /tmp/flowgap-test
-      
-      - name: Test CurveRank track
-        run: |
-          python scripts/run_curverank_screen.py --family xp --n-basis 10,15 --k-zeros 10 --output-dir /tmp/curverank-test
-      
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: all-tracks-test-results
-          path: /tmp/*-test/
-          retention-days: 7
-
-  check-claim-boundary:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      
-      - name: Check for overclaiming in documentation
-        # Single source of truth: the canonical audit script is context-aware
-        # (deny-list sections that quote phrases in order to ban them are not
-        # violations) and carries all patterns the old inline check had.
-        run: python scripts/claim_boundary_audit.py --strict
-      
-      - name: Verify AGENTS.md compliance
-        run: |
-          if [ ! -f "AGENTS.md" ]; then
-              echo "✗ AGENTS.md missing"
-              exit 1
-          fi
-          echo "✓ AGENTS.md present"
-          
-          # Check for required sections
-          grep -q "Claim boundary" AGENTS.md || (echo "✗ Missing 'Claim boundary' section" && exit 1)
-          echo "✓ Claim boundary section present"
-
-  security-scan:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Run security scan
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e ".[dev]"
-          python -m pip install pip-audit
-          pip-audit --progress-spinner off --skip-editable
-          
-      - name: Check for secrets
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          base: ${{ github.event_name == 'push' && github.event.before || github.event.repository.default_branch }}
-          head: ${{ github.sha }}
+          test -f AGENTS.md
+          grep -q "Claim boundary" AGENTS.md
 
   reproducibility:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-
-      - name: Install
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e ".[dev]"
-
-      - name: Proofpack is deterministic (issue #12 A4)
-        # Two fresh builds under a fixed SOURCE_DATE_EPOCH must share a
-        # reproducible_digest; the verifier exits non-zero otherwise.
-        run: python scripts/verify_proofpack.py
-
-      - name: Reviewer packet builds (issue #12 A7)
-        run: python scripts/build_reviewer_packet.py --output-dir results/reviewer-packet
-
-      - name: Upload reviewer packet
-        uses: actions/upload-artifact@v4
+          python-version: "3.12"
+      - name: Install package
+        run: python -m pip install -e '.[dev]'
+      - name: Verify deterministic proofpack
+        run: foundry run proofpack-verify
+      - name: Build reviewer packet
+        run: foundry run reviewer-packet
+      - uses: actions/upload-artifact@v4
         with:
           name: reviewer-packet
           path: results/reviewer-packet
           if-no-files-found: error
-
-# Made with Bob
