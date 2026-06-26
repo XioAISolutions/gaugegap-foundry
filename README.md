@@ -707,3 +707,26 @@ Language this project does not earn:
 > continuum Yang–Mills mass-gap proof · nonperturbative Standard Model construction · proof of the Riemann Hypothesis · formal proof of a global strange attractor from a plot · hardware result as mathematical proof · Millennium Prize resolution
 
 The project becomes more credible by making the evidence **more explorable without making the claims larger**: the experience invites investigation, while the equations, manifests, tests, hashes, audits, and certificates show exactly what every scene does—and does not—establish.
+
+---
+
+## 📚 Documentation index
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — unified Foundry architecture
+- [`docs/foundry-experience.md`](docs/foundry-experience.md) — nine-scene audiovisual interface, scientific substrate, and boundaries
+- [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) — Standard Model catalog, graph, controls, and audits
+- [`docs/anomaly-forge.md`](docs/anomaly-forge.md) — exact charge consistency, solver assumptions, interactive views, and claim boundaries
+- [`docs/end-of-day-integration-2026-06-26.md`](docs/end-of-day-integration-2026-06-26.md) — complete integration inventory
+- [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md) — cross-track verification checkpoint
+- [`docs/attractor-forge.md`](docs/attractor-forge.md) — nonlinear-dynamics evidence ladder
+- [`docs/physical-limits-web.md`](docs/physical-limits-web.md) — physical-limits synthesis
+- [`docs/inference-traps.md`](docs/inference-traps.md) — exact decision-theory demonstrations
+- [`docs/epistemics-and-claim-boundaries.md`](docs/epistemics-and-claim-boundaries.md) — why boundaries matter
+- [`docs/solution-gap-audit.md`](docs/solution-gap-audit.md) — honest gaps to stronger claims
+- [`docs/agent-work-orders.md`](docs/agent-work-orders.md) — execution-ready hardening work
+- [`docs/curverank-formal-proof.md`](docs/curverank-formal-proof.md) — finite spectral separation theorem
+- [`docs/spectra-language.md`](docs/spectra-language.md) and [`docs/verdict-language.md`](docs/verdict-language.md)
+
+## License
+
+Apache-2.0.
