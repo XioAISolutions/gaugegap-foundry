@@ -1,0 +1,72 @@
+{
+  "schema": "gaugegap.known_answers.v1",
+  "cases": [
+    {
+      "id": "standard-model-tree-default",
+      "runner": "standard_model_tree",
+      "parameters": {
+        "g_s": 1.22,
+        "g": 0.653,
+        "g_prime": 0.358,
+        "lambda_h": 0.129,
+        "v": 246.22,
+        "y_t": 0.995,
+        "y_b": 0.024,
+        "y_tau": 0.0102,
+        "xi": 1.0
+      },
+      "checks": [
+        {"path": "m_w", "expected": 80.39083, "abs_tol": 1e-8},
+        {"path": "m_z", "expected": 91.67959627263474, "abs_tol": 1e-8},
+        {"path": "m_h", "expected": 125.06424911700385, "abs_tol": 1e-8},
+        {"path": "m_top", "expected": 173.23331250543296, "abs_tol": 1e-8},
+        {"path": "m_bottom", "expected": 4.178491959930041, "abs_tol": 1e-10},
+        {"path": "m_tau", "expected": 1.7758590829702676, "abs_tol": 1e-10},
+        {"path": "sin2_theta_w", "expected": 0.2311039304113254, "abs_tol": 1e-12},
+        {"path": "electric_charge_coupling", "expected": 0.31391845416089015, "abs_tol": 1e-12},
+        {"path": "photon_mass_squared_residual", "expected": 0.0, "abs_tol": 1e-9},
+        {"path": "mixing_orthogonality_residual", "expected": 0.0, "abs_tol": 1e-12}
+      ],
+      "claim_boundary": "tree-level algebraic Standard Model relations for the configured finite parameter record only"
+    },
+    {
+      "id": "z2-one-plaquette-transverse-only",
+      "runner": "hamiltonian_audit",
+      "parameters": {
+        "model_id": "z2-plaquette",
+        "n_plaquettes": 1,
+        "plaquette_coupling": 0.0,
+        "transverse_field": 0.2
+      },
+      "checks": [
+        {"path": "dimension", "expected": 16, "abs_tol": 0.0},
+        {"path": "hermitian", "expected": true},
+        {"path": "ground_energy", "expected": -0.8, "abs_tol": 1e-12},
+        {"path": "first_excited_energy", "expected": -0.4, "abs_tol": 1e-12},
+        {"path": "spectral_gap", "expected": 0.4, "abs_tol": 1e-12},
+        {"path": "trace_real", "expected": 0.0, "abs_tol": 1e-12},
+        {"path": "trace_imaginary", "expected": 0.0, "abs_tol": 1e-12}
+      ],
+      "claim_boundary": "exact finite four-qubit transverse-field benchmark only"
+    },
+    {
+      "id": "z2-one-plaquette-diagonal-only",
+      "runner": "hamiltonian_audit",
+      "parameters": {
+        "model_id": "z2-plaquette",
+        "n_plaquettes": 1,
+        "plaquette_coupling": 1.0,
+        "transverse_field": 0.0
+      },
+      "checks": [
+        {"path": "dimension", "expected": 16, "abs_tol": 0.0},
+        {"path": "hermitian", "expected": true},
+        {"path": "ground_energy", "expected": -1.0, "abs_tol": 1e-12},
+        {"path": "first_excited_energy", "expected": -1.0, "abs_tol": 1e-12},
+        {"path": "spectral_gap", "expected": 0.0, "abs_tol": 1e-12},
+        {"path": "trace_real", "expected": 0.0, "abs_tol": 1e-12}
+      ],
+      "claim_boundary": "exact finite diagonal plaquette benchmark only"
+    }
+  ]
+}
