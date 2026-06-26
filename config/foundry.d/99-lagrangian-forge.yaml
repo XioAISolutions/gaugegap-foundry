@@ -1,0 +1,30 @@
+version: 1
+
+units:
+  foundry-experience-v2:
+    track: integrity
+    status: production
+    description: Generate the complete eight-scene Experience/Experiment bundle with Lagrangian Forge.
+    command:
+      - "{python}"
+      - scripts/generate_foundry_experience_complete.py
+      - --output-dir
+      - site/foundry-experience
+      - --preview
+      - figures/foundry-experience/preview.svg
+
+  lagrangian-forge:
+    track: gaugegap
+    status: production
+    description: Build the audited Standard Model catalog, interaction graph, and interactive Lagrangian scene.
+    command:
+      - "{python}"
+      - scripts/generate_foundry_experience_complete.py
+      - --output-dir
+      - site/foundry-experience
+      - --preview
+      - figures/foundry-experience/preview.svg
+
+groups:
+  experience-v2:
+    - foundry-experience-v2
