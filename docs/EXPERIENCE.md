@@ -24,11 +24,13 @@ or directly:
 ```bash
 python scripts/build_foundry_experience.py \
   --results-dir results \
-  --output results/foundry-experience/index.html
+  --output site/foundry-experience/index.html
 ```
 
-Open `results/foundry-experience/index.html` in a browser. It is self-contained and does
-not require a server, external JavaScript, fonts, analytics, or network access.
+Open `site/foundry-experience/index.html` in a browser. It is self-contained and does
+not require a server, external JavaScript, fonts, analytics, or network access. The generated
+site is deliberately outside `results/`, so rebuilding cannot accidentally ingest its own
+prior manifest as scientific evidence.
 
 Use `--strict` when building a release artifact. Strict mode fails when no supported result
 artifacts exist:
