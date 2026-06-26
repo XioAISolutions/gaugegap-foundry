@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620">
+<rect width="1200" height="620" fill="#020202"/>
+<defs>
+  <linearGradient id="fadeL" x1="0" x2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".85"/><stop offset="1" stop-color="#ffffff" stop-opacity=".08"/></linearGradient>
+  <linearGradient id="fadeR" x1="1" x2="0"><stop offset="0" stop-color="#ffffff" stop-opacity=".85"/><stop offset="1" stop-color="#ffffff" stop-opacity=".08"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g stroke="#242424" stroke-width="1">
+  <path d="M0 80H1200M0 160H1200M0 240H1200M0 320H1200M0 400H1200M0 480H1200M0 560H1200"/>
+  <path d="M100 0V620M200 0V620M300 0V620M400 0V620M500 0V620M600 0V620M700 0V620M800 0V620M900 0V620M1000 0V620M1100 0V620"/>
+</g>
+<text x="42" y="48" fill="#f7f7f2" font-family="monospace" font-size="19" letter-spacing="4">GAUGEGAP FOUNDRY</text>
+<text x="42" y="76" fill="#777" font-family="monospace" font-size="12" letter-spacing="2">EXPERIENCE / EXPERIMENT</text>
+<g fill="none" stroke-linecap="round" filter="url(#glow)">
+  <path d="M600 314 C558 236 488 210 424 248 C357 288 375 377 451 388 C529 398 591 346 610 286 C632 218 706 188 775 225 C849 264 837 361 760 384 C686 406 626 361 600 314Z" stroke="#f7f7f2" stroke-width="1.2"/>
+  <path d="M600 314 C544 289 501 275 459 291 C415 308 419 350 461 361 C510 374 567 346 600 314 C633 281 691 259 739 277 C784 294 783 338 741 359 C695 381 640 348 600 314Z" stroke="#58d7ff" stroke-width=".9" opacity=".8"/>
+</g>
+<g opacity=".9">
+  <g fill="url(#fadeL)">
+    <rect x="42" y="128" width="240" height="5"/><rect x="42" y="153" width="204" height="3"/><rect x="42" y="177" width="275" height="6"/>
+    <rect x="42" y="214" width="188" height="3"/><rect x="42" y="238" width="248" height="5"/><rect x="42" y="264" width="215" height="3"/>
+    <rect x="42" y="409" width="251" height="4"/><rect x="42" y="435" width="190" height="6"/><rect x="42" y="462" width="276" height="3"/>
+  </g>
+  <g fill="url(#fadeR)">
+    <rect x="918" y="128" width="240" height="5"/><rect x="954" y="153" width="204" height="3"/><rect x="883" y="177" width="275" height="6"/>
+    <rect x="970" y="214" width="188" height="3"/><rect x="910" y="238" width="248" height="5"/><rect x="943" y="264" width="215" height="3"/>
+    <rect x="907" y="409" width="251" height="4"/><rect x="968" y="435" width="190" height="6"/><rect x="882" y="462" width="276" height="3"/>
+  </g>
+</g>
+<g fill="#f7f7f2">
+  <circle cx="440" cy="248" r="3"/><circle cx="475" cy="221" r="2"/><circle cx="535" cy="228" r="2.5"/><circle cx="585" cy="270" r="3"/>
+  <circle cx="625" cy="286" r="2.5"/><circle cx="689" cy="224" r="2"/><circle cx="753" cy="217" r="3"/><circle cx="797" cy="256" r="2.5"/>
+  <circle cx="803" cy="332" r="3"/><circle cx="744" cy="379" r="2.5"/><circle cx="673" cy="386" r="2"/><circle cx="610" cy="337" r="3"/>
+  <circle cx="551" cy="375" r="2.5"/><circle cx="481" cy="389" r="2"/><circle cx="421" cy="349" r="3"/><circle cx="409" cy="294" r="2.5"/>
+</g>
+<g fill="#ff3158" filter="url(#glow)"><circle cx="600" cy="314" r="4"/><rect x="301" y="176" width="20" height="7"/><rect x="879" y="407" width="20" height="7"/></g>
+<g font-family="monospace" font-size="11" fill="#8a8a8a">
+  <text x="42" y="585">FINITE DATA / EXACT PROVENANCE / OPT-IN SOUND</text>
+  <text x="820" y="585">NO REMOTE ASSETS · NO CONTINUUM CLAIM</text>
+</g>
+</svg>
