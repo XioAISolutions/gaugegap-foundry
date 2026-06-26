@@ -6,7 +6,7 @@
 	entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy \
 	landauer bekenstein physical-limits temporal-double-slit physical-limits-figures \
 	verify-certificates compile-coq sonification cherenkov lieb-robinson \
-	attractor-forge rossler lorenz thomas
+	experience attractor-forge rossler lorenz thomas
 
 # Pin proof artifacts to the HEAD commit time so a fixed commit remains
 # byte-reproducible. The orchestration parameters live in config/foundry.yaml
@@ -129,6 +129,9 @@ lieb-robinson:
 
 geometry-figures:
 	$(FOUNDRY) run geometry-figures
+
+experience:
+	$(FOUNDRY) run foundry-experience
 
 attractor-forge:
 	$(FOUNDRY) run attractor-forge
