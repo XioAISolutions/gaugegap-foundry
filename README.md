@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <a href="#-foundry-experience--experience--experiment">Foundry Experience</a> ·
   <a href="#-attractor-forge--nonlinear-dynamics-you-can-inspect">Attractor Forge</a> ·
   <a href="#-the-web-of-physical-limits">Physical limits</a> ·
   <a href="#-the-web-of-inference-traps">Inference traps</a> ·
@@ -51,20 +52,60 @@ flowchart TD
     F --> C["📈 CurveRank<br/>finite spectral screening"]
     F --> P["🌐 Physical limits<br/>certified finite cores"]
     F --> D["🧩 DSLs<br/>Spectra · Verdict"]
+    F --> I["◼ Interface<br/>Experience · Experiment"]
 
     G --> G1["Z₂ → U(1) → SU(2) → SU(3 scaffold"]
     FL --> FL1["Burgers · Rössler · Lorenz · Thomas"]
     C --> C1["interval eigenvalues<br/>negative-result certificates"]
     P --> P1["energy · time · information · geometry"]
     D --> D1["claims fail closed"]
+    I --> I1["immersive data<br/>manipulable finite models"]
 
     classDef main fill:#eef6ff,stroke:#0969da,color:#111;
     classDef edge fill:#f6f0ff,stroke:#6929c4,color:#111;
     class F main;
-    class G,FL,C,P,D edge;
+    class G,FL,C,P,D,I edge;
 ```
 
 </details>
+
+---
+
+## ◼ Foundry Experience — Experience / Experiment
+
+The Foundry now has a self-contained audiovisual instrument built directly from its scientific modules. Its central distinction is simple:
+
+- **Experience** turns verified finite data into an immersive synchronized field.
+- **Experiment** exposes the parameters, equations, observables, numerical method, and claim boundary behind that field.
+
+<p align="center">
+  <img src="figures/experience/foundry-experience.svg" alt="GaugeGap Foundry Experience and Experiment interface" width="860"/>
+</p>
+
+| Mode | What happens | What remains inspectable |
+|---|---|---|
+| **Experience** | Rössler, Lorenz, Thomas, exact Z₂ spectra, and SU(3) weight geometry become animated high-contrast data fields with optional local sonification | source channel, sample count, method, divergence, exact/finite status, claim boundary |
+| **Experiment** | sliders recompute browser-side RK4 trajectories or select exact precomputed Z₂ diagonalization records | equations, parameters, `E₀`, `E₁`, finite gap, observables, method, evidence class |
+
+The generated bundle is dependency-free and contains no remote runtime assets:
+
+```text
+site/foundry-experience/
+├── index.html
+├── experience-data.json
+└── manifest.json
+```
+
+```bash
+foundry run foundry-experience
+python -m http.server 8000 --directory site/foundry-experience
+```
+
+Sound is **off by default** and is synthesized locally only after the visitor explicitly enables it. Every displayed source dataset is exported to JSON, and the manifest records SHA-256 hashes and byte counts. CI verifies that independent builds are byte-identical.
+
+📖 [`docs/foundry-experience.md`](docs/foundry-experience.md)
+
+> 🧭 **Boundary:** this interface makes finite computations explorable. It does not turn an attractor projection into a theorem, a finite Z₂ gap into a continuum Yang–Mills proof, or representation geometry into a completed SU(3) lattice model.
 
 ---
 
@@ -410,6 +451,7 @@ pip install -e '.[dev]'
 
 ```bash
 foundry list
+foundry run foundry-experience
 foundry run gaugegap-0002
 foundry run flowgap-0001
 foundry run flowgap-0002-rossler
@@ -423,6 +465,7 @@ foundry proofpack
 ```bash
 make smoke
 make audit
+make experience
 make attractor-forge
 make proofpack
 make reviewer-packet
@@ -489,7 +532,8 @@ hypotheses/     registered finite-system hypotheses
 scripts/        reproducible experiment entry points
 src/gaugegap/   scientific modules, DSLs, rigorous kernels, providers
 tests/          unit, regression, numerical, and smoke coverage
-figures/        attractors, weight diagrams, physical-limit galleries
+figures/        attractors, interface previews, weight diagrams, physical-limit galleries
+site/           generated self-contained interactive interfaces
 results/        small checked-in finite baseline artifacts
 examples/       Spectra and Verdict programs
 ```
@@ -513,6 +557,7 @@ The project becomes more credible by restoring the visual story **without weaken
 ## 📚 Documentation index
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — unified Foundry architecture
+- [`docs/foundry-experience.md`](docs/foundry-experience.md) — audiovisual Experience / Experiment interface
 - [`docs/attractor-forge.md`](docs/attractor-forge.md) — nonlinear-dynamics evidence ladder
 - [`docs/physical-limits-web.md`](docs/physical-limits-web.md) — physical-limits synthesis
 - [`docs/inference-traps.md`](docs/inference-traps.md) — exact decision-theory demonstrations
