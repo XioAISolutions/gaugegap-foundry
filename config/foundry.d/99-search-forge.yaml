@@ -1,0 +1,31 @@
+version: 1
+
+units:
+  search-forge:
+    track: integrity
+    status: production
+    description: Generate certified Dijkstra and A-star comparisons, scientific paths, symbolic null controls, and an offline interactive bundle.
+    command:
+      - "{python}"
+      - scripts/run_search_forge.py
+      - --output-dir
+      - site/search-forge
+      - --preview
+      - figures/search-forge/search-forge.svg
+
+  symbolic-search-lab:
+    track: integrity
+    status: evidence_only
+    description: Generate the Search Forge bundle with historically grounded ciphers and explicit null-model boundaries.
+    command:
+      - "{python}"
+      - scripts/run_search_forge.py
+      - --output-dir
+      - site/search-forge
+      - --preview
+      - figures/search-forge/search-forge.svg
+
+groups:
+  search-and-symbolic:
+    - search-forge
+    - symbolic-search-lab
