@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <a href="#-foundry-experience--experience--experiment">Foundry Experience</a> ·
   <a href="#-attractor-forge--nonlinear-dynamics-you-can-inspect">Attractor Forge</a> ·
   <a href="#-the-web-of-physical-limits">Physical limits</a> ·
   <a href="#-the-web-of-inference-traps">Inference traps</a> ·
@@ -37,6 +38,7 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 - **CurveRank** — certified screening of finite operator truncations against zeta-zero-inspired targets.
 - **Physical limits** — familiar physics claims reduced to their exact, bounded computational core.
 - **Spectra and Verdict DSLs** — small languages where certification and evidence are part of program semantics.
+- **Foundry Experience** — an audiovisual interface that separates immersive data from exposed experiment controls.
 
 > ⚠️ **Claim boundary:** this repository does **not** claim a solution to any Millennium Prize problem. A finite numerical experiment, a formal inequality, and a continuum theorem are different achievements and are labelled separately throughout the project.
 
@@ -51,20 +53,84 @@ flowchart TD
     F --> C["📈 CurveRank<br/>finite spectral screening"]
     F --> P["🌐 Physical limits<br/>certified finite cores"]
     F --> D["🧩 DSLs<br/>Spectra · Verdict"]
+    F --> I["◼ Interface<br/>Experience · Experiment"]
 
     G --> G1["Z₂ → U(1) → SU(2) → SU(3 scaffold"]
     FL --> FL1["Burgers · Rössler · Lorenz · Thomas"]
     C --> C1["interval eigenvalues<br/>negative-result certificates"]
     P --> P1["energy · time · information · geometry"]
     D --> D1["claims fail closed"]
+    I --> I1["immersive data<br/>manipulable finite models"]
 
     classDef main fill:#eef6ff,stroke:#0969da,color:#111;
     classDef edge fill:#f6f0ff,stroke:#6929c4,color:#111;
     class F main;
-    class G,FL,C,P,D edge;
+    class G,FL,C,P,D,I edge;
 ```
 
 </details>
+
+---
+
+## ◼ Foundry Experience — Experience / Experiment
+
+The Foundry has a dependency-free audiovisual instrument built directly from its scientific modules. It deliberately separates two modes:
+
+- **Experience** removes most controls and turns finite scientific data into an immersive synchronized field.
+- **Experiment** exposes the equations, parameters, projections, diagnostics, evidence manifest, and claim boundary behind every scene.
+
+<p align="center">
+  <img src="figures/foundry-experience/preview.svg" alt="GaugeGap Foundry Experience and Experiment interface" width="860"/>
+</p>
+
+The interface contains seven real scenes:
+
+| Scene | Data source | Evidence shown in the interface |
+|---|---|---|
+| **Rössler** | deterministic finite RK4 trajectory | finite-time Lyapunov spectrum, Poincaré crossings, Koopman/DMD modes, validated one-step interval enclosure |
+| **Lorenz** | deterministic finite RK4 trajectory | finite-time Lyapunov spectrum, Poincaré crossings, Koopman/DMD modes, validated one-step interval enclosure |
+| **Thomas** | deterministic finite RK4 trajectory | finite-time Lyapunov spectrum, Poincaré crossings, Koopman/DMD modes, validated one-step interval enclosure |
+| **Gauge lattice** | finite cubic lattice with highlighted Wilson-loop path | exact finite geometry and path metadata |
+| **SU(3) weights** | exact octet and decuplet representation weights | finite representation coordinates and multiplicities |
+| **Finite spectra** | canonical Z₂ and truncated U(1) Hamiltonian factory | matrix dimension, Hermiticity audit, matrix digest, exact finite eigenvalues and gaps |
+| **Mass–radius limits** | dimensionless Compton and Schwarzschild scaling curves | explicit finite sampling of established formulas |
+
+```mermaid
+flowchart LR
+    DATA["finite scientific modules"] --> EXP["EXPERIENCE<br/>immersive synchronized field"]
+    DATA --> LAB["EXPERIMENT<br/>parameters + projections"]
+    LAB --> DIAG["live diagnostics"]
+    LAB --> EVID["evidence manifest"]
+    DATA --> CLAIM["claim boundary"]
+    DIAG --> OUT["self-contained HTML"]
+    EVID --> OUT
+    CLAIM --> OUT
+```
+
+In **Experiment** mode, the attractor parameters can be changed and the browser recomputes the finite model with RK4. Projection, density, speed, persistence, point/line rendering, and opt-in sound are exposed rather than hidden. The precomputed evidence panel remains separate from the browser-side exploratory rerun.
+
+Sound begins **off**. When enabled, the Web Audio API synthesizes sound locally from the selected finite signal. No external audio, CDN, analytics service, or remote scientific data source is required.
+
+```bash
+foundry run foundry-experience
+# equivalent convenience target
+make experience
+```
+
+The generator writes:
+
+```text
+site/foundry-experience/
+├── index.html
+├── data.json
+└── research_manifest.json
+```
+
+It also regenerates `figures/foundry-experience/preview.svg`. The repository test suite checks that the interface is self-contained, exposes both modes, includes all seven registered scenes, produces a research claim manifest, keeps audio opt-in, and emits the preview.
+
+📖 [`docs/foundry-experience.md`](docs/foundry-experience.md)
+
+> 🧭 **Boundary:** the interface makes finite computations inspectable. It does not turn a trajectory into a global chaos theorem, a finite gauge gap into a continuum Yang–Mills proof, or representation geometry into a completed SU(3) lattice theory.
 
 ---
 
@@ -410,6 +476,8 @@ pip install -e '.[dev]'
 
 ```bash
 foundry list
+foundry run foundry-experience
+foundry run deep-boil-0001
 foundry run gaugegap-0002
 foundry run flowgap-0001
 foundry run flowgap-0002-rossler
@@ -423,6 +491,8 @@ foundry proofpack
 ```bash
 make smoke
 make audit
+make experience
+make deep-boil
 make attractor-forge
 make proofpack
 make reviewer-packet
@@ -489,7 +559,8 @@ hypotheses/     registered finite-system hypotheses
 scripts/        reproducible experiment entry points
 src/gaugegap/   scientific modules, DSLs, rigorous kernels, providers
 tests/          unit, regression, numerical, and smoke coverage
-figures/        attractors, weight diagrams, physical-limit galleries
+figures/        attractors, interface previews, weight diagrams, physical-limit galleries
+site/           generated self-contained interactive interfaces
 results/        small checked-in finite baseline artifacts
 examples/       Spectra and Verdict programs
 ```
@@ -513,6 +584,7 @@ The project becomes more credible by restoring the visual story **without weaken
 ## 📚 Documentation index
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — unified Foundry architecture
+- [`docs/foundry-experience.md`](docs/foundry-experience.md) — audiovisual Experience / Experiment interface and Deep Boil systems
 - [`docs/attractor-forge.md`](docs/attractor-forge.md) — nonlinear-dynamics evidence ladder
 - [`docs/physical-limits-web.md`](docs/physical-limits-web.md) — physical-limits synthesis
 - [`docs/inference-traps.md`](docs/inference-traps.md) — exact decision-theory demonstrations
