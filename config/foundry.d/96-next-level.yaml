@@ -1,0 +1,43 @@
+version: 1
+
+units:
+  scientific-benchmarks:
+    track: integrity
+    status: production
+    description: Run versioned known-answer scientific cases and enforce numerical error budgets.
+    command:
+      - "{python}"
+      - scripts/run_scientific_benchmarks.py
+
+  repository-inventory:
+    track: integrity
+    status: production
+    description: Audit module reachability and fail on unregistered runnable scripts.
+    command:
+      - "{python}"
+      - scripts/audit_repository_inventory.py
+
+  formal-registry:
+    track: integrity
+    status: production
+    description: Hash and classify formal artifacts while surfacing syntactic proof holes.
+    command:
+      - "{python}"
+      - scripts/build_formal_registry.py
+
+  source-manifest:
+    track: integrity
+    status: production
+    description: Build a deterministic source-input manifest and content digest.
+    command:
+      - "{python}"
+      - scripts/build_source_manifest.py
+      - --epoch
+      - "1700000000"
+
+groups:
+  next-level-foundation:
+    - scientific-benchmarks
+    - repository-inventory
+    - formal-registry
+    - source-manifest
