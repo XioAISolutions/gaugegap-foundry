@@ -18,42 +18,60 @@ jobs:
           python-version: "3.12"
       - name: Install
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e '.[spectral,dev]'
-      - name: Full test suite diagnostic
+          python -m pip install --upgrade pip >/dev/null
+          python -m pip install -e '.[spectral,dev]' >/dev/null
+      - name: Collect concise diagnostics
         shell: bash
         run: |
+          mkdir -p /tmp/anomaly-diagnostics
+
           set +e
-          python -m pytest -q > /tmp/tests.log 2>&1
-          rc=$?
-          tail -n 160 /tmp/tests.log
-          exit $rc
-      - name: Claim audit diagnostic
-        if: always()
-        shell: bash
-        run: |
-          set +e
-          python scripts/claim_boundary_audit.py --strict > /tmp/claim.log 2>&1
-          rc=$?
-          cat /tmp/claim.log
-          test -f results/claim-boundary-audit/claim_boundary_audit.md && tail -n 120 results/claim-boundary-audit/claim_boundary_audit.md
-          exit $rc
-      - name: Maturity audit diagnostic
-        if: always()
-        shell: bash
-        run: |
-          set +e
-          python scripts/research_maturity_audit.py --strict > /tmp/maturity.log 2>&1
-          rc=$?
-          cat /tmp/maturity.log
-          test -f results/research-maturity-audit/research_maturity_audit.md && tail -n 120 results/research-maturity-audit/research_maturity_audit.md
-          exit $rc
-      - name: Reviewer packet diagnostic
-        if: always()
-        shell: bash
-        run: |
-          set +e
-          foundry run reviewer-packet > /tmp/reviewer.log 2>&1
-          rc=$?
-          tail -n 160 /tmp/reviewer.log
-          exit $rc
+          python -m pytest -q > /tmp/tests-full.log 2>&1
+          tests_rc=$?
+          {
+            echo "exit_code=${tests_rc}"
+            grep -E '^(FAILED|ERROR|E   |=+ short test summary|[0-9]+ failed|Traceback|AssertionError)' /tmp/tests-full.log || true
+            tail -n 80 /tmp/tests-full.log
+          } > /tmp/anomaly-diagnostics/tests.txt
+
+          python scripts/claim_boundary_audit.py --strict > /tmp/claim-full.log 2>&1
+          claim_rc=$?
+          {
+            echo "exit_code=${claim_rc}"
+            cat /tmp/claim-full.log
+            if test -f results/claim-boundary-audit/claim_boundary_audit.json; then
+              python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('results/claim-boundary-audit/claim_boundary_audit.json')
+          data=json.loads(p.read_text())
+          for item in data:
+              if item.get('severity') == 'high' and not item.get('bounded'):
+                  print(json.dumps(item, sort_keys=True))
+          PY
+            fi
+          } > /tmp/anomaly-diagnostics/claim.txt
+
+          python scripts/research_maturity_audit.py --strict > /tmp/maturity-full.log 2>&1
+          maturity_rc=$?
+          {
+            echo "exit_code=${maturity_rc}"
+            cat /tmp/maturity-full.log
+          } > /tmp/anomaly-diagnostics/maturity.txt
+
+          foundry run reviewer-packet > /tmp/reviewer-full.log 2>&1
+          reviewer_rc=$?
+          {
+            echo "exit_code=${reviewer_rc}"
+            tail -n 120 /tmp/reviewer-full.log
+          } > /tmp/anomaly-diagnostics/reviewer.txt
+
+          printf 'tests=%s\nclaim=%s\nmaturity=%s\nreviewer=%s\n' \
+            "$tests_rc" "$claim_rc" "$maturity_rc" "$reviewer_rc" \
+            > /tmp/anomaly-diagnostics/status.txt
+          exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: anomaly-integration-diagnostics
+          path: /tmp/anomaly-diagnostics
+          if-no-files-found: error
