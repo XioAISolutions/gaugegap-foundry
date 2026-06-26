@@ -1,0 +1,59 @@
+name: Diagnose charge consistency integration
+
+on:
+  pull_request:
+    branches: [main]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  diagnose:
+    if: github.head_ref == 'claude/anomaly-forge'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[spectral,dev]'
+      - name: Full test suite diagnostic
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q > /tmp/tests.log 2>&1
+          rc=$?
+          tail -n 160 /tmp/tests.log
+          exit $rc
+      - name: Claim audit diagnostic
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          python scripts/claim_boundary_audit.py --strict > /tmp/claim.log 2>&1
+          rc=$?
+          cat /tmp/claim.log
+          test -f results/claim-boundary-audit/claim_boundary_audit.md && tail -n 120 results/claim-boundary-audit/claim_boundary_audit.md
+          exit $rc
+      - name: Maturity audit diagnostic
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          python scripts/research_maturity_audit.py --strict > /tmp/maturity.log 2>&1
+          rc=$?
+          cat /tmp/maturity.log
+          test -f results/research-maturity-audit/research_maturity_audit.md && tail -n 120 results/research-maturity-audit/research_maturity_audit.md
+          exit $rc
+      - name: Reviewer packet diagnostic
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          foundry run reviewer-packet > /tmp/reviewer.log 2>&1
+          rc=$?
+          tail -n 160 /tmp/reviewer.log
+          exit $rc
