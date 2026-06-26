@@ -1,21 +1,21 @@
 name: Apply Anomaly Forge README once
 
 on:
-  push:
-    branches: [claude/anomaly-forge]
-    paths: [.github/workflows/anomaly-readme-once.yml]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
 
 jobs:
   apply:
-    if: github.event.head_commit.message == 'Add one-time Anomaly Forge README updater'
+    if: github.head_ref == 'claude/anomaly-forge' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: claude/anomaly-forge
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -26,6 +26,9 @@ jobs:
 
           path = Path('README.md')
           text = path.read_text(encoding='utf-8')
+          if '<a id="anomaly-forge"></a>' in text:
+              print('README already contains Anomaly Forge; no mutation needed.')
+              raise SystemExit(0)
 
           def replace_once(old: str, new: str, label: str) -> None:
               global text
@@ -159,7 +162,6 @@ The solver reports its assumptions. Without a right-handed neutrino, the minimal
 
 ## 🌀 Attractor Forge — nonlinear dynamics you can inspect'''
           replace_once(marker, section, 'Anomaly Forge section')
-
           path.write_text(text, encoding='utf-8')
           PY
       - name: Commit README update
@@ -167,6 +169,9 @@ The solver reports its assumptions. Without a right-handed neutrino, the minimal
           git config user.name gaugegap-bot
           git config user.email actions@users.noreply.github.com
           git add README.md
-          git diff --cached --quiet && exit 1
+          if git diff --cached --quiet; then
+            echo 'README is already current.'
+            exit 0
+          fi
           git commit -m "Make Anomaly Forge visual and interactive in README"
-          git push origin HEAD:claude/anomaly-forge
+          git push origin HEAD:${GITHUB_HEAD_REF}
