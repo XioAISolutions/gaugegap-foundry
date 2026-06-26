@@ -1,0 +1,33 @@
+version: 1
+
+units:
+  anomaly-forge:
+    track: gaugegap
+    status: production
+    description: Run the exact rational Standard Model anomaly audit and emit JSON plus SVG evidence.
+    command:
+      - "{python}"
+      - scripts/run_anomaly_forge.py
+      - --require-pass
+      - --output-dir
+      - results/anomaly-forge
+
+  anomaly-forge-experience:
+    track: gaugegap
+    status: production
+    description: Generate the complete nine-scene Experience bundle with interactive anomaly controls.
+    command:
+      - "{python}"
+      - scripts/generate_foundry_experience_complete.py
+      - --output-dir
+      - site/foundry-experience
+      - --preview
+      - figures/foundry-experience/preview.svg
+
+groups:
+  anomaly-audit:
+    - anomaly-forge
+  standard-model-forge:
+    - lagrangian-forge
+    - anomaly-forge
+    - anomaly-forge-experience

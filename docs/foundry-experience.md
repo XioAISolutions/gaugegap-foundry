@@ -11,7 +11,7 @@ Reference: <https://www.ryojiikeda.com/project/supersymmetry/>
 
 ## What is included
 
-The complete generated interface contains eight scenes:
+The complete generated interface contains nine scenes:
 
 | Scene | Source | Interactive layer | Evidence layer |
 |---|---|---|---|
@@ -21,19 +21,24 @@ The complete generated interface contains eight scenes:
 | Gauge lattice | finite cubic lattice | rotation, density, line/point mode | finite geometry and Wilson-loop path boundary |
 | SU(3) weights | exact finite representation data | octet/decuplet cycling and rotation | representation-theory boundary |
 | Lagrangian Forge | canonical compact Standard Model catalog | interaction graph, equation wall, symmetry breaking, vertex atlas, coupling sliders | field/sector/vertex inventory, charge and dimension audits, electroweak mass-matrix checks |
+| Anomaly Forge | exact rational chiral charge inventory | hypercharge sliders, anomaly-balance ring, triangle channels, fractional-charge cards, constraint surface | exact local coefficients, global SU(2) parity, solver assumptions, proton/neutron charges |
 | Finite spectra | canonical Hamiltonian factory | visual comparison | Hermiticity audit, matrix digest, finite spectral gap |
 | Mass-radius limits | dimensionless Planck-unit formulas | animated finite plot | explicit formula and scaling boundary |
 
 The Lagrangian Forge scene does not use an artistic blackboard transcription as scientific source data. It reconstructs the visual density from the canonical compact Standard Model sector catalog in `src/gaugegap/standard_model_catalog.py`.
 
+The Anomaly Forge scene uses exact rational arithmetic in `src/gaugegap/anomaly_audit.py`. The browser recomputes the same polynomial residuals for interactive exploration, while the standalone runner and unit tests remain the source of exact pass/fail evidence.
+
 ## Run it
 
-Run the complete eight-scene interface:
+Run the complete nine-scene interface:
 
 ```bash
 foundry run foundry-experience-v2
-# focused alias
+# focused aliases
 foundry run lagrangian-forge
+foundry run anomaly-forge
+foundry run anomaly-forge-experience
 ```
 
 or directly:
@@ -66,6 +71,7 @@ Experience mode is intentionally sparse. It:
 - reveals trajectories progressively instead of drawing everything at once;
 - rotates three-dimensional finite structures;
 - animates the Standard Model interaction graph, equation wall, symmetry-breaking masses, and vertex atlas;
+- displays charge-cancellation channels and fractional-charge structure in Anomaly Forge;
 - maps the active state to two oscillators and a gain envelope after the visitor explicitly enables sound;
 - keeps finite-claim status visible even while the control panels are hidden;
 - displays the dataset schema, scene identifier, git commit, and boundary in the moving ticker.
@@ -80,29 +86,23 @@ Experiment mode reveals the machinery:
 - `xy`, `xz`, `yz`, and rotating three-dimensional projections;
 - editable ODE parameters and browser-side deterministic RK4 reintegration;
 - Standard Model gauge, Higgs, Yukawa, vacuum-scale, and schematic gauge-parameter controls;
-- interaction graph, equation-wall, symmetry-breaking, and vertex-atlas views;
+- exact-charge controls for colour count, generation count, and minimal hypercharges;
+- interaction graph, equation-wall, symmetry-breaking, vertex-atlas, anomaly-balance, triangle-channel, fractional-charge, and constraint-surface views;
 - density, speed, persistence, line, and point controls;
 - equations and live finite diagnostics;
 - embedded precomputed DMD and interval-validation records;
-- Lagrangian structural audits and tree-level observables;
+- Lagrangian structural audits, exact anomaly residuals, and tree-level observables;
 - explicit claim boundaries for every scene.
 
-Browser-side ODE runs are finite numerical experiments. They do not inherit the validated interval status of a precomputed canonical step unless the exact validated parameters match. Standard Model controls recompute finite tree-level algebraic relations; they do not evaluate the interacting quantum field theory.
+Browser-side ODE runs are finite numerical experiments. They do not inherit the validated interval status of a precomputed canonical step unless the exact validated parameters match. Standard Model controls recompute finite tree-level algebraic relations; they do not evaluate the interacting quantum field theory. Browser anomaly controls are exploratory floating-point views; exact certification comes from the rational backend and tests.
 
 ## Scientific substrate
 
-The complete interface is backed by five shared systems.
+The complete interface is backed by six shared systems.
 
 ### 1. Canonical Hamiltonian factory
 
-`src/gaugegap/hamiltonian_factory.py` provides one construction and audit surface for:
-
-- finite Z₂ plaquette Hamiltonians;
-- truncated compact U(1) Hamiltonians;
-- the explicitly labelled SU(2) prototype;
-- the explicitly labelled SU(3) prototype.
-
-Every artifact reports normalized parameters, implementation maturity, finite claim boundary, matrix digest, Hermiticity residual, and exact finite spectrum and gap when available. Normalizing construction does not promote prototype physics into a complete theory.
+`src/gaugegap/hamiltonian_factory.py` provides one construction and audit surface for finite Z₂, truncated compact U(1), and explicitly labelled SU(2)/SU(3) prototypes. Every artifact reports normalized parameters, implementation maturity, finite claim boundary, matrix digest, Hermiticity residual, and exact finite spectrum and gap when available.
 
 ### 2. Koopman / DMD analysis
 
@@ -118,7 +118,7 @@ The result is an approximation in the selected finite observable space. It is no
 X₀ + [0, Δt] f(B) ⊆ B
 ```
 
-When the inclusion closes, the exact solution starting in the supplied initial interval box remains in `B` over the configured finite step. The endpoint is enclosed separately. This establishes a finite-step enclosure under the displayed assumptions. It does not establish a global strange attractor, chaos or ergodicity, long-time boundedness, or a continuum PDE theorem.
+When the inclusion closes, the exact solution starting in the supplied initial interval box remains in `B` over the configured finite step. This does not establish a global strange attractor, chaos, ergodicity, long-time boundedness, or a continuum PDE theorem.
 
 ### 4. Standard Model catalog and Lagrangian audits
 
@@ -127,13 +127,22 @@ The complete scene is built from:
 - `src/gaugegap/standard_model_catalog.py` — field, sector, interaction, coupling, gauge-convention, and tree-level observable catalog;
 - `src/gaugegap/interaction_graph.py` — deterministic interaction hypergraph;
 - `src/gaugegap/lagrangian_audit.py` — fail-closed structural checks;
-- `src/gaugegap/lagrangian_scene.py` — eighth-scene dataset and self-contained browser extension.
-
-The audit checks unique identifiers, resolved references, electric-charge conservation, operator dimensions, declared conjugate pairs, recognized couplings, finite parameters, neutral mass-matrix symmetry, a massless tree-level photon, mixing-matrix orthogonality, and explicit gauge/source boundaries.
+- `src/gaugegap/lagrangian_scene.py` — Standard Model scene dataset and browser extension.
 
 This is a finite symbolic and tree-level representation. It does not calculate scattering amplitudes, loops, renormalization, a path integral, or a nonperturbative continuum Standard Model.
 
-### 5. Research claim manifests
+### 5. Exact anomaly audit and hypercharge solver
+
+The ninth scene is built from:
+
+- `src/gaugegap/anomaly_audit.py` — exact `Fraction` arithmetic for `SU(3)^2-U(1)`, `SU(2)^2-U(1)`, `U(1)^3`, mixed gravitational hypercharge, and global SU(2) parity;
+- `src/gaugegap/hypercharge_solver.py` — assumption-labelled minimal and right-neutrino solutions;
+- `src/gaugegap/anomaly_scene.py` — deterministic scene data and self-contained browser extension;
+- `scripts/run_anomaly_forge.py` — JSON/SVG evidence runner with fail-closed exit behavior.
+
+The minimal assignment is unique only under the declared field content, Higgs normalization, generation universality, and Yukawa assumptions. Adding a Dirac right-handed neutrino exposes a one-parameter anomaly-free family.
+
+### 6. Research claim manifests
 
 `src/gaugegap/research_manifest.py` binds each research claim to an explicit claim level, finite scope, assumptions, exclusions, hashed evidence artifacts, methods, parameters, git commit, and external review when relevant.
 
@@ -147,6 +156,7 @@ Run all shared systems together:
 foundry run deep-boil-smoke
 foundry run deep-boil-0001
 foundry run foundry-experience-v2
+foundry run anomaly-forge
 ```
 
 The full verification stack checks:
@@ -159,7 +169,8 @@ The full verification stack checks:
 6. research-manifest generation;
 7. canonical Standard Model catalog and interaction graph;
 8. Lagrangian charge, dimension, reference, mixing, and source-boundary audits;
-9. generation of the complete eight-scene Experience/Experiment site.
+9. exact anomaly cancellation, a deliberate broken assignment, solver assumptions, and global SU(2) parity;
+10. generation of the complete nine-scene Experience/Experiment site.
 
 ## Architecture
 
@@ -168,6 +179,7 @@ flowchart LR
     EQ[Registered equations and finite models] --> DATA[Deterministic finite data]
     SM[Canonical Standard Model catalog] --> GRAPH[Interaction hypergraph]
     SM --> LA[Lagrangian audits]
+    SM --> AN[Exact anomaly audit]
     DATA --> DMD[Koopman / DMD]
     DATA --> IV[Interval Picard step]
     DATA --> HAM[Hamiltonian audit]
@@ -176,10 +188,13 @@ flowchart LR
     HAM --> MAN
     GRAPH --> MAN
     LA --> MAN
+    AN --> MAN
     DATA --> EXP[Experience mode]
     DATA --> LAB[Experiment mode]
     GRAPH --> EXP
     GRAPH --> LAB
+    AN --> EXP
+    AN --> LAB
     MAN --> LAB
     EXP --> SITE[Self-contained browser bundle]
     LAB --> SITE
@@ -194,5 +209,6 @@ The interface is a scientific communication and exploration layer over finite co
 - a finite lattice spectral gap is not the continuum Yang–Mills mass gap;
 - a finite PDE surrogate is not Navier–Stokes existence and smoothness;
 - the Standard Model catalog is not a nonperturbative continuum construction or path-integral evaluation;
+- anomaly cancellation under a declared field inventory does not prove uniqueness across every possible theory;
 - an interactive visualization is not independent scientific validation;
 - no part of this interface claims a Millennium Prize solution.

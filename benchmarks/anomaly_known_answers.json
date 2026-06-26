@@ -1,0 +1,44 @@
+{
+  "schema": "gaugegap.anomaly_known_answers.v1",
+  "convention": "Q = T3 + Y; right-handed fields enter anomaly sums as left-handed conjugates",
+  "cases": [
+    {
+      "id": "standard-model-three-generations",
+      "assignment": {
+        "colors": 3,
+        "generations": 3,
+        "y_q": "1/6",
+        "y_u": "2/3",
+        "y_d": "-1/3",
+        "y_l": "-1/2",
+        "y_e": "-1"
+      },
+      "expected": {
+        "SU(3)^2-U(1)": "0",
+        "SU(2)^2-U(1)": "0",
+        "U(1)^3": "0",
+        "gravity^2-U(1)": "0",
+        "global_su2_pass": true,
+        "proton_charge": "1",
+        "neutron_charge": "0"
+      }
+    },
+    {
+      "id": "perturbed-up-hypercharge",
+      "assignment": {
+        "colors": 3,
+        "generations": 3,
+        "y_q": "1/6",
+        "y_u": "7/10",
+        "y_d": "-1/3",
+        "y_l": "-1/2",
+        "y_e": "-1"
+      },
+      "expected": {
+        "anomaly_free": false,
+        "nonzero_channels": ["SU(3)^2-U(1)", "U(1)^3", "gravity^2-U(1)"]
+      }
+    }
+  ],
+  "claim_boundary": "These cases verify exact finite anomaly arithmetic under declared assumptions, not uniqueness across all possible quantum field theories."
+}

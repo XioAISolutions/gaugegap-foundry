@@ -33,6 +33,9 @@ SAFE_CONTEXT_PATTERNS = [
     re.compile(r"\bfinite[- ]system\b", re.I),
     re.compile(r"\btoy\s+benchmark\b", re.I),
     re.compile(r"\bclaim boundary\b", re.I),
+    # Recognize both plain ``Boundary:`` and Markdown ``**Boundary:**`` labels,
+    # while avoiding a broad match on every use of the word "boundary".
+    re.compile(r"\bboundary(?:\*{1,2})?\s*:", re.I),
     re.compile(r"\bavoid\s+.*claim\b", re.I),
     # Deny-list sections enumerate phrases the project deliberately does not use;
     # quoted risky phrases in those sections are examples, not claims.

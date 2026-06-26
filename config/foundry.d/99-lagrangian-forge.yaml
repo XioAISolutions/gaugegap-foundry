@@ -4,7 +4,7 @@ units:
   foundry-experience-v2:
     track: integrity
     status: production
-    description: Generate the complete eight-scene Experience/Experiment bundle with Lagrangian Forge.
+    description: Generate the complete nine-scene Experience/Experiment bundle with Lagrangian Forge and exact charge consistency controls.
     command:
       - "{python}"
       - scripts/generate_foundry_experience_complete.py
