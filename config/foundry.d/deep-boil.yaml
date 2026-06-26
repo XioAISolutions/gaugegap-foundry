@@ -1,0 +1,37 @@
+version: 1
+
+units:
+  deep-boil-smoke:
+    track: integrity
+    hypothesis: deep-boil-0001
+    status: production
+    description: Cross-track smoke for DMD, interval ODE validation, Hamiltonian audits, and claim manifests.
+    command:
+      ["{python}", "scripts/run_deep_boil.py", "--smoke",
+       "--output-dir", "/tmp/gaugegap-deep-boil-smoke"]
+
+  deep-boil-0001:
+    track: integrity
+    hypothesis: deep-boil-0001
+    status: production
+    description: Full cross-track integration benchmark plus generated Experience/Experiment interface.
+    command:
+      ["{python}", "scripts/run_deep_boil.py", "--generate-experience",
+       "--output-dir", "results/deep-boil-0001"]
+
+  foundry-experience:
+    track: visualization
+    hypothesis: foundry-experience-0001
+    status: production
+    description: Generate the dependency-free audiovisual Experience/Experiment web interface.
+    command:
+      ["{python}", "scripts/generate_foundry_experience.py",
+       "--output-dir", "site/foundry-experience",
+       "--preview", "figures/foundry-experience/preview.svg"]
+
+groups:
+  deep-boil:
+    - deep-boil-0001
+
+  experience-stack:
+    - foundry-experience
