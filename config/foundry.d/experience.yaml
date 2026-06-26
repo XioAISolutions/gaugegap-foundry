@@ -1,0 +1,22 @@
+version: 1
+
+units:
+  foundry-experience-smoke:
+    track: interface
+    status: production
+    description: Deterministic self-contained Experience / Experiment CI bundle.
+    command:
+      ["{python}", "scripts/generate_foundry_experience.py", "--smoke",
+       "--output-dir", "/tmp/foundry-experience-smoke"]
+
+  foundry-experience:
+    track: interface
+    status: production
+    description: Full immersive and manipulable finite-data instrument.
+    command:
+      ["{python}", "scripts/generate_foundry_experience.py",
+       "--output-dir", "site/foundry-experience"]
+
+groups:
+  experience-system:
+    - foundry-experience
