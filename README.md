@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="#%EF%B8%8F-foundry-experience--experience--experiment">Foundry Experience</a> ·
+  <a href="#-lagrangian-forge--from-symmetry-to-matter">Lagrangian Forge</a> ·
   <a href="#-attractor-forge--nonlinear-dynamics-you-can-inspect">Attractor Forge</a> ·
   <a href="#-the-web-of-physical-limits">Physical limits</a> ·
   <a href="#-the-web-of-inference-traps">Inference traps</a> ·
@@ -34,13 +35,14 @@
 GaugeGap Foundry is a single laboratory for several kinds of finite scientific experiments:
 
 - **Foundry Experience** — a dependency-free audiovisual interface with separate immersion and apparatus modes.
+- **Lagrangian Forge** — an audited Standard Model field, sector, interaction, and tree-level mass atlas.
 - **GaugeGap** — finite lattice-gauge benchmarks from Z₂ through bounded SU(3) scaffolds.
 - **FlowGap** — finite PDE surrogates and nonlinear systems, including Rössler, Lorenz, and Thomas dynamics.
 - **CurveRank** — certified screening of finite operator truncations against zeta-zero-inspired targets.
 - **Physical limits** — familiar physics claims reduced to their exact, bounded computational core.
 - **Spectra and Verdict DSLs** — small languages where certification and evidence are part of program semantics.
 
-> ⚠️ **Claim boundary:** this repository does **not** claim a solution to any Millennium Prize problem. A finite numerical experiment, a formal inequality, and a continuum theorem are different achievements and are labelled separately throughout the project.
+> ⚠️ **Claim boundary:** this repository does **not** claim a solution to any Millennium Prize problem. A finite numerical experiment, a formal inequality, a symbolic catalog, and a continuum theorem are different achievements and are labelled separately throughout the project.
 
 <details open>
 <summary><strong>🗺️ Open the Foundry map</strong></summary>
@@ -49,6 +51,7 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 flowchart TD
     F["🔬 GaugeGap Foundry"]
     F --> X["◼️ Experience / Experiment<br/>interactive evidence interface"]
+    F --> L["🧬 Lagrangian Forge<br/>fields · vertices · symmetry breaking"]
     F --> G["⚛️ GaugeGap<br/>finite gauge systems"]
     F --> FL["🌊 FlowGap<br/>PDEs + nonlinear dynamics"]
     F --> C["📈 CurveRank<br/>finite spectral screening"]
@@ -56,6 +59,7 @@ flowchart TD
     F --> D["🧩 DSLs<br/>Spectra · Verdict"]
 
     X --> X1["Canvas · WebAudio · equations · manifests"]
+    L --> L1["SU(3)c × SU(2)L × U(1)Y<br/>interaction hypergraph · audits"]
     G --> G1["Z₂ → U(1) → SU(2) → SU(3 scaffold"]
     FL --> FL1["Burgers · Rössler · Lorenz · Thomas"]
     C --> C1["interval eigenvalues<br/>negative-result certificates"]
@@ -65,7 +69,7 @@ flowchart TD
     classDef main fill:#eef6ff,stroke:#0969da,color:#111;
     classDef edge fill:#f6f0ff,stroke:#6929c4,color:#111;
     class F main;
-    class X,G,FL,C,P,D edge;
+    class X,L,G,FL,C,P,D edge;
 ```
 
 </details>
@@ -74,7 +78,7 @@ flowchart TD
 
 ## ◼️ Foundry Experience — experience ↔ experiment
 
-The repository now has a self-contained browser interface inspired by the conceptual split between Ryoji Ikeda's **`supersymmetry [experience]`** and **`supersymmetry [experiment]`**: one mode emphasizes immersion, while the other exposes apparatus, controls, evidence, and process. The implementation does not copy the original artwork, sound, photography, or software.
+The repository has a self-contained browser interface inspired by the conceptual split between Ryoji Ikeda's **`supersymmetry [experience]`** and **`supersymmetry [experiment]`**: one mode emphasizes immersion, while the other exposes apparatus, controls, evidence, and process. The implementation does not copy the original artwork, sound, photography, or software.
 
 <p align="center">
   <img src="figures/foundry-experience/preview.svg" alt="Foundry Experience preview" width="780"/>
@@ -82,33 +86,47 @@ The repository now has a self-contained browser interface inspired by the concep
 
 | Mode | Purpose | What appears |
 |---|---|---|
-| **Experience** | sensory traversal of verified finite data | auto-cycling scenes, progressive trajectories, rotating geometry, scan fields, WebAudio sonification, live schema and commit ticker |
-| **Experiment** | inspect and manipulate the apparatus | equations, ODE parameter sliders, browser-side RK4 reintegration, projections, DMD diagnostics, interval-step status, Hamiltonian audits, provenance, claim boundaries |
+| **Experience** | sensory traversal of verified finite data | auto-cycling scenes, progressive trajectories, rotating geometry, equation fields, scan fields, WebAudio sonification, live schema and commit ticker |
+| **Experiment** | inspect and manipulate the apparatus | equations, ODE and Standard Model parameter sliders, browser-side RK4 reintegration, projections, DMD diagnostics, interval-step status, Lagrangian audits, Hamiltonian audits, provenance, claim boundaries |
 
-Seven scenes ship in the generated bundle:
+Eight scenes ship in the complete generated bundle:
 
 1. Rössler dynamics;
 2. Lorenz dynamics;
 3. Thomas cyclic dynamics;
 4. finite gauge lattice with highlighted Wilson-loop path;
 5. exact finite SU(3) octet/decuplet weight geometry;
-6. canonical Z₂ and truncated U(1) spectra;
-7. dimensionless Compton–Schwarzschild mass-radius limits.
+6. Lagrangian Forge interaction graph, equation wall, symmetry-breaking view, and vertex atlas;
+7. canonical Z₂ and truncated U(1) spectra;
+8. dimensionless Compton–Schwarzschild mass-radius limits.
 
 ```mermaid
 flowchart LR
     MODE["Experience / Experiment"] --> DATA["finite deterministic datasets"]
+    SM["canonical Standard Model catalog"] --> GRAPH["interaction hypergraph"]
+    SM --> LA["Lagrangian audits"]
     DATA --> DMD["Koopman / DMD"]
     DATA --> IV["interval Picard enclosure"]
     DATA --> HAM["canonical Hamiltonian audit"]
     DMD --> MAN["research claim manifest"]
     IV --> MAN
     HAM --> MAN
+    GRAPH --> MAN
+    LA --> MAN
     MAN --> UI["Canvas + WebAudio + evidence panels"]
+    GRAPH --> UI
 ```
 
 <details open>
-<summary><strong>▶️ Generate and open the interface</strong></summary>
+<summary><strong>▶️ Generate and open the complete interface</strong></summary>
+
+```bash
+foundry run foundry-experience-v2
+# focused alias
+foundry run lagrangian-forge
+```
+
+The original seven-scene generator remains available as the stable base implementation:
 
 ```bash
 foundry run foundry-experience
@@ -140,11 +158,45 @@ The supporting substrate is reusable outside the interface:
 - `src/gaugegap/koopman.py` — exact finite-data DMD, delay embeddings, dominant-mode summaries;
 - `src/gaugegap/validated_dynamics.py` — Picard-inclusion interval steps for Rössler, Lorenz, and Thomas;
 - `src/gaugegap/hamiltonian_factory.py` — canonical finite Hamiltonian construction and Hermiticity/gap audits;
+- `src/gaugegap/standard_model_catalog.py` — canonical Standard Model sectors, fields, interactions, controls, and tree-level relations;
+- `src/gaugegap/interaction_graph.py` — deterministic interaction hypergraph;
+- `src/gaugegap/lagrangian_audit.py` — fail-closed charge, dimension, reference, mixing, and source-boundary audits;
 - `src/gaugegap/research_manifest.py` — fail-closed claim levels tied to hashed evidence artifacts.
 
-📖 [`docs/foundry-experience.md`](docs/foundry-experience.md) · ✅ [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md)
+📖 [`docs/foundry-experience.md`](docs/foundry-experience.md) · 🧬 [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) · ✅ [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md)
 
-> 🧭 **Boundary:** the interface communicates and explores finite computations. It does not turn visual complexity, generated sound, a finite-time Lyapunov estimate, or a finite lattice gap into a continuum theorem.
+> 🧭 **Boundary:** the interface communicates and explores finite computations and canonical symbolic structure. It does not turn visual complexity, generated sound, a finite-time Lyapunov estimate, a finite lattice gap, or a tree-level Standard Model catalog into a continuum theorem.
+
+---
+
+## 🧬 Lagrangian Forge — from symmetry to matter
+
+Lagrangian Forge turns the visual density of a full expanded Standard Model blackboard into an inspectable scientific system. The artistic blackboard is inspiration only; the source of truth is the compact canonical sector decomposition.
+
+```text
+SU(3)c × SU(2)L × U(1)Y
+        ↓ fields + interactions
+      electroweak breaking
+        ↓ masses + vertices
+      finite audited scene
+```
+
+The four browser views are:
+
+| Selector | View |
+|---|---|
+| `x / y` | interaction hypergraph |
+| `x / z` | animated equation wall |
+| `y / z` | electroweak symmetry breaking and tree-level masses |
+| `rotating 3-D` | vertex atlas |
+
+The scene audits unique identifiers, field and sector references, electric-charge conservation, operator dimensions, Hermitian partner declarations, coupling labels, finite parameters, neutral mass-matrix symmetry, the tree-level massless photon, photon/Z mixing orthogonality, and explicit source and gauge-convention boundaries.
+
+```bash
+foundry run lagrangian-forge
+```
+
+> 🧭 **Boundary:** this is a finite symbolic catalog, interaction graph, structural audit, and tree-level calculator—not a scattering-amplitude engine, loop calculation, path-integral evaluation, nonperturbative continuum construction, or Yang–Mills mass-gap proof.
 
 ---
 
@@ -269,7 +321,8 @@ Plot objects by mass and radius and two limits seal off the lower-left region: c
 ```coq
 Require Import Reals. Require Import Lra. Open Scope R_scope.
 Section ComptonSchwarzschild_Planck.
-Variable Rad Rs Lc : R.
+Variables Rad Rs Lc : R.
+Hypothesis Rad_nonneg : Rad >= 0.
 Hypothesis Rs_pos : Rs > 0.
 Hypothesis Lc_pos : Lc > 0.
 Hypothesis not_bh : Rad >= Rs.
@@ -490,6 +543,8 @@ pip install -e '.[dev]'
 
 ```bash
 foundry list
+foundry run foundry-experience-v2
+foundry run lagrangian-forge
 foundry run foundry-experience
 foundry run deep-boil-smoke
 foundry run gaugegap-0002
@@ -585,20 +640,22 @@ examples/       Spectra and Verdict programs
 
 Good language:
 
-> finite-system benchmark · finite-time numerical evidence · local screening artifact · bounded formal statement · candidate negative result requiring independent review · prototype scaffold
+> finite-system benchmark · finite-time numerical evidence · local screening artifact · bounded formal statement · candidate negative result requiring independent review · prototype scaffold · canonical symbolic catalog · tree-level algebraic relation
 
 Language this project does not earn:
 
-> continuum Yang–Mills mass-gap proof · proof of the Riemann Hypothesis · formal proof of a global strange attractor from a plot · hardware result as mathematical proof · Millennium Prize resolution
+> continuum Yang–Mills mass-gap proof · nonperturbative Standard Model construction · proof of the Riemann Hypothesis · formal proof of a global strange attractor from a plot · hardware result as mathematical proof · Millennium Prize resolution
 
-The project becomes more credible by making the evidence **more explorable without making the claims larger**: the experience invites investigation, while the equations, manifests, tests, hashes, and certificates show exactly what every scene does—and does not—establish.
+The project becomes more credible by making the evidence **more explorable without making the claims larger**: the experience invites investigation, while the equations, manifests, tests, hashes, audits, and certificates show exactly what every scene does—and does not—establish.
 
 ---
 
 ## 📚 Documentation index
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — unified Foundry architecture
-- [`docs/foundry-experience.md`](docs/foundry-experience.md) — audiovisual interface, scientific substrate, and boundaries
+- [`docs/foundry-experience.md`](docs/foundry-experience.md) — eight-scene audiovisual interface, scientific substrate, and boundaries
+- [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) — Standard Model catalog, graph, controls, and audits
+- [`docs/end-of-day-integration-2026-06-26.md`](docs/end-of-day-integration-2026-06-26.md) — complete integration inventory
 - [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md) — cross-track verification checkpoint
 - [`docs/attractor-forge.md`](docs/attractor-forge.md) — nonlinear-dynamics evidence ladder
 - [`docs/physical-limits-web.md`](docs/physical-limits-web.md) — physical-limits synthesis
