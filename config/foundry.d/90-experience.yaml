@@ -1,0 +1,18 @@
+version: 1
+
+units:
+  foundry-experience:
+    track: integrity
+    status: production
+    description: Build the deterministic offline Experience/Experiment interface from results.
+    command:
+      - "{python}"
+      - scripts/build_foundry_experience.py
+      - --results-dir
+      - results
+      - --output
+      - results/foundry-experience/index.html
+
+groups:
+  experience:
+    - foundry-experience
