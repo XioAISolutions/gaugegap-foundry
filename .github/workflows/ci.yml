@@ -32,6 +32,12 @@ jobs:
           foundry run flowgap-0001
           foundry run flowgap-attractor-smoke
           foundry run curverank-screen-smoke
+          foundry run deep-boil-smoke
+      - name: Generate Foundry Experience smoke
+        run: |
+          foundry run foundry-experience -- --output-dir /tmp/foundry-experience --preview /tmp/foundry-experience.svg
+          test -s /tmp/foundry-experience/index.html
+          test -s /tmp/foundry-experience/research_manifest.json
       - name: Proofpack build smoke
         run: foundry run proofpack-build
 
@@ -74,8 +80,10 @@ jobs:
           python -m pip install --upgrade pip build
           python -m build
           python -m pip install dist/*.whl
-      - name: Check console entry points
+      - name: Check console entry points and registered systems
         run: |
           foundry list --json > /tmp/foundry-units.json
+          grep -q 'deep-boil-smoke' /tmp/foundry-units.json
+          grep -q 'foundry-experience' /tmp/foundry-units.json
           python -c "import numpy as np; np.save('/tmp/id.npy', np.diag([1.0,2.0,3.0,4.0]))"
           gaugegap-certify /tmp/id.npy --output /tmp/cert.json
