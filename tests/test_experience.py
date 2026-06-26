@@ -67,6 +67,19 @@ def test_build_experience_contains_both_modes_and_no_external_runtime(tmp_path: 
     assert output.with_suffix(".manifest.json").exists()
 
 
+def test_repeat_build_is_byte_identical(tmp_path: Path) -> None:
+    results = tmp_path / "results"
+    _seed_results(results)
+    output = tmp_path / "site" / "foundry-experience" / "index.html"
+    first = build_experience(results, output, strict=True)
+    first_html = output.read_bytes()
+    first_manifest = output.with_suffix(".manifest.json").read_bytes()
+    second = build_experience(results, output, strict=True)
+    assert first == second
+    assert output.read_bytes() == first_html
+    assert output.with_suffix(".manifest.json").read_bytes() == first_manifest
+
+
 def test_strict_mode_rejects_empty_results(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match="no supported artifacts"):
         build_experience(tmp_path, tmp_path / "index.html", strict=True)
@@ -83,4 +96,4 @@ def test_unsafe_script_terminator_is_escaped(tmp_path: Path) -> None:
     build_experience(tmp_path, output)
     rendered = output.read_text(encoding="utf-8")
     assert "</script><script>alert(1)</script>" not in rendered
-    assert "<\\/script>" in rendered
+    assert "<\/script>" in rendered
