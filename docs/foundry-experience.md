@@ -121,7 +121,7 @@ X₀ + [0, Δt] f(B) ⊆ B
 
 When the inclusion closes, the exact solution starting in the supplied initial interval box remains in `B` over the configured finite step. The endpoint is enclosed separately.
 
-This proves a finite-step enclosure. It does not prove:
+This establishes a finite-step enclosure under the displayed assumptions. It does not establish:
 
 - a global strange attractor;
 - chaos or ergodicity;

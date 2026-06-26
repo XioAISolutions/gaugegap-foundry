@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
@@ -84,11 +85,11 @@ def test_canonical_hamiltonian_factory_builds_hermitian_reference_models():
         assert artifact.digest() == audit.matrix_digest
 
 
-def test_continuum_theorem_manifest_fails_closed_without_review_and_formal_evidence():
+def test_continuum_theorem_manifest_fails_closed_without_required_evidence():
     claim = ResearchClaim(
         claim_id="unsafe",
-        title="Unsafe promotion",
-        statement="A continuum theorem has been proved.",
+        title="Unsupported promotion",
+        statement="Unsupported continuum-level promotion.",
         level=ClaimLevel.CONTINUUM_THEOREM,
         finite_scope="none",
         assumptions=("unspecified",),
@@ -103,24 +104,61 @@ def test_continuum_theorem_manifest_fails_closed_without_review_and_formal_evide
     assert "peer-reviewed" in joined
 
 
-def test_foundry_experience_generator_writes_self_contained_bundle(tmp_path):
+def test_foundry_experience_bundle_with_miniature_fixture(tmp_path, monkeypatch):
+    """Exercise bundle generation without recomputing all canonical scenes in unit tests."""
+    script = ROOT / "scripts" / "generate_foundry_experience.py"
+    spec = importlib.util.spec_from_file_location("foundry_experience_test_module", script)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+
+    scene_ids = ("rossler", "lorenz", "thomas", "lattice", "su3", "spectra", "limits")
+    scenes = []
+    for scene_id in scene_ids:
+        scenes.append(
+            {
+                "kind": "attractor" if scene_id in {"rossler", "lorenz", "thomas"} else "geometry",
+                "id": scene_id,
+                "label": scene_id.title(),
+                "description": "deterministic miniature scene",
+                "equations": ["finite fixture"],
+                "parameters": {"a": 0.2},
+                "defaults": [0.0, 1.0, 0.0],
+                "dt": 0.01,
+                "points": [[0.0, 0.0, 0.0], [1.0, 1.0, 1.0]],
+                "diagnostics": {
+                    "lyapunov": [0.0, 0.0, 0.0],
+                    "poincare_crossings": 0,
+                    "dmd": {"rank": 1, "reconstruction_error": 0.0},
+                    "dominant_modes": [],
+                    "validated_step": {
+                        "validated": True,
+                        "maximum_endpoint_width": 1e-12,
+                        "reason": "fixture",
+                    },
+                },
+                "claim_boundary": "finite fixture only",
+            }
+        )
+    miniature = {
+        "schema": "gaugegap.foundry_experience.test.v1",
+        "title": "Foundry Experience test bundle",
+        "git_commit": "test-commit",
+        "claim_boundary": "finite fixture only",
+        "scenes": scenes,
+    }
+    monkeypatch.setattr(module, "build_dataset", lambda: miniature)
+
     output = tmp_path / "experience"
     preview = tmp_path / "preview.svg"
-    completed = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / "scripts" / "generate_foundry_experience.py"),
-            "--output-dir",
-            str(output),
-            "--preview",
-            str(preview),
-        ],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-        check=False,
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [str(script), "--output-dir", str(output), "--preview", str(preview)],
     )
-    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert module.main() == 0
+
     html = (output / "index.html").read_text(encoding="utf-8")
     data = json.loads((output / "data.json").read_text(encoding="utf-8"))
     manifest = json.loads((output / "research_manifest.json").read_text(encoding="utf-8"))
@@ -128,15 +166,7 @@ def test_foundry_experience_generator_writes_self_contained_bundle(tmp_path):
     assert "AudioContext" in html
     assert "cdn" not in html.lower()
     assert len(data["scenes"]) == 7
-    assert {scene["id"] for scene in data["scenes"]} >= {
-        "rossler",
-        "lorenz",
-        "thomas",
-        "lattice",
-        "su3",
-        "spectra",
-        "limits",
-    }
+    assert {scene["id"] for scene in data["scenes"]} == set(scene_ids)
     assert manifest["claims"][0]["level"] == "reproducible_finite_result"
     assert preview.exists()
 

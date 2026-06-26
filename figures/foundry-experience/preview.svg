@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<rect width="1200" height="630" fill="#030303"/>
+<g fill="none" stroke="#fff" stroke-width="1" opacity=".9">
+  <path d="M670 110 C850 75 1025 180 1005 330 C985 480 760 535 585 450 C410 365 425 185 570 145 C705 110 860 205 835 335 C810 465 625 470 535 370 C445 270 525 165 635 170 C745 175 800 265 760 345 C720 425 610 410 565 345 C520 280 570 220 635 225 C700 230 725 285 700 330"/>
+</g>
+<g fill="#fff" font-family="monospace">
+  <text x="65" y="90" font-size="18" letter-spacing="5">GAUGEGAP // FOUNDRY</text>
+  <text x="65" y="155" font-size="54" font-weight="700">EXPERIENCE</text>
+  <text x="65" y="215" font-size="54" fill="#666">EXPERIMENT</text>
+  <text x="65" y="520" font-size="16" fill="#999">FINITE DATA · EQUATIONS · SONIFICATION · EVIDENCE · CLAIM BOUNDARIES</text>
+  <text x="65" y="566" font-size="12" fill="#ff5a5a">NO CONTINUUM OR MILLENNIUM CLAIM</text>
+</g>
+<path d="M65 470H1135" stroke="#222"/>
+</svg>
