@@ -11,7 +11,7 @@ units:
       - --results-dir
       - results
       - --output
-      - results/foundry-experience/index.html
+      - site/foundry-experience/index.html
 
 groups:
   experience:
