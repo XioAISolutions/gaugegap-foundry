@@ -6,7 +6,7 @@
 	entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy \
 	landauer bekenstein physical-limits temporal-double-slit physical-limits-figures \
 	verify-certificates compile-coq sonification cherenkov lieb-robinson \
-	attractor-forge rossler lorenz thomas
+	attractor-forge rossler lorenz thomas experience deep-boil deep-boil-smoke
 
 # Pin proof artifacts to the HEAD commit time so a fixed commit remains
 # byte-reproducible. The orchestration parameters live in config/foundry.yaml
@@ -141,3 +141,12 @@ lorenz:
 
 thomas:
 	$(FOUNDRY) run flowgap-0004-thomas
+
+experience:
+	$(FOUNDRY) run foundry-experience
+
+deep-boil:
+	$(FOUNDRY) run deep-boil-0001
+
+deep-boil-smoke:
+	$(FOUNDRY) run deep-boil-smoke
