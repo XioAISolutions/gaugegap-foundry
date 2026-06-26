@@ -36,4 +36,7 @@ jobs:
             audit-exit.txt
             reviewer-output.txt
             reviewer-exit.txt
+            results/claim-boundary-audit/**
+            results/reviewer-packet/**
+          if-no-files-found: warn
           retention-days: 1
