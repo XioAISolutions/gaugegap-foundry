@@ -12,6 +12,7 @@
   <a href="#%EF%B8%8F-foundry-experience--experience--experiment">Foundry Experience</a> ·
   <a href="#-lagrangian-forge--from-symmetry-to-matter">Lagrangian Forge</a> ·
   <a href="#anomaly-forge">Anomaly Forge</a> ·
+  <a href="#search-forge">Search Forge</a> ·
   <a href="#-attractor-forge--nonlinear-dynamics-you-can-inspect">Attractor Forge</a> ·
   <a href="#-the-web-of-physical-limits">Physical limits</a> ·
   <a href="#-the-web-of-inference-traps">Inference traps</a> ·
@@ -38,6 +39,7 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 - **Foundry Experience** — a dependency-free audiovisual interface with separate immersion and apparatus modes.
 - **Lagrangian Forge** — an audited Standard Model field, sector, interaction, and tree-level mass atlas.
 - **Anomaly Forge** — exact rational charge-consistency tests, a hypercharge solver, and a live anomaly-free surface.
+- **Search Forge** — certified Dijkstra/A* paths, scientific search spaces, and symbolic null controls.
 - **GaugeGap** — finite lattice-gauge benchmarks from Z₂ through bounded SU(3) scaffolds.
 - **FlowGap** — finite PDE surrogates and nonlinear systems, including Rössler, Lorenz, and Thomas dynamics.
 - **CurveRank** — certified screening of finite operator truncations against zeta-zero-inspired targets.
@@ -55,6 +57,7 @@ flowchart TD
     F --> X["◼️ Experience / Experiment<br/>interactive evidence interface"]
     F --> L["🧬 Lagrangian Forge<br/>fields · vertices · symmetry breaking"]
     F --> A["⚖️ Anomaly Forge<br/>charges · constraints · cancellation"]
+    F --> S["🧭 Search Forge<br/>paths · proofs · pattern controls"]
     F --> G["⚛️ GaugeGap<br/>finite gauge systems"]
     F --> FL["🌊 FlowGap<br/>PDEs + nonlinear dynamics"]
     F --> C["📈 CurveRank<br/>finite spectral screening"]
@@ -64,6 +67,7 @@ flowchart TD
     X --> X1["Canvas · WebAudio · equations · manifests"]
     L --> L1["SU(3)c × SU(2)L × U(1)Y<br/>interaction hypergraph · audits"]
     A --> A1["exact rational anomalies<br/>hypercharge solver · Witten parity"]
+    S --> S1["Dijkstra baseline · A* heuristic contract<br/>symbolic null models"]
     G --> G1["Z₂ → U(1) → SU(2) → SU(3 scaffold"]
     FL --> FL1["Burgers · Rössler · Lorenz · Thomas"]
     C --> C1["interval eigenvalues<br/>negative-result certificates"]
@@ -73,7 +77,7 @@ flowchart TD
     classDef main fill:#eef6ff,stroke:#0969da,color:#111;
     classDef edge fill:#f6f0ff,stroke:#6929c4,color:#111;
     class F main;
-    class X,L,A,G,FL,C,P,D edge;
+    class X,L,A,S,G,FL,C,P,D edge;
 ```
 
 </details>
@@ -173,9 +177,12 @@ The supporting substrate is reusable outside the interface:
 - `src/gaugegap/lagrangian_audit.py` — fail-closed charge, dimension, reference, mixing, and source-boundary audits;
 - `src/gaugegap/anomaly_audit.py` — exact rational local and global gauge-anomaly coefficients;
 - `src/gaugegap/hypercharge_solver.py` — assumption-labelled minimal and right-neutrino charge solutions;
+- `src/gaugegap/search_forge.py` — deterministic weighted graphs, Dijkstra, A*, heuristic checks, and hashed certificates;
+- `src/gaugegap/scientific_search_spaces.py` — exact anomaly-repair and research-maturity search spaces;
+- `src/gaugegap/symbolic_search.py` — historical ciphers and deterministic null-model controls;
 - `src/gaugegap/research_manifest.py` — fail-closed claim levels tied to hashed evidence artifacts.
 
-📖 [`docs/foundry-experience.md`](docs/foundry-experience.md) · 🧬 [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) · ⚖️ [`docs/anomaly-forge.md`](docs/anomaly-forge.md) · ✅ [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md)
+📖 [`docs/foundry-experience.md`](docs/foundry-experience.md) · 🧬 [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) · ⚖️ [`docs/anomaly-forge.md`](docs/anomaly-forge.md) · 🧭 [`docs/search-forge.md`](docs/search-forge.md) · ✅ [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md)
 
 > 🧭 **Boundary:** the interface communicates and explores finite computations and canonical symbolic structure. It does not turn visual complexity, generated sound, a finite-time Lyapunov estimate, a finite lattice gap, or a tree-level Standard Model catalog into a continuum theorem.
 
@@ -255,6 +262,33 @@ proton      = +1  neutron        = 0
 The solver reports its assumptions. Without a right-handed neutrino, the minimal assignment is unique under the declared Higgs and Yukawa assumptions. Adding a Dirac right-handed neutrino exposes the remaining one-parameter anomaly-free family instead of hiding it.
 
 > 🧭 **Boundary:** exact cancellation is proved only for the declared finite chiral field inventory and conventions. It does not show that these charges are unique across every possible theory, construct the continuum Standard Model, or solve a Millennium Prize problem.
+
+---
+
+<a id="search-forge"></a>
+## 🧭 Search Forge — certified paths and pattern controls
+
+Search Forge is the shared finite-search layer beneath anomaly repair, research routing, and controlled symbolic experiments. Dijkstra provides the exact non-negative-edge baseline; A* adds direction only through a declared heuristic contract that is checked against every edge in the finite graph.
+
+<p align="center">
+  <img src="figures/search-forge/search-forge.svg" alt="Search Forge Dijkstra and A-star comparison" width="920"/>
+</p>
+
+| Layer | What it does | Boundary |
+|---|---|---|
+| **Dijkstra** | least-cost path on a declared finite graph | requires finite non-negative edge costs |
+| **A\*** | combines accumulated cost with a goal heuristic | optimality requires the declared heuristic contract |
+| **Scientific spaces** | repairs a perturbed hypercharge and ranks research-maturity routes | searches only the registered candidate graph |
+| **Symbolic lab** | evaluates historical letter-number systems and compares them with deterministic null controls | equal values are associations, not causal evidence |
+
+```bash
+foundry run search-forge
+foundry run symbolic-search-lab
+```
+
+The offline bundle writes `site/search-forge/index.html`, a JSON evidence record, and a reproducible SVG preview. Every result includes the path, cost, expansion order, graph hash, heuristic metadata, result hash, and explicit claim boundary.
+
+> 🧭 **Boundary:** finding a path does not prove that the graph exhausts every physical theory, proof strategy, or interpretation. Symbolic equality does not establish causality, prediction, or a physical mechanism.
 
 ---
 
@@ -605,6 +639,8 @@ foundry run foundry-experience-v2
 foundry run lagrangian-forge
 foundry run anomaly-forge
 foundry run anomaly-forge-experience
+foundry run search-forge
+foundry run symbolic-search-lab
 foundry run foundry-experience
 foundry run deep-boil-smoke
 foundry run gaugegap-0002
@@ -716,6 +752,7 @@ The project becomes more credible by making the evidence **more explorable witho
 - [`docs/foundry-experience.md`](docs/foundry-experience.md) — nine-scene audiovisual interface, scientific substrate, and boundaries
 - [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) — Standard Model catalog, graph, controls, and audits
 - [`docs/anomaly-forge.md`](docs/anomaly-forge.md) — exact charge consistency, solver assumptions, interactive views, and claim boundaries
+- [`docs/search-forge.md`](docs/search-forge.md) — certified pathfinding, scientific search spaces, symbolic controls, and boundaries
 - [`docs/end-of-day-integration-2026-06-26.md`](docs/end-of-day-integration-2026-06-26.md) — complete integration inventory
 - [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md) — cross-track verification checkpoint
 - [`docs/attractor-forge.md`](docs/attractor-forge.md) — nonlinear-dynamics evidence ladder

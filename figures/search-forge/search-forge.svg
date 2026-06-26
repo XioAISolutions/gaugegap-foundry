@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#010409"/>
+      <stop offset="1" stop-color="#0d1117"/>
+    </linearGradient>
+    <linearGradient id="pathA" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#58a6ff"/>
+      <stop offset="1" stop-color="#79c0ff"/>
+    </linearGradient>
+    <linearGradient id="pathB" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d2a8ff"/>
+      <stop offset="1" stop-color="#7ee787"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1200" height="620" rx="28" fill="url(#bg)"/>
+  <text x="600" y="54" text-anchor="middle" fill="#f0f6fc" font-size="30" font-family="system-ui,sans-serif" font-weight="700">Search Forge</text>
+  <text x="600" y="82" text-anchor="middle" fill="#8b949e" font-size="15" font-family="ui-monospace,monospace">exact finite paths · heuristic guidance · symbolic null controls</text>
+
+  <g transform="translate(48,118)">
+    <rect width="510" height="420" rx="20" fill="#0d1117" stroke="#30363d"/>
+    <text x="255" y="34" text-anchor="middle" fill="#58a6ff" font-size="22" font-family="system-ui">Dijkstra</text>
+    <text x="255" y="58" text-anchor="middle" fill="#8b949e" font-size="12" font-family="ui-monospace,monospace">exact baseline on non-negative edges</text>
+    <g fill="#173a52" opacity="0.85">
+      <circle cx="95" cy="118" r="34"/><circle cx="150" cy="118" r="34"/><circle cx="205" cy="118" r="34"/>
+      <circle cx="95" cy="173" r="34"/><circle cx="150" cy="173" r="34"/><circle cx="205" cy="173" r="34"/><circle cx="260" cy="173" r="34"/>
+      <circle cx="95" cy="228" r="34"/><circle cx="150" cy="228" r="34"/><circle cx="205" cy="228" r="34"/><circle cx="260" cy="228" r="34"/><circle cx="315" cy="228" r="34"/>
+      <circle cx="150" cy="283" r="34"/><circle cx="205" cy="283" r="34"/><circle cx="260" cy="283" r="34"/><circle cx="315" cy="283" r="34"/><circle cx="370" cy="283" r="34"/>
+    </g>
+    <polyline points="74,228 150,228 205,228 260,228 315,228 370,283 430,330" fill="none" stroke="url(#pathA)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+    <circle cx="74" cy="228" r="12" fill="#3fb950"/><circle cx="430" cy="330" r="12" fill="#f85149"/>
+    <text x="255" y="390" text-anchor="middle" fill="#c9d1d9" font-size="14" font-family="ui-monospace,monospace">broad frontier · certified minimum</text>
+  </g>
+
+  <g transform="translate(642,118)">
+    <rect width="510" height="420" rx="20" fill="#0d1117" stroke="#30363d"/>
+    <text x="255" y="34" text-anchor="middle" fill="#d2a8ff" font-size="22" font-family="system-ui">A*</text>
+    <text x="255" y="58" text-anchor="middle" fill="#8b949e" font-size="12" font-family="ui-monospace,monospace">g(n) + admissible h(n)</text>
+    <g fill="#2b1f3d" opacity="0.9">
+      <circle cx="90" cy="225" r="30"/><circle cx="145" cy="225" r="30"/><circle cx="200" cy="225" r="30"/>
+      <circle cx="255" cy="225" r="30"/><circle cx="310" cy="245" r="30"/><circle cx="365" cy="285" r="30"/>
+    </g>
+    <polyline points="74,228 145,225 200,225 255,225 310,245 365,285 430,330" fill="none" stroke="url(#pathB)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+    <circle cx="74" cy="228" r="12" fill="#3fb950"/><circle cx="430" cy="330" r="12" fill="#f85149"/>
+    <g transform="translate(86,92)">
+      <rect width="338" height="64" rx="12" fill="#161b22" stroke="#30363d"/>
+      <text x="169" y="25" text-anchor="middle" fill="#f0f6fc" font-size="14" font-family="ui-monospace,monospace">heuristic contract</text>
+      <text x="169" y="46" text-anchor="middle" fill="#7ee787" font-size="12" font-family="ui-monospace,monospace">admissible declared · consistency checked</text>
+    </g>
+    <text x="255" y="390" text-anchor="middle" fill="#c9d1d9" font-size="14" font-family="ui-monospace,monospace">directed frontier · same optimum</text>
+  </g>
+
+  <g transform="translate(162,560)">
+    <text x="0" y="0" fill="#58a6ff" font-size="14" font-family="ui-monospace,monospace">anomaly repair</text>
+    <text x="260" y="0" fill="#d2a8ff" font-size="14" font-family="ui-monospace,monospace">research paths</text>
+    <text x="486" y="0" fill="#7ee787" font-size="14" font-family="ui-monospace,monospace">proof states</text>
+    <text x="686" y="0" fill="#f2cc60" font-size="14" font-family="ui-monospace,monospace">symbolic null models</text>
+  </g>
+</svg>
