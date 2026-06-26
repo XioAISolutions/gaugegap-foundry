@@ -20,7 +20,7 @@ def main() -> int:
     parser.add_argument(
         "--output",
         type=Path,
-        default=ROOT / "results" / "foundry-experience" / "index.html",
+        default=ROOT / "site" / "foundry-experience" / "index.html",
     )
     parser.add_argument("--title", default="GaugeGap Foundry")
     parser.add_argument("--strict", action="store_true", help="fail if no supported artifacts exist")
