@@ -11,6 +11,7 @@
 <p align="center">
   <a href="#%EF%B8%8F-foundry-experience--experience--experiment">Foundry Experience</a> ·
   <a href="#-lagrangian-forge--from-symmetry-to-matter">Lagrangian Forge</a> ·
+  <a href="#anomaly-forge">Anomaly Forge</a> ·
   <a href="#-attractor-forge--nonlinear-dynamics-you-can-inspect">Attractor Forge</a> ·
   <a href="#-the-web-of-physical-limits">Physical limits</a> ·
   <a href="#-the-web-of-inference-traps">Inference traps</a> ·
@@ -36,6 +37,7 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 
 - **Foundry Experience** — a dependency-free audiovisual interface with separate immersion and apparatus modes.
 - **Lagrangian Forge** — an audited Standard Model field, sector, interaction, and tree-level mass atlas.
+- **Anomaly Forge** — exact rational charge-consistency tests, a hypercharge solver, and a live anomaly-free surface.
 - **GaugeGap** — finite lattice-gauge benchmarks from Z₂ through bounded SU(3) scaffolds.
 - **FlowGap** — finite PDE surrogates and nonlinear systems, including Rössler, Lorenz, and Thomas dynamics.
 - **CurveRank** — certified screening of finite operator truncations against zeta-zero-inspired targets.
@@ -52,6 +54,7 @@ flowchart TD
     F["🔬 GaugeGap Foundry"]
     F --> X["◼️ Experience / Experiment<br/>interactive evidence interface"]
     F --> L["🧬 Lagrangian Forge<br/>fields · vertices · symmetry breaking"]
+    F --> A["⚖️ Anomaly Forge<br/>charges · constraints · cancellation"]
     F --> G["⚛️ GaugeGap<br/>finite gauge systems"]
     F --> FL["🌊 FlowGap<br/>PDEs + nonlinear dynamics"]
     F --> C["📈 CurveRank<br/>finite spectral screening"]
@@ -60,6 +63,7 @@ flowchart TD
 
     X --> X1["Canvas · WebAudio · equations · manifests"]
     L --> L1["SU(3)c × SU(2)L × U(1)Y<br/>interaction hypergraph · audits"]
+    A --> A1["exact rational anomalies<br/>hypercharge solver · Witten parity"]
     G --> G1["Z₂ → U(1) → SU(2) → SU(3 scaffold"]
     FL --> FL1["Burgers · Rössler · Lorenz · Thomas"]
     C --> C1["interval eigenvalues<br/>negative-result certificates"]
@@ -69,7 +73,7 @@ flowchart TD
     classDef main fill:#eef6ff,stroke:#0969da,color:#111;
     classDef edge fill:#f6f0ff,stroke:#6929c4,color:#111;
     class F main;
-    class X,L,G,FL,C,P,D edge;
+    class X,L,A,G,FL,C,P,D edge;
 ```
 
 </details>
@@ -87,9 +91,9 @@ The repository has a self-contained browser interface inspired by the conceptual
 | Mode | Purpose | What appears |
 |---|---|---|
 | **Experience** | sensory traversal of verified finite data | auto-cycling scenes, progressive trajectories, rotating geometry, equation fields, scan fields, WebAudio sonification, live schema and commit ticker |
-| **Experiment** | inspect and manipulate the apparatus | equations, ODE and Standard Model parameter sliders, browser-side RK4 reintegration, projections, DMD diagnostics, interval-step status, Lagrangian audits, Hamiltonian audits, provenance, claim boundaries |
+| **Experiment** | inspect and manipulate the apparatus | equations, ODE, Standard Model, and hypercharge sliders; browser-side RK4 reintegration; anomaly residuals; projections; DMD and interval diagnostics; Lagrangian and Hamiltonian audits; provenance; claim boundaries |
 
-Eight scenes ship in the complete generated bundle:
+Nine scenes ship in the complete generated bundle:
 
 1. Rössler dynamics;
 2. Lorenz dynamics;
@@ -97,14 +101,16 @@ Eight scenes ship in the complete generated bundle:
 4. finite gauge lattice with highlighted Wilson-loop path;
 5. exact finite SU(3) octet/decuplet weight geometry;
 6. Lagrangian Forge interaction graph, equation wall, symmetry-breaking view, and vertex atlas;
-7. canonical Z₂ and truncated U(1) spectra;
-8. dimensionless Compton–Schwarzschild mass-radius limits.
+7. Anomaly Forge balance ring, triangle channels, fractional-charge cards, and anomaly-free surface;
+8. canonical Z₂ and truncated U(1) spectra;
+9. dimensionless Compton–Schwarzschild mass-radius limits.
 
 ```mermaid
 flowchart LR
     MODE["Experience / Experiment"] --> DATA["finite deterministic datasets"]
     SM["canonical Standard Model catalog"] --> GRAPH["interaction hypergraph"]
     SM --> LA["Lagrangian audits"]
+    SM --> AN["exact anomaly audit"]
     DATA --> DMD["Koopman / DMD"]
     DATA --> IV["interval Picard enclosure"]
     DATA --> HAM["canonical Hamiltonian audit"]
@@ -113,8 +119,10 @@ flowchart LR
     HAM --> MAN
     GRAPH --> MAN
     LA --> MAN
+    AN --> MAN
     MAN --> UI["Canvas + WebAudio + evidence panels"]
     GRAPH --> UI
+    AN --> UI
 ```
 
 <details open>
@@ -122,8 +130,10 @@ flowchart LR
 
 ```bash
 foundry run foundry-experience-v2
-# focused alias
+# focused aliases
 foundry run lagrangian-forge
+foundry run anomaly-forge
+foundry run anomaly-forge-experience
 ```
 
 The original seven-scene generator remains available as the stable base implementation:
@@ -161,9 +171,11 @@ The supporting substrate is reusable outside the interface:
 - `src/gaugegap/standard_model_catalog.py` — canonical Standard Model sectors, fields, interactions, controls, and tree-level relations;
 - `src/gaugegap/interaction_graph.py` — deterministic interaction hypergraph;
 - `src/gaugegap/lagrangian_audit.py` — fail-closed charge, dimension, reference, mixing, and source-boundary audits;
+- `src/gaugegap/anomaly_audit.py` — exact rational local and global gauge-anomaly coefficients;
+- `src/gaugegap/hypercharge_solver.py` — assumption-labelled minimal and right-neutrino charge solutions;
 - `src/gaugegap/research_manifest.py` — fail-closed claim levels tied to hashed evidence artifacts.
 
-📖 [`docs/foundry-experience.md`](docs/foundry-experience.md) · 🧬 [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) · ✅ [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md)
+📖 [`docs/foundry-experience.md`](docs/foundry-experience.md) · 🧬 [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) · ⚖️ [`docs/anomaly-forge.md`](docs/anomaly-forge.md) · ✅ [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md)
 
 > 🧭 **Boundary:** the interface communicates and explores finite computations and canonical symbolic structure. It does not turn visual complexity, generated sound, a finite-time Lyapunov estimate, a finite lattice gap, or a tree-level Standard Model catalog into a continuum theorem.
 
@@ -197,6 +209,52 @@ foundry run lagrangian-forge
 ```
 
 > 🧭 **Boundary:** this is a finite symbolic catalog, interaction graph, structural audit, and tree-level calculator—not a scattering-amplitude engine, loop calculation, path-integral evaluation, nonperturbative continuum construction, or Yang–Mills mass-gap proof.
+
+---
+
+<a id="anomaly-forge"></a>
+## ⚖️ Anomaly Forge — why the fractions fit
+
+Anomaly Forge turns the familiar `+2/3` and `−1/3` quark charges into a live consistency apparatus. The backend uses exact rational arithmetic; the browser lets you move the hypercharges and watch the anomaly channels leave zero.
+
+<p align="center">
+  <img src="figures/anomaly-forge/charge-cancellation.svg" alt="Anomaly Forge charge-cancellation map" width="820"/>
+</p>
+
+| View | What moves |
+|---|---|
+| **anomaly balance** | four residual channels switch from green zeroes to red inconsistencies |
+| **triangle channels** | `SU(3)²-U(1)`, `SU(2)²-U(1)`, `U(1)³`, and gravity mixing |
+| **fractional charges** | live `u`, `d`, proton `uud`, and neutron `udd` charges |
+| **constraint surface** | the current assignment moves relative to exact cancellation |
+
+<details open>
+<summary><strong>🧪 Try to break the charge assignment</strong></summary>
+
+```bash
+foundry run anomaly-forge
+foundry run anomaly-forge-experience
+
+# Deliberately move Y_u away from 2/3; --require-pass exits nonzero.
+python scripts/run_anomaly_forge.py --y-u 7/10 --require-pass
+```
+
+Inside the generated interface, choose **Anomaly Forge** and drag `y_u`, `y_q`, or the colour count. The default point has:
+
+```text
+Y_Q = 1/6   Y_u = 2/3   Y_d = -1/3
+Y_L = -1/2  Y_e = -1
+
+SU(3)²-U(1) = 0   SU(2)²-U(1) = 0
+U(1)³       = 0   gravity²-U(1) = 0
+proton      = +1  neutron        = 0
+```
+
+</details>
+
+The solver reports its assumptions. Without a right-handed neutrino, the minimal assignment is unique under the declared Higgs and Yukawa assumptions. Adding a Dirac right-handed neutrino exposes the remaining one-parameter anomaly-free family instead of hiding it.
+
+> 🧭 **Boundary:** exact cancellation is proved only for the declared finite chiral field inventory and conventions. It does not show that these charges are unique across every possible theory, construct the continuum Standard Model, or solve a Millennium Prize problem.
 
 ---
 
@@ -545,6 +603,8 @@ pip install -e '.[dev]'
 foundry list
 foundry run foundry-experience-v2
 foundry run lagrangian-forge
+foundry run anomaly-forge
+foundry run anomaly-forge-experience
 foundry run foundry-experience
 foundry run deep-boil-smoke
 foundry run gaugegap-0002
@@ -647,25 +707,3 @@ Language this project does not earn:
 > continuum Yang–Mills mass-gap proof · nonperturbative Standard Model construction · proof of the Riemann Hypothesis · formal proof of a global strange attractor from a plot · hardware result as mathematical proof · Millennium Prize resolution
 
 The project becomes more credible by making the evidence **more explorable without making the claims larger**: the experience invites investigation, while the equations, manifests, tests, hashes, audits, and certificates show exactly what every scene does—and does not—establish.
-
----
-
-## 📚 Documentation index
-
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — unified Foundry architecture
-- [`docs/foundry-experience.md`](docs/foundry-experience.md) — eight-scene audiovisual interface, scientific substrate, and boundaries
-- [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) — Standard Model catalog, graph, controls, and audits
-- [`docs/end-of-day-integration-2026-06-26.md`](docs/end-of-day-integration-2026-06-26.md) — complete integration inventory
-- [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md) — cross-track verification checkpoint
-- [`docs/attractor-forge.md`](docs/attractor-forge.md) — nonlinear-dynamics evidence ladder
-- [`docs/physical-limits-web.md`](docs/physical-limits-web.md) — physical-limits synthesis
-- [`docs/inference-traps.md`](docs/inference-traps.md) — exact decision-theory demonstrations
-- [`docs/epistemics-and-claim-boundaries.md`](docs/epistemics-and-claim-boundaries.md) — why boundaries matter
-- [`docs/solution-gap-audit.md`](docs/solution-gap-audit.md) — honest gaps to stronger claims
-- [`docs/agent-work-orders.md`](docs/agent-work-orders.md) — execution-ready hardening work
-- [`docs/curverank-formal-proof.md`](docs/curverank-formal-proof.md) — finite spectral separation theorem
-- [`docs/spectra-language.md`](docs/spectra-language.md) and [`docs/verdict-language.md`](docs/verdict-language.md)
-
-## License
-
-Apache-2.0.
