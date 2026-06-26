@@ -3,12 +3,13 @@
 > **Verification-first AI-for-science infrastructure for finite, reproducible, theorem-adjacent experiments.**
 
 <p align="center">
-  <img src="figures/physical-limits/web.svg" alt="The web of physical limits" width="780"/>
+  <img src="figures/foundry-experience/preview.svg" alt="GaugeGap Foundry Experience and Experiment" width="820"/>
   <br/>
-  <em>Energy · time · information · geometry · mass · measurement — reduced to finite computations and machine-checkable statements.</em>
+  <em>Finite data becomes an audiovisual experience; every scene opens back into equations, diagnostics, provenance, and explicit claim boundaries.</em>
 </p>
 
 <p align="center">
+  <a href="#%EF%B8%8F-foundry-experience--experience--experiment">Foundry Experience</a> ·
   <a href="#-attractor-forge--nonlinear-dynamics-you-can-inspect">Attractor Forge</a> ·
   <a href="#-the-web-of-physical-limits">Physical limits</a> ·
   <a href="#-the-web-of-inference-traps">Inference traps</a> ·
@@ -32,6 +33,7 @@
 
 GaugeGap Foundry is a single laboratory for several kinds of finite scientific experiments:
 
+- **Foundry Experience** — a dependency-free audiovisual interface with separate immersion and apparatus modes.
 - **GaugeGap** — finite lattice-gauge benchmarks from Z₂ through bounded SU(3) scaffolds.
 - **FlowGap** — finite PDE surrogates and nonlinear systems, including Rössler, Lorenz, and Thomas dynamics.
 - **CurveRank** — certified screening of finite operator truncations against zeta-zero-inspired targets.
@@ -46,12 +48,14 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 ```mermaid
 flowchart TD
     F["🔬 GaugeGap Foundry"]
+    F --> X["◼️ Experience / Experiment<br/>interactive evidence interface"]
     F --> G["⚛️ GaugeGap<br/>finite gauge systems"]
     F --> FL["🌊 FlowGap<br/>PDEs + nonlinear dynamics"]
     F --> C["📈 CurveRank<br/>finite spectral screening"]
     F --> P["🌐 Physical limits<br/>certified finite cores"]
     F --> D["🧩 DSLs<br/>Spectra · Verdict"]
 
+    X --> X1["Canvas · WebAudio · equations · manifests"]
     G --> G1["Z₂ → U(1) → SU(2) → SU(3 scaffold"]
     FL --> FL1["Burgers · Rössler · Lorenz · Thomas"]
     C --> C1["interval eigenvalues<br/>negative-result certificates"]
@@ -61,10 +65,86 @@ flowchart TD
     classDef main fill:#eef6ff,stroke:#0969da,color:#111;
     classDef edge fill:#f6f0ff,stroke:#6929c4,color:#111;
     class F main;
-    class G,FL,C,P,D edge;
+    class X,G,FL,C,P,D edge;
 ```
 
 </details>
+
+---
+
+## ◼️ Foundry Experience — experience ↔ experiment
+
+The repository now has a self-contained browser interface inspired by the conceptual split between Ryoji Ikeda's **`supersymmetry [experience]`** and **`supersymmetry [experiment]`**: one mode emphasizes immersion, while the other exposes apparatus, controls, evidence, and process. The implementation does not copy the original artwork, sound, photography, or software.
+
+<p align="center">
+  <img src="figures/foundry-experience/preview.svg" alt="Foundry Experience preview" width="780"/>
+</p>
+
+| Mode | Purpose | What appears |
+|---|---|---|
+| **Experience** | sensory traversal of verified finite data | auto-cycling scenes, progressive trajectories, rotating geometry, scan fields, WebAudio sonification, live schema and commit ticker |
+| **Experiment** | inspect and manipulate the apparatus | equations, ODE parameter sliders, browser-side RK4 reintegration, projections, DMD diagnostics, interval-step status, Hamiltonian audits, provenance, claim boundaries |
+
+Seven scenes ship in the generated bundle:
+
+1. Rössler dynamics;
+2. Lorenz dynamics;
+3. Thomas cyclic dynamics;
+4. finite gauge lattice with highlighted Wilson-loop path;
+5. exact finite SU(3) octet/decuplet weight geometry;
+6. canonical Z₂ and truncated U(1) spectra;
+7. dimensionless Compton–Schwarzschild mass-radius limits.
+
+```mermaid
+flowchart LR
+    MODE["Experience / Experiment"] --> DATA["finite deterministic datasets"]
+    DATA --> DMD["Koopman / DMD"]
+    DATA --> IV["interval Picard enclosure"]
+    DATA --> HAM["canonical Hamiltonian audit"]
+    DMD --> MAN["research claim manifest"]
+    IV --> MAN
+    HAM --> MAN
+    MAN --> UI["Canvas + WebAudio + evidence panels"]
+```
+
+<details open>
+<summary><strong>▶️ Generate and open the interface</strong></summary>
+
+```bash
+foundry run foundry-experience
+# or
+make experience
+```
+
+Then open:
+
+```text
+site/foundry-experience/index.html
+```
+
+The generated site uses only HTML, CSS, Canvas, vanilla JavaScript, and optional WebAudio. It has no CDN or external JavaScript dependency.
+
+Run the cross-track integration benchmark:
+
+```bash
+foundry run deep-boil-smoke
+foundry run deep-boil-0001
+# or
+make deep-boil
+```
+
+</details>
+
+The supporting substrate is reusable outside the interface:
+
+- `src/gaugegap/koopman.py` — exact finite-data DMD, delay embeddings, dominant-mode summaries;
+- `src/gaugegap/validated_dynamics.py` — Picard-inclusion interval steps for Rössler, Lorenz, and Thomas;
+- `src/gaugegap/hamiltonian_factory.py` — canonical finite Hamiltonian construction and Hermiticity/gap audits;
+- `src/gaugegap/research_manifest.py` — fail-closed claim levels tied to hashed evidence artifacts.
+
+📖 [`docs/foundry-experience.md`](docs/foundry-experience.md) · ✅ [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md)
+
+> 🧭 **Boundary:** the interface communicates and explores finite computations. It does not turn visual complexity, generated sound, a finite-time Lyapunov estimate, or a finite lattice gap into a continuum theorem.
 
 ---
 
@@ -410,6 +490,8 @@ pip install -e '.[dev]'
 
 ```bash
 foundry list
+foundry run foundry-experience
+foundry run deep-boil-smoke
 foundry run gaugegap-0002
 foundry run flowgap-0001
 foundry run flowgap-0002-rossler
@@ -423,6 +505,8 @@ foundry proofpack
 ```bash
 make smoke
 make audit
+make experience
+make deep-boil
 make attractor-forge
 make proofpack
 make reviewer-packet
@@ -486,10 +570,11 @@ flowchart LR
 config/         canonical Foundry units and modular fragments
 docs/           architecture, methods, boundaries, and runbooks
 hypotheses/     registered finite-system hypotheses
-scripts/        reproducible experiment entry points
+scripts/        reproducible experiment and interface entry points
 src/gaugegap/   scientific modules, DSLs, rigorous kernels, providers
+site/           generated dependency-free Foundry Experience bundle
 tests/          unit, regression, numerical, and smoke coverage
-figures/        attractors, weight diagrams, physical-limit galleries
+figures/        experience previews, attractors, weight diagrams, galleries
 results/        small checked-in finite baseline artifacts
 examples/       Spectra and Verdict programs
 ```
@@ -506,13 +591,15 @@ Language this project does not earn:
 
 > continuum Yang–Mills mass-gap proof · proof of the Riemann Hypothesis · formal proof of a global strange attractor from a plot · hardware result as mathematical proof · Millennium Prize resolution
 
-The project becomes more credible by restoring the visual story **without weakening the epistemic boundary**: the graphs invite exploration, while the reports, hashes, tests, and certificates show exactly what each graph does—and does not—establish.
+The project becomes more credible by making the evidence **more explorable without making the claims larger**: the experience invites investigation, while the equations, manifests, tests, hashes, and certificates show exactly what every scene does—and does not—establish.
 
 ---
 
 ## 📚 Documentation index
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — unified Foundry architecture
+- [`docs/foundry-experience.md`](docs/foundry-experience.md) — audiovisual interface, scientific substrate, and boundaries
+- [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md) — cross-track verification checkpoint
 - [`docs/attractor-forge.md`](docs/attractor-forge.md) — nonlinear-dynamics evidence ladder
 - [`docs/physical-limits-web.md`](docs/physical-limits-web.md) — physical-limits synthesis
 - [`docs/inference-traps.md`](docs/inference-traps.md) — exact decision-theory demonstrations
