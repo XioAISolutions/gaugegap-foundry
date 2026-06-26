@@ -34,6 +34,10 @@ SAFE_CONTEXT_PATTERNS = [
     re.compile(r"\btoy\s+benchmark\b", re.I),
     re.compile(r"\bclaim boundary\b", re.I),
     re.compile(r"\bavoid\s+.*claim\b", re.I),
+    # Explicit deny-list headings enumerate wording the project rejects.  This
+    # phrase appears in the README immediately before examples of claims the
+    # finite-system evidence does not earn.
+    re.compile(r"\blanguage\s+this\s+project\s+does\s+not\s+earn\b", re.I),
     # "Avoided language:" lists enumerate phrases the project deliberately does
     # NOT use; the quoted phrases are negative examples, not claims.
     re.compile(r"\bavoided\s+language\b", re.I),
