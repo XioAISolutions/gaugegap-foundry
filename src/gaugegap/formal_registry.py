@@ -11,7 +11,7 @@ from typing import Iterable
 FORMAL_SUFFIXES = {".lean": "lean4", ".v": "coq", ".thy": "isabelle", ".smt2": "smtlib"}
 _HOLE_PATTERNS = {
     "lean4": re.compile(r"(?m)^\s*(?:sorry|admit)\b"),
-    "coq": re.compile(r"(?m)^\s*(?:Admitted\.|admit\.)"),
+    "coq": re.compile(r"\b(?:Admitted|admit)\."),
     "isabelle": re.compile(r"(?m)^\s*(?:sorry|oops)\b"),
     "smtlib": re.compile(r"a^"),
 }
