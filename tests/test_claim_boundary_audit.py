@@ -27,6 +27,31 @@ class ClaimBoundaryAuditTests(unittest.TestCase):
             self.assertTrue(findings)
             self.assertTrue(all(item.severity == "low" for item in findings))
 
+    def test_markdown_boundary_label_bounds_certainty_language(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "README.md").write_text(
+                "> 🧭 **Boundary:** exact cancellation is proved only for a declared finite field inventory. "
+                "It does not establish a continuum theorem.\n",
+                encoding="utf-8",
+            )
+            findings = scan(root, ("README.md",))
+            certainty = [item for item in findings if item.kind == "certainty_overclaim"]
+            self.assertTrue(certainty)
+            self.assertTrue(all(item.severity == "low" for item in certainty))
+
+    def test_unbounded_certainty_language_remains_high(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "README.md").write_text(
+                "This theorem is proved and definitive.\n",
+                encoding="utf-8",
+            )
+            findings = scan(root, ("README.md",))
+            certainty = [item for item in findings if item.kind == "certainty_overclaim"]
+            self.assertTrue(certainty)
+            self.assertTrue(all(item.severity == "high" for item in certainty))
+
 
 if __name__ == "__main__":
     unittest.main()
