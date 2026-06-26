@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620" role="img" aria-labelledby="title desc">
+  <title id="title">Anomaly Forge charge-cancellation map</title>
+  <desc id="desc">Standard Model hypercharges feed four anomaly channels which all cancel exactly.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#090c12"/><stop offset="1" stop-color="#121827"/></linearGradient>
+    <linearGradient id="flow" x1="0" x2="1"><stop stop-color="#58d7ff"/><stop offset=".52" stop-color="#d2a8ff"/><stop offset="1" stop-color="#7ee787"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1100" height="620" rx="28" fill="url(#bg)"/>
+  <text x="56" y="68" fill="#e6edf3" font-family="system-ui" font-size="32" font-weight="700">ANOMALY FORGE</text>
+  <text x="56" y="102" fill="#8b949e" font-family="system-ui" font-size="17">fractional charges are constrained by quantum consistency</text>
+  <g font-family="ui-monospace,monospace" text-anchor="middle">
+    <g transform="translate(150 220)"><circle r="62" fill="#0d2630" stroke="#58d7ff" stroke-width="3"/><text y="-8" fill="#58d7ff" font-size="28">Q<tspan baseline-shift="sub" font-size="16">L</tspan></text><text y="28" fill="#fff" font-size="22">Y = 1/6</text></g>
+    <g transform="translate(150 390)"><circle r="52" fill="#221531" stroke="#d2a8ff" stroke-width="3"/><text y="-6" fill="#d2a8ff" font-size="24">u<tspan baseline-shift="sub" font-size="14">R</tspan></text><text y="25" fill="#fff" font-size="20">2/3</text></g>
+    <g transform="translate(300 390)"><circle r="52" fill="#221531" stroke="#d2a8ff" stroke-width="3"/><text y="-6" fill="#d2a8ff" font-size="24">d<tspan baseline-shift="sub" font-size="14">R</tspan></text><text y="25" fill="#fff" font-size="20">−1/3</text></g>
+    <g transform="translate(300 220)"><circle r="62" fill="#181e2c" stroke="#8b949e" stroke-width="3"/><text y="-8" fill="#e6edf3" font-size="28">L<tspan baseline-shift="sub" font-size="16">L</tspan></text><text y="28" fill="#fff" font-size="22">Y = −1/2</text></g>
+    <g transform="translate(225 515)"><rect x="-118" y="-35" width="236" height="70" rx="18" fill="#101720" stroke="#7ee787"/><text y="-5" fill="#7ee787" font-size="20">uud → proton</text><text y="24" fill="#fff" font-size="22">2/3 + 2/3 − 1/3 = 1</text></g>
+  </g>
+  <g stroke="url(#flow)" stroke-width="3" fill="none" opacity=".75">
+    <path d="M365 220 C465 210 470 190 535 190"/><path d="M210 390 C430 380 455 290 535 280"/><path d="M352 390 C455 390 475 370 535 370"/><path d="M360 240 C470 255 475 455 535 455"/>
+  </g>
+  <g font-family="ui-monospace,monospace">
+    <g transform="translate(555 145)"><rect width="330" height="82" rx="18" fill="#101720" stroke="#30363d"/><text x="24" y="31" fill="#8b949e" font-size="16">SU(3)²–U(1)</text><text x="306" y="55" text-anchor="end" fill="#7ee787" font-size="28">0</text></g>
+    <g transform="translate(555 238)"><rect width="330" height="82" rx="18" fill="#101720" stroke="#30363d"/><text x="24" y="31" fill="#8b949e" font-size="16">SU(2)²–U(1)</text><text x="306" y="55" text-anchor="end" fill="#7ee787" font-size="28">0</text></g>
+    <g transform="translate(555 331)"><rect width="330" height="82" rx="18" fill="#101720" stroke="#30363d"/><text x="24" y="31" fill="#8b949e" font-size="16">U(1)³</text><text x="306" y="55" text-anchor="end" fill="#7ee787" font-size="28">0</text></g>
+    <g transform="translate(555 424)"><rect width="330" height="82" rx="18" fill="#101720" stroke="#30363d"/><text x="24" y="31" fill="#8b949e" font-size="16">gravity²–U(1)</text><text x="306" y="55" text-anchor="end" fill="#7ee787" font-size="28">0</text></g>
+  </g>
+  <g transform="translate(970 310)" filter="url(#glow)" font-family="system-ui" text-anchor="middle"><circle r="82" fill="#10271c" stroke="#7ee787" stroke-width="4"/><text y="-8" fill="#7ee787" font-size="23" font-weight="700">CONSISTENT</text><text y="25" fill="#c9d1d9" font-size="15">all channels cancel</text></g>
+  <text x="550" y="584" text-anchor="middle" fill="#6e7681" font-family="ui-monospace,monospace" font-size="13">change one hypercharge → residuals light up → the assignment leaves the anomaly-free surface</text>
+</svg>
