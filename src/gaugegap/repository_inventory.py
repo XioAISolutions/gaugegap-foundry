@@ -1,8 +1,9 @@
 """Repository inventory and reachability audit for GaugeGap Foundry.
 
-The audit distinguishes hard failures from review candidates. Unregistered runnable
-scripts fail the audit; modules that appear unreferenced are reported for human review
-because dynamic imports are common in scientific software.
+The audit distinguishes hard failures from review candidates. Runnable scripts must be
+reachable through an explicit Foundry unit or deterministic discovery. Modules that appear
+unreferenced are reported for human review because dynamic imports are common in scientific
+software.
 """
 from __future__ import annotations
 
@@ -49,8 +50,8 @@ class RepositoryInventory:
             "review_candidates": list(self.review_candidates),
             "modules": [asdict(item) for item in self.modules],
             "claim_boundary": (
-                "static repository reachability audit only; review candidates are not "
-                "proof that code is unused because dynamic imports may exist"
+                "static repository reachability audit only; discovered units remain visible "
+                "as migration debt and review candidates are not proof that code is unused"
             ),
         }
 
@@ -96,9 +97,9 @@ def build_inventory(root: Path | str) -> RepositoryInventory:
 
     config = load_config(root_path / "config" / "foundry.yaml")
     units = all_units(config, root_path)
-    configured_scripts = {
+    reachable_scripts = {
         token
-        for unit in config.units.values()
+        for unit in units.values()
         for token in unit.command
         if token.startswith("scripts/") and token.endswith(".py")
     }
@@ -106,7 +107,7 @@ def build_inventory(root: Path | str) -> RepositoryInventory:
         path.relative_to(root_path).as_posix()
         for path in (root_path / "scripts").glob("run_*.py")
     }
-    unregistered = tuple(sorted(run_scripts - configured_scripts))
+    unregistered = tuple(sorted(run_scripts - reachable_scripts))
 
     entrypoints = {"gaugegap.cli", "gaugegap.certify"}
     records: list[ModuleRecord] = []
