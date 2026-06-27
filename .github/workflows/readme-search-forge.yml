@@ -1,0 +1,118 @@
+name: Patch Search Forge README
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.head_ref == 'claude/search-forge-integration'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Insert Search Forge layer without rewriting README
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('README.md')
+          text = path.read_text(encoding='utf-8')
+          if '<a id="search-forge"></a>' in text:
+              print('Search Forge README layer already present')
+              raise SystemExit(0)
+
+          replacements = [
+              (
+                  '  <a href="#anomaly-forge">Anomaly Forge</a> ·\n',
+                  '  <a href="#anomaly-forge">Anomaly Forge</a> ·\n  <a href="#search-forge">Search Forge</a> ·\n',
+              ),
+              (
+                  '- **Anomaly Forge** — exact rational charge-consistency tests, a hypercharge solver, and a live anomaly-free surface.\n',
+                  '- **Anomaly Forge** — exact rational charge-consistency tests, a hypercharge solver, and a live anomaly-free surface.\n- **Search Forge** — certified Dijkstra/A* paths, scientific search spaces, and symbolic null controls.\n',
+              ),
+              (
+                  '    F --> A["⚖️ Anomaly Forge<br/>charges · constraints · cancellation"]\n',
+                  '    F --> A["⚖️ Anomaly Forge<br/>charges · constraints · cancellation"]\n    F --> S["🧭 Search Forge<br/>paths · proofs · pattern controls"]\n',
+              ),
+              (
+                  '    A --> A1["exact rational anomalies<br/>hypercharge solver · Witten parity"]\n',
+                  '    A --> A1["exact rational anomalies<br/>hypercharge solver · Witten parity"]\n    S --> S1["Dijkstra baseline · A* heuristic contract<br/>symbolic null models"]\n',
+              ),
+              (
+                  '    class X,L,A,G,FL,C,P,D edge;\n',
+                  '    class X,L,A,S,G,FL,C,P,D edge;\n',
+              ),
+              (
+                  '- `src/gaugegap/hypercharge_solver.py` — assumption-labelled minimal and right-neutrino charge solutions;\n',
+                  '- `src/gaugegap/hypercharge_solver.py` — assumption-labelled minimal and right-neutrino charge solutions;\n- `src/gaugegap/search_forge.py` — deterministic weighted graphs, Dijkstra, A*, heuristic checks, and hashed certificates;\n- `src/gaugegap/scientific_search_spaces.py` — exact anomaly-repair and research-maturity search spaces;\n- `src/gaugegap/symbolic_search.py` — historical ciphers and deterministic null-model controls;\n',
+              ),
+              (
+                  '📖 [`docs/foundry-experience.md`](docs/foundry-experience.md) · 🧬 [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) · ⚖️ [`docs/anomaly-forge.md`](docs/anomaly-forge.md) · ✅ [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md)\n',
+                  '📖 [`docs/foundry-experience.md`](docs/foundry-experience.md) · 🧬 [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) · ⚖️ [`docs/anomaly-forge.md`](docs/anomaly-forge.md) · 🧭 [`docs/search-forge.md`](docs/search-forge.md) · ✅ [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md)\n',
+              ),
+              (
+                  'foundry run anomaly-forge-experience\nfoundry run foundry-experience\n',
+                  'foundry run anomaly-forge-experience\nfoundry run search-forge\nfoundry run symbolic-search-lab\nfoundry run foundry-experience\n',
+              ),
+              (
+                  '- [`docs/anomaly-forge.md`](docs/anomaly-forge.md) — exact charge consistency, solver assumptions, interactive views, and claim boundaries\n',
+                  '- [`docs/anomaly-forge.md`](docs/anomaly-forge.md) — exact charge consistency, solver assumptions, interactive views, and claim boundaries\n- [`docs/search-forge.md`](docs/search-forge.md) — certified pathfinding, scientific search spaces, symbolic controls, and boundaries\n',
+              ),
+          ]
+
+          for needle, replacement in replacements:
+              count = text.count(needle)
+              if count != 1:
+                  raise SystemExit(f'expected one README marker, found {count}: {needle[:80]!r}')
+              text = text.replace(needle, replacement, 1)
+
+          section = '''<a id="search-forge"></a>
+          ## 🧭 Search Forge — certified paths and pattern controls
+
+          Search Forge is the shared finite-search layer beneath anomaly repair, research routing, and controlled symbolic experiments. Dijkstra provides the exact non-negative-edge baseline; A* adds direction only through a declared heuristic contract that is checked against every edge in the finite graph.
+
+          <p align="center">
+            <img src="figures/search-forge/search-forge.svg" alt="Search Forge Dijkstra and A-star comparison" width="920"/>
+          </p>
+
+          | Layer | What it does | Boundary |
+          |---|---|---|
+          | **Dijkstra** | least-cost path on a declared finite graph | requires finite non-negative edge costs |
+          | **A\*** | combines accumulated cost with a goal heuristic | optimality requires the declared heuristic contract |
+          | **Scientific spaces** | repairs a perturbed hypercharge and ranks research-maturity routes | searches only the registered candidate graph |
+          | **Symbolic lab** | evaluates historical letter-number systems and compares them with deterministic null controls | equal values are associations, not causal evidence |
+
+          ```bash
+          foundry run search-forge
+          foundry run symbolic-search-lab
+          ```
+
+          The offline bundle writes `site/search-forge/index.html`, a JSON evidence record, and a reproducible SVG preview. Every result includes the path, cost, expansion order, graph hash, heuristic metadata, result hash, and explicit claim boundary.
+
+          > 🧭 **Boundary:** finding a path does not prove that the graph exhausts every physical theory, proof strategy, or interpretation. Symbolic equality does not establish causality, prediction, or a physical mechanism.
+
+          ---
+
+          '''
+          marker = '## 🌀 Attractor Forge — nonlinear dynamics you can inspect\n'
+          if text.count(marker) != 1:
+              raise SystemExit('Attractor Forge insertion marker missing or duplicated')
+          text = text.replace(marker, section + marker, 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit README patch
+        run: |
+          if git diff --quiet -- README.md; then
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add README.md
+          git commit -m "docs: add Search Forge layer without removing existing content"
+          git push origin HEAD:${{ github.head_ref }}
