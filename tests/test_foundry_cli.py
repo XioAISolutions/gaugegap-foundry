@@ -11,9 +11,12 @@ from gaugegap.cli import (
     all_units,
     build_parser,
     load_config,
+    main,
     resolve_command,
     run_named,
+    unresolved_hypotheses,
 )
+from gaugegap.hypothesis_registry import load_registry
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -89,6 +92,31 @@ def test_group_cycle_is_rejected(tmp_path):
     config = load_config(path)
     with pytest.raises(FoundryConfigError, match="group cycle"):
         run_named("a", config, root=ROOT, dry_run=True)
+
+
+def test_every_config_hypothesis_reference_is_registered():
+    # The cross-reference gate: no unit may point at a hypothesis that does not
+    # exist in hypotheses/. This is also enforced as a `foundry hypotheses --check`.
+    config = load_config(ROOT / "config" / "foundry.yaml")
+    registry = load_registry(ROOT / "hypotheses")
+    assert unresolved_hypotheses(config, registry) == []
+
+
+def test_hypotheses_check_passes_on_repository(capsys):
+    rc = main(["hypotheses", "--check"])
+    assert rc == 0
+    assert "all hypothesis references resolve" in capsys.readouterr().out
+
+
+def test_hypotheses_json_lists_registered_records(capsys):
+    rc = main(["hypotheses", "--json"])
+    assert rc == 0
+    import json
+
+    payload = json.loads(capsys.readouterr().out)
+    ids = {record["id"] for record in payload["hypotheses"]}
+    assert "curverank-0001" in ids
+    assert payload["unresolved_references"] == []
 
 
 def test_invalid_command_shape_is_rejected(tmp_path):

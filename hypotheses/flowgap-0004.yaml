@@ -1,0 +1,35 @@
+id: flowgap-0004
+track: FlowGap
+model: thomas_cyclic_finite_ode
+scope: finite-time Thomas cyclically-symmetric flow diagnostics (Attractor Forge)
+claim: >
+  Deterministic finite-time integration of the Thomas cyclically-symmetric flow
+  at the registered parameters produces reproducible trajectory, Poincaré-section,
+  return-map, and Lyapunov-spectrum diagnostics, and the emitted Lean/Coq
+  certificate discharges only its stated algebraic divergence inequality.
+prediction:
+  observable: largest_lyapunov_exponent
+  expected_shape: finite_estimate_at_registered_parameters
+controls:
+  system: thomas
+  dt: 0.02
+  steps: 50000
+  transient: 8000
+  sample_every: 4
+  lyapunov_steps: 50000
+  bifurcation_points: 20
+validation:
+  required:
+    - deterministic_finite_integration
+    - lyapunov_spectrum_estimate
+    - divergence_certificate
+kill_criteria:
+  - integration is non-deterministic for a fixed seed and parameters
+  - the emitted certificate claims more than its stated divergence inequality
+  - diagnostics change qualitatively under a tighter time step at fixed horizon
+status: active
+claim_boundary: >
+  Finite-time numerical ODE diagnostics only; not a proof of chaos, global
+  attraction, fractal dimension, or ergodicity. No continuum or Millennium claim.
+notes:
+  - Lyapunov/recurrence values are finite-horizon estimates, not asymptotic invariants.

@@ -25,6 +25,12 @@ units:
     description: Hard maturity audit for unbounded placeholders/prototypes.
     command: ["{python}", "scripts/research_maturity_audit.py", "--strict"]
 
+  hypotheses-check:
+    track: integrity
+    status: production
+    description: Fail closed if any unit references an unregistered hypothesis.
+    command: ["{python}", "-m", "gaugegap.cli", "hypotheses", "--check"]
+
   gap-sweep-smoke:
     track: gaugegap
     hypothesis: gaugegap-0001
@@ -402,6 +408,7 @@ groups:
   audit:
     - claim-boundary
     - research-maturity
+    - hypotheses-check
 
   smoke:
     - tests

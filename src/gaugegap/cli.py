@@ -21,6 +21,12 @@ from typing import Any, Mapping, Sequence
 
 import yaml
 
+from gaugegap.hypothesis_registry import (
+    Hypothesis,
+    HypothesisError,
+    load_registry,
+)
+
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
 
@@ -290,6 +296,46 @@ def _list_payload(config: FoundryConfig, root: Path) -> dict[str, Any]:
     }
 
 
+def unresolved_hypotheses(
+    config: FoundryConfig, registry: Mapping[str, Hypothesis]
+) -> list[tuple[str, str]]:
+    """Every ``(unit_id, hypothesis)`` whose hypothesis is not registered.
+
+    This is the cross-reference gate: a unit may not point at a hypothesis that
+    does not exist in ``hypotheses/``. Returns an empty list when all references
+    resolve.
+    """
+    missing: list[tuple[str, str]] = []
+    for unit in sorted(config.units.values(), key=lambda item: item.id):
+        if unit.hypothesis and unit.hypothesis not in registry:
+            missing.append((unit.id, unit.hypothesis))
+    return missing
+
+
+def _hypotheses_payload(
+    config: FoundryConfig, registry: Mapping[str, Hypothesis]
+) -> dict[str, Any]:
+    referenced = {
+        unit.hypothesis for unit in config.units.values() if unit.hypothesis
+    }
+    return {
+        "hypotheses": [
+            {
+                "id": h.id,
+                "track": h.track,
+                "status": h.status,
+                "scope": h.scope,
+                "referenced": h.id in referenced,
+            }
+            for h in sorted(registry.values(), key=lambda h: (h.track, h.id))
+        ],
+        "unresolved_references": [
+            {"unit": unit_id, "hypothesis": hypothesis}
+            for unit_id, hypothesis in unresolved_hypotheses(config, registry)
+        ],
+    }
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="foundry",
@@ -315,6 +361,16 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser = sub.add_parser("run", help="Run a configured unit or group.")
     run_parser.add_argument("id")
     run_parser.add_argument("--dry-run", action="store_true")
+
+    hyp_parser = sub.add_parser(
+        "hypotheses", help="List registered hypotheses and validate config references."
+    )
+    hyp_parser.add_argument("--json", action="store_true", dest="as_json")
+    hyp_parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Fail closed if any unit references an unregistered hypothesis.",
+    )
 
     for verb in ("audit", "proofpack", "all"):
         command_parser = sub.add_parser(verb, help=f"Run the configured {verb} group.")
@@ -348,6 +404,32 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"{name:<38} " + ", ".join(members))
             return 0
 
+        if args.verb == "hypotheses":
+            registry = load_registry(root / "hypotheses")
+            payload = _hypotheses_payload(config, registry)
+            if args.as_json:
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                for h in payload["hypotheses"]:
+                    mark = "*" if h["referenced"] else " "
+                    print(
+                        f"{mark} {h['id']:<22} track={h['track']:<10} "
+                        f"status={h['status']:<18} {h['scope']}"
+                    )
+            missing = payload["unresolved_references"]
+            if missing:
+                for item in missing:
+                    print(
+                        f"[foundry] unresolved: unit {item['unit']!r} references "
+                        f"unregistered hypothesis {item['hypothesis']!r}",
+                        file=sys.stderr,
+                    )
+                if args.check:
+                    return 2
+            elif args.check:
+                print("[foundry] all hypothesis references resolve.")
+            return 0
+
         if args.verb == "run":
             forwarded = list(extra)
             if forwarded[:1] == ["--"]:
@@ -361,7 +443,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
 
         return run_named(args.verb, config, root=root, dry_run=args.dry_run)
-    except FoundryConfigError as exc:
+    except (FoundryConfigError, HypothesisError) as exc:
         parser.error(str(exc))
         return 2
 

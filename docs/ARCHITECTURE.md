@@ -88,6 +88,15 @@ Phase 2 replaces hard-coded hypothesis strings with validated YAML loading and a
 track-agnostic `TrackSpec`. A registered track supplies its supported stages,
 claim boundary, parameter schema, output contract, and optional hardware path.
 
+**Shipped:** `gaugegap.hypothesis_registry` loads and validates every file under
+`hypotheses/` (YAML plus the historical JSON), failing closed on a missing/duplicate
+id, an id that disagrees with its filename, or a missing track. `foundry hypotheses`
+lists the registered records and `foundry hypotheses --check` is the cross-reference
+gate: every `hypothesis:` declared in `config/foundry.yaml` must resolve to a
+registered hypothesis (also enforced in the test suite). The track-agnostic
+`TrackSpec`/`unified_registry` and the `unified_orchestrator` that consumes it remain
+the documented next step.
+
 ### ③ Orchestrator stages
 
 Every track uses the same stage vocabulary, while unsupported stages are recorded

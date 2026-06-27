@@ -1,0 +1,33 @@
+id: deep-boil-0001
+track: Integration
+model: deep_boil_cross_track
+scope: cross-track finite integration benchmark over the shared scientific substrate
+claim: >
+  The Deep Boil benchmark exercises the shared substrate end to end — canonical
+  Hamiltonian construction with audit, finite Koopman/DMD analysis, validated
+  interval ODE (Picard) steps, and a fail-closed research manifest — producing
+  reproducible artifacts whose claim levels are recorded rather than overstated.
+prediction:
+  observable: cross_track_manifest_status
+  expected_shape: all_registered_claims_supported_by_logged_evidence
+controls:
+  hamiltonian_audit: required
+  koopman_dmd: dominant_modes
+  interval_ode: picard_enclosure_step
+  manifest: fail_closed
+validation:
+  required:
+    - hamiltonian_factory_audit
+    - finite_dmd_analysis
+    - validated_interval_ode_step
+    - research_manifest_fail_closed
+kill_criteria:
+  - any registered claim lacks a logged evidence artifact
+  - the interval ODE step does not enclose the reference trajectory
+  - the Hamiltonian audit fails for a canonical model
+status: active
+claim_boundary: >
+  Cross-track finite integration benchmark only; no continuum theorem, global
+  attractor proof, or Millennium Prize problem solution claim.
+notes:
+  - Validates infrastructure integration, not any new scientific result.
