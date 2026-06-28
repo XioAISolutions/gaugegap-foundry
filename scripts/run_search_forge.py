@@ -15,7 +15,7 @@ from gaugegap.scientific_search_spaces import (
     research_maturity_graph,
 )
 from gaugegap.search_forge import astar, dijkstra, manhattan, rectangular_grid
-from gaugegap.symbolic_search import evaluate, null_distance_test
+from gaugegap.symbolic_search import CLAIM_BOUNDARY, evaluate, null_distance_test
 
 WIDTH = 17
 HEIGHT = 11
@@ -102,10 +102,7 @@ def _symbolic_payload() -> dict[str, object]:
             "equal": messiah.value == serpent.value,
         },
         "null_model": null.summary(),
-        "claim_boundary": (
-            "Equal cipher totals are symbolic associations. They are not evidence of causation, "
-            "prediction, elite coordination, or a physical mechanism."
-        ),
+        "claim_boundary": CLAIM_BOUNDARY,
     }
 
 
