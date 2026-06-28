@@ -1,0 +1,21 @@
+id: deep-boil-0001
+track: Integration
+model: deep_boil_cross_track
+scope: cross-track finite integration benchmark over the shared scientific substrate
+claim: >
+  The Deep Boil benchmark exercises canonical finite Hamiltonians, nonlinear dynamics,
+  manifests, search controls, and reproducibility gates without upgrading finite evidence
+  into a continuum theorem.
+validation:
+  required:
+    - hamiltonian_factory_audit
+    - finite_dmd_analysis
+    - validated_interval_ode_step
+    - research_manifest_fail_closed
+kill_criteria:
+  - any registered claim lacks logged evidence
+  - a canonical Hamiltonian fails its audit
+  - a declared validated enclosure misses its reference trajectory
+status: active
+claim_boundary: >
+  Finite cross-track integration only; no continuum theorem or Millennium Prize solution.

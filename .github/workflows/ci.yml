@@ -85,5 +85,5 @@ jobs:
           foundry list --json > /tmp/foundry-units.json
           grep -q 'deep-boil-smoke' /tmp/foundry-units.json
           grep -q 'foundry-experience' /tmp/foundry-units.json
-          python -c "import numpy as np; np.save('/tmp/id.npy', np.diag([1.0,2.0,3.0,4.0]))"
+          python scripts/write_identity_matrix.py
           gaugegap-certify /tmp/id.npy --output /tmp/cert.json

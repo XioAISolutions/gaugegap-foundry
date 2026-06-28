@@ -1,0 +1,27 @@
+id: flowgap-0003
+track: FlowGap
+model: lorenz_finite_ode
+scope: finite-time Lorenz-system diagnostics
+claim: Deterministic finite-time runs produce reproducible trajectory and spectral diagnostics.
+prediction:
+  observable: largest_lyapunov_exponent
+  expected_shape: finite_positive_estimate
+controls:
+  system: lorenz
+  dt: 0.005
+  steps: 40000
+  transient: 5000
+  sample_every: 4
+  lyapunov_steps: 40000
+validation:
+  required:
+    - deterministic_finite_integration
+    - lyapunov_spectrum_estimate
+    - divergence_certificate
+failure_conditions:
+  - results vary for fixed inputs
+  - refinement changes the qualitative finite-horizon result
+status: active
+claim_boundary: finite-time numerical diagnostics only
+notes:
+  - Reported values are finite-horizon estimates.

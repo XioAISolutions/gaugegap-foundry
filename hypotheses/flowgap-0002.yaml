@@ -1,0 +1,15 @@
+id: flowgap-0002
+track: FlowGap
+model: rossler
+scope: finite-time nonlinear dynamics benchmark
+claim: Reproducible numerical diagnostics for the finite Rössler trajectory.
+validation:
+  required:
+    - step_refinement
+    - lyapunov_disclosure
+    - poincare_section
+kill_criteria:
+  - diagnostics are not deterministic under fixed inputs
+  - convergence checks fail their declared tolerance
+status: active
+claim_boundary: Numerical finite-time evidence only; not a proof of a global strange attractor or chaos.
