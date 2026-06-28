@@ -14,6 +14,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from gaugegap.gap_forge import render_gap_forge_html  # noqa: E402
 from gaugegap.verified_su2_gap import (  # noqa: E402
     CLAIM_BOUNDARY,
     as_fraction,
@@ -42,10 +43,7 @@ def _ints(value: str) -> list[int]:
 
 
 def _fractions(value: str) -> list[Fraction]:
-    try:
-        values = [_fraction(item.strip()) for item in value.split(",") if item.strip()]
-    except argparse.ArgumentTypeError:
-        raise
+    values = [_fraction(item.strip()) for item in value.split(",") if item.strip()]
     if not values or min(values) <= 0:
         raise argparse.ArgumentTypeError("all electric couplings must be positive")
     return values
@@ -56,8 +54,7 @@ def _svg(rows: list[dict[str, object]]) -> str:
     left, right, top, bottom = 90, 48, 90, 80
     chart_w, chart_h = width - left - right, height - top - bottom
     gaps = [float(row["gap_lower"]) for row in rows]
-    max_gap = max(gaps) if gaps else 1.0
-    max_gap = max(max_gap, 1e-12)
+    max_gap = max(max(gaps), 1e-12)
     groups: dict[int, list[dict[str, object]]] = {}
     for row in rows:
         groups.setdefault(int(row["max_two_j"]), []).append(row)
@@ -90,8 +87,7 @@ def _svg(rows: list[dict[str, object]]) -> str:
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
 <rect width="{width}" height="{height}" rx="24" fill="#0b0e14"/>
 <text x="{width/2}" y="38" fill="#e6edf3" text-anchor="middle" font-family="system-ui" font-size="24" font-weight="700">Gap Forge · certified SU(2) one-plaquette separation</text>
-{''.join(labels)}
-{grid}
+{''.join(labels)}{grid}
 <line x1="{left}" y1="{top + chart_h}" x2="{left + chart_w}" y2="{top + chart_h}" stroke="#8b949e"/>
 <line x1="{left}" y1="{top}" x2="{left}" y2="{top + chart_h}" stroke="#8b949e"/>
 {''.join(polylines)}
@@ -158,6 +154,9 @@ def main() -> int:
         writer.writeheader()
         writer.writerows(rows)
     (output / "gap_forge.svg").write_text(_svg(rows), encoding="utf-8")
+    (output / "gap_forge.html").write_text(
+        render_gap_forge_html(summary, rows), encoding="utf-8"
+    )
 
     report = [
         "# Verified finite SU(2) gap benchmark",
