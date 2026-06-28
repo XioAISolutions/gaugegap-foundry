@@ -1,7 +1,7 @@
 """Canonical Hamiltonian construction and audit surface for GaugeGap models.
 
 The factory gives every supported finite model one normalized entry point and one
-common audit contract.  Prototype models remain explicitly labelled as such;
+common audit contract. Prototype models remain explicitly labelled as such;
 normalizing construction does not upgrade their scientific maturity.
 """
 from __future__ import annotations
@@ -75,7 +75,13 @@ class HamiltonianAudit:
 
 
 def registered_models() -> tuple[str, ...]:
-    return ("z2-plaquette", "u1-plaquette", "su2-pure-prototype", "su3-pure-prototype")
+    return (
+        "z2-plaquette",
+        "u1-plaquette",
+        "su2-one-plaquette-verified",
+        "su2-pure-prototype",
+        "su3-pure-prototype",
+    )
 
 
 def build_hamiltonian(model_id: str, **parameters: object) -> HamiltonianArtifact:
@@ -122,6 +128,45 @@ def build_hamiltonian(model_id: str, **parameters: object) -> HamiltonianArtifac
             metadata={
                 "link_dimension": 2 * params["truncation"] + 1,
                 "hilbert_dimension": int(matrix.shape[0]),
+            },
+        )
+
+    if model == "su2-one-plaquette-verified":
+        from gaugegap.verified_su2_gap import (
+            CLAIM_BOUNDARY,
+            GaugeInvariantBasis,
+            dense_float,
+            direct_matrix_exact,
+            fraction_text,
+        )
+
+        params = {
+            "max_two_j": int(parameters.get("max_two_j", 1)),
+            "electric": str(parameters.get("electric", "1")),
+            "magnetic": str(parameters.get("magnetic", "1/2")),
+        }
+        basis = GaugeInvariantBasis(params["max_two_j"])
+        exact_matrix = direct_matrix_exact(
+            basis,
+            electric=params["electric"],
+            magnetic=params["magnetic"],
+        )
+        matrix = dense_float(exact_matrix)
+        return HamiltonianArtifact(
+            model_id=model,
+            matrix=np.asarray(matrix, dtype=np.complex128),
+            parameters=params,
+            implementation_status="finite_verified_reference",
+            claim_boundary=CLAIM_BOUNDARY,
+            metadata={
+                "basis": basis.summary(),
+                "hilbert_dimension": basis.dimension,
+                "gauge_invariant_by_construction": True,
+                "gauss_law_residual": "0",
+                "magnetic_term_complete": True,
+                "exact_rational_matrix": [
+                    [fraction_text(value) for value in row] for row in exact_matrix
+                ],
             },
         )
 
