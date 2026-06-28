@@ -1,0 +1,38 @@
+id: schwinger-matter-0001
+track: GaugeMatter
+model: finite_open_chain_schwinger_staggered_fermions
+scope: exact diagonalization inside a Gauss-projected finite electric-flux truncation
+claim: >
+  The registered finite Hamiltonian preserves the selected Gauss-law sector,
+  is Hermitian, and produces reproducible spectra and matter/electric observables
+  for the declared lattice, boundary fluxes, and truncation.
+prediction:
+  observable: projected_spectrum_and_gauss_audit
+  expected_shape:
+    max_basis_gauss_residual: zero
+    transition_leakage_count: zero
+    hermiticity_residual: below_1e-12
+controls:
+  boundary: open
+  fermions: one_component_staggered
+  gauge_group: compact_U1
+  electric_truncation: hard_wall
+  default_sites: 4
+  default_flux_truncation: 2
+validation:
+  required:
+    - exact_gauss_basis_enumeration
+    - sector_closed_hopping
+    - dense_hermiticity
+    - deterministic_exact_diagonalization
+    - charge_neutrality_for_zero_boundary_flux
+kill_criteria:
+  - a retained basis state violates Gauss law
+  - a non-clipped hopping transition exits the physical sector
+  - the projected Hamiltonian is non-Hermitian
+  - repeated runs differ for fixed inputs
+status: active
+claim_boundary: >
+  Finite open-chain lattice Schwinger benchmark with staggered fermions and a
+  hard-wall electric-flux truncation. It is not a continuum extrapolation,
+  not 3+1-dimensional QED, and not a Yang-Mills mass-gap result.
