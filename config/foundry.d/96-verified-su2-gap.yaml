@@ -1,0 +1,79 @@
+version: 1
+
+units:
+  su2-gap-known-answer:
+    track: gaugegap
+    status: production
+    description: Reproduce the exact 2x2 SU(2) one-plaquette benchmark with gap 5/4.
+    command:
+      - "{python}"
+      - scripts/run_verified_su2_gap.py
+      - --max-two-j
+      - "1"
+      - --electric
+      - "1"
+      - --magnetic
+      - "1/2"
+      - --require-positive
+      - --output-dir
+      - results/verified-su2-gap/known-answer
+
+  su2-gap-certified:
+    track: gaugegap
+    status: production
+    description: Build the gauge-invariant finite Hamiltonian and certify the first spectral gap with exact Sturm bisection.
+    command:
+      - "{python}"
+      - scripts/run_verified_su2_gap.py
+      - --max-two-j
+      - "4"
+      - --electric
+      - "1"
+      - --magnetic
+      - "1/2"
+      - --sturm-bits
+      - "112"
+      - --require-positive
+      - --output-dir
+      - results/verified-su2-gap/certified
+
+  su2-gap-sweep:
+    track: gaugegap
+    status: production
+    description: Sweep coupling and representation cutoffs while preserving exact gap enclosures.
+    command:
+      - "{python}"
+      - scripts/run_verified_su2_gap.py
+      - --max-two-j
+      - "4"
+      - --sweep-max-two-j
+      - "1,2,3,4,5,6"
+      - --sweep-electric
+      - "1/2,3/4,1,5/4,3/2,2"
+      - --magnetic
+      - "1/2"
+      - --sturm-bits
+      - "96"
+      - --require-positive
+      - --output-dir
+      - results/verified-su2-gap/sweep
+
+  gap-forge:
+    track: gaugegap
+    status: production
+    description: Generate the verified SU(2) report, CSV sweep, and Gap Forge SVG.
+    command:
+      - "{python}"
+      - scripts/run_verified_su2_gap.py
+      - --max-two-j
+      - "4"
+      - --require-positive
+      - --output-dir
+      - results/verified-su2-gap/gap-forge
+
+groups:
+  verified-su2-gap:
+    - su2-gap-known-answer
+    - su2-gap-certified
+    - su2-gap-sweep
+    - gap-forge
