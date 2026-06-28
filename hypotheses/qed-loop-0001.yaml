@@ -1,0 +1,38 @@
+id: qed-loop-0001
+track: LoopForge
+model: continuum_one_loop_qed_euclidean_mom
+scope: finite-precision perturbative benchmark at declared spacelike momenta
+claim: >
+  The registered implementation reproduces a subtracted one-loop vacuum-polarization
+  scalar, a transverse polarization tensor, finite MOM fermion dressing functions,
+  a Ward-consistent longitudinal vertex, and the one-loop Pauli form-factor limit.
+prediction:
+  observable: ward_and_form_factor_audit
+  expected_shape:
+    vacuum_transversality_residual: below_1e-10
+    ward_takahashi_residual: below_1e-10
+    pauli_f2_zero: alpha_over_2pi
+controls:
+  signature: Euclidean
+  renormalization_scheme: momentum_subtraction
+  momentum_domain: spacelike_nonnegative_Q_squared
+  default_quadrature_order: 160
+validation:
+  required:
+    - vacuum_subtraction_at_zero
+    - tensor_transversality
+    - ward_takahashi_identity
+    - charge_normalization
+    - pauli_zero_momentum_benchmark
+    - quadrature_refinement
+kill_criteria:
+  - any symmetry residual exceeds its declared tolerance
+  - the zero-momentum Pauli benchmark fails
+  - results change beyond tolerance under quadrature refinement
+status: active
+claim_boundary: >
+  Continuum perturbative one-loop QED in a declared Euclidean MOM convention only.
+  The Ball-Chiu object is the Ward-consistent longitudinal vertex reconstructed from
+  the registered dressing functions, not the complete transverse one-loop vertex.
+  This is not nonperturbative QED, a continuum existence theorem, or evidence for
+  the Yang-Mills mass gap.
