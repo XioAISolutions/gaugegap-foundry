@@ -70,8 +70,11 @@ and prove the transport theorem rather than postulate it.
 foundry run qed-loop-0001
 foundry run schwinger-matter-0001
 foundry run cohesive-gauge-0001
-foundry run qed-schwinger-hott
+foundry run qed-schwinger-suite
 ```
+
+The combined group is deliberately named differently from the Python runner so
+Foundry auto-discovery cannot create a unit/group identifier collision.
 
 ## Scientific boundary
 
