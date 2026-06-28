@@ -1,0 +1,21 @@
+id: cohesive-gauge-0001
+track: CohesiveGauge
+model: finite_U1_gauge_groupoid_transport
+scope: executable finite groupoid-law and gauge-observable transport audit
+claim: >
+  Identity, inverse, composition, associativity, and transport of a registered
+  gauge-invariant endpoint observable hold within numerical tolerance for the
+  finite U(1) configuration model.
+validation:
+  required:
+    - identity_path
+    - inverse_path
+    - associative_composition
+    - observable_transport
+kill_criteria:
+  - any coherence residual exceeds tolerance
+status: active
+claim_boundary: >
+  Finite computational gauge-groupoid model only. The accompanying Agda file is
+  an interface scaffold and is not counted as a compiled proof of univalence,
+  cohesive HoTT, or quantum gauge-field theory.

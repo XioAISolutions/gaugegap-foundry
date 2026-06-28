@@ -33,6 +33,7 @@ jobs:
           foundry run flowgap-attractor-smoke
           foundry run curverank-screen-smoke
           foundry run deep-boil-smoke
+          foundry run qed-schwinger-suite
       - name: Generate Foundry Experience smoke
         run: |
           foundry run foundry-experience -- --output-dir /tmp/foundry-experience --preview /tmp/foundry-experience.svg
@@ -85,5 +86,7 @@ jobs:
           foundry list --json > /tmp/foundry-units.json
           grep -q 'deep-boil-smoke' /tmp/foundry-units.json
           grep -q 'foundry-experience' /tmp/foundry-units.json
+          grep -q 'qed-loop-0001' /tmp/foundry-units.json
+          grep -q 'schwinger-matter-0001' /tmp/foundry-units.json
           python scripts/write_identity_matrix.py
           gaugegap-certify /tmp/id.npy --output /tmp/cert.json
