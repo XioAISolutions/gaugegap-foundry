@@ -23,8 +23,12 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_checked_in_known_answer_suite_passes():
     result = run_suite(ROOT / "benchmarks" / "known_answers.json")
     assert result.passed, result.summary()
-    assert result.case_count == 3
+    assert result.case_count == 4
     assert not result.failed_cases
+    assert {case.case_id for case in result.cases} >= {
+        "standard-model-tree-default",
+        "infogap-no-hiding-generic-qubit",
+    }
 
 
 def test_error_budget_fails_closed():
