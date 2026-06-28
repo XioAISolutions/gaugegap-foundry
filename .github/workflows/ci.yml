@@ -20,9 +20,20 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e '.[dev]'
-      - name: Tests and hard audits
+      - name: Tests
+        id: tests
+        continue-on-error: true
+        run: python -m pytest -q -x --tb=short > /tmp/pytest.log 2>&1
+      - name: Upload pytest debug
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-debug
+          path: /tmp/pytest.log
+      - name: Enforce tests and hard audits
         run: |
-          python -m pytest -q -x --tb=short
+          cat /tmp/pytest.log
+          test "${{ steps.tests.outcome }}" = "success"
           foundry audit
       - name: Config-driven finite-track smoke
         run: |
