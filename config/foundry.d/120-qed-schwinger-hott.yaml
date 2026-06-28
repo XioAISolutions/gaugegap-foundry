@@ -3,7 +3,7 @@ version: 1
 units:
   qed-loop-0001:
     track: LoopForge
-    status: finite_perturbative_reference
+    status: evidence_only
     hypothesis: qed-loop-0001
     description: Generate renormalized one-loop QED scans and Ward/transversality audits.
     command:
@@ -23,7 +23,7 @@ units:
 
   cohesive-gauge-0001:
     track: CohesiveGauge
-    status: computational_coherence_reference
+    status: evidence_only
     hypothesis: cohesive-gauge-0001
     description: Emit a finite U(1) gauge-groupoid transport certificate and HoTT interface status.
     command:
@@ -41,7 +41,7 @@ groups:
   cohesive-gauge:
     - cohesive-gauge-0001
 
-  qed-schwinger-hott:
+  qed-schwinger-suite:
     - qed-loop-0001
     - schwinger-matter-0001
     - cohesive-gauge-0001
