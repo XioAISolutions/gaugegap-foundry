@@ -1,0 +1,58 @@
+name: Diagnose verified SU2 integration
+
+on:
+  pull_request:
+    branches: [main]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  diagnose:
+    if: github.head_ref == 'claude/verified-su2-gap'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip >/dev/null
+          python -m pip install -e '.[dev]' >/dev/null
+      - name: Collect concise failures
+        shell: bash
+        run: |
+          mkdir -p /tmp/su2-gap-diagnostics
+          set +e
+          python -m pytest -q > /tmp/tests.log 2>&1
+          tests_rc=$?
+          {
+            echo "exit_code=${tests_rc}"
+            grep -E '^(FAILED|ERROR|E   |=+ short test summary|[0-9]+ failed|Traceback|AssertionError)' /tmp/tests.log || true
+            tail -n 140 /tmp/tests.log
+          } > /tmp/su2-gap-diagnostics/tests.txt
+
+          python scripts/claim_boundary_audit.py --strict > /tmp/claim.log 2>&1
+          claim_rc=$?
+          {
+            echo "exit_code=${claim_rc}"
+            cat /tmp/claim.log
+            test -f results/claim-boundary-audit/claim_boundary_audit.md && tail -n 100 results/claim-boundary-audit/claim_boundary_audit.md
+          } > /tmp/su2-gap-diagnostics/claim.txt
+
+          python scripts/research_maturity_audit.py --strict > /tmp/maturity.log 2>&1
+          maturity_rc=$?
+          {
+            echo "exit_code=${maturity_rc}"
+            cat /tmp/maturity.log
+            test -f results/research-maturity-audit/research_maturity_audit.md && tail -n 100 results/research-maturity-audit/research_maturity_audit.md
+          } > /tmp/su2-gap-diagnostics/maturity.txt
+
+          printf 'tests=%s\nclaim=%s\nmaturity=%s\n' "$tests_rc" "$claim_rc" "$maturity_rc" > /tmp/su2-gap-diagnostics/status.txt
+          exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: su2-gap-diagnostics
+          path: /tmp/su2-gap-diagnostics
+          if-no-files-found: error
