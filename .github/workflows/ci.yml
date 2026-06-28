@@ -22,7 +22,7 @@ jobs:
           python -m pip install -e '.[dev]'
       - name: Tests and hard audits
         run: |
-          foundry run tests
+          python -m pytest -q -x --tb=short
           foundry audit
       - name: Config-driven finite-track smoke
         run: |
