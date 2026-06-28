@@ -21,22 +21,25 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e '.[dev]'
-      - name: Foundation, charge, and verified gap tests
+      - name: Foundation, charge, quantum-information, and verified-gap tests
         run: |
           python -m pytest -q tests/test_next_level_foundation.py
           python -m pytest -q tests/test_anomaly_forge.py tests/test_lagrangian_forge_integration.py
+          python -m pytest -q tests/test_no_hiding.py
           python -m pytest -q tests/test_verified_su2_gap.py tests/test_verified_su2_gap_integration.py
       - name: Known answers, inventory, formal registry, and source manifest
         run: foundry run next-level-foundation
       - name: Exact charge audit
         run: foundry run anomaly-forge
+      - name: InfoGap no-hiding smoke
+        run: foundry run infogap-smoke
       - name: Verified finite SU2 benchmark
         run: |
           foundry run su2-gap-known-answer
           foundry run su2-gap-certified
           test -s results/verified-su2-gap/certified/verified_gap.json
           test -s results/verified-su2-gap/certified/gap_forge.html
-      - name: Complete nine-scene interface
+      - name: Complete ten-scene interface
         run: |
           foundry run foundry-experience-v2 -- --output-dir /tmp/foundry-experience --preview /tmp/foundry-experience.svg
           test -s /tmp/foundry-experience/index.html
