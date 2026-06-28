@@ -104,6 +104,8 @@ def test_search_forge_generates_complete_offline_bundle(tmp_path: Path) -> None:
     payload = json.loads((output / "search-forge.json").read_text(encoding="utf-8"))
     assert payload["schema"] == "gaugegap.search_forge.v1"
     assert payload["grid"]["dijkstra"]["path_cost"] == payload["grid"]["astar"]["path_cost"]
-    assert "Symbolic association only" in payload["symbolic"]["claim_boundary"]
+    boundary = payload["symbolic"]["claim_boundary"].lower()
+    assert "symbolic association" in boundary
+    assert "not evidence" in boundary
     assert (output / "index.html").stat().st_size > 5000
     assert preview.read_text(encoding="utf-8").startswith("<svg")
