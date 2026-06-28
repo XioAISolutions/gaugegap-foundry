@@ -103,7 +103,7 @@ def _symbolic_payload() -> dict[str, object]:
         },
         "null_model": null.summary(),
         "claim_boundary": (
-            "Equal cipher totals are symbolic associations. They are not evidence of causation, "
+            "Symbolic association only. Equal cipher totals are not evidence of causation, "
             "prediction, elite coordination, or a physical mechanism."
         ),
     }

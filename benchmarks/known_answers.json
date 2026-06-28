@@ -67,6 +67,28 @@
         {"path": "trace_real", "expected": 0.0, "abs_tol": 1e-12}
       ],
       "claim_boundary": "exact finite diagonal plaquette benchmark only"
+    },
+    {
+      "id": "infogap-no-hiding-generic-qubit",
+      "runner": "no_hiding",
+      "parameters": {
+        "theta": 1.1,
+        "phi": 0.7,
+        "tolerance": 1e-10
+      },
+      "checks": [
+        {"path": "passed", "expected": true},
+        {"path": "system_bleaching_trace_distance", "expected": 0.0, "abs_tol": 1e-12},
+        {"path": "channel_bleaching_trace_distance", "expected": 0.0, "abs_tol": 1e-12},
+        {"path": "recovery_fidelity", "expected": 1.0, "abs_tol": 1e-12},
+        {"path": "bell_pair_fidelity", "expected": 1.0, "abs_tol": 1e-12},
+        {"path": "system_entropy", "expected": 1.0, "abs_tol": 1e-12},
+        {"path": "mutual_information_system_environment", "expected": 2.0, "abs_tol": 1e-12},
+        {"path": "mutual_information_system_recovery", "expected": 0.0, "abs_tol": 1e-12},
+        {"path": "unitarity_residual", "expected": 0.0, "abs_tol": 1e-12},
+        {"path": "channel_completeness_residual", "expected": 0.0, "abs_tol": 1e-12}
+      ],
+      "claim_boundary": "finite three-qubit no-hiding realization and numerical recovery audit only"
     }
   ]
 }

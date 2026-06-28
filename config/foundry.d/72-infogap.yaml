@@ -1,0 +1,30 @@
+version: 1
+
+units:
+  infogap-0001-no-hiding:
+    track: infogap
+    status: production
+    description: Run the finite no-hiding theorem benchmark and emit reproducible evidence.
+    command:
+      - "{python}"
+      - scripts/run_no_hiding.py
+      - --output-dir
+      - results/infogap-0001-no-hiding
+
+  infogap-smoke:
+    track: infogap
+    status: production
+    description: Run a reduced deterministic no-hiding suite for CI and local checks.
+    command:
+      - "{python}"
+      - scripts/run_no_hiding.py
+      - --random-count
+      - "2"
+      - --shots
+      - "512"
+      - --output-dir
+      - results/infogap-smoke
+
+groups:
+  infogap:
+    - infogap-0001-no-hiding

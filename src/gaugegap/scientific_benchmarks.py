@@ -1,8 +1,8 @@
 """Known-answer scientific benchmarks with explicit numerical error budgets.
 
-The benchmark engine is deliberately small and deterministic.  It compares finite
+The benchmark engine is deliberately small and deterministic. It compares finite
 results against versioned reference values and fails closed when any configured budget
-is exceeded.  Benchmarks validate implementations; they do not promote finite models
+is exceeded. Benchmarks validate implementations; they do not promote finite models
 into continuum claims.
 """
 from __future__ import annotations
@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping
 
 from gaugegap.hamiltonian_factory import build_and_audit
+from gaugegap.quantum_information.no_hiding import audit_no_hiding
 from gaugegap.standard_model_catalog import tree_level_observables
 
 
@@ -83,9 +84,20 @@ def _run_hamiltonian(parameters: Mapping[str, Any]) -> dict[str, Any]:
     return audit.summary()
 
 
+def _run_no_hiding(parameters: Mapping[str, Any]) -> dict[str, Any]:
+    values = dict(parameters)
+    theta = float(values.pop("theta"))
+    phi = float(values.pop("phi"))
+    tolerance = float(values.pop("tolerance", 1e-10))
+    if values:
+        raise ValueError(f"unknown no-hiding parameters: {sorted(values)}")
+    return audit_no_hiding(theta, phi, label="known-answer", tolerance=tolerance).summary()
+
+
 _RUNNERS: dict[str, Callable[[Mapping[str, Any]], dict[str, Any]]] = {
     "standard_model_tree": _run_standard_model,
     "hamiltonian_audit": _run_hamiltonian,
+    "no_hiding": _run_no_hiding,
 }
 
 

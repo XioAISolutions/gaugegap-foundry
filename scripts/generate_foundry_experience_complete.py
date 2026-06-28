@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Generate the complete Foundry Experience, including Lagrangian and Anomaly Forge.
+"""Generate the complete Foundry Experience with all audited extension scenes.
 
 The original generator remains the stable seven-scene engine. This canonical wrapper
-extends its dataset and self-contained HTML in two fail-closed layers so all existing
-scenes remain intact while the Standard Model and anomaly-consistency scenes are added.
+extends its dataset and self-contained HTML through fail-closed layers so every existing
+scene remains intact while Lagrangian Forge, Anomaly Forge, and InfoGap no-hiding are added.
 """
 from __future__ import annotations
 
@@ -24,6 +24,10 @@ from gaugegap.lagrangian_scene import (  # noqa: E402
     enhance_dataset as enhance_lagrangian_dataset,
     enhance_html as enhance_lagrangian_html,
 )
+from gaugegap.no_hiding_scene import (  # noqa: E402
+    enhance_dataset as enhance_no_hiding_dataset,
+    enhance_html as enhance_no_hiding_html,
+)
 
 BASE_SCRIPT = ROOT / "scripts" / "generate_foundry_experience.py"
 SPEC = importlib.util.spec_from_file_location("gaugegap_base_foundry_experience", BASE_SCRIPT)
@@ -37,11 +41,15 @@ _BASE_BUILD_DATASET = BASE.build_dataset
 
 
 def _complete_dataset():
-    return enhance_anomaly_dataset(enhance_lagrangian_dataset(_BASE_BUILD_DATASET()))
+    dataset = enhance_lagrangian_dataset(_BASE_BUILD_DATASET())
+    dataset = enhance_anomaly_dataset(dataset)
+    return enhance_no_hiding_dataset(dataset)
 
 
 BASE.build_dataset = _complete_dataset
-BASE._HTML = enhance_anomaly_html(enhance_lagrangian_html(BASE._HTML))
+BASE._HTML = enhance_no_hiding_html(
+    enhance_anomaly_html(enhance_lagrangian_html(BASE._HTML))
+)
 
 
 def build_dataset():
