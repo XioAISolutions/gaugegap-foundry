@@ -9,23 +9,23 @@ Definition char_poly (x : R) : R := x*x - (3/4)*x - 1/4.
 Theorem ground_energy_is_root : char_poly (-1/4) = 0.
 Proof.
   unfold char_poly.
-  norm_num.
+  ring.
 Qed.
 
 Theorem first_excited_is_root : char_poly 1 = 0.
 Proof.
   unfold char_poly.
-  norm_num.
+  ring.
 Qed.
 
 Theorem certified_gap_exact : 1 - (-1/4) = 5/4.
 Proof.
-  norm_num.
+  ring.
 Qed.
 
 Theorem certified_gap_positive : 0 < 1 - (-1/4).
 Proof.
-  norm_num.
+  lra.
 Qed.
 
 End VerifiedSU2Gap.
