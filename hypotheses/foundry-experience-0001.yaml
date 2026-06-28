@@ -1,0 +1,31 @@
+id: foundry-experience-0001
+track: Visualization
+model: foundry_experience_interface
+scope: dependency-free audiovisual Experience/Experiment interface over finite data
+claim: >
+  The generator emits a self-contained interface with two separate modes —
+  Experience (an audiovisual traversal of finite scientific data) and Experiment
+  (direct control over equations, parameters, projections) — where every rendered
+  scene carries its evidence and explicit claim boundary, from finite numerical
+  artifacts only.
+prediction:
+  observable: rendered_scene_claim_boundaries
+  expected_shape: every_scene_carries_finite_system_claim_boundary
+controls:
+  output: site/foundry-experience
+  preview: figures/foundry-experience/preview.svg
+  dependencies: none
+validation:
+  required:
+    - deterministic_generation
+    - per_scene_evidence_and_claim_boundary
+kill_criteria:
+  - a rendered scene omits its claim boundary or evidence reference
+  - generated output depends on network or non-vendored assets
+  - any scene asserts a continuum or Millennium-level claim
+status: active
+claim_boundary: >
+  All generated data are finite numerical artifacts; the interface does not claim
+  a continuum theorem, a global strange attractor, or a Millennium solution.
+notes:
+  - Presentation layer over existing finite-system results; no new scientific claim.
