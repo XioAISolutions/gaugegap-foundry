@@ -26,7 +26,7 @@ foundry run infogap-smoke
 
 The result directory contains:
 
-- `summary.json` — circuit, parameters, audits, provider metadata, and claim boundary;
+- `summary.json` — circuit, parameters, audits, provider metadata, formal-artifact reference, and claim boundary;
 - `cases.csv` — canonical and fixed-seed Haar-state results;
 - `no_hiding_flow.svg` — static information-flow diagram.
 
@@ -47,6 +47,16 @@ The benchmark checks:
 - circuit matrix SHA-256 digest.
 
 Canonical inputs are `|0>`, `|1>`, `|+>`, `|->`, `|+i>`, and `|-i>`, followed by fixed-seed Haar states.
+
+## Finite formal certificate
+
+`formal/infogap/no_hiding_finite.v` is a Coq certificate for the exact probability identities used by the implemented three-qubit circuit. Given normalized input amplitudes and a Hadamard weight satisfying `h² = 1/2`, it proves:
+
+- the two system outcomes each have probability `1/2`;
+- the recovery qubit preserves the input `|alpha|²` and `|beta|²` probabilities;
+- the recovered probabilities remain normalized.
+
+This formal source is intentionally narrower than the general no-hiding theorem. It certifies the algebraic finite circuit used in this repository; it does not formalize arbitrary Hilbert spaces, Stinespring dilation, Schmidt decomposition, or the universal theorem.
 
 ## Experience / Experiment
 
@@ -78,6 +88,7 @@ This artifact is:
 - an exact finite three-qubit construction;
 - a deterministic numerical audit of that construction;
 - a provider-portable finite benchmark;
+- a bounded Coq certificate for the implemented probability identities;
 - an interactive scientific communication scene.
 
 It is not:
