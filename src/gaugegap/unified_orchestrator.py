@@ -44,8 +44,8 @@ class PipelineResult:
         }
 
 
-def _flatten(name: str, config, *, stack: tuple[str, ...] = ()) -> list[str]:
-    units = all_units(config, ROOT)
+def _flatten(name: str, config, root: Path, *, stack: tuple[str, ...] = ()) -> list[str]:
+    units = all_units(config, root)
     if name in units:
         return [name]
     if name not in config.groups:
@@ -54,8 +54,19 @@ def _flatten(name: str, config, *, stack: tuple[str, ...] = ()) -> list[str]:
         raise FoundryConfigError("group cycle: " + " -> ".join((*stack, name)))
     result: list[str] = []
     for child in config.groups[name]:
-        result.extend(_flatten(child, config, stack=(*stack, name)))
+        result.extend(_flatten(child, config, root, stack=(*stack, name)))
     return result
+
+
+def _stable_run(run: UnitRun) -> dict[str, object]:
+    return {
+        "id": run.id,
+        "track": run.track,
+        "status": run.status,
+        "hypothesis": run.hypothesis,
+        "command": list(run.command),
+        "returncode": run.returncode,
+    }
 
 
 class UnifiedOrchestrator:
@@ -73,7 +84,7 @@ class UnifiedOrchestrator:
         extra_args: Sequence[str] = (),
         output: Path | None = None,
     ) -> PipelineResult:
-        leaf_ids = _flatten(target, self.config)
+        leaf_ids = _flatten(target, self.config, self.root)
         if extra_args and len(leaf_ids) != 1:
             raise FoundryConfigError("extra arguments require a single leaf unit")
         units = all_units(self.config, self.root)
@@ -86,14 +97,15 @@ class UnifiedOrchestrator:
             records.append(UnitRun(unit.id, unit.track, unit.status, unit.hypothesis, tuple(command), int(rc), time.perf_counter() - started))
             if rc:
                 break
-        payload = {
+        success = bool(records) and all(record.returncode == 0 for record in records)
+        stable_payload = {
             "target": target,
             "stages": STAGES,
-            "runs": [asdict(record) for record in records],
-            "success": bool(records) and all(record.returncode == 0 for record in records),
+            "runs": [_stable_run(record) for record in records],
+            "success": success,
         }
-        digest = hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
-        result = PipelineResult(target, STAGES, tuple(records), bool(payload["success"]), digest)
+        digest = hashlib.sha256(json.dumps(stable_payload, sort_keys=True).encode()).hexdigest()
+        result = PipelineResult(target, STAGES, tuple(records), success, digest)
         if output:
             output.parent.mkdir(parents=True, exist_ok=True)
             output.write_text(json.dumps(result.to_dict(), indent=2, sort_keys=True), encoding="utf-8")
