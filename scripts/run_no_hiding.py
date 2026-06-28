@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -22,6 +23,8 @@ from gaugegap.quantum_provider import (  # noqa: E402
     LocalStatevectorProvider,
     QuantumExecutionRequest,
 )
+
+FORMAL_ARTIFACT = ROOT / "formal" / "infogap" / "no_hiding_finite.v"
 
 
 def _render_svg(payload: dict[str, object]) -> str:
@@ -88,6 +91,9 @@ def main() -> int:
             seed=args.seed,
         )
     )
+    if not FORMAL_ARTIFACT.exists():
+        raise RuntimeError(f"missing formal artifact: {FORMAL_ARTIFACT}")
+    formal_bytes = FORMAL_ARTIFACT.read_bytes()
     payload = {
         "schema": "gaugegap.infogap.no_hiding.v1",
         "benchmark_id": "infogap-0001-no-hiding",
@@ -106,6 +112,15 @@ def main() -> int:
         "provider": {
             "capabilities": provider.capabilities().__dict__,
             "sample": sample.summary(),
+        },
+        "formal_evidence": {
+            "path": FORMAL_ARTIFACT.relative_to(ROOT).as_posix(),
+            "prover": "Coq",
+            "sha256": hashlib.sha256(formal_bytes).hexdigest(),
+            "scope": (
+                "finite probability identities for the implemented three-qubit circuit; "
+                "not the general no-hiding theorem"
+            ),
         },
         "claim_level": "reproducible_finite_result",
         "claim_boundary": selected.claim_boundary,
