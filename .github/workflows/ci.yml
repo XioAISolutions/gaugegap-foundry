@@ -20,20 +20,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e '.[dev]'
-      - name: Tests
-        id: tests
-        continue-on-error: true
-        run: python -m pytest -q -x --tb=short > /tmp/pytest.log 2>&1
-      - name: Upload pytest debug
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pytest-debug
-          path: /tmp/pytest.log
-      - name: Enforce tests and hard audits
+      - name: Tests and hard audits
         run: |
-          cat /tmp/pytest.log
-          test "${{ steps.tests.outcome }}" = "success"
+          foundry run tests
           foundry audit
       - name: Config-driven finite-track smoke
         run: |
@@ -96,5 +85,5 @@ jobs:
           foundry list --json > /tmp/foundry-units.json
           grep -q 'deep-boil-smoke' /tmp/foundry-units.json
           grep -q 'foundry-experience' /tmp/foundry-units.json
-          python -c "import numpy as np; np.save('/tmp/id.npy', np.diag([1.0,2.0,3.0,4.0]))"
+          python scripts/write_identity_matrix.py
           gaugegap-certify /tmp/id.npy --output /tmp/cert.json
