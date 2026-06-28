@@ -1,0 +1,27 @@
+{
+  "schema": "gaugegap.su2_one_plaquette_known_answers.v1",
+  "model": "SU(2) one-plaquette class-function truncation",
+  "convention": "H = electric * j(j+1) - magnetic * chi_(1/2), in the orthonormal character basis",
+  "cases": [
+    {
+      "id": "j-half-exact",
+      "parameters": {
+        "max_two_j": 1,
+        "electric": "1",
+        "magnetic": "1/2"
+      },
+      "exact_matrix": [
+        ["0", "-1/2"],
+        ["-1/2", "3/4"]
+      ],
+      "expected": {
+        "ground_energy": "-1/4",
+        "first_excited_energy": "1",
+        "spectral_gap": "5/4",
+        "gauge_invariant_by_construction": true,
+        "strictly_positive": true
+      }
+    }
+  ],
+  "claim_boundary": "Finite one-plaquette SU(2) class-function truncation only; no thermodynamic or continuum mass-gap claim."
+}
