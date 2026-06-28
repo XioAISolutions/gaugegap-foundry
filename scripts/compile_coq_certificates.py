@@ -32,8 +32,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def _fresh_emitted_certs() -> list[tuple[str, str]]:
-    """(name, coq_source) freshly emitted from each certificate emitter -- so the
-    current code path, not just checked-in artifacts, is compiled."""
+    """Return freshly emitted certificate sources from current code paths."""
     sys.path.insert(0, str(ROOT / "src"))
     out: list[tuple[str, str]] = []
     from gaugegap.rigorous.bracket_certificate import emit_bracket_certificate
@@ -58,32 +57,28 @@ def _fresh_emitted_certs() -> list[tuple[str, str]]:
     out.append(("cherenkov", emit_cherenkov_certificate("cone", 1.33, 0.9)[1]))
     from gaugegap.quantum.lieb_robinson import emit_lightcone_certificate
     out.append(("lieb_robinson", emit_lightcone_certificate("front", 2.718)[1]))
-    from gaugegap.relativity.compton_schwarzschild import (
-        emit_compton_schwarzschild_certificate,
-    )
-    out.append(("compton_schwarzschild",
-                emit_compton_schwarzschild_certificate("planck", 1.0, 2.0)[1]))
+    from gaugegap.relativity.compton_schwarzschild import emit_compton_schwarzschild_certificate
+    out.append(("compton_schwarzschild", emit_compton_schwarzschild_certificate("planck", 1.0, 2.0)[1]))
     from gaugegap.quantum.quantum_zeno import emit_zeno_certificate
     out.append(("quantum_zeno", emit_zeno_certificate("watched", 1.0, 1.0, 5.0)[1]))
     from gaugegap.quantum.transmon import emit_transmon_certificate
     out.append(("transmon", emit_transmon_certificate("qubit", 1.0)[1]))
+    from gaugegap.verified_su2_proof import emit_verified_su2_gap_coq
+    out.append(("verified_su2_gap", emit_verified_su2_gap_coq()))
     return out
 
 
 def _compile(name: str, source: str, workdir: Path) -> tuple[bool, str]:
     v = workdir / f"{name}.v"
     v.write_text(source)
-    proc = subprocess.run(["coqc", str(v)], capture_output=True, text=True,
-                          cwd=workdir)
+    proc = subprocess.run(["coqc", str(v)], capture_output=True, text=True, cwd=workdir)
     return proc.returncode == 0, (proc.stdout + proc.stderr).strip()
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--results-dir", type=Path, default=ROOT / "results")
-    ap.add_argument("--emit", action="store_true",
-                    help="also compile a fresh certificate from each emitter")
+    ap.add_argument("--emit", action="store_true", help="also compile a fresh certificate from each emitter")
     args = ap.parse_args()
 
     if shutil.which("coqc") is None:
@@ -93,6 +88,9 @@ def main() -> int:
     jobs: list[tuple[str, str]] = []
     for f in sorted(args.results_dir.rglob("*.coq")):
         jobs.append((f.stem + "_" + str(abs(hash(str(f))) % 10000), f.read_text()))
+    checked_in = ROOT / "proofs" / "su2_finite_gap" / "VerifiedSU2Gap.v"
+    if checked_in.exists():
+        jobs.append(("checked_in_verified_su2_gap", checked_in.read_text()))
     if args.emit:
         jobs += [(f"emit_{n}", src) for n, src in _fresh_emitted_certs()]
 
