@@ -57,6 +57,16 @@ CLAIM_BOUNDARY = (
     "no continuum theorem, formal chaos proof, or Millennium Prize solution claim"
 )
 
+# Inspiration-only attribution. The two-mode Experience/Experiment split is a
+# conceptual nod to Ryoji Ikeda's ``supersymmetry [experience] / [experiment]``.
+# No artwork, photography, audio, data, or source code from that work is used,
+# and no affiliation or endorsement is implied.
+ATTRIBUTION = (
+    "Conceptual inspiration only: Ryoji Ikeda — supersymmetry [experience] / "
+    "[experiment]. No artwork, audio, data, or code from that work is used; "
+    "no affiliation or endorsement is implied. https://www.ryojiikeda.com/project/supersymmetry/"
+)
+
 
 def _round_rows(values: np.ndarray, digits: int = 7) -> list[list[float]]:
     return [[round(float(value), digits) for value in row] for row in values]
@@ -241,6 +251,7 @@ def build_dataset() -> dict[str, Any]:
         "title": "GaugeGap Foundry Experience",
         "git_commit": _git_commit(),
         "claim_boundary": CLAIM_BOUNDARY,
+        "attribution": ATTRIBUTION,
         "scenes": scenes,
     }
 
@@ -297,6 +308,7 @@ select,input[type=range]{width:100%}select{padding:8px}input[type=range]{accent-
   <div class="section"><div class="label">Live diagnostics</div><div id="metrics"></div></div>
   <div class="section"><div class="label">Evidence manifest</div><div id="evidence"></div></div>
   <div class="section"><div class="label">Claim boundary</div><div id="boundary" class="warn"></div></div>
+  <div class="section"><div class="label">Attribution</div><div id="attribution" class="tiny"></div></div>
 </aside>
 <div id="ticker"><div id="tickerInner"></div></div>
 <script>
@@ -339,6 +351,7 @@ sceneSel.onchange=()=>setScene(+sceneSel.value);projection.onchange=()=>frame=0;
 document.getElementById('sound').onclick=()=>soundOn?stopSound():startSound();document.getElementById('run').onclick=()=>{const sc=current();if(sc.kind==='attractor'){points=integrateClient(sc);frame=0;updatePanels()}};
 document.getElementById('points').onclick=()=>{drawLines=false;document.getElementById('points').classList.add('active');document.getElementById('lines').classList.remove('active')};document.getElementById('lines').onclick=()=>{drawLines=true;document.getElementById('lines').classList.add('active');document.getElementById('points').classList.remove('active')};
 for(const el of [density,speed,trail])el.oninput=()=>{document.getElementById(el.id+'V').textContent=el.value};density.oninput();speed.oninput();trail.oninput();
+document.getElementById('attribution').textContent=DATA.attribution||'';
 setInterval(()=>document.getElementById('clock').textContent=new Date().toISOString(),250);setScene(0);draw();
 </script></body></html>'''
 
