@@ -1,0 +1,41 @@
+name: Diagnose InfoGap full suite
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install quietly
+        run: |
+          python -m pip install --upgrade pip >/dev/null
+          python -m pip install -e '.[dev]' >/dev/null
+      - name: Capture full-suite report
+        id: tests
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q --tb=short > /tmp/pytest-full.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          echo "===== FAILURE SUMMARY ====="
+          grep -E '^(FAILED|ERROR)|^E   |^_{3,}|short test summary|[0-9]+ failed' /tmp/pytest-full.log | tail -120 || true
+          exit 0
+      - name: Upload diagnostic report
+        uses: actions/upload-artifact@v4
+        with:
+          name: infogap-full-test-report
+          path: /tmp/pytest-full.log
+          if-no-files-found: error
+      - name: Enforce result
+        run: test '${{ steps.tests.outputs.exit_code }}' = '0'
