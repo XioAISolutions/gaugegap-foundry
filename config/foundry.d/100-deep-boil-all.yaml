@@ -1,0 +1,25 @@
+version: 1
+
+units:
+  deep-boil-registry-check:
+    track: integrity
+    status: production
+    description: Validate the track registry and hypothesis references.
+    command:
+      - "{python}"
+      - scripts/check_deep_boil_registry.py
+
+  deep-boil-unified:
+    track: integrity
+    status: production
+    description: Run all configured Deep Boil systems through the unified orchestrator.
+    command:
+      - "{python}"
+      - scripts/run_deep_boil_all.py
+
+groups:
+  deep-boil-all:
+    - deep-boil-registry-check
+    - next-level-foundation
+    - foundry-experience
+    - search-and-symbolic
