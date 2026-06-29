@@ -13,6 +13,7 @@
   <a href="#-lagrangian-forge--from-symmetry-to-matter">Lagrangian Forge</a> ·
   <a href="#anomaly-forge">Anomaly Forge</a> ·
   <a href="#search-forge">Search Forge</a> ·
+  <a href="#infogap">InfoGap</a> ·
   <a href="#-attractor-forge--nonlinear-dynamics-you-can-inspect">Attractor Forge</a> ·
   <a href="#-the-web-of-physical-limits">Physical limits</a> ·
   <a href="#-the-web-of-inference-traps">Inference traps</a> ·
@@ -40,6 +41,7 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 - **Lagrangian Forge** — an audited Standard Model field, sector, interaction, and tree-level mass atlas.
 - **Anomaly Forge** — exact rational charge-consistency tests, a hypercharge solver, and a live anomaly-free surface.
 - **Search Forge** — certified Dijkstra/A* paths, scientific search spaces, and symbolic null controls.
+- **InfoGap** — an exact finite realization of the quantum no-hiding theorem with a discharged Coq certificate.
 - **GaugeGap** — finite lattice-gauge benchmarks from Z₂ through bounded SU(3) scaffolds.
 - **FlowGap** — finite PDE surrogates and nonlinear systems, including Rössler, Lorenz, and Thomas dynamics.
 - **CurveRank** — certified screening of finite operator truncations against zeta-zero-inspired targets.
@@ -58,6 +60,7 @@ flowchart TD
     F --> L["🧬 Lagrangian Forge<br/>fields · vertices · symmetry breaking"]
     F --> A["⚖️ Anomaly Forge<br/>charges · constraints · cancellation"]
     F --> S["🧭 Search Forge<br/>paths · proofs · pattern controls"]
+    F --> I["🪞 InfoGap<br/>quantum no-hiding theorem"]
     F --> G["⚛️ GaugeGap<br/>finite gauge systems"]
     F --> FL["🌊 FlowGap<br/>PDEs + nonlinear dynamics"]
     F --> C["📈 CurveRank<br/>finite spectral screening"]
@@ -68,6 +71,7 @@ flowchart TD
     L --> L1["SU(3)c × SU(2)L × U(1)Y<br/>interaction hypergraph · audits"]
     A --> A1["exact rational anomalies<br/>hypercharge solver · Witten parity"]
     S --> S1["Dijkstra baseline · A* heuristic contract<br/>symbolic null models"]
+    I --> I1["exact dilation · Bell pair<br/>recoverable state · Coq certificate"]
     G --> G1["Z₂ → U(1) → SU(2) → SU(3 scaffold"]
     FL --> FL1["Burgers · Rössler · Lorenz · Thomas"]
     C --> C1["interval eigenvalues<br/>negative-result certificates"]
@@ -77,7 +81,7 @@ flowchart TD
     classDef main fill:#eef6ff,stroke:#0969da,color:#111;
     classDef edge fill:#f6f0ff,stroke:#6929c4,color:#111;
     class F main;
-    class X,L,A,S,G,FL,C,P,D edge;
+    class X,L,A,S,I,G,FL,C,P,D edge;
 ```
 
 </details>
@@ -97,7 +101,7 @@ The repository has a self-contained browser interface inspired by the conceptual
 | **Experience** | sensory traversal of verified finite data | auto-cycling scenes, progressive trajectories, rotating geometry, equation fields, scan fields, WebAudio sonification, live schema and commit ticker |
 | **Experiment** | inspect and manipulate the apparatus | equations, ODE, Standard Model, and hypercharge sliders; browser-side RK4 reintegration; anomaly residuals; projections; DMD and interval diagnostics; Lagrangian and Hamiltonian audits; provenance; claim boundaries |
 
-Nine scenes ship in the complete generated bundle:
+Ten scenes ship in the complete generated bundle (`gaugegap.foundry_experience.v4`):
 
 1. Rössler dynamics;
 2. Lorenz dynamics;
@@ -106,8 +110,9 @@ Nine scenes ship in the complete generated bundle:
 5. exact finite SU(3) octet/decuplet weight geometry;
 6. Lagrangian Forge interaction graph, equation wall, symmetry-breaking view, and vertex atlas;
 7. Anomaly Forge balance ring, triangle channels, fractional-charge cards, and anomaly-free surface;
-8. canonical Z₂ and truncated U(1) spectra;
-9. dimensionless Compton–Schwarzschild mass-radius limits.
+8. InfoGap no-hiding dilation — the system qubit goes maximally mixed while the original state stays recoverable from the complement;
+9. canonical Z₂ and truncated U(1) spectra;
+10. dimensionless Compton–Schwarzschild mass-radius limits.
 
 ```mermaid
 flowchart LR
@@ -289,6 +294,35 @@ foundry run symbolic-search-lab
 The offline bundle writes `site/search-forge/index.html`, a JSON evidence record, and a reproducible SVG preview. Every result includes the path, cost, expansion order, graph hash, heuristic metadata, result hash, and explicit claim boundary.
 
 > 🧭 **Boundary:** finding a path does not prove that the graph exhausts every physical theory, proof strategy, or interpretation. Symbolic equality does not establish causality, prediction, or a physical mechanism.
+
+---
+
+<a id="infogap"></a>
+## 🪞 InfoGap — the quantum no-hiding theorem, exactly
+
+InfoGap takes a counter-intuitive information claim and turns it into an exact, finite, machine-checkable circuit. The no-hiding theorem says that when a process erases all dependence on an unknown input state from one subsystem, that information cannot hide in correlations — in a unitary dilation it must reappear, intact, in the complement.
+
+```text
+input:   |ψ⟩_S |0⟩_A |0⟩_B
+circuit: SWAP(S,B) → H(S) → CNOT(S,A)
+output:  |Φ⁺⟩_SA ⊗ |ψ⟩_B
+```
+
+| What the run shows | Finite statement |
+|---|---|
+| **System qubit erased** | the reduced state of `S` is maximally mixed, independent of the input `|ψ⟩` |
+| **Information conserved** | the original `|ψ⟩` is recovered exactly on the complementary qubit `B` |
+| **Fixed residue** | `S,A` form a Bell pair `|Φ⁺⟩` that carries none of the input |
+| **Discharged certificate** | `formal/infogap/no_hiding_finite.v` proves the finite identity with no holes |
+
+```bash
+foundry run infogap-0001-no-hiding
+foundry run infogap-smoke
+```
+
+📖 [`docs/no-hiding-theorem.md`](docs/no-hiding-theorem.md)
+
+> 🧭 **Boundary:** this certifies one exact finite-dimensional realization of the no-hiding theorem on specified qubits. It is not a continuum field-theory statement, an information-loss-paradox resolution, or a Millennium Prize result.
 
 ---
 
@@ -617,6 +651,12 @@ flowchart TB
 
 The fragment loader is deterministic and fails closed if two files declare the same unit or group ID.
 
+Three validated registries sit on top of that single source of truth:
+
+- `src/gaugegap/hypothesis_registry.py` loads and validates every `hypotheses/*.yaml` (plus the legacy JSON record), failing closed on a missing track or an id that disagrees with its filename;
+- `src/gaugegap/unified_registry.py` builds a track-agnostic `TrackSpec` registry from the canonical Foundry configuration and rejects missing units, duplicates, or unknown group references;
+- `src/gaugegap/unified_orchestrator.py` threads a registered finite run through the shared stages, and `scripts/check_deep_boil_registry.py` resolves the whole graph as a fast gate.
+
 📐 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 
 ---
@@ -642,6 +682,7 @@ foundry run anomaly-forge-experience
 foundry run search-forge
 foundry run symbolic-search-lab
 foundry run foundry-experience
+foundry run infogap-0001-no-hiding
 foundry run deep-boil-smoke
 foundry run gaugegap-0002
 foundry run flowgap-0001
@@ -753,8 +794,10 @@ The project becomes more credible by making the evidence **more explorable witho
 - [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) — Standard Model catalog, graph, controls, and audits
 - [`docs/anomaly-forge.md`](docs/anomaly-forge.md) — exact charge consistency, solver assumptions, interactive views, and claim boundaries
 - [`docs/search-forge.md`](docs/search-forge.md) — certified pathfinding, scientific search spaces, symbolic controls, and boundaries
+- [`docs/no-hiding-theorem.md`](docs/no-hiding-theorem.md) — exact finite quantum no-hiding theorem and its discharged certificate
 - [`docs/end-of-day-integration-2026-06-26.md`](docs/end-of-day-integration-2026-06-26.md) — complete integration inventory
 - [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md) — cross-track verification checkpoint
+- [`docs/roadmap-prize-impact.md`](docs/roadmap-prize-impact.md) — finite-system-first high-impact research roadmap
 - [`docs/attractor-forge.md`](docs/attractor-forge.md) — nonlinear-dynamics evidence ladder
 - [`docs/physical-limits-web.md`](docs/physical-limits-web.md) — physical-limits synthesis
 - [`docs/inference-traps.md`](docs/inference-traps.md) — exact decision-theory demonstrations
