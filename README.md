@@ -591,6 +591,9 @@ flowchart LR
 | `flowgap-0002-rossler` | Rössler flow | attractor diagnostics + regional contraction certificate |
 | `flowgap-0003-lorenz` | Lorenz flow | attractor diagnostics + global volume-contraction certificate |
 | `flowgap-0004-thomas` | Thomas cyclic flow | attractor diagnostics + global volume-contraction certificate |
+| `flowgap-0005-navier-stokes` | 2D incompressible Navier–Stokes surrogate | Taylor–Green vortex via Chorin projection: monotone energy decay, divergence control, analytic decay-rate convergence under grid refinement |
+
+The full incompressible Navier–Stokes equations map term-by-term onto FlowGap code: the convective `(u·∇)u` and viscous `ν∇²u` terms are the Burgers surrogate, continuity `∇·u = 0` is enforced by the pressure-Poisson projection, and Lorenz is a truncated convection model. The Taylor–Green surrogate recovers the exact analytic energy-decay rate `4νk²` to ~1% on a 16×16 grid, with the error shrinking as the grid refines. See [`docs/navier-stokes.md`](docs/navier-stokes.md).
 
 > 🧭 **Boundary:** finite discretizations and finite-time integrations—not Navier–Stokes regularity, global chaos, or continuum existence proofs.
 
@@ -799,6 +802,7 @@ The project becomes more credible by making the evidence **more explorable witho
 - [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md) — cross-track verification checkpoint
 - [`docs/roadmap-prize-impact.md`](docs/roadmap-prize-impact.md) — finite-system-first high-impact research roadmap
 - [`docs/attractor-forge.md`](docs/attractor-forge.md) — nonlinear-dynamics evidence ladder
+- [`docs/navier-stokes.md`](docs/navier-stokes.md) — Navier–Stokes terms mapped to FlowGap code and the 2D surrogate
 - [`docs/physical-limits-web.md`](docs/physical-limits-web.md) — physical-limits synthesis
 - [`docs/inference-traps.md`](docs/inference-traps.md) — exact decision-theory demonstrations
 - [`docs/epistemics-and-claim-boundaries.md`](docs/epistemics-and-claim-boundaries.md) — why boundaries matter
