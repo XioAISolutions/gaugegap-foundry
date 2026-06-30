@@ -1,0 +1,39 @@
+id: flowgap-0005
+track: FlowGap
+model: taylor_green_vortex_2d
+scope: finite 2D incompressible Navier-Stokes surrogate (Taylor-Green vortex)
+claim: >
+  A finite periodic-grid Chorin projection of the incompressible Navier-Stokes
+  equations on the Taylor-Green vortex keeps the velocity field approximately
+  divergence-free, decays the kinetic energy monotonically, and recovers the exact
+  analytic energy-decay rate 4*nu*k^2 to within a refinement-controlled error.
+prediction:
+  observable: energy_decay_rate
+  expected_shape: converges_to_analytic_4_nu_k2_under_grid_refinement
+controls:
+  grid: 16
+  refine_grid: 24
+  nu: 0.02
+  dt: 0.001
+  n_steps: 200
+  wavenumber: 2*pi
+validation:
+  required:
+    - deterministic_finite_integration
+    - monotone_energy_decay
+    - bounded_divergence_after_projection
+    - taylor_green_decay_rate_convergence
+kill_criteria:
+  - results vary for fixed inputs
+  - kinetic energy increases under the unforced viscous flow
+  - the projection fails to reduce the divergence of a divergent field
+  - grid refinement does not reduce the analytic decay-rate error
+status: active
+claim_boundary: >
+  Finite periodic-grid numerical evidence only; not a continuum existence or
+  smoothness result for Navier-Stokes and not a Millennium Prize solution.
+notes:
+  - The Taylor-Green vortex is an exact unsteady incompressible solution; the
+    surrogate is judged against it on finite grids.
+  - Divergence is controlled (not exactly zero) because the collocated central
+    scheme composes a wide-stencil projection.
