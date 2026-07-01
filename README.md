@@ -660,6 +660,18 @@ foundry run netgap-0004-loss-budget
 foundry run netgap-0005-qkd
 ```
 
+**The noise layer** drops the idealization and models what a real link does — CPTP amplitude/phase/depolarizing channels — the honest bridge toward hardware:
+
+| ID | Primitive | Certified statement |
+|---|---|---|
+| `netgap-0006` | Noise channels + quantum-advantage floor | `F_avg = (2F_e+1)/3` beats the classical `2/3` bound iff `F_e > ½` (discharged Lean/Coq) |
+| `netgap-0007` | Entanglement distribution (lossy+noisy link) | exact singlet fraction / negativity / concurrence; **distillable** while `F > ½`, rate `~ η` (discharged Lean/Coq) |
+
+```bash
+foundry run netgap-0006-noise-channels
+foundry run netgap-0007-entanglement-distribution
+```
+
 📖 [`docs/photonic-quantum-switch.md`](docs/photonic-quantum-switch.md)
 
 > 🧭 **Boundary:** a finite, lossless, unitary linear-optics model — not a hardware device, a TFLN materials/electro-optic claim, a loss/noise/thermal chip model, or a full quantum-network protocol. It is the exact mathematical switch fabric such a device implements.

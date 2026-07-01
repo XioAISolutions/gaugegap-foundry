@@ -1,0 +1,36 @@
+version: 1
+
+units:
+  netgap-0006-noise-channels:
+    track: netgap
+    hypothesis: netgap-0006
+    status: production
+    description: Amplitude/phase/depolarizing channels with the quantum-advantage fidelity floor.
+    command:
+      ["{python}", "scripts/run_quantum_channel.py", "--primitive", "channels",
+       "--gamma", "0.1", "--lam", "0.05", "--emit-certificates",
+       "--output-dir", "results/netgap-0006"]
+
+  netgap-0007-entanglement-distribution:
+    track: netgap
+    hypothesis: netgap-0007
+    status: production
+    description: Entanglement distribution over a lossy+noisy link with distillability certificate.
+    command:
+      ["{python}", "scripts/run_quantum_channel.py", "--primitive", "distribution",
+       "--eta", "0.9", "--gamma", "0.1", "--lam", "0.05", "--emit-certificates",
+       "--output-dir", "results/netgap-0007"]
+
+  netgap-noise-smoke:
+    track: netgap
+    hypothesis: netgap-0006
+    status: production
+    description: Reduced deterministic run of the NetGap noise layer for CI.
+    command:
+      ["{python}", "scripts/run_quantum_channel.py", "--primitive", "all",
+       "--gamma", "0.2", "--lam", "0.1", "--output-dir", "/tmp/netgap-noise-smoke"]
+
+groups:
+  netgap-noise:
+    - netgap-0006-noise-channels
+    - netgap-0007-entanglement-distribution
