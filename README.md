@@ -644,6 +644,22 @@ foundry run netgap-0001-photonic-switch
 foundry run netgap-smoke
 ```
 
+**The network layer** builds the next rungs a real quantum network needs, each an exact finite core with its own certificate:
+
+| ID | Primitive | Certified statement |
+|---|---|---|
+| `netgap-0002` | Clements/Reck decomposition | any programmable unitary → adjacent-coupler mesh, reconstructed to ~1e-16 |
+| `netgap-0003` | Entanglement swapping (repeater primitive) | a Bell measurement entangles the outer pair — concurrence `1` for every outcome |
+| `netgap-0004` | Heralded loss budget | success `η^k`, heralded fidelity `1`, **monotone** loss (discharged Lean/Coq) |
+| `netgap-0005` | BB84 key rate | `r = 1 − 2h(Q) ≥ 0` below `Q ≈ 0.11` (discharged Lean/Coq) |
+
+```bash
+foundry run netgap-0002-clements
+foundry run netgap-0003-entanglement-swap
+foundry run netgap-0004-loss-budget
+foundry run netgap-0005-qkd
+```
+
 📖 [`docs/photonic-quantum-switch.md`](docs/photonic-quantum-switch.md)
 
 > 🧭 **Boundary:** a finite, lossless, unitary linear-optics model — not a hardware device, a TFLN materials/electro-optic claim, a loss/noise/thermal chip model, or a full quantum-network protocol. It is the exact mathematical switch fabric such a device implements.

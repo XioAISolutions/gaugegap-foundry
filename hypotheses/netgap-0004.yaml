@@ -1,0 +1,23 @@
+id: netgap-0004
+track: NetGap
+model: heralded_loss_budget
+scope: heralded lossy switch chain with an explicit loss budget
+claim: >
+  A heralded lossy switch chain preserves the state on heralding (fidelity 1), has
+  end-to-end heralding probability eta**k for transmissivity eta over k switches, and
+  its success probability is monotone non-increasing as switches are added.
+prediction:
+  observable: end_to_end_heralding_probability
+  expected_shape: eta_to_the_k_monotone_nonincreasing
+validation:
+  required:
+    - heralded_fidelity_one
+    - success_probability_eta_to_the_k
+    - monotone_loss_certificate
+kill_criteria:
+  - heralded fidelity is not one
+  - adding a switch increases the success probability
+status: active
+claim_boundary: >
+  Idealized heralded-loss accounting only; the surviving-photon state is taken as
+  perfectly preserved. Not a full device-noise or decoherence model.

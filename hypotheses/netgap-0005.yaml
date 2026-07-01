@@ -1,0 +1,22 @@
+id: netgap-0005
+track: NetGap
+model: bb84_asymptotic_key_rate
+scope: exact asymptotic BB84 secret-key rate and secure threshold
+claim: >
+  The asymptotic BB84 secret-key rate r = 1 - 2 h(Q) is non-negative below the QBER
+  threshold Q ~ 0.11 (where h(Q) = 1/2), and this is discharged as a formal inequality.
+prediction:
+  observable: secret_key_rate
+  expected_shape: nonnegative_below_threshold_negative_above
+validation:
+  required:
+    - exact_binary_entropy_key_rate
+    - secure_threshold_near_eleven_percent
+    - discharged_nonnegative_rate_certificate
+kill_criteria:
+  - the key rate is positive above the threshold
+  - the reported threshold is not near 0.11
+status: active
+claim_boundary: >
+  Exact asymptotic one-way BB84 rate formula only; not a finite-key, composable, or
+  device-independent security proof.

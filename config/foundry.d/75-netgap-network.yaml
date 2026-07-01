@@ -1,0 +1,55 @@
+version: 1
+
+units:
+  netgap-0002-clements:
+    track: netgap
+    hypothesis: netgap-0002
+    status: production
+    description: Reck/Clements decomposition of a programmable unitary into an adjacent-coupler mesh.
+    command:
+      ["{python}", "scripts/run_quantum_network.py", "--primitive", "clements",
+       "--modes", "4", "--output-dir", "results/netgap-0002"]
+
+  netgap-0003-entanglement-swap:
+    track: netgap
+    hypothesis: netgap-0003
+    status: production
+    description: Entanglement swapping via a Bell measurement (quantum-repeater primitive).
+    command:
+      ["{python}", "scripts/run_quantum_network.py", "--primitive", "swap",
+       "--output-dir", "results/netgap-0003"]
+
+  netgap-0004-loss-budget:
+    track: netgap
+    hypothesis: netgap-0004
+    status: production
+    description: Heralded lossy switch chain with an explicit loss budget and monotonicity certificate.
+    command:
+      ["{python}", "scripts/run_quantum_network.py", "--primitive", "loss",
+       "--eta", "0.9", "--switches", "5", "--emit-certificates",
+       "--output-dir", "results/netgap-0004"]
+
+  netgap-0005-qkd:
+    track: netgap
+    hypothesis: netgap-0005
+    status: production
+    description: Exact BB84 asymptotic key rate with a discharged secure-key certificate.
+    command:
+      ["{python}", "scripts/run_quantum_network.py", "--primitive", "qkd",
+       "--qber", "0.05", "--emit-certificates", "--output-dir", "results/netgap-0005"]
+
+  netgap-network-smoke:
+    track: netgap
+    hypothesis: netgap-0002
+    status: production
+    description: Reduced deterministic run of all NetGap network primitives for CI.
+    command:
+      ["{python}", "scripts/run_quantum_network.py", "--primitive", "all",
+       "--modes", "3", "--switches", "3", "--output-dir", "/tmp/netgap-network-smoke"]
+
+groups:
+  netgap-network:
+    - netgap-0002-clements
+    - netgap-0003-entanglement-swap
+    - netgap-0004-loss-budget
+    - netgap-0005-qkd
