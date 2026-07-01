@@ -19,6 +19,7 @@
   <a href="#-the-web-of-inference-traps">Inference traps</a> ·
   <a href="#%EF%B8%8F-gaugegap-track--finite-gauge-system-benchmarks">Gauge systems</a> ·
   <a href="#-curverank-track--riemann-adjacent-spectral-screening">Spectral screening</a> ·
+  <a href="#netgap">NetGap</a> ·
   <a href="#-run-the-foundry">Run the Foundry</a>
 </p>
 
@@ -45,6 +46,7 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 - **GaugeGap** — finite lattice-gauge benchmarks from Z₂ through bounded SU(3) scaffolds.
 - **FlowGap** — finite PDE surrogates and nonlinear systems, including Rössler, Lorenz, and Thomas dynamics.
 - **CurveRank** — certified screening of finite operator truncations against zeta-zero-inspired targets.
+- **NetGap** — the exact unitary core of a photonic quantum switch: non-blocking routing, encoding conversion, and certified coherence preservation.
 - **Physical limits** — familiar physics claims reduced to their exact, bounded computational core.
 - **Spectra and Verdict DSLs** — small languages where certification and evidence are part of program semantics.
 
@@ -64,6 +66,7 @@ flowchart TD
     F --> G["⚛️ GaugeGap<br/>finite gauge systems"]
     F --> FL["🌊 FlowGap<br/>PDEs + nonlinear dynamics"]
     F --> C["📈 CurveRank<br/>finite spectral screening"]
+    F --> N["🛰️ NetGap<br/>photonic quantum switch"]
     F --> P["🌐 Physical limits<br/>certified finite cores"]
     F --> D["🧩 DSLs<br/>Spectra · Verdict"]
 
@@ -75,13 +78,14 @@ flowchart TD
     G --> G1["Z₂ → U(1) → SU(2) → SU(3 scaffold"]
     FL --> FL1["Burgers · Rössler · Lorenz · Thomas"]
     C --> C1["interval eigenvalues<br/>negative-result certificates"]
+    N --> N1["non-blocking routing unitary<br/>fidelity + entanglement preserved"]
     P --> P1["energy · time · information · geometry"]
     D --> D1["claims fail closed"]
 
     classDef main fill:#eef6ff,stroke:#0969da,color:#111;
     classDef edge fill:#f6f0ff,stroke:#6929c4,color:#111;
     class F main;
-    class X,L,A,S,I,G,FL,C,P,D edge;
+    class X,L,A,S,I,G,FL,C,N,P,D edge;
 ```
 
 </details>
@@ -622,6 +626,30 @@ The current artifact rigorously rules out specified **finite truncations** under
 
 ---
 
+<a id="netgap"></a>
+## 🛰️ NetGap Track — the exact core of a photonic quantum switch
+
+Quantum networks need a switch that routes quantum information carried in photons from any input port to any output port **without measuring it** (a measurement would collapse the state). Thin-film-lithium-niobate (TFLN) photonic prototypes do this with a programmable mesh of electro-optic couplers plus encoding converters. NetGap keeps the exactly-computable part — the **unitary switch fabric** — and certifies that routing preserves quantum information.
+
+| Device stage | Exact finite object | Certified statement |
+|---|---|---|
+| Non-blocking switch (any in → any out) | permutation/crossbar unitary on N modes | unitary; **all N! routings** realized |
+| Realized by a coupler mesh | product of embedded 2×2 couplers (sorting network) | mesh reconstructs the fabric with error `0` |
+| Switch without collapsing the state | the fabric is a **unitary channel** | inner products & norm preserved ⇒ **no information loss** (discharged Lean/Coq) |
+| Encoding converters | conversion unitary `U`, `U†U = I` | **round-trip fidelity = 1** |
+| Preserves coherence | routing = local unitary on the photon's subsystem | **entanglement invariant** — route one qubit of a Bell pair, `S = ln 2` unchanged |
+
+```bash
+foundry run netgap-0001-photonic-switch
+foundry run netgap-smoke
+```
+
+📖 [`docs/photonic-quantum-switch.md`](docs/photonic-quantum-switch.md)
+
+> 🧭 **Boundary:** a finite, lossless, unitary linear-optics model — not a hardware device, a TFLN materials/electro-optic claim, a loss/noise/thermal chip model, or a full quantum-network protocol. It is the exact mathematical switch fabric such a device implements.
+
+---
+
 ## 🧩 Honest-by-construction DSLs
 
 | DSL | First-class semantic | Claim form | Backed by | Fails when |
@@ -803,6 +831,7 @@ The project becomes more credible by making the evidence **more explorable witho
 - [`docs/roadmap-prize-impact.md`](docs/roadmap-prize-impact.md) — finite-system-first high-impact research roadmap
 - [`docs/attractor-forge.md`](docs/attractor-forge.md) — nonlinear-dynamics evidence ladder
 - [`docs/navier-stokes.md`](docs/navier-stokes.md) — Navier–Stokes terms mapped to FlowGap code and the 2D surrogate
+- [`docs/photonic-quantum-switch.md`](docs/photonic-quantum-switch.md) — the exact unitary core of a photonic quantum switch (NetGap)
 - [`docs/physical-limits-web.md`](docs/physical-limits-web.md) — physical-limits synthesis
 - [`docs/inference-traps.md`](docs/inference-traps.md) — exact decision-theory demonstrations
 - [`docs/epistemics-and-claim-boundaries.md`](docs/epistemics-and-claim-boundaries.md) — why boundaries matter

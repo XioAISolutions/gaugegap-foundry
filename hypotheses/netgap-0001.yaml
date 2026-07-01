@@ -1,0 +1,39 @@
+id: netgap-0001
+track: NetGap
+model: photonic_quantum_switch_unitary
+scope: finite lossless unitary model of a non-blocking photonic quantum switch
+claim: >
+  A finite N-mode photonic quantum switch modelled as a routing unitary (realized as a
+  mesh of 2x2 couplers) plus an encoding-conversion unitary preserves quantum
+  information exactly: it is non-blocking (every input port reaches every output port),
+  preserves inner products, norm, and fidelity, round-trips the encoding conversion,
+  and leaves the entanglement of a routed pair invariant.
+prediction:
+  observable: routed_fidelity_and_entanglement
+  expected_shape: fidelity_equals_one_and_entanglement_invariant
+controls:
+  modes: 4
+  routing: full_reversal
+  convert_theta: 0.4
+validation:
+  required:
+    - routing_fabric_unitary
+    - all_routings_realized_by_coupler_mesh
+    - inner_products_and_norm_preserved
+    - encoding_round_trip_fidelity_one
+    - entanglement_invariant_under_routing
+    - discharged_fidelity_preservation_certificate
+kill_criteria:
+  - the routing fabric is not unitary
+  - a routing is not realizable as a coupler mesh
+  - routing changes an inner product or the norm
+  - the encoding round trip loses fidelity
+  - routing changes the entanglement of a pair
+status: active
+claim_boundary: >
+  Finite lossless unitary linear-optics model only; not a hardware device, a
+  thin-film-lithium-niobate materials or electro-optic claim, a loss/noise/thermal
+  model of a real chip, or a full quantum-network-protocol result.
+notes:
+  - Inspired by TFLN photonic quantum-switch prototypes; models the exact mathematical
+    switch fabric such a device implements, not the device itself.
