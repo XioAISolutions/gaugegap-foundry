@@ -1,0 +1,24 @@
+version: 1
+
+units:
+  netgap-0001-photonic-switch:
+    track: netgap
+    hypothesis: netgap-0001
+    status: production
+    description: Finite photonic quantum-switch model (non-blocking routing + conversion + coherence certificate).
+    command:
+      ["{python}", "scripts/run_photonic_switch.py", "--modes", "4",
+       "--emit-certificate", "--output-dir", "results/netgap-0001"]
+
+  netgap-smoke:
+    track: netgap
+    hypothesis: netgap-0001
+    status: production
+    description: Reduced deterministic photonic-switch check for CI and local runs.
+    command:
+      ["{python}", "scripts/run_photonic_switch.py", "--modes", "3",
+       "--output-dir", "/tmp/netgap-smoke"]
+
+groups:
+  netgap:
+    - netgap-0001-photonic-switch
