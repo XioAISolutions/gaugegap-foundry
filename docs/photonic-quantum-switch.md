@@ -81,3 +81,36 @@ foundry run netgap-0005-qkd
 > algebra, unit-fidelity Bell measurements, heralded-loss accounting, and the asymptotic
 > one-way BB84 formula. They are not hardware, device-noise, finite-key, or
 > composable-security claims. Each states exactly what it proves and what it does not.
+
+## The noise layer (`netgap-0006`, `netgap-0007`)
+
+The earlier rungs are unitary or heralded-lossless. The noise layer drops that
+idealization and models what a real link does to a qubit, as completely-positive
+trace-preserving (CPTP) Kraus channels — the honest bridge toward hardware.
+
+| ID | Primitive | Exact statement | Certificate |
+|---|---|---|---|
+| `netgap-0006` | **Noise channels** (amplitude/phase/depolarizing) | `F_avg = (2 F_e + 1)/3`; the channel beats the classical measure-and-prepare bound `2/3` iff `F_e > 1/2` | discharged Lean/Coq `F_e ≥ ½ ⇒ F_avg ≥ ⅔` |
+| `netgap-0007` | **Entanglement distribution** over a lossy+noisy link | heralded Bell pair through loss `η` + damping: exact singlet fraction, negativity, concurrence; distillable while singlet fraction `> ½`; rate `~ η` | discharged Lean/Coq `2F − 1 ≥ 0` |
+
+```bash
+foundry run netgap-0006-noise-channels
+foundry run netgap-0007-entanglement-distribution
+```
+
+- **`netgap-0006`** answers "does this link really carry quantum information?" exactly:
+  the **average-fidelity floor `2/3`** is the best any classical (measure-and-prepare)
+  channel can do, so `F_avg > 2/3` is a machine-checkable quantum-advantage witness. For
+  amplitude damping this holds until full relaxation (`γ = 1 → F_avg = ½`); for
+  depolarizing until `p = 2/3`.
+- **`netgap-0007`** is the end-to-end network primitive: send half a Bell pair through
+  the combined **loss + amplitude/phase damping** channel and read off the exact
+  distributed-state entanglement. The pair is **one-copy distillable** while its singlet
+  fraction exceeds `½`, and the raw rate scales with the transmissivity `η` — loss costs
+  rate, noise costs entanglement, both explicit.
+
+> **Boundary:** exact single-qubit CPTP channels and one-copy entanglement criteria. Not
+> a device-calibrated noise model, a full distillation protocol, a finite-key security
+> proof, or a hardware rate guarantee. The next honest rung is a device-parameterized
+> `(T1, T2, η)` budget fitted to a real platform, still reported as evidence, not a
+> guarantee.

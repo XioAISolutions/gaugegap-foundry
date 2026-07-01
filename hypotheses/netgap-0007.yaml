@@ -1,0 +1,27 @@
+id: netgap-0007
+track: NetGap
+model: entanglement_distribution_lossy_noisy
+scope: exact entanglement distribution over a combined lossy and noisy link
+claim: >
+  Sending one qubit of a Bell pair through a heralded lossy link (transmissivity eta)
+  followed by amplitude and phase damping yields a heralded state whose singlet
+  fraction, negativity, and concurrence are computed exactly; the pair is one-copy
+  distillable while its singlet fraction exceeds 1/2, and the raw distribution rate
+  scales with eta.
+prediction:
+  observable: singlet_fraction_and_rate
+  expected_shape: distillable_above_half_rate_scales_with_eta
+validation:
+  required:
+    - exact_heralded_state_from_composed_channels
+    - distillable_while_singlet_fraction_above_half
+    - rate_scales_with_transmissivity
+    - discharged_distillability_certificate
+kill_criteria:
+  - the heralded state is not a valid density matrix
+  - a state with singlet fraction above 1/2 is reported non-distillable
+  - the distribution rate does not scale with eta
+status: active
+claim_boundary: >
+  Exact idealized one-copy entanglement-distribution criteria only; not a hardware rate
+  guarantee, a full distillation protocol, or a finite-key security proof.
