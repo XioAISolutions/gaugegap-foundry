@@ -1,0 +1,19 @@
+id: netgap-0002
+track: NetGap
+model: reck_clements_mesh_decomposition
+scope: exact decomposition of an N-mode unitary into an adjacent 2x2-coupler mesh
+claim: >
+  Any programmable N-mode unitary factors into a mesh of adjacent 2x2 couplers plus a
+  diagonal phase screen (Reck/Clements-style), and the mesh reconstructs the unitary to
+  machine precision.
+validation:
+  required:
+    - adjacent_coupler_mesh_decomposition
+    - reconstruction_error_at_machine_precision
+kill_criteria:
+  - the reconstructed unitary differs from the target beyond numerical tolerance
+  - a coupler acts on non-adjacent modes
+status: active
+claim_boundary: >
+  Exact finite linear-algebra decomposition only; not a hardware calibration or
+  device-fabrication claim.

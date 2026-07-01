@@ -1,0 +1,23 @@
+id: netgap-0003
+track: NetGap
+model: entanglement_swapping
+scope: finite entanglement swapping (quantum-repeater primitive)
+claim: >
+  Two Bell pairs A-B and C-D, followed by a Bell measurement on the middle qubits B-C,
+  project the outer qubits A-D into a maximally entangled state for every measurement
+  outcome, although A and D never interacted.
+prediction:
+  observable: concurrence_of_outer_pair
+  expected_shape: unit_concurrence_for_every_bell_outcome
+validation:
+  required:
+    - bell_measurement_on_middle_qubits
+    - outer_pair_concurrence_one
+    - outcome_probabilities_sum_to_one
+kill_criteria:
+  - an outcome leaves the outer pair non-maximally entangled
+  - outcome probabilities do not sum to one
+status: active
+claim_boundary: >
+  Exact finite-dimensional idealized (unit-fidelity, lossless) model; not a hardware
+  repeater or a rate/loss claim.

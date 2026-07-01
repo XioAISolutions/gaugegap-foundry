@@ -47,14 +47,37 @@ foundry run netgap-0001-photonic-switch
 foundry run netgap-smoke
 ```
 
-## Where this can grow
+## The network layer (`netgap-0002` … `netgap-0005`)
 
-This is the first NetGap layer. Natural finite extensions that stay inside the boundary:
-Clements/Reck decomposition of an arbitrary programmable unitary, entanglement-swapping
-and Bell-measurement routing, a lossy (non-unitary) channel model with an explicit loss
-budget, and a small quantum-key-distribution or entanglement-distribution protocol over
-the finite switch — each with its own certificate and claim boundary.
+The switch fabric is the first rung. The network layer adds the primitives a real
+quantum network needs, each reduced to its exact finite core.
 
-> **Boundary:** a finite unitary that preserves fidelity and entanglement is exact
-> evidence for the switch fabric's mathematics. It does not establish that a physical
-> TFLN chip achieves it, nor that a full quantum network is realizable end to end.
+| ID | Primitive | Exact statement | Certificate |
+|---|---|---|---|
+| `netgap-0002` | **Clements/Reck decomposition** | any programmable N-mode unitary factors into an adjacent 2×2-coupler mesh | reconstruction error at machine precision (~1e-16) |
+| `netgap-0003` | **Entanglement swapping** | two Bell pairs + a Bell measurement on the middle qubits leave the outer pair maximally entangled for **every** outcome | concurrence = 1, outcome probabilities sum to 1 |
+| `netgap-0004` | **Loss budget** | heralded chain of transmissivity `η` over `k` switches: heralded fidelity 1, success `η^k`, monotone loss | discharged Lean/Coq `η·s ≤ s` |
+| `netgap-0005` | **BB84 key rate** | asymptotic secret-key rate `r = 1 − 2h(Q)`, secure below `Q ≈ 0.11` | discharged Lean/Coq `r ≥ 0` when `h(Q) ≤ ½` |
+
+```bash
+foundry run netgap-0002-clements
+foundry run netgap-0003-entanglement-swap
+foundry run netgap-0004-loss-budget
+foundry run netgap-0005-qkd
+```
+
+- **`netgap-0002`** turns the abstract routing unitary into a concrete mesh of couplers
+  (the programmable core of a TFLN switch), verified by exact reconstruction.
+- **`netgap-0003`** is the quantum-repeater primitive: entanglement is *created* between
+  qubits that never met, by measuring their partners — the basis of long-distance
+  quantum links.
+- **`netgap-0004`** is the first honest step toward hardware: loss is explicit. The
+  surviving-photon state is idealized as preserved, but the photon is lost with
+  probability `1 − η^k`, and that loss is certified monotone.
+- **`netgap-0005`** closes the loop with an application: a secure key can be extracted
+  below the BB84 error threshold, discharged as a formal non-negativity certificate.
+
+> **Boundary:** these are finite, exact, idealized models — machine-precision linear
+> algebra, unit-fidelity Bell measurements, heralded-loss accounting, and the asymptotic
+> one-way BB84 formula. They are not hardware, device-noise, finite-key, or
+> composable-security claims. Each states exactly what it proves and what it does not.
