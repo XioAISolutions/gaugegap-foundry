@@ -11,7 +11,7 @@ Reference: <https://www.ryojiikeda.com/project/supersymmetry/>
 
 ## What is included
 
-The complete generated interface contains nine scenes:
+The complete generated interface contains fifteen scenes:
 
 | Scene | Source | Interactive layer | Evidence layer |
 |---|---|---|---|
@@ -22,6 +22,12 @@ The complete generated interface contains nine scenes:
 | SU(3) weights | exact finite representation data | octet/decuplet cycling and rotation | representation-theory boundary |
 | Lagrangian Forge | canonical compact Standard Model catalog | interaction graph, equation wall, symmetry breaking, vertex atlas, coupling sliders | field/sector/vertex inventory, charge and dimension audits, electroweak mass-matrix checks |
 | Anomaly Forge | exact rational chiral charge inventory | hypercharge sliders, anomaly-balance ring, triangle channels, fractional-charge cards, constraint surface | exact local coefficients, global SU(2) parity, solver assumptions, proton/neutron charges |
+| InfoGap | exact three-qubit no-hiding dilation | circuit flow, Bloch transfer, entropy ledger | system bleaching, recovery fidelity, Bell-pair audit, Coq artifact boundary |
+| Entanglement Forge | finite two-qubit Bell state | spectra-style CHSH and no-signaling view | classical bound, Tsirelson value, local-marginal residual, Bluetooth-analogy boundary |
+| UQT Forge | exact finite algebra known-answer tasks | spectra-style reversibility and accuracy view | modular arithmetic, S4 composition, negative control, unitary ledger |
+| Compactification Forge | finite hidden circle/torus spectra | spectra-style KK/winding tower view | zero mode, first excited mass, cutoff visibility, toy-model boundary |
+| Perception Forge | finite fitness-interface evolutionary game | spectra-style truth/interface payoff comparison | payoff advantage, extinction fraction, rich-truth control |
+| Menger Sponge Forge | finite fractal construction stages | spectra-style volume/surface/dimension view | retained cubes, volume, surface area, Hausdorff-dimension estimate, topology boundary |
 | Finite spectra | canonical Hamiltonian factory | visual comparison | Hermiticity audit, matrix digest, finite spectral gap |
 | Mass-radius limits | dimensionless Planck-unit formulas | animated finite plot | explicit formula and scaling boundary |
 
@@ -31,7 +37,7 @@ The Anomaly Forge scene uses exact rational arithmetic in `src/gaugegap/anomaly_
 
 ## Run it
 
-Run the complete nine-scene interface:
+Run the complete fifteen-scene interface:
 
 ```bash
 foundry run foundry-experience-v2
@@ -142,7 +148,27 @@ The ninth scene is built from:
 
 The minimal assignment is unique only under the declared field content, Higgs normalization, generation universality, and Yukawa assumptions. Adding a Dirac right-handed neutrino exposes a one-parameter anomaly-free family.
 
-### 6. Research claim manifests
+### 6. Quantum, topology, and perception forges
+
+The complete scene bundle now includes five bounded concept tracks:
+
+- `src/gaugegap/entanglement_forge.py` — finite Bell-state CHSH and
+  no-signaling checks with a Bluetooth-analogy boundary;
+- `src/gaugegap/quantum/uqt_forge.py` — finite UQT-inspired algebra tasks,
+  reversibility controls, and 5-qubit circuit accounting;
+- `src/gaugegap/compactification_forge.py` — compact circle/torus KK and
+  winding-mode spectra;
+- `src/gaugegap/perception_forge.py` — finite fitness-interface vs truth-coded
+  perception games with resource-budget controls.
+- `src/gaugegap/fractal_topology_forge.py` — finite Menger sponge stage
+  identities, volume/surface trends, and dimension boundary.
+
+These scenes are explanatory finite artifacts.  They do not claim UQT training
+reproduction, extra-dimension evidence, neuroscience evidence, or metaphysical
+proof; the Bell scene also does not claim faster-than-light communication, and
+the Menger scene does not prove the completed fractal's topology.
+
+### 7. Research claim manifests
 
 `src/gaugegap/research_manifest.py` binds each research claim to an explicit claim level, finite scope, assumptions, exclusions, hashed evidence artifacts, methods, parameters, git commit, and external review when relevant.
 
@@ -170,7 +196,12 @@ The full verification stack checks:
 7. canonical Standard Model catalog and interaction graph;
 8. Lagrangian charge, dimension, reference, mixing, and source-boundary audits;
 9. exact anomaly cancellation, a deliberate broken assignment, solver assumptions, and global SU(2) parity;
-10. generation of the complete nine-scene Experience/Experiment site.
+10. UQT-inspired algebra known-answer and reversibility controls;
+11. compact hidden-dimension toy spectra;
+12. fitness-interface perception games with rich-truth controls;
+13. finite Bell-state CHSH/no-signaling checks;
+14. finite Menger sponge stage identities;
+15. generation of the complete fifteen-scene Experience/Experiment site.
 
 ## Architecture
 
@@ -210,5 +241,8 @@ The interface is a scientific communication and exploration layer over finite co
 - a finite PDE surrogate is not Navier–Stokes existence and smoothness;
 - the Standard Model catalog is not a nonperturbative continuum construction or path-integral evaluation;
 - anomaly cancellation under a declared field inventory does not prove uniqueness across every possible theory;
+- UQT-inspired algebra checks are not UQT training reproduction or hardware results;
+- compactification toy spectra are not evidence that extra dimensions exist;
+- fitness-interface simulations are not proof that human perception is false;
 - an interactive visualization is not independent scientific validation;
 - no part of this interface claims a Millennium Prize solution.

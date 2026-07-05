@@ -15,7 +15,7 @@ units:
   anomaly-forge-experience:
     track: gaugegap
     status: production
-    description: Generate the complete nine-scene Experience bundle with interactive anomaly controls.
+    description: Generate the complete Experience bundle with interactive anomaly controls.
     command:
       - "{python}"
       - scripts/generate_foundry_experience_complete.py

@@ -1,0 +1,14 @@
+version: 1
+
+units:
+  brainsnn-gaugegap-showcase:
+    track: showcase
+    status: prototype_scaffold
+    description: Export a bounded GaugeGap research-showcase package for BrainSNN.
+    command:
+      ["{python}", "scripts/export_brainsnn_showcase.py",
+       "--output-dir", "site/brainsnn-gaugegap-showcase"]
+
+groups:
+  brainsnn-showcase:
+    - brainsnn-gaugegap-showcase

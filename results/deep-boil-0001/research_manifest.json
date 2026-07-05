@@ -1,0 +1,64 @@
+{
+  "claims": [
+    {
+      "assumptions": [
+        "registered model equations and finite truncations"
+      ],
+      "claim_id": "deep-boil-0001",
+      "digest": "abcd89790116cd7915d72cadbc6355ea33378db5e7fedc0eab3ff28e2de9bf7a",
+      "evidence": [
+        {
+          "bytes": 27959,
+          "description": "",
+          "kind": "result",
+          "path": "deep_boil.json",
+          "sha256": "bcb052affac8bd27fe74e1ccdafedf922bcf1a9f78769fab541d96d04496223e",
+          "verifier": null
+        },
+        {
+          "bytes": 2306,
+          "description": "",
+          "kind": "report",
+          "path": "DEEP_BOIL.md",
+          "sha256": "25ec15731a2d7b84b4289e4ee721309b2e2bc7e16e3b9fa2a76e43f192542c6a",
+          "verifier": null
+        }
+      ],
+      "exclusions": [
+        "no continuum theorem",
+        "no global strange-attractor proof",
+        "no Yang-Mills or Navier-Stokes Millennium solution",
+        "no physical law or universal quantum-gravity formula",
+        "no UQT training reproduction or hardware result",
+        "no evidence for extra dimensions or conscious realism",
+        "no proof of completed fractal topology",
+        "no faster-than-light communication"
+      ],
+      "external_review": [],
+      "finite_scope": "three finite-time ODE runs, two finite Hamiltonian matrices, finite UQT-inspired algebra tables, compactification toy spectra, finite perception games, finite Menger sponge stages, and a finite two-qubit Bell calculation",
+      "git_commit": "0ddefbcd5b03b2eca1eadf5211282ff292d08dbc",
+      "level": "reproducible_finite_result",
+      "methods": [
+        "RK4",
+        "exact DMD",
+        "interval Picard inclusion",
+        "exact diagonalization",
+        "finite algebra known-answer tables",
+        "finite compactification spectra",
+        "replicator dynamics",
+        "finite fractal stage algebra",
+        "Bell-state CHSH/no-signaling calculation",
+        "weighted geometric synthesis"
+      ],
+      "parameters": {
+        "quantum_gap_score": 0.2333321284990673,
+        "smoke": false
+      },
+      "schema": "gaugegap.research_claim.v1",
+      "statement": "The configured finite dynamics, Koopman, interval-step, Hamiltonian, quantum-reality, topology, entanglement, and Quantum Gap synthesis checks execute under a shared reproducible contract.",
+      "title": "Cross-track finite integration benchmark"
+    }
+  ],
+  "schema": "gaugegap.research_manifest_collection.v1",
+  "warnings": []
+}

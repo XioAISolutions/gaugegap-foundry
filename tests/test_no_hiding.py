@@ -120,10 +120,17 @@ def test_complete_experience_contains_no_hiding_scene():
     spec.loader.exec_module(module)
     dataset = module.build_dataset()
     ids = [scene["id"] for scene in dataset["scenes"]]
-    assert dataset["schema"] == "gaugegap.foundry_experience.v4"
+    assert dataset["schema"] == "gaugegap.foundry_experience.v6"
     assert "no-hiding" in ids
     assert ids.index("no-hiding") == ids.index("standard-model-anomalies") + 1
-    assert len(ids) == 10
+    assert ids[ids.index("no-hiding") + 1 : ids.index("no-hiding") + 6] == [
+        "entanglement-bell",
+        "uqt-algebra",
+        "compactification",
+        "perception-interface",
+        "menger-sponge",
+    ]
+    assert len(ids) == 15
     scene = next(scene for scene in dataset["scenes"] if scene["id"] == "no-hiding")
     assert scene["suite"]["passed"]
     assert scene["selected"]["recovery_fidelity"] == pytest.approx(1.0)

@@ -1,0 +1,34 @@
+id: perception-0001
+track: Perception Forge
+model: finite_fitness_interface_game
+scope: finite evolutionary game comparing truth-coded and fitness-interface perceptual encodings
+claim: >
+  Under a fixed finite percept budget and non-monotone action payoffs, an
+  interface strategy that encodes fitness-relevant distinctions can outcompete a
+  truth-coded strategy that bins objective hidden states by order.
+prediction:
+  observable: replicator_share_after_generations
+  expected_shape: interface_strategy_payoff_exceeds_truth_strategy_and_truth_share_falls_below_extinction_threshold
+controls:
+  state_count: 64
+  action_count: 4
+  percept_count: 4
+  generations: 80
+validation:
+  required:
+    - truth_and_interface_payoffs_recorded
+    - replicator_dynamics_share_recorded
+    - rich_truth_control_reported
+    - claim_boundary_excludes_metaphysical_conclusions
+kill_criteria:
+  - interface payoff does not exceed truth-coded payoff in the registered finite worlds
+  - truth-coded final share does not fall below the configured threshold
+  - artifact claims neuroscience, conscious realism, or quantum-foundation evidence
+  - artifact hides the limited-percept-budget assumption
+status: active
+claim_boundary: >
+  Finite evolutionary-game toy model only; not a proof that perception is false,
+  not a neuroscience result, and not evidence for or against conscious realism,
+  quantum interpretations, or spirituality.
+notes:
+  - Inspired by Donald Hoffman's interface theory of perception and fitness-beats-truth work.

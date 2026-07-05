@@ -1,0 +1,41 @@
+id: quantum-gap-0001
+track: Quantum Gap
+model: finite_cross_track_gap_functional
+scope: weighted fail-closed synthesis of finite spectral, algebraic, geometric, and interface margins
+claim: >
+  The repository can report one bounded Quantum Gap Functional that is positive
+  only when registered finite validation gates pass and all normalized separation
+  terms remain positive.
+formula: >
+  Q_gap = B * exp((sum_i w_i log(eps + g_i)) / (sum_i w_i)),
+  where g_i are normalized finite separation terms, w_i are explicit weights,
+  and B is zero unless all validation gates pass.
+prediction:
+  observable: quantum_gap_score
+  expected_shape: positive_only_when_all_finite_terms_and_boundary_gate_pass
+controls:
+  boundary_gate: fail_closed
+  terms:
+    - normalized_hamiltonian_gap
+    - validated_dynamics_coherence
+    - uqt_reversibility_gap
+    - uqt_unitarity_confidence
+    - compactification_visibility_gap
+    - fitness_interface_gap
+    - fractal_topology_gap
+    - entanglement_nonlocality_gap
+validation:
+  required:
+    - all_term_values_in_unit_interval
+    - boundary_gate_zeroes_score_on_failed_validation
+    - deep_boil_report_records_formula_terms_and_claim_boundary
+kill_criteria:
+  - score remains positive after a validation gate fails
+  - output implies a physical law, universal quantum-gravity formula, or continuum theorem
+  - output uses unbounded or hidden weights
+status: active
+claim_boundary: >
+  Finite cross-track synthesis metric only; not a physical constant, not a
+  universal law of quantum gravity, not a continuum mass-gap theorem, and not
+  evidence for extra dimensions, conscious realism, faster-than-light
+  communication, completed fractal topology, or general quantum AI.

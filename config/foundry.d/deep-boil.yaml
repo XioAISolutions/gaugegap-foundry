@@ -5,7 +5,7 @@ units:
     track: integrity
     hypothesis: deep-boil-0001
     status: production
-    description: Cross-track smoke for DMD, interval ODE validation, Hamiltonian audits, and claim manifests.
+    description: Cross-track smoke for DMD, interval ODE validation, Hamiltonian audits, quantum-reality, topology, entanglement forges, Quantum Gap synthesis, and claim manifests.
     command:
       ["{python}", "scripts/run_deep_boil.py", "--smoke",
        "--output-dir", "/tmp/gaugegap-deep-boil-smoke"]
@@ -14,7 +14,7 @@ units:
     track: integrity
     hypothesis: deep-boil-0001
     status: production
-    description: Full cross-track integration benchmark plus generated Experience/Experiment interface.
+    description: Full cross-track integration benchmark plus topology/entanglement-aware Quantum Gap synthesis and generated complete Experience/Experiment interface.
     command:
       ["{python}", "scripts/run_deep_boil.py", "--generate-experience",
        "--output-dir", "results/deep-boil-0001"]

@@ -1,0 +1,34 @@
+id: compact-0001
+track: Compactification Forge
+model: finite_hidden_circle_spectrum
+scope: finite Kaluza-Klein and winding-mode toy spectra on compact circles and tori
+claim: >
+  A finite compact hidden dimension produces a discrete excitation tower; for a
+  sufficiently small radius and fixed detector cutoff, only the zero mode is
+  visible in the low-energy effective description.
+prediction:
+  observable: compact_mode_mass_spectrum
+  expected_shape: zero_mode_first_and_excited_modes_increase_as_radius_shrinks
+controls:
+  geometry: S1_circle
+  radius: 0.08
+  cutoff: 8.0
+  max_mode: 3
+validation:
+  required:
+    - zero_mode_present
+    - first_excited_mass_positive
+    - finite_mode_table_emitted
+    - low_energy_effective_dimension_recorded
+kill_criteria:
+  - no zero mode is present
+  - first excited mass is non-positive
+  - output implies discovery of real extra dimensions
+  - output implies a Calabi-Yau or string-landscape computation
+status: active
+claim_boundary: >
+  Finite toy compactification spectrum only; not evidence for string theory,
+  not a Calabi-Yau vacuum construction, and not a prediction of observed
+  particle masses or extra dimensions.
+notes:
+  - This is the safe first substrate for string-theory explainer content in Foundry.

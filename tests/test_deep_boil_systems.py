@@ -190,4 +190,13 @@ def test_deep_boil_smoke_command(tmp_path):
     payload = json.loads((output / "deep_boil.json").read_text(encoding="utf-8"))
     assert payload["status"] == "pass"
     assert all(payload["checks"].values())
+    assert payload["quantum_gap"]["passed"]
+    assert payload["quantum_gap"]["score"] > 0.0
+    assert "quantum_reality" in payload
+    assert payload["topology_entanglement"]["menger_sponge"]["passed"]
+    assert payload["topology_entanglement"]["entanglement"]["passed"]
+    assert {term["name"] for term in payload["quantum_gap"]["terms"]} >= {
+        "fractal_topology_gap",
+        "entanglement_nonlocality_gap",
+    }
     assert (output / "research_manifest.json").exists()

@@ -1,0 +1,865 @@
+{
+  "checks": {
+    "all_dmd_errors_finite": true,
+    "all_hamiltonians_hermitian": true,
+    "all_interval_steps_validated": true,
+    "compactification_forge_passed": true,
+    "entanglement_forge_passed": true,
+    "menger_sponge_forge_passed": true,
+    "perception_forge_passed": true,
+    "quantum_gap_functional_passed": true,
+    "uqt_forge_passed": true
+  },
+  "claim_boundary": "cross-track finite integration benchmark only; no continuum theorem, global attractor proof, quantum-gravity law, cognitive-science proof, fractal-topology theorem, faster-than-light communication claim, or Millennium Prize problem solution claim",
+  "dynamics": [
+    {
+      "dmd": {
+        "claim_boundary": "finite sampled DMD/Koopman approximation only; eigenvalues and modes depend on observables, sampling, truncation, and rank selection",
+        "continuous_eigenvalues": [
+          {
+            "imag": 1.1656985893752005,
+            "real": -0.011458836034183763
+          },
+          {
+            "imag": -1.165698589375196,
+            "real": -0.011458836034172762
+          },
+          {
+            "imag": -3.6288375951575187e-16,
+            "real": -0.0675857388689865
+          }
+        ],
+        "dt": 0.02,
+        "eigenvalues": [
+          {
+            "imag": 0.023306517903779245,
+            "real": 0.9994991534812447
+          },
+          {
+            "imag": -0.02330651790377916,
+            "real": 0.999499153481245
+          },
+          {
+            "imag": -7.24787151089276e-18,
+            "real": 0.998649198377552
+          }
+        ],
+        "rank": 3,
+        "reconstruction_error": 0.020426486240499822,
+        "singular_values": [
+          344.1833928791733,
+          288.67639219476894,
+          163.3537564654305
+        ],
+        "spectral_radius": 0.9997708495382952
+      },
+      "dominant_modes": [
+        {
+          "amplitude": 3.9051748661387093,
+          "discrete_magnitude": 0.9997708495382952,
+          "frequency_hz": 0.18552669265431201,
+          "growth_rate": -0.011458836034172762,
+          "index": 1
+        },
+        {
+          "amplitude": 3.905174866138697,
+          "discrete_magnitude": 0.999770849538295,
+          "frequency_hz": 0.1855266926543127,
+          "growth_rate": -0.011458836034183763,
+          "index": 0
+        },
+        {
+          "amplitude": 2.1247693277764155,
+          "discrete_magnitude": 0.998649198377552,
+          "frequency_hz": 5.775474409470252e-17,
+          "growth_rate": -0.0675857388689865,
+          "index": 2
+        }
+      ],
+      "samples": 7201,
+      "system": "rossler",
+      "validated_step": {
+        "claim_boundary": "validated finite-step interval ODE enclosure only; repeated enclosures may grow from wrapping and do not establish a global strange attractor",
+        "dt": 0.002,
+        "endpoint": [
+          [
+            -0.002001600321001644,
+            -0.001999999998798756
+          ],
+          [
+            1.0003959967990377,
+            1.000400160064681
+          ],
+          [
+            0.00039543839529745104,
+            0.0004000000034222124
+          ]
+        ],
+        "initial": [
+          [
+            -1e-15,
+            1e-15
+          ],
+          [
+            0.999999999999999,
+            1.000000000000001
+          ],
+          [
+            -1e-15,
+            1e-15
+          ]
+        ],
+        "iterations": 3,
+        "maximum_endpoint_width": 4.56160812476134e-06,
+        "maximum_tube_width": 0.0020016007206025642,
+        "reason": "Picard image is contained in the interval tube",
+        "system": "rossler",
+        "tube": [
+          [
+            -0.002001600420601564,
+            3.00001e-10
+          ],
+          [
+            0.999999999699879,
+            1.000400160200321
+          ],
+          [
+            -3.00001e-10,
+            0.0004000003000010114
+          ]
+        ],
+        "validated": true
+      }
+    },
+    {
+      "dmd": {
+        "claim_boundary": "finite sampled DMD/Koopman approximation only; eigenvalues and modes depend on observables, sampling, truncation, and rank selection",
+        "continuous_eigenvalues": [
+          {
+            "imag": 0.0,
+            "real": -0.09950982730419036
+          },
+          {
+            "imag": 5.379526378354131,
+            "real": -0.5274074750736946
+          },
+          {
+            "imag": -5.379526378354135,
+            "real": -0.5274074750736886
+          }
+        ],
+        "dt": 0.02,
+        "eigenvalues": [
+          {
+            "imag": 0.0,
+            "real": 0.9980117825818933
+          },
+          {
+            "imag": 0.10625633490618223,
+            "real": 0.9837856791964681
+          },
+          {
+            "imag": -0.1062563349061823,
+            "real": 0.9837856791964682
+          }
+        ],
+        "rank": 3,
+        "reconstruction_error": 0.06595423573865757,
+        "singular_values": [
+          1506.8559119429228,
+          695.7041779136256,
+          174.0388962348807
+        ],
+        "spectral_radius": 0.9980117825818933
+      },
+      "dominant_modes": [
+        {
+          "amplitude": 22.430925277273786,
+          "discrete_magnitude": 0.9980117825818933,
+          "frequency_hz": 0.0,
+          "growth_rate": -0.09950982730419036,
+          "index": 0
+        },
+        {
+          "amplitude": 2.4619092514107264,
+          "discrete_magnitude": 0.9895072871382761,
+          "frequency_hz": 0.8561782146083017,
+          "growth_rate": -0.5274074750736946,
+          "index": 1
+        },
+        {
+          "amplitude": 2.4619092514107224,
+          "discrete_magnitude": 0.9895072871382763,
+          "frequency_hz": 0.8561782146083022,
+          "growth_rate": -0.5274074750736886,
+          "index": 2
+        }
+      ],
+      "samples": 7201,
+      "system": "lorenz",
+      "validated_step": {
+        "claim_boundary": "validated finite-step interval ODE enclosure only; repeated enclosures may grow from wrapping and do not establish a global strange attractor",
+        "dt": 0.002,
+        "endpoint": [
+          [
+            0.9999791664822945,
+            1.0010416751580007
+          ],
+          [
+            1.051894749132463,
+            1.0520629241600399
+          ],
+          [
+            0.9966666249948749,
+            0.9967907623322244
+          ]
+        ],
+        "initial": [
+          [
+            0.999999999999999,
+            1.000000000000001
+          ],
+          [
+            0.999999999999999,
+            1.000000000000001
+          ],
+          [
+            0.999999999999999,
+            1.000000000000001
+          ]
+        ],
+        "iterations": 6,
+        "maximum_endpoint_width": 0.0010625086757061677,
+        "maximum_tube_width": 0.05206292486705483,
+        "reason": "Picard image is contained in the interval tube",
+        "system": "lorenz",
+        "tube": [
+          [
+            0.999979166335845,
+            1.0010416752539986
+          ],
+          [
+            0.9999999993687732,
+            1.052062924235828
+          ],
+          [
+            0.9966666247642216,
+            1.000000000600001
+          ]
+        ],
+        "validated": true
+      }
+    },
+    {
+      "dmd": {
+        "claim_boundary": "finite sampled DMD/Koopman approximation only; eigenvalues and modes depend on observables, sampling, truncation, and rank selection",
+        "continuous_eigenvalues": [
+          {
+            "imag": 0.0,
+            "real": -0.0008660727714669398
+          },
+          {
+            "imag": 0.021462911129440918,
+            "real": -0.0013589743425901002
+          },
+          {
+            "imag": -0.021462911129443114,
+            "real": -0.0013589743425900982
+          }
+        ],
+        "dt": 0.04,
+        "eigenvalues": [
+          {
+            "imag": 0.0,
+            "real": 0.9999653576892
+          },
+          {
+            "imag": 0.0008584696729172364,
+            "real": 0.9999452739985301
+          },
+          {
+            "imag": -0.0008584696729173242,
+            "real": 0.9999452739985301
+          }
+        ],
+        "rank": 3,
+        "reconstruction_error": 0.008338449637000166,
+        "singular_values": [
+          259.59173882050544,
+          89.7850853972476,
+          88.00347686387708
+        ],
+        "spectral_radius": 0.9999653576892
+      },
+      "dominant_modes": [
+        {
+          "amplitude": 4.403352330502224,
+          "discrete_magnitude": 0.9999653576892,
+          "frequency_hz": 0.0,
+          "growth_rate": -0.0008660727714669398,
+          "index": 0
+        },
+        {
+          "amplitude": 1.2124487583149672,
+          "discrete_magnitude": 0.9999456425037186,
+          "frequency_hz": 0.0034159283993925762,
+          "growth_rate": -0.0013589743425901002,
+          "index": 1
+        },
+        {
+          "amplitude": 1.2124487583147898,
+          "discrete_magnitude": 0.9999456425037186,
+          "frequency_hz": 0.0034159283993929258,
+          "growth_rate": -0.0013589743425900982,
+          "index": 2
+        }
+      ],
+      "samples": 11001,
+      "system": "thomas",
+      "validated_step": {
+        "claim_boundary": "validated finite-step interval ODE enclosure only; repeated enclosures may grow from wrapping and do not establish a global strange attractor",
+        "dt": 0.002,
+        "endpoint": [
+          [
+            0.09995836279951573,
+            0.09995838093551633
+          ],
+          [
+            -1.6671409654784994e-10,
+            3.993341482107647e-07
+          ],
+          [
+            0.0001995008385847501,
+            0.0001996668337759348
+          ]
+        ],
+        "initial": [
+          [
+            0.099999999999999,
+            0.100000000000001
+          ],
+          [
+            -1e-15,
+            1e-15
+          ],
+          [
+            -1e-15,
+            1e-15
+          ]
+        ],
+        "iterations": 2,
+        "maximum_endpoint_width": 3.9950086230731255e-07,
+        "maximum_tube_width": 0.00019966723329565872,
+        "reason": "Picard image is contained in the interval tube",
+        "system": "thomas",
+        "tube": [
+          [
+            0.099958362599999,
+            0.10000000020000101
+          ],
+          [
+            -2.0000100241637202e-10,
+            3.994339065735687e-07
+          ],
+          [
+            -2.0000100000000002e-10,
+            0.00019966703329465872
+          ]
+        ],
+        "validated": true
+      }
+    }
+  ],
+  "experience": {
+    "output_dir": "results/deep-boil-0001/experience",
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\n  \"status\": \"pass\",\n  \"output\": \"results/deep-boil-0001/experience/index.html\",\n  \"scenes\": 15,\n  \"preview\": \"results/deep-boil-0001/foundry_experience_preview.svg\",\n  \"claim_boundary\": \"finite deterministic visualizations and browser-side numerical experiments only; no continuum theorem, formal chaos proof, or Millennium Prize solution claim\"\n}\n"
+  },
+  "git_commit": "0ddefbcd5b03b2eca1eadf5211282ff292d08dbc",
+  "hamiltonians": [
+    {
+      "audit": {
+        "claim_boundary": "Finite Z2 lattice gauge toy benchmark only; no continuum Yang-Mills mass-gap claim.",
+        "dimension": 16,
+        "finite": true,
+        "first_excited_energy": -1.2206555615733707,
+        "ground_energy": -1.7204650534085255,
+        "hermitian": true,
+        "hermiticity_residual": 0.0,
+        "implementation_status": "finite_reference",
+        "matrix_digest": "dbf2972809ff6b8cb62a42ae22bb154f4c0134a12ab839bdebe22b7f65af212e",
+        "model_id": "z2-plaquette",
+        "spectral_gap": 0.4998094918351548,
+        "square": true,
+        "trace_imaginary": 0.0,
+        "trace_real": 0.0
+      },
+      "metadata": {
+        "boundary": "open-plaquette-chain",
+        "claim_boundary": "Finite Z2 lattice gauge toy benchmark only; no continuum Yang-Mills mass-gap claim.",
+        "model": "z2_open_plaquette_chain",
+        "n_links": 4,
+        "n_plaquettes": 1,
+        "n_qubits": 4,
+        "plaquette_coupling": 1.0,
+        "plaquettes": [
+          [
+            0,
+            1,
+            2,
+            3
+          ]
+        ],
+        "transverse_field": 0.35
+      },
+      "model": "z2-plaquette",
+      "parameters": {
+        "n_plaquettes": 1,
+        "plaquette_coupling": 1.0,
+        "transverse_field": 0.35
+      }
+    },
+    {
+      "audit": {
+        "claim_boundary": "finite compact U(1) electric-basis truncation only; no continuum gauge-theory or universal mass-gap claim",
+        "dimension": 9,
+        "finite": true,
+        "first_excited_energy": -1.3507810593582126,
+        "ground_energy": -1.4142135623730934,
+        "hermitian": true,
+        "hermiticity_residual": 0.0,
+        "implementation_status": "finite_truncated_reference",
+        "matrix_digest": "1ec75f55442ea79d16a3beb198f9b08dc22f8bcc57ecf76377ec0411e00c8cde",
+        "model_id": "u1-plaquette",
+        "spectral_gap": 0.06343250301488079,
+        "square": true,
+        "trace_imaginary": 0.0,
+        "trace_real": 6.0
+      },
+      "metadata": {
+        "hilbert_dimension": 9,
+        "link_dimension": 3
+      },
+      "model": "u1-plaquette",
+      "parameters": {
+        "g_electric": 1.0,
+        "g_magnetic": 0.5,
+        "n_links": 2,
+        "truncation": 1
+      }
+    }
+  ],
+  "quantum_gap": {
+    "benchmark_id": "quantum-gap-0001",
+    "boundary_gate": 1,
+    "claim_boundary": "finite cross-track synthesis metric only; not a physical constant, not a universal law of quantum gravity, not a continuum mass-gap theorem, and not evidence for extra dimensions, conscious realism, faster-than-light communication, completed fractal topology, or general quantum AI",
+    "equation": "Q_gap = B * exp((sum_i w_i log(eps + g_i)) / (sum_i w_i)); g_i in [0,1], B=1 only when every finite validation gate passes",
+    "passed": true,
+    "schema": "gaugegap.quantum_gap.v1",
+    "score": 0.2333321284990673,
+    "terms": [
+      {
+        "definition": "min finite spectral gap divided by 1 + |E0| + |E1|",
+        "name": "normalized_hamiltonian_gap",
+        "passed": true,
+        "value": 0.016847966434998998,
+        "weight": 1.0
+      },
+      {
+        "definition": "1/(1+max DMD residual), gated by interval-step validation",
+        "name": "validated_dynamics_coherence",
+        "passed": true,
+        "value": 0.9381265784895969,
+        "weight": 0.75
+      },
+      {
+        "definition": "min reversible row-permutation fraction minus irreversible-control fraction",
+        "name": "uqt_reversibility_gap",
+        "passed": true,
+        "value": 0.09090909090909094,
+        "weight": 1.0
+      },
+      {
+        "definition": "1/(1+unitarity residual) for the finite UQT-like circuit scaffold",
+        "name": "uqt_unitarity_confidence",
+        "passed": true,
+        "value": 0.9999999999999984,
+        "weight": 0.5
+      },
+      {
+        "definition": "min positive margin (m_first - cutoff)/(m_first + cutoff)",
+        "name": "compactification_visibility_gap",
+        "passed": true,
+        "value": 0.1627906976744186,
+        "weight": 0.75
+      },
+      {
+        "definition": "minimum interface payoff advantage over truth-coded bins",
+        "name": "fitness_interface_gap",
+        "passed": true,
+        "value": 0.475,
+        "weight": 0.5
+      },
+      {
+        "definition": "geometric mean of finite volume-collapse, surface-growth, and dimension-bridge scores",
+        "name": "fractal_topology_gap",
+        "passed": true,
+        "value": 0.8107137228166935,
+        "weight": 0.5
+      },
+      {
+        "definition": "CHSH violation fraction gated by the no-signaling residual",
+        "name": "entanglement_nonlocality_gap",
+        "passed": true,
+        "value": 0.9999999444888482,
+        "weight": 0.75
+      }
+    ]
+  },
+  "quantum_reality": {
+    "compactification": [
+      {
+        "alpha_prime": 0.005,
+        "benchmark_id": "compact-0001-hidden-circle",
+        "claim_boundary": "finite toy compactification spectrum only; not evidence for string theory, not a Calabi-Yau vacuum construction, and not a prediction of observed particle masses or extra dimensions",
+        "cutoff": 8.0,
+        "effective_dimension_label": "4D-only below cutoff",
+        "first_excited_mass": 12.5,
+        "geometry": "S1 circle",
+        "mode_count": 49,
+        "passed": true,
+        "radii": [
+          0.08
+        ],
+        "schema": "gaugegap.compactification_forge.v1",
+        "visible_mode_count": 1
+      },
+      {
+        "alpha_prime": 0.005,
+        "benchmark_id": "compact-0002-hidden-torus",
+        "claim_boundary": "finite toy compactification spectrum only; not evidence for string theory, not a Calabi-Yau vacuum construction, and not a prediction of observed particle masses or extra dimensions",
+        "cutoff": 8.0,
+        "effective_dimension_label": "4D-only below cutoff",
+        "first_excited_mass": 11.11111111111111,
+        "geometry": "T2 torus",
+        "mode_count": 2401,
+        "passed": true,
+        "radii": [
+          0.08,
+          0.09
+        ],
+        "schema": "gaugegap.compactification_forge.v1",
+        "visible_mode_count": 1
+      }
+    ],
+    "perception": {
+      "benchmark_id": "perception-0001-fitness-interface",
+      "claim_boundary": "finite evolutionary-game toy model only; not a proof that perception is false, not a neuroscience result, and not evidence for or against conscious realism, quantum interpretations, or spirituality",
+      "controls": {
+        "rich_interface_control_payoff": 1.0,
+        "rich_truth_control_note": "With one percept per state and an action payoff oracle, truth-coded perception is no longer resource-limited in this toy setup.",
+        "rich_truth_control_payoff": 1.0,
+        "same_percept_budget": 4
+      },
+      "interface_win_fraction": 1.0,
+      "minimum_payoff_advantage": 0.475,
+      "passed": true,
+      "schema": "gaugegap.perception_forge.v1",
+      "truth_extinction_fraction": 1.0,
+      "world_count": 12
+    },
+    "uqt": {
+      "benchmark_id": "uqt-0001-algebra",
+      "circuit": {
+        "architecture": [
+          "token angles -> SU(2) phase embedding",
+          "sequential token unitaries compose before readout",
+          "single-qubit SU(2) Euler mixing",
+          "cyclic conveyor-belt CNOT ring",
+          "finite known-answer measurement audit"
+        ],
+        "dimension": 32,
+        "embedding_qubits": 5,
+        "layers": 14,
+        "n_qubits": 5,
+        "parameter_count": 690,
+        "unitarity_residual": 1.5333246414209682e-15,
+        "unitary_sha256": "da4b8d3f083e0bab20f0ea9d8fc0ae18eaa4781ebd1fc824d10b07fafe0e0f5b",
+        "vocab_size": 24
+      },
+      "claim_boundary": "finite UQT-inspired algebra benchmark and circuit-accounting artifact only; not an independent reproduction of UQT training, not an IBM Quantum hardware result, and not a claim about general language intelligence or continuum physics",
+      "passed": true,
+      "schema": "gaugegap.uqt_forge.v1",
+      "selected_task": "all",
+      "tasks": [
+        {
+          "accuracy": 1.0,
+          "case_count": 121,
+          "negative_control": false,
+          "passed": true,
+          "reversible_by_rows": true,
+          "row_permutation_fraction": 1.0,
+          "task_id": "mod11-add",
+          "vocab_size": 11
+        },
+        {
+          "accuracy": 1.0,
+          "case_count": 121,
+          "negative_control": true,
+          "passed": true,
+          "reversible_by_rows": false,
+          "row_permutation_fraction": 0.9090909090909091,
+          "task_id": "mod11-mul",
+          "vocab_size": 11
+        },
+        {
+          "accuracy": 1.0,
+          "case_count": 100,
+          "negative_control": false,
+          "passed": true,
+          "reversible_by_rows": true,
+          "row_permutation_fraction": 1.0,
+          "task_id": "mod11-star-mul",
+          "vocab_size": 10
+        },
+        {
+          "accuracy": 1.0,
+          "case_count": 576,
+          "negative_control": false,
+          "passed": true,
+          "reversible_by_rows": true,
+          "row_permutation_fraction": 1.0,
+          "task_id": "s4-cayley",
+          "vocab_size": 24
+        }
+      ]
+    }
+  },
+  "schema": "gaugegap.deep_boil.v1",
+  "smoke": false,
+  "status": "pass",
+  "topology_entanglement": {
+    "entanglement": {
+      "benchmark_id": "entangle-0001",
+      "bluetooth_analogy_boundary": "Bluetooth pairing is a local-device analogy only.  Entanglement correlations are audited here with a no-signaling residual, so the benchmark explicitly does not implement communication through measurement choices.",
+      "chsh_value": 2.82842712474619,
+      "claim_boundary": "finite two-qubit Bell-state calculation only; demonstrates CHSH violation and no-signaling numerically, not faster-than-light communication or a hardware Bell experiment",
+      "classical_bound": 2.0,
+      "classical_control_chsh": 2.0,
+      "correlations": [
+        {
+          "alice_setting": "A0:sigma_z",
+          "bob_setting": "B0:(z+x)/sqrt2",
+          "expectation": -0.7071067811865475
+        },
+        {
+          "alice_setting": "A0:sigma_z",
+          "bob_setting": "B1:(z-x)/sqrt2",
+          "expectation": -0.7071067811865475
+        },
+        {
+          "alice_setting": "A1:sigma_x",
+          "bob_setting": "B0:(z+x)/sqrt2",
+          "expectation": -0.7071067811865475
+        },
+        {
+          "alice_setting": "A1:sigma_x",
+          "bob_setting": "B1:(z-x)/sqrt2",
+          "expectation": 0.7071067811865475
+        }
+      ],
+      "entanglement_gap_score": 0.9999999444888482,
+      "joint_probabilities": [
+        {
+          "alice_outcome": -1,
+          "alice_setting": "A0:sigma_z",
+          "bob_outcome": -1,
+          "bob_setting": "B0:(z+x)/sqrt2",
+          "probability": 0.07322330470336309
+        },
+        {
+          "alice_outcome": -1,
+          "alice_setting": "A0:sigma_z",
+          "bob_outcome": 1,
+          "bob_setting": "B0:(z+x)/sqrt2",
+          "probability": 0.4267766952966368
+        },
+        {
+          "alice_outcome": 1,
+          "alice_setting": "A0:sigma_z",
+          "bob_outcome": -1,
+          "bob_setting": "B0:(z+x)/sqrt2",
+          "probability": 0.4267766952966368
+        },
+        {
+          "alice_outcome": 1,
+          "alice_setting": "A0:sigma_z",
+          "bob_outcome": 1,
+          "bob_setting": "B0:(z+x)/sqrt2",
+          "probability": 0.07322330470336309
+        },
+        {
+          "alice_outcome": -1,
+          "alice_setting": "A0:sigma_z",
+          "bob_outcome": -1,
+          "bob_setting": "B1:(z-x)/sqrt2",
+          "probability": 0.07322330470336309
+        },
+        {
+          "alice_outcome": -1,
+          "alice_setting": "A0:sigma_z",
+          "bob_outcome": 1,
+          "bob_setting": "B1:(z-x)/sqrt2",
+          "probability": 0.4267766952966368
+        },
+        {
+          "alice_outcome": 1,
+          "alice_setting": "A0:sigma_z",
+          "bob_outcome": -1,
+          "bob_setting": "B1:(z-x)/sqrt2",
+          "probability": 0.4267766952966368
+        },
+        {
+          "alice_outcome": 1,
+          "alice_setting": "A0:sigma_z",
+          "bob_outcome": 1,
+          "bob_setting": "B1:(z-x)/sqrt2",
+          "probability": 0.07322330470336309
+        },
+        {
+          "alice_outcome": -1,
+          "alice_setting": "A1:sigma_x",
+          "bob_outcome": -1,
+          "bob_setting": "B0:(z+x)/sqrt2",
+          "probability": 0.07322330470336308
+        },
+        {
+          "alice_outcome": -1,
+          "alice_setting": "A1:sigma_x",
+          "bob_outcome": 1,
+          "bob_setting": "B0:(z+x)/sqrt2",
+          "probability": 0.4267766952966368
+        },
+        {
+          "alice_outcome": 1,
+          "alice_setting": "A1:sigma_x",
+          "bob_outcome": -1,
+          "bob_setting": "B0:(z+x)/sqrt2",
+          "probability": 0.42677669529663687
+        },
+        {
+          "alice_outcome": 1,
+          "alice_setting": "A1:sigma_x",
+          "bob_outcome": 1,
+          "bob_setting": "B0:(z+x)/sqrt2",
+          "probability": 0.07322330470336309
+        },
+        {
+          "alice_outcome": -1,
+          "alice_setting": "A1:sigma_x",
+          "bob_outcome": -1,
+          "bob_setting": "B1:(z-x)/sqrt2",
+          "probability": 0.42677669529663687
+        },
+        {
+          "alice_outcome": -1,
+          "alice_setting": "A1:sigma_x",
+          "bob_outcome": 1,
+          "bob_setting": "B1:(z-x)/sqrt2",
+          "probability": 0.07322330470336309
+        },
+        {
+          "alice_outcome": 1,
+          "alice_setting": "A1:sigma_x",
+          "bob_outcome": -1,
+          "bob_setting": "B1:(z-x)/sqrt2",
+          "probability": 0.07322330470336308
+        },
+        {
+          "alice_outcome": 1,
+          "alice_setting": "A1:sigma_x",
+          "bob_outcome": 1,
+          "bob_setting": "B1:(z-x)/sqrt2",
+          "probability": 0.4267766952966368
+        }
+      ],
+      "no_signaling_residual": 5.551115123125783e-17,
+      "passed": true,
+      "schema": "gaugegap.entanglement_forge.v1",
+      "state_label": "singlet Bell state (|01> - |10>)/sqrt(2)",
+      "tsirelson_bound": 2.8284271247461903,
+      "violation_fraction": 0.9999999999999994,
+      "violation_margin": 0.8284271247461898
+    },
+    "menger_sponge": {
+      "benchmark_id": "menger-0001",
+      "claim_boundary": "finite Menger sponge stage benchmark only; reports algebraic stage identities and convergence direction, not a new theorem about the limit space or a physical material claim",
+      "dimension_bridge_score": 0.8634165139304208,
+      "hausdorff_dimension": 2.7268330278608417,
+      "iterations": 4,
+      "passed": true,
+      "schema": "gaugegap.menger_sponge_forge.v1",
+      "stages": [
+        {
+          "grid_width": 1,
+          "hausdorff_dimension_estimate": 3.0,
+          "removed_cubes": 0,
+          "retained_cubes": 1,
+          "side_length": 1.0,
+          "stage": 0,
+          "surface_area": 6.0,
+          "surface_to_volume": 6.0,
+          "volume": 1.0
+        },
+        {
+          "grid_width": 3,
+          "hausdorff_dimension_estimate": 2.7268330278608417,
+          "removed_cubes": 7,
+          "retained_cubes": 20,
+          "side_length": 0.3333333333333333,
+          "stage": 1,
+          "surface_area": 8.0,
+          "surface_to_volume": 10.8,
+          "volume": 0.7407407407407407
+        },
+        {
+          "grid_width": 9,
+          "hausdorff_dimension_estimate": 2.7268330278608417,
+          "removed_cubes": 329,
+          "retained_cubes": 400,
+          "side_length": 0.1111111111111111,
+          "stage": 2,
+          "surface_area": 13.037037037037038,
+          "surface_to_volume": 23.760000000000005,
+          "volume": 0.5486968449931412
+        },
+        {
+          "grid_width": 27,
+          "hausdorff_dimension_estimate": 2.726833027860842,
+          "removed_cubes": 11683,
+          "retained_cubes": 8000,
+          "side_length": 0.037037037037037035,
+          "stage": 3,
+          "surface_area": 24.75720164609054,
+          "surface_to_volume": 60.91200000000002,
+          "volume": 0.40644210740232684
+        },
+        {
+          "grid_width": 81,
+          "hausdorff_dimension_estimate": 2.7268330278608417,
+          "removed_cubes": 371441,
+          "retained_cubes": 160000,
+          "side_length": 0.012345679012345678,
+          "stage": 4,
+          "surface_area": 51.270233196159126,
+          "surface_to_volume": 170.29440000000005,
+          "volume": 0.30106822770542724
+        }
+      ],
+      "surface_growth_score": 0.8829730308219178,
+      "topological_dimension_label": "literature-boundary: the ideal Menger sponge is a universal curve with topological dimension 1; this runner does not prove that theorem",
+      "volume_collapse_score": 0.6989317722945727
+    }
+  }
+}

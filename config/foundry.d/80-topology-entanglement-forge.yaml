@@ -1,0 +1,43 @@
+version: 1
+
+units:
+  menger-0001-topology:
+    track: topology-forge
+    hypothesis: menger-0001
+    status: prototype_scaffold
+    description: Finite Menger sponge stage identities and convergence-direction audit.
+    command:
+      ["{python}", "scripts/run_menger_sponge_forge.py", "--iterations", "4",
+       "--output-dir", "results/menger-0001-topology"]
+
+  menger-smoke:
+    track: topology-forge
+    hypothesis: menger-0001
+    status: prototype_scaffold
+    description: Reduced finite Menger sponge smoke check.
+    command:
+      ["{python}", "scripts/run_menger_sponge_forge.py", "--iterations", "2",
+       "--output-dir", "/tmp/menger-forge-smoke"]
+
+  entangle-0001-bell:
+    track: entanglement-forge
+    hypothesis: entangle-0001
+    status: prototype_scaffold
+    description: Finite Bell-state CHSH and no-signaling audit.
+    command:
+      ["{python}", "scripts/run_entanglement_forge.py",
+       "--output-dir", "results/entangle-0001-bell"]
+
+  entanglement-smoke:
+    track: entanglement-forge
+    hypothesis: entangle-0001
+    status: prototype_scaffold
+    description: Reduced Bell-state entanglement smoke check.
+    command:
+      ["{python}", "scripts/run_entanglement_forge.py",
+       "--output-dir", "/tmp/entanglement-forge-smoke"]
+
+groups:
+  topology-entanglement-forges:
+    - menger-smoke
+    - entanglement-smoke

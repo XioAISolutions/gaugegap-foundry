@@ -21,5 +21,8 @@ groups:
   deep-boil-all:
     - deep-boil-registry-check
     - next-level-foundation
-    - foundry-experience
+    - quantum-reality-forges
+    - topology-entanglement-forges
+    - foundry-experience-v2
+    - brainsnn-showcase
     - search-and-symbolic

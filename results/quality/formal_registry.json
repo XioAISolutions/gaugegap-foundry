@@ -1,0 +1,415 @@
+{
+  "artifact_count": 45,
+  "artifacts": [
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 12,
+      "path": "figures/geometry/weight_symmetry_adjoint.lean",
+      "prover": "lean4",
+      "sha256": "75a1eb84ba39d264dd98eb3aa7163c1e32b31137c94ff26390dd2ed134c3421d"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 12,
+      "path": "figures/geometry/weight_symmetry_antifundamental.lean",
+      "prover": "lean4",
+      "sha256": "b26d4923e2ca3ab975ad39340ffe17d17a489aebd56940d5d74b354c889f35cd"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 12,
+      "path": "figures/geometry/weight_symmetry_decuplet.lean",
+      "prover": "lean4",
+      "sha256": "dca0d0ce1ac7f56b5d5f7cf6063d5089aa2e2eed5b69842a399e02905c4d0eba"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 12,
+      "path": "figures/geometry/weight_symmetry_fundamental.lean",
+      "prover": "lean4",
+      "sha256": "df697f217c02b28f669c5b89a235cb125049962f79ebea688043158436bedf49"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 12,
+      "path": "figures/geometry/weight_symmetry_sextet.lean",
+      "prover": "lean4",
+      "sha256": "37d3fc5a35446790ad073b448e317d2942d0e18afd23967169c2c2f5421c4cb1"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 92,
+      "path": "formal/infogap/no_hiding_finite.v",
+      "prover": "coq",
+      "sha256": "30643451513a542c0596098570a2c80433a61de9fc4d71ecbd2b533cf3ea33e5"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 21,
+      "path": "results/alcubierre-warp/warp_energy_condition.lean",
+      "prover": "lean4",
+      "sha256": "ad130c6373d7bdca954d0b99c6a42ff8c918da25df2ff33d2658a80f931a6ba9"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 21,
+      "path": "results/certified-bracket/bracket_E0.lean",
+      "prover": "lean4",
+      "sha256": "bca878c084086cc01ef17f3a6f155d0123afb989f1b71c40340e3bd30fa84d73"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 21,
+      "path": "results/cherenkov/cherenkov_cone.lean",
+      "prover": "lean4",
+      "sha256": "10f6a7823ab81b3460b8bbcd1b2a17de2d494568f3984e1fb690895b4aee5238"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 27,
+      "path": "results/curverank-formal/discharged/dirac_rindler_n30_separation.lean",
+      "prover": "lean4",
+      "sha256": "3cce7e9eded1755c344c1bd14e9c216a9f52c3083dcf9577a5a37f8184daedce"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 25,
+      "path": "results/curverank-formal/discharged/dirac_rindler_n30_separation.v",
+      "prover": "coq",
+      "sha256": "5d8285fddc776fde256da7809bff022aa9c7092626c2dfb7c9d853c61b4f4318"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 27,
+      "path": "results/curverank-formal/discharged/quantum_graph_n30_separation.lean",
+      "prover": "lean4",
+      "sha256": "dd6c309b6c0d6bf10b8e9b8c7a853abdda345f2b87a4c52d4470a6cc60965b91"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 25,
+      "path": "results/curverank-formal/discharged/quantum_graph_n30_separation.v",
+      "prover": "coq",
+      "sha256": "6ce09ffa7769de1fcb9504e1337950c9f441c46cd7fd5155271de6386a66349f"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 27,
+      "path": "results/curverank-formal/discharged/xp_n30_separation.lean",
+      "prover": "lean4",
+      "sha256": "73d24dd0d66fd52605f550b6814677161ae3997ca778bde03befed12a3e04028"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 25,
+      "path": "results/curverank-formal/discharged/xp_n30_separation.v",
+      "prover": "coq",
+      "sha256": "b56bb290b7c721784f7549f59a1ca56085417882ba28da4218b6d79809c213f8"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "sorry"
+      ],
+      "lines": 31,
+      "path": "results/curverank-formal/proof_assistants/n10/Berry-Keating_xp_Impossibility_(finite_truncation).lean",
+      "prover": "lean4",
+      "sha256": "4f5089ab06e5b9d1d206ff0b33eac2b01f0d45465bf13d90ac86027a716f4611"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "sorry"
+      ],
+      "lines": 37,
+      "path": "results/curverank-formal/proof_assistants/n10/Berry-Keating_xp_Impossibility_(finite_truncation).thy",
+      "prover": "isabelle",
+      "sha256": "c0a245fad72ae0ac019afcfd05b4f97e21df47af81795e4448e1e3a312eddfb9"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "Admitted."
+      ],
+      "lines": 35,
+      "path": "results/curverank-formal/proof_assistants/n10/Berry-Keating_xp_Impossibility_(finite_truncation).v",
+      "prover": "coq",
+      "sha256": "398591d252e393381400e561031f1742e3976eac15c7b022df2495a97223c673"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "sorry"
+      ],
+      "lines": 31,
+      "path": "results/curverank-formal/proof_assistants/n15/Berry-Keating_xp_Impossibility_(finite_truncation).lean",
+      "prover": "lean4",
+      "sha256": "d438a2a65f20fe6ddf58d4e7f5295e5d581360f58eb7b237ec3f4c867eebc10f"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "sorry"
+      ],
+      "lines": 37,
+      "path": "results/curverank-formal/proof_assistants/n15/Berry-Keating_xp_Impossibility_(finite_truncation).thy",
+      "prover": "isabelle",
+      "sha256": "1b2dba582ffca421cf4badb615d0ec042a8d69771a45ceff3d68102df250e337"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "Admitted."
+      ],
+      "lines": 35,
+      "path": "results/curverank-formal/proof_assistants/n15/Berry-Keating_xp_Impossibility_(finite_truncation).v",
+      "prover": "coq",
+      "sha256": "021dd775e767323485c8bd75525145c3776163b132d9095ae6d8b4005beb7c65"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "sorry"
+      ],
+      "lines": 31,
+      "path": "results/curverank-formal/proof_assistants/n20/Berry-Keating_xp_Impossibility_(finite_truncation).lean",
+      "prover": "lean4",
+      "sha256": "9d7832e9ac1a604346f9ac3a1a20abb1331ed48a298808a7d8c14ceece781005"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "sorry"
+      ],
+      "lines": 37,
+      "path": "results/curverank-formal/proof_assistants/n20/Berry-Keating_xp_Impossibility_(finite_truncation).thy",
+      "prover": "isabelle",
+      "sha256": "cb6a000b46aec906df1ef31b8ae1b541843d9e99819860f70eafca3edd86ee2d"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "Admitted."
+      ],
+      "lines": 35,
+      "path": "results/curverank-formal/proof_assistants/n20/Berry-Keating_xp_Impossibility_(finite_truncation).v",
+      "prover": "coq",
+      "sha256": "c08dae416c14eb10afb0412fc65e987ba1db9d6304e0050bb92a5e906cede6c1"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "sorry"
+      ],
+      "lines": 31,
+      "path": "results/curverank-formal/proof_assistants/n25/Berry-Keating_xp_Impossibility_(finite_truncation).lean",
+      "prover": "lean4",
+      "sha256": "86d70a2684593051ea3540e45f46ee083d717f76b6ca92fa0ceb6627ed1d274b"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "sorry"
+      ],
+      "lines": 37,
+      "path": "results/curverank-formal/proof_assistants/n25/Berry-Keating_xp_Impossibility_(finite_truncation).thy",
+      "prover": "isabelle",
+      "sha256": "a5297dc5ae2771bf437c19de652f3e2b55926baec1538e163957b1e46f1b472c"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "Admitted."
+      ],
+      "lines": 35,
+      "path": "results/curverank-formal/proof_assistants/n25/Berry-Keating_xp_Impossibility_(finite_truncation).v",
+      "prover": "coq",
+      "sha256": "a868c177248187e361b28b0237f263a1229ab7461258661849c942b8b4445b97"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "sorry"
+      ],
+      "lines": 31,
+      "path": "results/curverank-formal/proof_assistants/n30/Berry-Keating_xp_Impossibility_(finite_truncation).lean",
+      "prover": "lean4",
+      "sha256": "b78513809cd40e5d47c834688f6b49c5c82abf5db836e29a859480fba6e13abf"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "sorry"
+      ],
+      "lines": 37,
+      "path": "results/curverank-formal/proof_assistants/n30/Berry-Keating_xp_Impossibility_(finite_truncation).thy",
+      "prover": "isabelle",
+      "sha256": "a44a5f98f8f2a592c135c61122d7afa0ae6fdf983554a6f0ef433fbf418eb01b"
+    },
+    {
+      "hole_free": false,
+      "holes": [
+        "Admitted."
+      ],
+      "lines": 35,
+      "path": "results/curverank-formal/proof_assistants/n30/Berry-Keating_xp_Impossibility_(finite_truncation).v",
+      "prover": "coq",
+      "sha256": "f58b19e2e411ccbf4e5ff5a522a2e6e9bca886c2f471911aea6e4c8652a736bf"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 19,
+      "path": "results/decoherence-branching/branch_count.lean",
+      "prover": "lean4",
+      "sha256": "c79aec044aa9853867ac35c6bc12d1ce6ec80f97a682b7400cc7b347f7ffb418"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 18,
+      "path": "results/entanglement-speed-limit/speed_limit_t_buildup.lean",
+      "prover": "lean4",
+      "sha256": "5ffba52875238f6c991b25e919c8e937ceba463f7ea7e1c399938b215ca568d3"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 20,
+      "path": "results/ergotropy/ergotropy_bound.lean",
+      "prover": "lean4",
+      "sha256": "136d72cfa1ac0d98964ed290bea87c0af70c291d9ef8e69313eebc8c7417f7cb"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 19,
+      "path": "results/lieb-robinson/light_cone.lean",
+      "prover": "lean4",
+      "sha256": "8fd57604c481da7dd8f3a476ae25074e8b60c0edac4dd5ac86edd3ded14e713c"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 20,
+      "path": "results/sonification/aliasing_fold.lean",
+      "prover": "lean4",
+      "sha256": "93348955b4bf92ad6d7632c3a6f854e87d9b6642400fd2d6830e8291c83300c8"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 27,
+      "path": "results/spectra-demo/Md_separation.lean",
+      "prover": "lean4",
+      "sha256": "cc47db719005c37aeecd446dbb6d34d8ee35158013fc7cdc19c7f8ab00a68bb0"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 25,
+      "path": "results/spectra-demo/Md_separation.v",
+      "prover": "coq",
+      "sha256": "b2439a07442dd7aca74c8715e381e2f5adac003c5bb451e3375c92ac077713a9"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 27,
+      "path": "results/spectra-demo/Mq_separation.lean",
+      "prover": "lean4",
+      "sha256": "1ea7d236efb84924b7a2ab1207ab4c4950719a4a2f0b3c528f815e4adb77ff5a"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 25,
+      "path": "results/spectra-demo/Mq_separation.v",
+      "prover": "coq",
+      "sha256": "79c29684bf3071f4ede177f5317d9a9bf52106e6c0cfe6b0f6c28a6c276cab3c"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 27,
+      "path": "results/spectra-demo/Mx_separation.lean",
+      "prover": "lean4",
+      "sha256": "d468385d53a33f58581dff93deadaa99fdab2cfa23077ed9c4a8e07bd32e0345"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 25,
+      "path": "results/spectra-demo/Mx_separation.v",
+      "prover": "coq",
+      "sha256": "3e93723be5b9ad180f4e941764ff1b4b97d17567e44a67e196559b1e482ae1c7"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 17,
+      "path": "results/spectra-demo/xp_monotone.lean",
+      "prover": "lean4",
+      "sha256": "961be5f30ee3771a0623feabe1f9f759d6c34dc142fff3fad1c4f83498646b38"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 16,
+      "path": "results/spectra-demo/xp_monotone.v",
+      "prover": "coq",
+      "sha256": "ea70a2bcebfd39e001fe99e6034f55c8326c309180a49f7282306a2c36bceaf9"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 21,
+      "path": "results/temple-bracket/bracket_E0_temple.lean",
+      "prover": "lean4",
+      "sha256": "6bbff6f1cd03d5d1b69ac214743bd76513f2a73b596e7724b30f7a3c466a80d1"
+    },
+    {
+      "hole_free": true,
+      "holes": [],
+      "lines": 17,
+      "path": "results/temporal-double-slit/time_bandwidth.lean",
+      "prover": "lean4",
+      "sha256": "f0d4ea3ee1480f43b438c071529b8bdb952b061fbf48333d2c425ad765747689"
+    }
+  ],
+  "artifacts_with_holes": [
+    "results/curverank-formal/proof_assistants/n10/Berry-Keating_xp_Impossibility_(finite_truncation).lean",
+    "results/curverank-formal/proof_assistants/n10/Berry-Keating_xp_Impossibility_(finite_truncation).thy",
+    "results/curverank-formal/proof_assistants/n10/Berry-Keating_xp_Impossibility_(finite_truncation).v",
+    "results/curverank-formal/proof_assistants/n15/Berry-Keating_xp_Impossibility_(finite_truncation).lean",
+    "results/curverank-formal/proof_assistants/n15/Berry-Keating_xp_Impossibility_(finite_truncation).thy",
+    "results/curverank-formal/proof_assistants/n15/Berry-Keating_xp_Impossibility_(finite_truncation).v",
+    "results/curverank-formal/proof_assistants/n20/Berry-Keating_xp_Impossibility_(finite_truncation).lean",
+    "results/curverank-formal/proof_assistants/n20/Berry-Keating_xp_Impossibility_(finite_truncation).thy",
+    "results/curverank-formal/proof_assistants/n20/Berry-Keating_xp_Impossibility_(finite_truncation).v",
+    "results/curverank-formal/proof_assistants/n25/Berry-Keating_xp_Impossibility_(finite_truncation).lean",
+    "results/curverank-formal/proof_assistants/n25/Berry-Keating_xp_Impossibility_(finite_truncation).thy",
+    "results/curverank-formal/proof_assistants/n25/Berry-Keating_xp_Impossibility_(finite_truncation).v",
+    "results/curverank-formal/proof_assistants/n30/Berry-Keating_xp_Impossibility_(finite_truncation).lean",
+    "results/curverank-formal/proof_assistants/n30/Berry-Keating_xp_Impossibility_(finite_truncation).thy",
+    "results/curverank-formal/proof_assistants/n30/Berry-Keating_xp_Impossibility_(finite_truncation).v"
+  ],
+  "claim_boundary": "syntactic proof-artifact inventory only; hole-free source still requires successful checking by the declared prover",
+  "hole_free_count": 30,
+  "schema": "gaugegap.formal_registry.v1"
+}

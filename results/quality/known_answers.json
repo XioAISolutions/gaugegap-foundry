@@ -1,0 +1,304 @@
+{
+  "case_count": 4,
+  "cases": [
+    {
+      "case_id": "standard-model-tree-default",
+      "checks": [
+        {
+          "absolute_error": 1.4210854715202004e-14,
+          "actual": 80.39083000000001,
+          "allowed_error": 1e-08,
+          "expected": 80.39083,
+          "passed": true,
+          "path": "m_w"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 91.67959627263474,
+          "allowed_error": 1e-08,
+          "expected": 91.67959627263474,
+          "passed": true,
+          "path": "m_z"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 125.06424911700385,
+          "allowed_error": 1e-08,
+          "expected": 125.06424911700385,
+          "passed": true,
+          "path": "m_h"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 173.23331250543296,
+          "allowed_error": 1e-08,
+          "expected": 173.23331250543296,
+          "passed": true,
+          "path": "m_top"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 4.178491959930041,
+          "allowed_error": 1e-10,
+          "expected": 4.178491959930041,
+          "passed": true,
+          "path": "m_bottom"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 1.7758590829702676,
+          "allowed_error": 1e-10,
+          "expected": 1.7758590829702676,
+          "passed": true,
+          "path": "m_tau"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 0.2311039304113254,
+          "allowed_error": 1e-12,
+          "expected": 0.2311039304113254,
+          "passed": true,
+          "path": "sin2_theta_w"
+        },
+        {
+          "absolute_error": 5.551115123125783e-17,
+          "actual": 0.3139184541608901,
+          "allowed_error": 1e-12,
+          "expected": 0.31391845416089015,
+          "passed": true,
+          "path": "electric_charge_coupling"
+        },
+        {
+          "absolute_error": 1.0329452918190422e-13,
+          "actual": 1.0329452918190422e-13,
+          "allowed_error": 1e-09,
+          "expected": 0.0,
+          "passed": true,
+          "path": "photon_mass_squared_residual"
+        },
+        {
+          "absolute_error": 1.1105317006595362e-16,
+          "actual": 1.1105317006595362e-16,
+          "allowed_error": 1e-12,
+          "expected": 0.0,
+          "passed": true,
+          "path": "mixing_orthogonality_residual"
+        }
+      ],
+      "claim_boundary": "tree-level algebraic Standard Model relations for the configured finite parameter record only",
+      "passed": true,
+      "runner": "standard_model_tree"
+    },
+    {
+      "case_id": "z2-one-plaquette-transverse-only",
+      "checks": [
+        {
+          "absolute_error": 0.0,
+          "actual": 16.0,
+          "allowed_error": 0.0,
+          "expected": 16,
+          "passed": true,
+          "path": "dimension"
+        },
+        {
+          "absolute_error": null,
+          "actual": true,
+          "allowed_error": null,
+          "expected": true,
+          "passed": true,
+          "path": "hermitian"
+        },
+        {
+          "absolute_error": 1.1102230246251565e-16,
+          "actual": -0.8000000000000002,
+          "allowed_error": 1e-12,
+          "expected": -0.8,
+          "passed": true,
+          "path": "ground_energy"
+        },
+        {
+          "absolute_error": 1.6653345369377348e-16,
+          "actual": -0.4000000000000002,
+          "allowed_error": 1e-12,
+          "expected": -0.4,
+          "passed": true,
+          "path": "first_excited_energy"
+        },
+        {
+          "absolute_error": 5.551115123125783e-17,
+          "actual": 0.39999999999999997,
+          "allowed_error": 1e-12,
+          "expected": 0.4,
+          "passed": true,
+          "path": "spectral_gap"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 0.0,
+          "allowed_error": 1e-12,
+          "expected": 0.0,
+          "passed": true,
+          "path": "trace_real"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 0.0,
+          "allowed_error": 1e-12,
+          "expected": 0.0,
+          "passed": true,
+          "path": "trace_imaginary"
+        }
+      ],
+      "claim_boundary": "exact finite four-qubit transverse-field benchmark only",
+      "passed": true,
+      "runner": "hamiltonian_audit"
+    },
+    {
+      "case_id": "z2-one-plaquette-diagonal-only",
+      "checks": [
+        {
+          "absolute_error": 0.0,
+          "actual": 16.0,
+          "allowed_error": 0.0,
+          "expected": 16,
+          "passed": true,
+          "path": "dimension"
+        },
+        {
+          "absolute_error": null,
+          "actual": true,
+          "allowed_error": null,
+          "expected": true,
+          "passed": true,
+          "path": "hermitian"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": -1.0,
+          "allowed_error": 1e-12,
+          "expected": -1.0,
+          "passed": true,
+          "path": "ground_energy"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": -1.0,
+          "allowed_error": 1e-12,
+          "expected": -1.0,
+          "passed": true,
+          "path": "first_excited_energy"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 0.0,
+          "allowed_error": 1e-12,
+          "expected": 0.0,
+          "passed": true,
+          "path": "spectral_gap"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 0.0,
+          "allowed_error": 1e-12,
+          "expected": 0.0,
+          "passed": true,
+          "path": "trace_real"
+        }
+      ],
+      "claim_boundary": "exact finite diagonal plaquette benchmark only",
+      "passed": true,
+      "runner": "hamiltonian_audit"
+    },
+    {
+      "case_id": "infogap-no-hiding-generic-qubit",
+      "checks": [
+        {
+          "absolute_error": null,
+          "actual": true,
+          "allowed_error": null,
+          "expected": true,
+          "passed": true,
+          "path": "passed"
+        },
+        {
+          "absolute_error": 1.1102230246251565e-16,
+          "actual": 1.1102230246251565e-16,
+          "allowed_error": 1e-12,
+          "expected": 0.0,
+          "passed": true,
+          "path": "system_bleaching_trace_distance"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 0.0,
+          "allowed_error": 1e-12,
+          "expected": 0.0,
+          "passed": true,
+          "path": "channel_bleaching_trace_distance"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 1.0,
+          "allowed_error": 1e-12,
+          "expected": 1.0,
+          "passed": true,
+          "path": "recovery_fidelity"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 1.0,
+          "allowed_error": 1e-12,
+          "expected": 1.0,
+          "passed": true,
+          "path": "bell_pair_fidelity"
+        },
+        {
+          "absolute_error": 1.1102230246251565e-16,
+          "actual": 0.9999999999999999,
+          "allowed_error": 1e-12,
+          "expected": 1.0,
+          "passed": true,
+          "path": "system_entropy"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 2.0,
+          "allowed_error": 1e-12,
+          "expected": 2.0,
+          "passed": true,
+          "path": "mutual_information_system_environment"
+        },
+        {
+          "absolute_error": 1.1102230246251565e-16,
+          "actual": -1.1102230246251565e-16,
+          "allowed_error": 1e-12,
+          "expected": 0.0,
+          "passed": true,
+          "path": "mutual_information_system_recovery"
+        },
+        {
+          "absolute_error": 6.312164422641715e-16,
+          "actual": 6.312164422641715e-16,
+          "allowed_error": 1e-12,
+          "expected": 0.0,
+          "passed": true,
+          "path": "unitarity_residual"
+        },
+        {
+          "absolute_error": 0.0,
+          "actual": 0.0,
+          "allowed_error": 1e-12,
+          "expected": 0.0,
+          "passed": true,
+          "path": "channel_completeness_residual"
+        }
+      ],
+      "claim_boundary": "finite three-qubit no-hiding realization and numerical recovery audit only",
+      "passed": true,
+      "runner": "no_hiding"
+    }
+  ],
+  "failed_cases": [],
+  "passed": true,
+  "schema": "gaugegap.benchmark_results.v1"
+}

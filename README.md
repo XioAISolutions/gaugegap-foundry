@@ -43,6 +43,9 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 - **Anomaly Forge** — exact rational charge-consistency tests, a hypercharge solver, and a live anomaly-free surface.
 - **Search Forge** — certified Dijkstra/A* paths, scientific search spaces, and symbolic null controls.
 - **InfoGap** — an exact finite realization of the quantum no-hiding theorem with a discharged Coq certificate.
+- **UQT Forge** — UQT-inspired finite algebra known-answer tasks with reversible and irreversible controls.
+- **Compactification Forge** — finite hidden-dimension toy spectra for KK/winding-mode explanations.
+- **Perception Forge** — finite fitness-interface simulations inspired by Hoffman's perception work, with explicit resource-budget controls.
 - **GaugeGap** — finite lattice-gauge benchmarks from Z₂ through bounded SU(3) scaffolds.
 - **FlowGap** — finite PDE surrogates and nonlinear systems, including Rössler, Lorenz, and Thomas dynamics.
 - **CurveRank** — certified screening of finite operator truncations against zeta-zero-inspired targets.
@@ -63,6 +66,9 @@ flowchart TD
     F --> A["⚖️ Anomaly Forge<br/>charges · constraints · cancellation"]
     F --> S["🧭 Search Forge<br/>paths · proofs · pattern controls"]
     F --> I["🪞 InfoGap<br/>quantum no-hiding theorem"]
+    F --> U["🧠 UQT Forge<br/>finite quantum algebra controls"]
+    F --> K["🧵 Compactification Forge<br/>hidden-dimension spectra"]
+    F --> H["👁️ Perception Forge<br/>fitness interface games"]
     F --> G["⚛️ GaugeGap<br/>finite gauge systems"]
     F --> FL["🌊 FlowGap<br/>PDEs + nonlinear dynamics"]
     F --> C["📈 CurveRank<br/>finite spectral screening"]
@@ -75,6 +81,9 @@ flowchart TD
     A --> A1["exact rational anomalies<br/>hypercharge solver · Witten parity"]
     S --> S1["Dijkstra baseline · A* heuristic contract<br/>symbolic null models"]
     I --> I1["exact dilation · Bell pair<br/>recoverable state · Coq certificate"]
+    U --> U1["Z11 · Z11* · S4<br/>reversibility ledger"]
+    K --> K1["S1 · T2<br/>KK + winding towers"]
+    H --> H1["truth-coded bins<br/>fitness-interface bins"]
     G --> G1["Z₂ → U(1) → SU(2) → SU(3 scaffold"]
     FL --> FL1["Burgers · Rössler · Lorenz · Thomas"]
     C --> C1["interval eigenvalues<br/>negative-result certificates"]
@@ -85,7 +94,7 @@ flowchart TD
     classDef main fill:#eef6ff,stroke:#0969da,color:#111;
     classDef edge fill:#f6f0ff,stroke:#6929c4,color:#111;
     class F main;
-    class X,L,A,S,I,G,FL,C,N,P,D edge;
+    class X,L,A,S,I,U,K,H,G,FL,C,N,P,D edge;
 ```
 
 </details>
@@ -105,7 +114,7 @@ The repository has a self-contained browser interface inspired by the conceptual
 | **Experience** | sensory traversal of verified finite data | auto-cycling scenes, progressive trajectories, rotating geometry, equation fields, scan fields, WebAudio sonification, live schema and commit ticker |
 | **Experiment** | inspect and manipulate the apparatus | equations, ODE, Standard Model, and hypercharge sliders; browser-side RK4 reintegration; anomaly residuals; projections; DMD and interval diagnostics; Lagrangian and Hamiltonian audits; provenance; claim boundaries |
 
-Ten scenes ship in the complete generated bundle (`gaugegap.foundry_experience.v4`):
+Fifteen scenes ship in the complete generated bundle (`gaugegap.foundry_experience.v6`):
 
 1. Rössler dynamics;
 2. Lorenz dynamics;
@@ -115,8 +124,13 @@ Ten scenes ship in the complete generated bundle (`gaugegap.foundry_experience.v
 6. Lagrangian Forge interaction graph, equation wall, symmetry-breaking view, and vertex atlas;
 7. Anomaly Forge balance ring, triangle channels, fractional-charge cards, and anomaly-free surface;
 8. InfoGap no-hiding dilation — the system qubit goes maximally mixed while the original state stays recoverable from the complement;
-9. canonical Z₂ and truncated U(1) spectra;
-10. dimensionless Compton–Schwarzschild mass-radius limits.
+9. Bell-state entanglement boundary with CHSH and no-signaling checks;
+10. UQT-inspired finite quantum algebra controls;
+11. compactification toy spectra for hidden circle/torus dimensions;
+12. fitness-interface vs truth-coded perception game;
+13. Menger sponge finite fractal-topology stages;
+14. canonical Z₂ and truncated U(1) spectra;
+15. dimensionless Compton–Schwarzschild mass-radius limits.
 
 ```mermaid
 flowchart LR
@@ -168,8 +182,12 @@ The generated site uses only HTML, CSS, Canvas, vanilla JavaScript, and optional
 Run the cross-track integration benchmark:
 
 ```bash
+foundry run quantum-reality-forges
+foundry run topology-entanglement-forges
+foundry run brainsnn-showcase
 foundry run deep-boil-smoke
 foundry run deep-boil-0001
+foundry run deep-boil-all
 # or
 make deep-boil
 ```
@@ -189,7 +207,41 @@ The supporting substrate is reusable outside the interface:
 - `src/gaugegap/search_forge.py` — deterministic weighted graphs, Dijkstra, A*, heuristic checks, and hashed certificates;
 - `src/gaugegap/scientific_search_spaces.py` — exact anomaly-repair and research-maturity search spaces;
 - `src/gaugegap/symbolic_search.py` — historical ciphers and deterministic null-model controls;
+- `src/gaugegap/quantum/uqt_forge.py` — UQT-inspired finite algebra tables, reversibility controls, and circuit accounting;
+- `src/gaugegap/compactification_forge.py` — finite compactification spectra and cutoff-visibility checks;
+- `src/gaugegap/perception_forge.py` — finite fitness-interface perception games with rich-truth controls;
+- `src/gaugegap/fractal_topology_forge.py` — finite Menger sponge stage identities, volume/surface trends, and dimension boundary;
+- `src/gaugegap/entanglement_forge.py` — finite Bell-state CHSH/no-signaling checks and Bluetooth-analogy boundary;
+- `src/gaugegap/quantum_gap.py` — the fail-closed finite Quantum Gap synthesis functional;
 - `src/gaugegap/research_manifest.py` — fail-closed claim levels tied to hashed evidence artifacts.
+
+### Quantum Gap Functional
+
+Deep Boil now emits a bounded synthesis scalar called the **Quantum Gap Functional**:
+
+```text
+Q_gap = B * exp((sum_i w_i log(eps + g_i)) / (sum_i w_i))
+```
+
+Here each `g_i` is a normalized finite separation term in `[0, 1]`, each `w_i`
+is an explicit weight, and `B` is a fail-closed boundary gate.  If any registered
+finite validation gate fails, `B = 0` and the score is zero.
+
+The current Deep Boil terms are:
+
+- normalized Hamiltonian spectral gap;
+- validated nonlinear-dynamics coherence from interval-gated DMD residuals;
+- UQT-inspired reversibility gap between reversible algebra tasks and the irreversible multiplication-by-zero control;
+- UQT-like circuit unitarity confidence;
+- compactification cutoff-visibility gap;
+- fitness-interface payoff advantage over truth-coded perception bins.
+- fractal-topology gap from finite Menger sponge volume, surface, and dimension scores;
+- entanglement nonlocality gap from CHSH violation gated by no-signaling residual.
+
+This is our repository-level finite evidence formula.  It is not a physical
+constant, not a quantum-gravity law, not a continuum mass-gap proof, and not
+evidence for extra dimensions, conscious realism, faster-than-light
+communication, completed fractal topology, or general quantum AI.
 
 📖 [`docs/foundry-experience.md`](docs/foundry-experience.md) · 🧬 [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) · ⚖️ [`docs/anomaly-forge.md`](docs/anomaly-forge.md) · 🧭 [`docs/search-forge.md`](docs/search-forge.md) · ✅ [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md)
 
@@ -740,9 +792,14 @@ foundry run anomaly-forge
 foundry run anomaly-forge-experience
 foundry run search-forge
 foundry run symbolic-search-lab
+foundry run quantum-reality-forges
+foundry run topology-entanglement-forges
+foundry run brainsnn-showcase
 foundry run foundry-experience
 foundry run infogap-0001-no-hiding
 foundry run deep-boil-smoke
+foundry run deep-boil-0001
+foundry run deep-boil-all
 foundry run gaugegap-0002
 foundry run flowgap-0001
 foundry run flowgap-0002-rossler
@@ -840,7 +897,7 @@ Good language:
 
 Language this project does not earn:
 
-> continuum Yang–Mills mass-gap proof · nonperturbative Standard Model construction · proof of the Riemann Hypothesis · formal proof of a global strange attractor from a plot · hardware result as mathematical proof · Millennium Prize resolution
+> continuum Yang–Mills mass-gap proof · nonperturbative Standard Model construction · proof of the Riemann Hypothesis · formal proof of a global strange attractor from a plot · hardware result as mathematical proof · faster-than-light communication · proof of completed fractal topology · Millennium Prize resolution
 
 The project becomes more credible by making the evidence **more explorable without making the claims larger**: the experience invites investigation, while the equations, manifests, tests, hashes, audits, and certificates show exactly what every scene does—and does not—establish.
 
@@ -849,11 +906,17 @@ The project becomes more credible by making the evidence **more explorable witho
 ## 📚 Documentation index
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — unified Foundry architecture
-- [`docs/foundry-experience.md`](docs/foundry-experience.md) — nine-scene audiovisual interface, scientific substrate, and boundaries
+- [`docs/foundry-experience.md`](docs/foundry-experience.md) — fifteen-scene audiovisual interface, scientific substrate, and boundaries
 - [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) — Standard Model catalog, graph, controls, and audits
 - [`docs/anomaly-forge.md`](docs/anomaly-forge.md) — exact charge consistency, solver assumptions, interactive views, and claim boundaries
 - [`docs/search-forge.md`](docs/search-forge.md) — certified pathfinding, scientific search spaces, symbolic controls, and boundaries
 - [`docs/no-hiding-theorem.md`](docs/no-hiding-theorem.md) — exact finite quantum no-hiding theorem and its discharged certificate
+- [`docs/uqt-forge.md`](docs/uqt-forge.md) — UQT-inspired finite algebra known-answer and reversibility controls
+- [`docs/compactification-forge.md`](docs/compactification-forge.md) — compact hidden-dimension toy spectra and boundaries
+- [`docs/perception-forge.md`](docs/perception-forge.md) — Hoffman-inspired finite fitness-interface simulations
+- [`docs/menger-sponge-forge.md`](docs/menger-sponge-forge.md) — finite Menger sponge topology/fractal stage benchmark
+- [`docs/entanglement-forge.md`](docs/entanglement-forge.md) — finite Bell-state CHSH and no-signaling benchmark
+- [`docs/brainsnn-foundry-bridge.md`](docs/brainsnn-foundry-bridge.md) — BrainSNN-facing research showcase bridge and boundaries
 - [`docs/end-of-day-integration-2026-06-26.md`](docs/end-of-day-integration-2026-06-26.md) — complete integration inventory
 - [`docs/deep-boil-verification.md`](docs/deep-boil-verification.md) — cross-track verification checkpoint
 - [`docs/roadmap-prize-impact.md`](docs/roadmap-prize-impact.md) — finite-system-first high-impact research roadmap

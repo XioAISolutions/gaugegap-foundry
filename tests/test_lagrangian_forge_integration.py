@@ -23,8 +23,8 @@ def test_complete_dataset_preserves_old_scenes_and_adds_all_extensions():
     module = _load_complete_generator()
     dataset = module.build_dataset()
     ids = [scene["id"] for scene in dataset["scenes"]]
-    assert dataset["schema"] == "gaugegap.foundry_experience.v4"
-    assert len(ids) == 10
+    assert dataset["schema"] == "gaugegap.foundry_experience.v6"
+    assert len(ids) == 15
     assert ids == [
         "rossler",
         "lorenz",
@@ -34,6 +34,11 @@ def test_complete_dataset_preserves_old_scenes_and_adds_all_extensions():
         "standard-model",
         "standard-model-anomalies",
         "no-hiding",
+        "entanglement-bell",
+        "uqt-algebra",
+        "compactification",
+        "perception-interface",
+        "menger-sponge",
         "spectra",
         "limits",
     ]
@@ -64,10 +69,15 @@ def test_complete_generator_writes_interactive_extension_scenes(tmp_path: Path):
     data = json.loads((output / "data.json").read_text(encoding="utf-8"))
     html = (output / "index.html").read_text(encoding="utf-8")
     manifest = json.loads((output / "research_manifest.json").read_text(encoding="utf-8"))
-    assert len(data["scenes"]) == 10
+    assert len(data["scenes"]) == 15
     assert any(scene["id"] == "standard-model" for scene in data["scenes"])
     assert any(scene["id"] == "standard-model-anomalies" for scene in data["scenes"])
     assert any(scene["id"] == "no-hiding" for scene in data["scenes"])
+    assert any(scene["id"] == "entanglement-bell" for scene in data["scenes"])
+    assert any(scene["id"] == "uqt-algebra" for scene in data["scenes"])
+    assert any(scene["id"] == "compactification" for scene in data["scenes"])
+    assert any(scene["id"] == "perception-interface" for scene in data["scenes"])
+    assert any(scene["id"] == "menger-sponge" for scene in data["scenes"])
     assert "drawLagrangian" in html
     assert "drawAnomaly" in html
     assert "drawNoHiding" in html
@@ -75,5 +85,10 @@ def test_complete_generator_writes_interactive_extension_scenes(tmp_path: Path):
     assert "Lagrangian Forge" in html
     assert "Anomaly Forge" in html
     assert "Information Cannot Disappear" in html
-    assert manifest["claims"][0]["parameters"]["scene_count"] == 10
+    assert "Bell Entanglement Boundary" in html
+    assert "Quantum Algebra Interface" in html
+    assert "Compact Hidden Dimensions" in html
+    assert "Fitness Beats Truth Toy Game" in html
+    assert "Menger Sponge Topology Gap" in html
+    assert manifest["claims"][0]["parameters"]["scene_count"] == 15
     assert preview.exists()

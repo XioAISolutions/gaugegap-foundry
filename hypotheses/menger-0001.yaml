@@ -1,0 +1,34 @@
+id: menger-0001
+track: Topology Forge
+model: finite_menger_sponge_stages
+scope: finite construction-stage algebra for the Menger sponge
+claim: >
+  Finite Menger sponge stages can be emitted as auditable artifacts whose
+  retained-cube counts, volume, surface-area formula, and fractal-dimension
+  estimate expose the intuition gap between 3D appearance and limit topology.
+formula: >
+  N_n = 20^n, V_n = (20/27)^n,
+  A_n = 2*(20/9)^n + 4*(8/9)^n,
+  dim_H = log(20)/log(3).
+prediction:
+  observable: finite_menger_stage_table
+  expected_shape: volume_decreases_surface_area_increases_dimension_matches_log20_over_log3
+controls:
+  boundary:
+    - stage_zero_is_the_unit_cube
+    - topological_dimension_label_is_literature_boundary_not_local_proof
+validation:
+  required:
+    - retained_cubes_match_closed_form
+    - volume_strictly_decreases_for_registered_stages
+    - surface_area_strictly_increases_for_registered_stages
+    - dimension_estimate_matches_log20_over_log3
+kill_criteria:
+  - finite stage is described as the completed infinite sponge
+  - output claims to prove topological dimension 1
+  - output implies physical material feasibility
+status: active
+claim_boundary: >
+  Finite Menger sponge stage benchmark only; reports algebraic stage identities
+  and convergence direction, not a new theorem about the limit space or a
+  physical material claim.

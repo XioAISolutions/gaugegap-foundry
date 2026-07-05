@@ -1,0 +1,36 @@
+id: entangle-0001
+track: Entanglement Forge
+model: finite_bell_state_chsh_no_signaling
+scope: two-qubit singlet CHSH calculation with no-signaling audit
+claim: >
+  A finite Bell-state artifact can show quantum correlations exceeding the
+  classical CHSH bound while simultaneously confirming that local marginals do
+  not encode a usable communication channel.
+formula: >
+  S = |E(A0,B0) + E(A0,B1) + E(A1,B0) - E(A1,B1)|,
+  with classical bound 2 and singlet-state value 2*sqrt(2).
+prediction:
+  observable: chsh_value
+  expected_shape: chsh_value_equals_tsirelson_bound_and_no_signaling_residual_is_zero
+controls:
+  classical_control:
+    - enumerate_local_deterministic_assignments
+    - maximum_chsh_is_2
+  analogy_boundary:
+    - bluetooth_pairing_is_local_device_metaphor_only
+    - no_signaling_residual_is_the_gate_against_communication_claims
+validation:
+  required:
+    - chsh_value_exceeds_classical_bound
+    - chsh_value_matches_tsirelson_bound_for_registered_axes
+    - no_signaling_residual_below_tolerance
+    - classical_control_chsh_does_not_exceed_2
+kill_criteria:
+  - output claims faster_than_light_communication
+  - output describes the calculation as a hardware Bell experiment
+  - output treats Bluetooth as more than an analogy
+status: active
+claim_boundary: >
+  Finite two-qubit Bell-state calculation only; demonstrates CHSH violation
+  and no-signaling numerically, not faster-than-light communication or a
+  hardware Bell experiment.

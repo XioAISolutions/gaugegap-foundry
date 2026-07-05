@@ -3,7 +3,8 @@
 
 The original generator remains the stable seven-scene engine. This canonical wrapper
 extends its dataset and self-contained HTML through fail-closed layers so every existing
-scene remains intact while Lagrangian Forge, Anomaly Forge, and InfoGap no-hiding are added.
+scene remains intact while Lagrangian Forge, Anomaly Forge, InfoGap no-hiding,
+and the quantum/topology/reality forge scenes are added.
 """
 from __future__ import annotations
 
@@ -28,6 +29,7 @@ from gaugegap.no_hiding_scene import (  # noqa: E402
     enhance_dataset as enhance_no_hiding_dataset,
     enhance_html as enhance_no_hiding_html,
 )
+from gaugegap.reality_forge_scene import enhance_dataset as enhance_reality_dataset  # noqa: E402
 
 BASE_SCRIPT = ROOT / "scripts" / "generate_foundry_experience.py"
 SPEC = importlib.util.spec_from_file_location("gaugegap_base_foundry_experience", BASE_SCRIPT)
@@ -43,7 +45,8 @@ _BASE_BUILD_DATASET = BASE.build_dataset
 def _complete_dataset():
     dataset = enhance_lagrangian_dataset(_BASE_BUILD_DATASET())
     dataset = enhance_anomaly_dataset(dataset)
-    return enhance_no_hiding_dataset(dataset)
+    dataset = enhance_no_hiding_dataset(dataset)
+    return enhance_reality_dataset(dataset)
 
 
 BASE.build_dataset = _complete_dataset

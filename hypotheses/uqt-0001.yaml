@@ -1,0 +1,37 @@
+id: uqt-0001
+track: UQT Forge
+model: finite_uqt_inspired_algebra_benchmark
+scope: finite known-answer algebra tasks with a UQT-like 5-qubit circuit-accounting scaffold
+claim: >
+  A bounded UQT-inspired benchmark can encode exact finite algebra tasks as
+  auditable known-answer tables, distinguish reversible group-like operations
+  from an irreversible negative control, and record the qubit/parameter/unitarity
+  ledger needed before any training or hardware claim is attempted.
+prediction:
+  observable: exact_case_accuracy_and_reversibility_controls
+  expected_shape: reversible_tasks_pass_known_answers_and_irreversible_zero_multiplication_remains_flagged
+controls:
+  n_qubits: 5
+  modular_field: Z_11
+  non_abelian_group: S4
+validation:
+  required:
+    - mod11_addition_known_answers
+    - mod11_star_multiplication_known_answers
+    - s4_cayley_known_answers
+    - multiplication_with_zero_negative_control
+    - uqt_like_unitary_residual_recorded
+kill_criteria:
+  - a known-answer algebra case fails
+  - multiplication including zero is reported as reversible
+  - the unitary skeleton fails the residual tolerance
+  - artifacts imply independent UQT training reproduction without optimizer evidence
+  - artifacts imply hardware execution without provider job metadata
+status: active
+claim_boundary: >
+  Finite UQT-inspired algebra benchmark only; not an independent reproduction of
+  Universal Quantum Transformer training, not a hardware result, not a language
+  model, and not evidence for general intelligence.
+notes:
+  - Literature inspiration: arXiv:2606.00045, Universal Quantum Transformer.
+  - The first Foundry artifact is deliberately an evidence pack, not a training loop.

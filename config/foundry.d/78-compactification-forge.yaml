@@ -1,0 +1,24 @@
+version: 1
+
+units:
+  compact-0001-hidden-circle:
+    track: compactification-forge
+    hypothesis: compact-0001
+    status: prototype_scaffold
+    description: Finite compact hidden-dimension toy spectrum with KK/winding modes.
+    command:
+      ["{python}", "scripts/run_compactification_forge.py", "--geometry", "suite",
+       "--output-dir", "results/compact-0001-hidden-circle"]
+
+  compactification-smoke:
+    track: compactification-forge
+    hypothesis: compact-0001
+    status: prototype_scaffold
+    description: Reduced circle compactification smoke check.
+    command:
+      ["{python}", "scripts/run_compactification_forge.py", "--geometry", "circle",
+       "--max-mode", "2", "--output-dir", "/tmp/compactification-forge-smoke"]
+
+groups:
+  compactification-forge:
+    - compact-0001-hidden-circle

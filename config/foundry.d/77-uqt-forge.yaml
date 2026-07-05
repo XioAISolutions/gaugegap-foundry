@@ -1,0 +1,24 @@
+version: 1
+
+units:
+  uqt-0001-algebra:
+    track: uqt-forge
+    hypothesis: uqt-0001
+    status: prototype_scaffold
+    description: UQT-inspired finite algebra known-answer benchmark with reversible/irreversible controls.
+    command:
+      ["{python}", "scripts/run_uqt_forge.py", "--task", "all",
+       "--output-dir", "results/uqt-0001-algebra"]
+
+  uqt-smoke:
+    track: uqt-forge
+    hypothesis: uqt-0001
+    status: prototype_scaffold
+    description: Reduced UQT-inspired finite modular-addition smoke check.
+    command:
+      ["{python}", "scripts/run_uqt_forge.py", "--task", "mod11-add",
+       "--output-dir", "/tmp/uqt-forge-smoke"]
+
+groups:
+  uqt-forge:
+    - uqt-0001-algebra

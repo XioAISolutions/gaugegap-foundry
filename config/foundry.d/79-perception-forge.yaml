@@ -1,0 +1,29 @@
+version: 1
+
+units:
+  perception-0001-fitness-interface:
+    track: perception-forge
+    hypothesis: perception-0001
+    status: prototype_scaffold
+    description: Finite Hoffman-inspired fitness-interface vs truth-coded perception game.
+    command:
+      ["{python}", "scripts/run_perception_forge.py", "--world-count", "12",
+       "--output-dir", "results/perception-0001-fitness-interface"]
+
+  perception-smoke:
+    track: perception-forge
+    hypothesis: perception-0001
+    status: prototype_scaffold
+    description: Reduced finite fitness-interface smoke check.
+    command:
+      ["{python}", "scripts/run_perception_forge.py", "--world-count", "4",
+       "--output-dir", "/tmp/perception-forge-smoke"]
+
+groups:
+  perception-forge:
+    - perception-0001-fitness-interface
+
+  quantum-reality-forges:
+    - uqt-smoke
+    - compactification-smoke
+    - perception-smoke
