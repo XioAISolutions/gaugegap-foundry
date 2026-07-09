@@ -20,6 +20,7 @@
   <a href="#%EF%B8%8F-gaugegap-track--finite-gauge-system-benchmarks">Gauge systems</a> ·
   <a href="#-curverank-track--riemann-adjacent-spectral-screening">Spectral screening</a> ·
   <a href="#netgap">NetGap</a> ·
+  <a href="#-the-quantum-gap--one-formula-for-every-certificate">The Quantum Gap</a> ·
   <a href="#-run-the-foundry">Run the Foundry</a>
 </p>
 
@@ -575,6 +576,7 @@ flowchart LR
 | `gaugegap-0003` | SU(2) pure gauge | finite non-abelian benchmark |
 | `gaugegap-0004` | SU(2) gauge-matter / hardware readiness | local checks before optional provider submission |
 | `gaugegap-0005` | SU(3) scaffold | explicit `prototype_scaffold` status |
+| `gaugegap-0006` | SU(3) **exact single plaquette** | exact character-basis Hamiltonian; real magnetic term + Wilson loop; Gauss law by construction |
 | `gaugegap-search-0001` | finite gap-candidate search | ranks size survival, perturbation stability, replicas, residuals |
 
 <p align="center">
@@ -583,7 +585,18 @@ flowchart LR
   <img src="figures/decuplet_weight_diagram.svg" alt="SU(3) decuplet weight diagram" width="330"/>
 </p>
 
-> 🧭 **Boundary:** all GaugeGap results are finite-lattice or finite-Hilbert-space benchmarks. There is no continuum Yang–Mills mass-gap claim.
+The SU(3) exact building block now exists: `gaugegap-0006` supplies the exactly-tractable
+single-plaquette case the multi-plaquette scaffold (`gaugegap-0005`) is missing — a genuinely
+gauge-invariant Kogut–Susskind Hamiltonian in the irrep (character) basis with a *real*
+magnetic term via the exact fusion rule `(p,q) ⊗ (1,0)`, a real Wilson loop `⟨(1/3) Re Tr U⟩`,
+Gauss's law satisfied by construction, and truncation convergence. The `gaugegap-0005` scaffold
+is unchanged and still honestly bounded.
+
+```bash
+foundry run gaugegap-0006-su3-plaquette
+```
+
+> 🧭 **Boundary:** all GaugeGap results are finite-lattice or finite-Hilbert-space benchmarks. `gaugegap-0006` is an exact *single-plaquette* SU(3) truncation — not a multi-plaquette lattice, a continuum limit, or a Yang–Mills mass-gap claim. There is no continuum Yang–Mills mass-gap claim.
 
 ---
 
@@ -675,6 +688,52 @@ foundry run netgap-0007-entanglement-distribution
 📖 [`docs/photonic-quantum-switch.md`](docs/photonic-quantum-switch.md)
 
 > 🧭 **Boundary:** a finite, lossless, unitary linear-optics model — not a hardware device, a TFLN materials/electro-optic claim, a loss/noise/thermal chip model, or a full quantum-network protocol. It is the exact mathematical switch fabric such a device implements.
+
+---
+
+## 🧮 The Quantum Gap — one formula for every certificate
+
+Across every track above, each certified result turns out to be the **same mathematical
+object**: the verified lower endpoint of a finite enclosure of an observable, held strictly
+above an explicit floor. Name that functional the **Quantum Gap**:
+
+$$\mathrm{QG}(O, \beta) \;:=\; \mathrm{lower}(O) - \beta$$
+
+where `lower(O)` is the *rigorous* lower bound of a finite enclosure `[low, high]` of an
+observable `O`, and `β` is a declared floor or target. **A claim is certified exactly when
+`QG > 0`.** The tracks differ only in what `O` and `β` are:
+
+| Track | `O` — enclosed observable | `β` — floor | Certified statement |
+|---|---|---|---|
+| GaugeGap | `E₁ − E₀` (spectral gap) | `0` | finite gap is positive |
+| CurveRank | minimum certified level spacing | `0` | spectrum is separated |
+| FlowGap | energy-decay rate | `0` | finite dynamics dissipate |
+| NetGap (advantage) | average channel fidelity | `2/3` | beats the classical floor |
+| NetGap (security) | BB84 key rate `r = 1 − 2h(Q)` | `0` | key is secure |
+| Physical limits | demonstrated margin | established bound | bound is respected with slack |
+
+`quantumgap-0001` runs the program **end to end**: it pushes one representative observable
+from every track through the *same* formula and reports each as a `(low, floor, gap, certified)`
+row, alongside one generic discharged Lean 4 / Coq proof that `low ≥ β + m ⇒ QG ≥ m` (no holes).
+
+```bash
+foundry run quantumgap-0001-unified
+```
+
+```
+[GaugeGap ]  Z2 chain spectral gap            QG = +0.0235   CERT
+[GaugeGap ]  SU(3) single-plaquette gap       QG = +1.0265   CERT
+[CurveRank]  xp minimum certified spacing     QG = +1.8789   CERT
+[FlowGap  ]  Taylor–Green energy-decay rate   QG = +3.1254   CERT
+[NetGap   ]  depolarizing channel fidelity    QG = +0.2833   CERT
+[NetGap   ]  BB84 secure key rate             QG = +0.4272   CERT
+[Limits   ]  Landauer two-bit erasure margin  QG = +0.6931   CERT
+```
+
+> 🧭 **Boundary:** the Quantum Gap is a *unifying bookkeeping functional over verified finite
+> enclosures*. It makes the repository's existing certificates one formula; it is **not new
+> physics** and proves nothing beyond each underlying finite certificate. Every row keeps its
+> own track's claim boundary (finite-system, toy, or established-bound).
 
 ---
 
@@ -849,6 +908,7 @@ The project becomes more credible by making the evidence **more explorable witho
 ## 📚 Documentation index
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — unified Foundry architecture
+- [`docs/quantum-gap.md`](docs/quantum-gap.md) — the Quantum Gap, the one formula unifying every track's certificate
 - [`docs/foundry-experience.md`](docs/foundry-experience.md) — nine-scene audiovisual interface, scientific substrate, and boundaries
 - [`docs/lagrangian-forge.md`](docs/lagrangian-forge.md) — Standard Model catalog, graph, controls, and audits
 - [`docs/anomaly-forge.md`](docs/anomaly-forge.md) — exact charge consistency, solver assumptions, interactive views, and claim boundaries

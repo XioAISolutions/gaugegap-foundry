@@ -1,0 +1,23 @@
+version: 1
+
+units:
+  quantumgap-0001-unified:
+    track: quantumgap
+    hypothesis: quantumgap-0001
+    status: production
+    description: The unified Quantum Gap report - one certified QG = lower(O) - floor row per track (the program end to end).
+    command:
+      ["{python}", "scripts/run_quantum_gap.py", "--emit-certificate",
+       "--output-dir", "results/quantumgap-0001"]
+
+  quantumgap-smoke:
+    track: quantumgap
+    hypothesis: quantumgap-0001
+    status: production
+    description: Reduced deterministic Quantum Gap report for CI and local runs.
+    command:
+      ["{python}", "scripts/run_quantum_gap.py", "--output-dir", "/tmp/quantumgap-smoke"]
+
+groups:
+  quantumgap:
+    - quantumgap-0001-unified

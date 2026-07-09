@@ -318,7 +318,7 @@ gaugegap-foundry/
 │   ├── API.md                         # API documentation
 │   ├── INSTALL.md                     # Installation guide
 │   ├── quantum-mvp-plan.md            # Quantum hardware plan
-│   ├── 3DAY_SPRINT.md                 # Sprint guide
+│   ├── archive/                       # Archived status docs (incl. sprint guide)
 │   └── QUICKSTART.md                  # Quick start guide
 ├── scripts/
 │   ├── generate_publication_figures.py # NEW: Publication figures

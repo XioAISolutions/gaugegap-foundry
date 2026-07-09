@@ -1,0 +1,43 @@
+id: quantumgap-0001
+track: QuantumGap
+model: unified_gap_functional
+scope: >
+  a unifying bookkeeping functional over the repository's verified finite enclosures,
+  QG(O, floor) = lower(O) - floor, evaluated once per Foundry track
+claim: >
+  Every certified result in the Foundry is the same mathematical object: the verified
+  lower endpoint of a finite enclosure of an observable held strictly above an explicit
+  floor. Defining the Quantum Gap QG(O, floor) = lower(O) - floor, a claim is certified
+  exactly when QG > 0, and one representative observable from each track (GaugeGap Z2
+  chain and SU(3) single-plaquette spectral gaps, CurveRank minimum certified level
+  spacing, FlowGap Taylor-Green energy-decay rate, NetGap channel-fidelity advantage and
+  BB84 key rate, and a Landauer erasure-cost margin) is certified through this one
+  formula.
+prediction:
+  observable: unified_quantum_gap
+  expected_shape: every_representative_row_certified_positive
+controls:
+  tracks: [GaugeGap, CurveRank, FlowGap, NetGap, Limits]
+  formula: "QG(O, floor) = lower(O) - floor"
+validation:
+  required:
+    - formula_algebra_gap_equals_low_minus_floor
+    - certified_iff_gap_positive
+    - per_track_constructors_reuse_certified_kernels
+    - quantum_gap_certificate_no_holes
+    - unified_report_at_least_six_certified_rows
+kill_criteria:
+  - gap is not exactly lower(O) - floor
+  - a row reports certified while its gap is non-positive
+  - the discharged certificate contains a hole (sorry/Admitted)
+  - the unified report yields fewer than six certified rows
+status: active
+claim_boundary: >
+  QG is a unifying bookkeeping functional over verified finite enclosures. It makes the
+  repository's existing certificates one formula; it is not new physics and proves
+  nothing beyond each underlying finite certificate. Each row retains its own track's
+  claim boundary (finite-system, toy, or established-bound).
+notes:
+  - The formula does not add any claim; it re-expresses existing certificates uniformly.
+  - lower(O) is always a rigorous lower bound of a finite enclosure, never a point estimate.
+  - No claim of Millennium Prize resolution - a bookkeeping unification only.

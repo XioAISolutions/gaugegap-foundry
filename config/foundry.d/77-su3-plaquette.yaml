@@ -1,0 +1,27 @@
+version: 1
+
+units:
+  gaugegap-0006-su3-plaquette:
+    track: gaugegap
+    hypothesis: gaugegap-0006
+    status: production
+    description: Exact single-plaquette SU(3) character-basis benchmark (gap + Wilson loop + convergence + gap-positivity certificate).
+    command:
+      ["{python}", "scripts/run_su3_plaquette.py",
+       "--couplings", "0.7", "1.0", "1.5", "2.0", "3.0", "5.0",
+       "--cutoff", "8", "--emit-certificate",
+       "--output-dir", "results/gaugegap-0006"]
+
+  gaugegap-0006-smoke:
+    track: gaugegap
+    hypothesis: gaugegap-0006
+    status: production
+    description: Reduced deterministic single-plaquette SU(3) check for CI and local runs.
+    command:
+      ["{python}", "scripts/run_su3_plaquette.py",
+       "--couplings", "1.0", "3.0", "--cutoff", "5",
+       "--output-dir", "/tmp/gaugegap-0006-smoke"]
+
+groups:
+  gaugegap-su3-plaquette:
+    - gaugegap-0006-su3-plaquette

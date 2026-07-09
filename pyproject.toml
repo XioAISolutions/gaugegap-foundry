@@ -83,6 +83,7 @@ smt = [
 ]
 dev = [
   "pytest>=8",
+  "pytest-cov>=5",
   "scipy>=1.11",
   "z3-solver>=4.12",
 ]

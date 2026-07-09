@@ -10,7 +10,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 DEFAULT_INCLUDE = ("README.md", "DEPLOYMENT.md", "docs", "hypotheses", "results")
-DEFAULT_EXCLUDE_PARTS = (".git", ".venv", "__pycache__", ".pytest_cache", "node_modules")
+# "archive" holds unmaintained historical snapshots (see docs/archive/README.md);
+# their superseded claims are not active statements of this repository.
+DEFAULT_EXCLUDE_PARTS = (".git", ".venv", "__pycache__", ".pytest_cache", "node_modules", "archive")
 
 RISK_PATTERNS = [
     ("millennium_solution", re.compile(r"\b(solved|solution to|proof of)\s+(a\s+|the\s+)?(millennium|yang[- ]mills|navier[- ]stokes|riemann)\b", re.I)),

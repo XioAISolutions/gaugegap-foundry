@@ -75,7 +75,13 @@ class HamiltonianAudit:
 
 
 def registered_models() -> tuple[str, ...]:
-    return ("z2-plaquette", "u1-plaquette", "su2-pure-prototype", "su3-pure-prototype")
+    return (
+        "z2-plaquette",
+        "u1-plaquette",
+        "su2-pure-prototype",
+        "su3-pure-prototype",
+        "su3-single-plaquette",
+    )
 
 
 def build_hamiltonian(model_id: str, **parameters: object) -> HamiltonianArtifact:
@@ -185,6 +191,32 @@ def build_hamiltonian(model_id: str, **parameters: object) -> HamiltonianArtifac
                 "hilbert_dimension": lattice.hilbert_dim,
                 "gauss_law_verified": False,
                 "magnetic_term_complete": False,
+            },
+        )
+
+    if model == "su3-single-plaquette":
+        from gaugegap.gaugegap_su3_plaquette import (
+            CLAIM_BOUNDARY,
+            IMPLEMENTATION_STATUS,
+            hamiltonian_dense,
+            irrep_basis,
+        )
+
+        params = {
+            "coupling": float(parameters.get("coupling", 1.0)),
+            "cutoff": int(parameters.get("cutoff", 5)),
+        }
+        matrix = hamiltonian_dense(**params)
+        return HamiltonianArtifact(
+            model_id=model,
+            matrix=np.asarray(matrix, dtype=np.complex128),
+            parameters=params,
+            implementation_status=IMPLEMENTATION_STATUS,
+            claim_boundary=CLAIM_BOUNDARY,
+            metadata={
+                "basis": "su3_character_irreps",
+                "basis_size": len(irrep_basis(params["cutoff"])),
+                "gauss_law_by_construction": True,
             },
         )
 
