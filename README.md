@@ -32,6 +32,10 @@
   <img alt="Quantum" src="https://img.shields.io/badge/quantum-optional%20providers-6929c4"/>
 </p>
 
+<p align="center">
+  <a href="https://xioaisolutions.github.io/gaugegap-foundry/foundry-experience/"><strong>▶ Live playground — open the Foundry Experience in your browser</strong></a>
+</p>
+
 ---
 
 ## 🎯 What this repository is
@@ -104,6 +108,14 @@ flowchart TD
 ## ◼️ Foundry Experience — experience ↔ experiment
 
 The repository has a self-contained browser interface inspired by the conceptual split between Ryoji Ikeda's **`supersymmetry [experience]`** and **`supersymmetry [experiment]`**: one mode emphasizes immersion, while the other exposes apparatus, controls, evidence, and process. The implementation does not copy the original artwork, sound, photography, or software.
+
+**▶ Play it live:** the complete bundle is published at
+[xioaisolutions.github.io/gaugegap-foundry/foundry-experience](https://xioaisolutions.github.io/gaugegap-foundry/foundry-experience/)
+on every push to `main` (`.github/workflows/pages.yml`). Attractor scenes include an
+**Export proofpack** button that downloads a content-hashed JSON evidence file —
+live slider parameters, RK4 solver settings, trajectory digest, and the claim
+boundary (schema `gaugegap.browser_attractor_proofpack.v1`). Browser packs are
+per-engine reproducible numerical artifacts, not formal certificates.
 
 <p align="center">
   <img src="figures/foundry-experience/preview.svg" alt="Foundry Experience preview" width="780"/>
@@ -384,7 +396,7 @@ foundry run infogap-smoke
 
 ## 🌀 Attractor Forge — nonlinear dynamics you can inspect
 
-Attractor Forge is the FlowGap nonlinear-dynamics laboratory. It does more than draw a familiar spiral or butterfly: each run produces a complete finite evidence bundle.
+Attractor Forge is the FlowGap nonlinear-dynamics laboratory. It does more than draw a familiar spiral or butterfly: each run produces a complete finite evidence bundle. In the [published Foundry Experience](https://xioaisolutions.github.io/gaugegap-foundry/foundry-experience/), the same attractor scenes carry an **Export proofpack** button so anyone can download the exact parameters, solver settings, and trajectory hash behind what they see on screen.
 
 <p align="center">
   <img src="figures/attractor-forge/rossler_xy.svg" alt="Rössler attractor finite trajectory" width="720"/>
