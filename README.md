@@ -115,7 +115,11 @@ on every push to `main` (`.github/workflows/pages.yml`). Attractor scenes includ
 **Export proofpack** button that downloads a content-hashed JSON evidence file —
 live slider parameters, RK4 solver settings, trajectory digest, and the claim
 boundary (schema `gaugegap.browser_attractor_proofpack.v1`). Browser packs are
-per-engine reproducible numerical artifacts, not formal certificates.
+per-engine reproducible numerical artifacts, not formal certificates. Verify a
+downloaded pack offline with
+`python3 scripts/verify_browser_proofpack.py <pack.json>` — it recomputes the
+content hash (cross-language canonical JSON, ECMAScript number formatting) and
+checks the schema and claim boundary.
 
 <p align="center">
   <img src="figures/foundry-experience/preview.svg" alt="Foundry Experience preview" width="780"/>
