@@ -1,0 +1,43 @@
+version: 1
+
+units:
+  fractal-reality-lab:
+    track: fractal-reality
+    hypothesis: fractal-reality-0001
+    status: production
+    description: Generate the finite Mandelbrot/Julia, sonification, analogy, and BrainSNN evidence bundle.
+    command:
+      ["{python}", "scripts/run_fractal_reality_lab.py",
+       "--output-dir", "site/fractal-reality-lab/data",
+       "--max-iterations", "256"]
+
+  fractal-reality-smoke:
+    track: fractal-reality
+    hypothesis: fractal-reality-0001
+    status: production
+    description: Reduced deterministic smoke bundle for CI and local verification.
+    command:
+      ["{python}", "scripts/run_fractal_reality_lab.py",
+       "--output-dir", "/tmp/fractal-reality-smoke",
+       "--max-iterations", "32",
+       "--julia-width", "24",
+       "--julia-height", "18"]
+
+  fractal-reality-site-check:
+    track: fractal-reality
+    hypothesis: fractal-reality-0001
+    status: production
+    description: Fail-closed browser, manifest, hash, BrainSNN handoff, and comparison release gate.
+    command:
+      ["{python}", "scripts/check_fractal_reality_site.py",
+       "--site-dir", "site/fractal-reality-lab",
+       "--artifact-dir", "/tmp/fractal-reality-smoke"]
+
+groups:
+  fractal-reality:
+    - fractal-reality-lab
+
+  fractal-reality-release:
+    - fractal-reality-smoke
+    - fractal-reality-site-check
+    - brainsnn-showcase

@@ -14,6 +14,7 @@ if str(SRC) not in sys.path:
 
 from gaugegap.compactification_forge import run_compactification_suite  # noqa: E402
 from gaugegap.entanglement_forge import run_entanglement_forge  # noqa: E402
+from gaugegap.fractal_reality import build_fractal_reality_manifest  # noqa: E402
 from gaugegap.fractal_topology_forge import run_menger_forge  # noqa: E402
 from gaugegap.perception_forge import run_perception_forge  # noqa: E402
 from gaugegap.quantum.uqt_forge import run_uqt_forge  # noqa: E402
@@ -49,6 +50,7 @@ def build_showcase() -> dict[str, object]:
     perception = run_perception_forge(world_count=12).summary()
     menger = run_menger_forge(iterations=4).summary()
     entanglement = run_entanglement_forge().summary()
+    fractal_reality = build_fractal_reality_manifest(max_iterations=64)
     quantum_gap = compute_quantum_gap(
         dynamics=[{"dmd": {"reconstruction_error": 0.01}, "validated_step": {"validated": True}}],
         hamiltonians=[
@@ -74,6 +76,21 @@ def build_showcase() -> dict[str, object]:
             "Verification-first finite research artifacts for BrainSNN-style "
             "content preflight: every strong claim carries an observable, control, "
             "evidence artifact, and boundary."
+        ),
+        "featured_experience": _card(
+            "Fractal Reality Lab",
+            "site/fractal-reality-lab/index.html",
+            (
+                f"experiments={len(fractal_reality['experiments'])}; "
+                f"analogues={len(fractal_reality['analogues'])}; "
+                f"sha256={fractal_reality['content_sha256'][:12]}"
+            ),
+            (
+                "Use as the flagship public bridge: one selected Mandelbrot point "
+                "drives Julia dynamics, sound, evidence labels, Gauge Gap, and a "
+                "transparent BrainSNN feature-to-spike view."
+            ),
+            fractal_reality["claim_boundary"],
         ),
         "cards": [
             _card(
@@ -138,9 +155,23 @@ def _markdown(payload: dict[str, object]) -> str:
         "",
         f"> {payload['claim_boundary']}",
         "",
-        "## Showcase Cards",
-        "",
     ]
+    featured = payload.get("featured_experience")
+    if isinstance(featured, dict):
+        lines.extend(
+            [
+                "## Featured Experience",
+                "",
+                f"### {featured['title']}",
+                "",
+                f"- Artifact: `{featured['artifact']}`",
+                f"- Observable: `{featured['observable']}`",
+                f"- BrainSNN use: {featured['brainsnn_use']}",
+                f"- Boundary: {featured['claim_boundary']}",
+                "",
+            ]
+        )
+    lines.extend(["## Showcase Cards", ""])
     for card in payload["cards"]:
         lines.extend(
             [

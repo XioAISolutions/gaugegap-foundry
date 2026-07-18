@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#05070b" />
+  <title>Fractal Reality Lab · GaugeGap Foundry × BrainSNN</title>
+  <meta name="description" content="Explore Mandelbrot and Julia dynamics, sonify finite orbits, compare recurring forms, and watch an inspectable BrainSNN-style spike encoding." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="Fractal Reality Lab home">
+      <span class="brand-mark">GG</span>
+      <span><strong>GaugeGap Foundry</strong><small>Fractal Reality Lab · powered by BrainSNN</small></span>
+    </a>
+    <nav>
+      <a href="#lab">Lab</a>
+      <a href="#atlas">Reality Atlas</a>
+      <a href="#evidence">Evidence</a>
+    </nav>
+    <button id="modeToggle" class="ghost" type="button">Focus mode</button>
+  </header>
+
+  <main id="top">
+    <section class="hero shell">
+      <div class="hero-copy">
+        <p class="eyebrow">LAB 001 · ONE RULE, INFINITE BEHAVIOUR</p>
+        <h1>Is the Mandelbrot set the <em>code of reality?</em></h1>
+        <p class="lede">Change one complex number. Watch the fractal, its Julia set, its orbit, its sound, and an artificial spiking network react together. Then test which links to nature are mathematics, analogy, or philosophy.</p>
+        <div class="hero-actions">
+          <a class="primary" href="#lab">Enter the experiment</a>
+          <button id="randomBoundary" class="secondary" type="button">Find a boundary point</button>
+        </div>
+        <div class="equation" aria-label="Mandelbrot recurrence">
+          <span>z<sub>n+1</sub> = z<sub>n</sub><sup>2</sup> + c</span>
+          <small>start with z<sub>0</sub> = 0 · repeat · observe</small>
+        </div>
+      </div>
+      <div class="hero-visual panel">
+        <canvas id="heroCanvas" width="900" height="700" aria-label="Animated Mandelbrot boundary"></canvas>
+        <div class="hero-hud">
+          <span>LIVE FINITE RENDER</span>
+          <span id="heroCoordinate">c = −0.743644 + 0.131826i</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="lab" class="shell lab-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">EXPERIENCE ↔ EXPERIMENT</p>
+          <h2>Four views of the same point</h2>
+        </div>
+        <p>Select anywhere in the Mandelbrot canvas. Every other instrument updates from the same finite orbit.</p>
+      </div>
+
+      <div class="control-deck panel">
+        <label>Real c<input id="realInput" type="number" step="0.000001" value="-0.743644" /></label>
+        <label>Imaginary c<input id="imagInput" type="number" step="0.000001" value="0.131826" /></label>
+        <label>Iterations<input id="iterationInput" type="range" min="48" max="420" value="180" /><output id="iterationOutput">180</output></label>
+        <label>Prediction<input id="predictionInput" type="range" min="0" max="100" value="75" /><output id="predictionOutput">75%</output></label>
+        <label>Compare with<select id="analogueSelect"></select></label>
+        <div class="button-row">
+          <button id="applyPoint" class="primary" type="button">Run point</button>
+          <button id="playSound" class="secondary" type="button">Sonify orbit</button>
+          <button id="resetView" class="ghost" type="button">Reset zoom</button>
+        </div>
+      </div>
+
+      <div class="instrument-grid">
+        <article class="instrument panel wide">
+          <header><div><span>01</span><h3>Mandelbrot parameter space</h3></div><small>scroll to zoom · drag to pan · tap to choose c</small></header>
+          <canvas id="mandelbrotCanvas" width="920" height="600"></canvas>
+          <footer><span id="mandelbrotStatus">Rendering…</span><span id="zoomStatus">zoom 1.00×</span></footer>
+        </article>
+
+        <article class="instrument panel">
+          <header><div><span>02</span><h3>Corresponding Julia set</h3></div><small>same c · different starting z</small></header>
+          <canvas id="juliaCanvas" width="620" height="440"></canvas>
+          <footer><span>finite escape-time field</span><span id="juliaStatus">—</span></footer>
+        </article>
+
+        <article class="instrument panel">
+          <header><div><span>03</span><h3>Orbit microscope</h3></div><small>z moves through the complex plane</small></header>
+          <canvas id="orbitCanvas" width="620" height="440"></canvas>
+          <footer><span id="orbitStatus">—</span><span id="escapeStatus">—</span></footer>
+        </article>
+
+        <article class="instrument panel wide">
+          <header><div><span>04</span><h3>BrainSNN pattern encoding</h3></div><small>transparent feature → spike surrogate</small></header>
+          <canvas id="brainCanvas" width="920" height="480"></canvas>
+          <footer><span>not a biological brain model</span><span id="brainStatus">7 regions · deterministic</span></footer>
+        </article>
+      </div>
+
+      <div class="readout-grid">
+        <article class="panel metrics-card">
+          <header><p class="eyebrow">ORBIT FEATURES</p><h3>What the system measured</h3></header>
+          <div id="featureBars" class="feature-bars"></div>
+        </article>
+        <article class="panel verdict-card">
+          <header><p class="eyebrow">GAUGE GAP</p><h3>Prediction versus measurement</h3></header>
+          <div class="score-ring"><strong id="similarityScore">—</strong><span>feature similarity</span></div>
+          <dl>
+            <div><dt>Your prediction</dt><dd id="predictionScore">75%</dd></div>
+            <div><dt>Gauge gap</dt><dd id="gapScore">—</dd></div>
+            <div><dt>Strongest match</dt><dd id="strongestMatch">—</dd></div>
+            <div><dt>Weakest match</dt><dd id="weakestMatch">—</dd></div>
+          </dl>
+          <div id="evidenceBadge" class="evidence-badge">—</div>
+          <p id="mechanismText" class="boundary-copy">—</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="shell bulb-section">
+      <div class="section-heading">
+        <div><p class="eyebrow">FROM 2D TO 3D</p><h2>The Mandelbulb</h2></div>
+        <p>A ray-marched power-8 fractal inspired by Mandelbrot iteration. It is a compelling 3D construction, not the one uniquely canonical “true 3D Mandelbrot.”</p>
+      </div>
+      <div class="bulb-layout panel">
+        <canvas id="bulbCanvas" width="1000" height="620"></canvas>
+        <div class="bulb-copy">
+          <span class="truth demonstrated">DEMONSTRATED CONSTRUCTION</span>
+          <h3>Organic appearance can emerge from iteration alone.</h3>
+          <p>Rotate the field and it begins to resemble coral, lungs, roots, broccoli, or architecture. The resemblance is real; a shared physical generator is a separate claim.</p>
+          <label>Power<input id="bulbPower" type="range" min="3" max="12" value="8" /><output id="bulbPowerOutput">8</output></label>
+          <label>Detail<input id="bulbDetail" type="range" min="36" max="96" value="64" /><output id="bulbDetailOutput">64</output></label>
+        </div>
+      </div>
+    </section>
+
+    <section id="atlas" class="shell atlas-section">
+      <div class="section-heading">
+        <div><p class="eyebrow">REALITY ATLAS</p><h2>Where the pattern appears—and what that means</h2></div>
+        <p>Every card states the proposed mechanism and its evidence class. Similar shape never silently becomes identical cause.</p>
+      </div>
+      <div id="atlasGrid" class="atlas-grid"></div>
+    </section>
+
+    <section id="evidence" class="shell evidence-section">
+      <div class="section-heading">
+        <div><p class="eyebrow">TRUTH LAYERS</p><h2>Keep the wonder. Label the leap.</h2></div>
+      </div>
+      <div class="truth-grid">
+        <article class="panel"><span class="truth demonstrated">DEMONSTRATED</span><h3>Equation-level or experimental connection</h3><p>Mandelbrot/Julia dynamics, finite escape times, cardioid polar equations, optical caustics, interference, and deliberate sonification mappings.</p></article>
+        <article class="panel"><span class="truth analogy">STRUCTURAL ANALOGY</span><h3>Measured resemblance, different generator</h3><p>Neurons, lightning, trees, lungs, rivers, rose windows, and other branching or symmetric systems can be fractal-like without obeying z²+c.</p></article>
+        <article class="panel"><span class="truth philosophy">PHILOSOPHICAL</span><h3>Interpretation, metaphor, worldview</h3><p>“All things are one thing” and “the Mandelbrot is the code of reality” are powerful framing ideas—not conclusions produced by this finite experiment.</p></article>
+      </div>
+      <blockquote>Math may be the language we use to describe recurring structure. This lab tests the grammar without pretending every rhyme is the same sentence.</blockquote>
+    </section>
+
+    <section class="shell share-section">
+      <div class="share-layout panel">
+        <div>
+          <p class="eyebrow">PUBLISH THE EXPERIMENT</p>
+          <h2>Turn every discovery into a shareable result.</h2>
+          <p>The card includes the selected point, finite measurements, evidence class, and the gap between intuition and result.</p>
+          <div class="hero-actions"><button id="downloadCard" class="primary" type="button">Download result card</button><button id="copyResult" class="secondary" type="button">Copy result text</button></div>
+          <p id="copyStatus" class="status-line" aria-live="polite"></p>
+        </div>
+        <canvas id="shareCanvas" width="1080" height="1350" aria-label="Shareable result card preview"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer shell">
+    <div><strong>GaugeGap Foundry × BrainSNN</strong><p>Observe → perturb → simulate → measure the gap → learn → fork.</p></div>
+    <p class="claim">Finite educational experiment. Visual resemblance is not proof of a shared physical mechanism.</p>
+  </footer>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
