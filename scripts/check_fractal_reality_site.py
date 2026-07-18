@@ -20,12 +20,12 @@ REQUIRED_SITE_MARKERS = {
         "extractFeatures",
         "renderEscape",
         "drawBrain",
-        "sonifyOrbit",
+        "function sonify(",
     ),
     "styles.css": (
         ":root",
         ".instrument-grid",
-        ".evidence-grid",
+        ".truth-grid",
     ),
 }
 
