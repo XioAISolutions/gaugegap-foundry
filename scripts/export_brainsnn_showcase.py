@@ -14,6 +14,7 @@ if str(SRC) not in sys.path:
 
 from gaugegap.compactification_forge import run_compactification_suite  # noqa: E402
 from gaugegap.entanglement_forge import run_entanglement_forge  # noqa: E402
+from gaugegap.fractal_reality import build_fractal_reality_manifest  # noqa: E402
 from gaugegap.fractal_topology_forge import run_menger_forge  # noqa: E402
 from gaugegap.perception_forge import run_perception_forge  # noqa: E402
 from gaugegap.quantum.uqt_forge import run_uqt_forge  # noqa: E402
@@ -49,6 +50,7 @@ def build_showcase() -> dict[str, object]:
     perception = run_perception_forge(world_count=12).summary()
     menger = run_menger_forge(iterations=4).summary()
     entanglement = run_entanglement_forge().summary()
+    fractal_reality = build_fractal_reality_manifest(max_iterations=64)
     quantum_gap = compute_quantum_gap(
         dynamics=[{"dmd": {"reconstruction_error": 0.01}, "validated_step": {"validated": True}}],
         hamiltonians=[
@@ -68,7 +70,7 @@ def build_showcase() -> dict[str, object]:
         validation_gate=True,
     ).summary()
     return {
-        "schema": "gaugegap.brainsnn_showcase.v1",
+        "schema": "gaugegap.brainsnn_showcase.v2",
         "title": "GaugeGap Foundry Research Showcase",
         "positioning": (
             "Verification-first finite research artifacts for BrainSNN-style "
@@ -76,6 +78,21 @@ def build_showcase() -> dict[str, object]:
             "evidence artifact, and boundary."
         ),
         "cards": [
+            _card(
+                "Fractal Reality Lab",
+                "site/fractal-reality-lab/index.html",
+                (
+                    f"experiments={len(fractal_reality['experiments'])}; "
+                    f"analogues={len(fractal_reality['analogues'])}; "
+                    f"sha256={fractal_reality['content_sha256'][:12]}"
+                ),
+                (
+                    "Use as the flagship public bridge: one selected Mandelbrot point "
+                    "drives Julia dynamics, sound, evidence labels, Gauge Gap, and a "
+                    "transparent BrainSNN feature-to-spike view."
+                ),
+                fractal_reality["claim_boundary"],
+            ),
             _card(
                 "Quantum Gap Functional",
                 "src/gaugegap/quantum_gap.py",
@@ -123,6 +140,8 @@ def build_showcase() -> dict[str, object]:
             "BrainSNN proves physics claims",
             "Quantum Gap is a universal truth score",
             "GaugeGap validates marketing claims automatically",
+            "the Mandelbrot set is proven to be the literal code of physical reality",
+            "visual resemblance proves a shared physical generator",
             "entanglement enables faster-than-light communication",
             "finite Menger stages prove the completed fractal topology",
         ],
