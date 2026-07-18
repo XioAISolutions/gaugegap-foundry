@@ -70,29 +70,29 @@ def build_showcase() -> dict[str, object]:
         validation_gate=True,
     ).summary()
     return {
-        "schema": "gaugegap.brainsnn_showcase.v2",
+        "schema": "gaugegap.brainsnn_showcase.v1",
         "title": "GaugeGap Foundry Research Showcase",
         "positioning": (
             "Verification-first finite research artifacts for BrainSNN-style "
             "content preflight: every strong claim carries an observable, control, "
             "evidence artifact, and boundary."
         ),
-        "cards": [
-            _card(
-                "Fractal Reality Lab",
-                "site/fractal-reality-lab/index.html",
-                (
-                    f"experiments={len(fractal_reality['experiments'])}; "
-                    f"analogues={len(fractal_reality['analogues'])}; "
-                    f"sha256={fractal_reality['content_sha256'][:12]}"
-                ),
-                (
-                    "Use as the flagship public bridge: one selected Mandelbrot point "
-                    "drives Julia dynamics, sound, evidence labels, Gauge Gap, and a "
-                    "transparent BrainSNN feature-to-spike view."
-                ),
-                fractal_reality["claim_boundary"],
+        "featured_experience": _card(
+            "Fractal Reality Lab",
+            "site/fractal-reality-lab/index.html",
+            (
+                f"experiments={len(fractal_reality['experiments'])}; "
+                f"analogues={len(fractal_reality['analogues'])}; "
+                f"sha256={fractal_reality['content_sha256'][:12]}"
             ),
+            (
+                "Use as the flagship public bridge: one selected Mandelbrot point "
+                "drives Julia dynamics, sound, evidence labels, Gauge Gap, and a "
+                "transparent BrainSNN feature-to-spike view."
+            ),
+            fractal_reality["claim_boundary"],
+        ),
+        "cards": [
             _card(
                 "Quantum Gap Functional",
                 "src/gaugegap/quantum_gap.py",
@@ -140,8 +140,6 @@ def build_showcase() -> dict[str, object]:
             "BrainSNN proves physics claims",
             "Quantum Gap is a universal truth score",
             "GaugeGap validates marketing claims automatically",
-            "the Mandelbrot set is proven to be the literal code of physical reality",
-            "visual resemblance proves a shared physical generator",
             "entanglement enables faster-than-light communication",
             "finite Menger stages prove the completed fractal topology",
         ],
@@ -157,9 +155,23 @@ def _markdown(payload: dict[str, object]) -> str:
         "",
         f"> {payload['claim_boundary']}",
         "",
-        "## Showcase Cards",
-        "",
     ]
+    featured = payload.get("featured_experience")
+    if isinstance(featured, dict):
+        lines.extend(
+            [
+                "## Featured Experience",
+                "",
+                f"### {featured['title']}",
+                "",
+                f"- Artifact: `{featured['artifact']}`",
+                f"- Observable: `{featured['observable']}`",
+                f"- BrainSNN use: {featured['brainsnn_use']}",
+                f"- Boundary: {featured['claim_boundary']}",
+                "",
+            ]
+        )
+    lines.extend(["## Showcase Cards", ""])
     for card in payload["cards"]:
         lines.extend(
             [
