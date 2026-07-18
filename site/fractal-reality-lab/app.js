@@ -118,7 +118,7 @@ async function renderEscape(canvas, mode, options = {}) {
   const { width, height } = fitCanvas(canvas, mode === 'hero' ? 1 : 1.15);
   const ctx = canvas.getContext('2d', { alpha: false });
   const image = ctx.createImageData(width, height); const data = image.data;
-  const token = ++state.renderToken;
+  const token = (canvas.__renderToken || 0) + 1; canvas.__renderToken = token;
   const span = options.span ?? (mode === 'julia' ? 3.5 : state.view.span);
   const centerRe = options.re ?? (mode === 'julia' ? 0 : state.view.re);
   const centerIm = options.im ?? (mode === 'julia' ? 0 : state.view.im);
@@ -127,7 +127,7 @@ async function renderEscape(canvas, mode, options = {}) {
   const juliaC = options.c ?? state.c;
   const chunk = 20;
   for (let y0=0;y0<height;y0+=chunk) {
-    if (token !== state.renderToken && mode !== 'hero') return;
+    if (token !== canvas.__renderToken) return;
     for(let y=y0;y<Math.min(height,y0+chunk);y++) for(let x=0;x<width;x++) {
       const px = centerRe + (x/width-.5)*span;
       const py = centerIm + (y/height-.5)*spanY;
