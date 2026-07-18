@@ -23,6 +23,21 @@ units:
        "--julia-width", "24",
        "--julia-height", "18"]
 
+  fractal-reality-site-check:
+    track: fractal-reality
+    hypothesis: fractal-reality-0001
+    status: production
+    description: Fail-closed browser, manifest, hash, BrainSNN handoff, and comparison release gate.
+    command:
+      ["{python}", "scripts/check_fractal_reality_site.py",
+       "--site-dir", "site/fractal-reality-lab",
+       "--artifact-dir", "/tmp/fractal-reality-smoke"]
+
 groups:
   fractal-reality:
     - fractal-reality-lab
+
+  fractal-reality-release:
+    - fractal-reality-smoke
+    - fractal-reality-site-check
+    - brainsnn-showcase
