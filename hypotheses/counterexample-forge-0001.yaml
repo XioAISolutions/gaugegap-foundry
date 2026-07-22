@@ -1,0 +1,39 @@
+id: counterexample-forge-0001
+track: Counterexample Forge
+model: exact_rational_polynomial_map_C3
+scope: exact three-variable polynomial map over the rationals with a finite collision witness
+claim: >
+  The registered public benchmark map has an identically constant nonzero
+  Jacobian determinant and maps three pairwise-distinct exact points to the same
+  exact image. This executable witness falsifies global injectivity for that map.
+prediction:
+  observable: exact_jacobian_and_collision
+  expected_shape: determinant_equals_minus_two_and_three_points_share_one_image
+controls:
+  arithmetic: exact_rational
+  dimensions: 3
+  expected_determinant: -2
+  release_label: REPRODUCED
+validation:
+  required:
+    - polynomial_coordinates_canonicalize_exactly
+    - jacobian_determinant_is_identically_minus_two
+    - witnesses_are_pairwise_distinct
+    - witness_images_are_exactly_equal
+    - candidate_and_proofpack_hashes_are_reproducible
+    - tampered_witnesses_fail_closed
+kill_criteria:
+  - any coordinate contains a non-polynomial or floating-point term
+  - the Jacobian determinant is zero or depends on the variables
+  - the registered points are not pairwise distinct
+  - the registered points do not have one exact common image
+  - repeated runs emit different canonical hashes
+status: active
+claim_boundary: >
+  Exact verification of a public finite algebraic witness only. The v1 result is
+  labelled REPRODUCED, not an original discovery. It does not claim independent
+  rediscovery, does not establish minimality, and does not resolve a separately
+  open lower-dimensional Jacobian case.
+notes:
+  - Verification mode is the known-answer task for the search and reconstruction layers that follow.
+  - Public labels are REPRODUCED, REDISCOVERED, and DISCOVERED; they must not be used interchangeably.

@@ -1,0 +1,29 @@
+version: 1
+
+units:
+  counterexample-forge-0001-verify:
+    track: counterexample-forge
+    hypothesis: counterexample-forge-0001
+    status: experimental
+    description: Verify the public three-variable Jacobian benchmark with exact rational arithmetic and emit a deterministic proofpack.
+    command:
+      ["{python}", "scripts/run_counterexample_forge.py",
+       "--output-dir", "artifacts/counterexample-forge-0001",
+       "--release-label", "REPRODUCED"]
+
+  counterexample-forge-smoke:
+    track: counterexample-forge
+    hypothesis: counterexample-forge-0001
+    status: experimental
+    description: Reduced CI gate for the exact Jacobian determinant, collision witness, and proofpack hash.
+    command:
+      ["{python}", "scripts/run_counterexample_forge.py",
+       "--output-dir", "/tmp/counterexample-forge-smoke",
+       "--release-label", "REPRODUCED"]
+
+groups:
+  counterexample-forge:
+    - counterexample-forge-0001-verify
+
+  counterexample-forge-release:
+    - counterexample-forge-smoke
