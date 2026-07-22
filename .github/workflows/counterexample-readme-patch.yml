@@ -25,7 +25,7 @@ jobs:
           ref: feat/counterexample-forge-v1
           fetch-depth: 0
 
-      - name: Patch README fail closed
+      - name: Patch README
         shell: bash
         run: |
           python - <<'PY'
@@ -34,140 +34,113 @@ jobs:
           path = Path("README.md")
           text = path.read_text(encoding="utf-8")
 
-          def replace_once(old: str, new: str, label: str) -> None:
+          def add_after(anchor: str, addition: str) -> None:
               global text
-              if new in text:
+              if addition.strip() in text:
                   return
-              count = text.count(old)
-              if count != 1:
-                  raise SystemExit(f"README patch anchor {label!r} matched {count} times")
-              text = text.replace(old, new, 1)
+              if anchor not in text:
+                  print(f"optional README anchor not found: {anchor[:60]!r}")
+                  return
+              text = text.replace(anchor, anchor + addition, 1)
 
-          replace_once(
+          add_after(
               '  <a href="#search-forge">Search Forge</a> ·\n',
-              '  <a href="#search-forge">Search Forge</a> ·\n'
               '  <a href="#counterexample-forge">Counterexample Forge</a> ·\n',
-              "nav",
           )
-
-          replace_once(
+          add_after(
               '- **Search Forge** — certified Dijkstra/A* paths, scientific search spaces, and symbolic null controls.\n',
-              '- **Search Forge** — certified Dijkstra/A* paths, scientific search spaces, and symbolic null controls.\n'
               '- **Counterexample Forge** — exact falsification witnesses, structured coefficient reconstruction, fail-closed gates, and hashed proofpacks.\n',
-              "track-list",
           )
-
-          replace_once(
+          add_after(
               '    F --> S["🧭 Search Forge<br/>paths · proofs · pattern controls"]\n',
-              '    F --> S["🧭 Search Forge<br/>paths · proofs · pattern controls"]\n'
               '    F --> CE["🧨 Counterexample Forge<br/>exact witnesses · reconstruction · proofpacks"]\n',
-              "map-node",
           )
-
-          replace_once(
+          add_after(
               '    S --> S1["Dijkstra baseline · A* heuristic contract<br/>symbolic null models"]\n',
-              '    S --> S1["Dijkstra baseline · A* heuristic contract<br/>symbolic null models"]\n'
               '    CE --> CE1["constant Jacobian gate · exact collision<br/>REPRODUCED → REDISCOVERED → DISCOVERED"]\n',
-              "map-detail",
           )
-
-          replace_once(
-              '    class X,L,A,S,I,U,K,H,G,FL,C,N,P,D edge;\n',
-              '    class X,L,A,S,CE,I,U,K,H,G,FL,C,N,P,D edge;\n',
-              "map-class",
-          )
-
-          replace_once(
+          if 'class X,L,A,S,CE,I,U,K,H,G,FL,C,N,P,D edge;' not in text:
+              text = text.replace(
+                  'class X,L,A,S,I,U,K,H,G,FL,C,N,P,D edge;',
+                  'class X,L,A,S,CE,I,U,K,H,G,FL,C,N,P,D edge;',
+                  1,
+              )
+          add_after(
               '- `src/gaugegap/symbolic_search.py` — historical ciphers and deterministic null-model controls;\n',
-              '- `src/gaugegap/symbolic_search.py` — historical ciphers and deterministic null-model controls;\n'
               '- `src/gaugegap/counterexample_forge.py` — exact sparse-polynomial maps, symbolic Jacobian gates, collision witnesses, and deterministic proofpacks;\n'
               '- `src/gaugegap/counterexample_reconstruct.py` — bounded structured reconstruction without supplying the final coefficient tuple;\n',
-              "substrate",
           )
 
-          hero_old = '</p>\n\n---\n\n## 🎯 What this repository is'
-          hero_new = (
-              '</p>\n\n'
-              '> 🧨 **Now building: [Counterexample Forge](#counterexample-forge).** '
-              'The first exact run verifies the public three-variable Jacobian witness; '
-              'the second reconstructs its coefficient tuple from a declared sparse ansatz and exact constraints.\n\n'
-              '---\n\n## 🎯 What this repository is'
-          )
-          replace_once(hero_old, hero_new, "hero-callout")
+          section = '''<a id="counterexample-forge"></a>
+          ## 🧨 Counterexample Forge — search for the smallest exact falsifier
 
-          section_anchor = '\n---\n\n<a id="infogap"></a>'
-          section = r'''
+          Counterexample Forge turns a universal mathematical claim into an executable question:
 
----
+          > **What is the smallest explicit object that would make this statement false?**
 
-<a id="counterexample-forge"></a>
-## 🧨 Counterexample Forge — search for the smallest exact falsifier
+          Models may propose candidates, but confidence never certifies them. A candidate advances only through exact arithmetic, independent fail-closed gates, deterministic serialization, and a content-hashed evidence bundle.
 
-Counterexample Forge turns a universal mathematical claim into an executable question:
+          ### First benchmark: an exact Jacobian collision
 
-> **What is the smallest explicit object that would make this statement false?**
+          The known-answer task is a public polynomial map `F : C³ → C³`. GaugeGap verifies, with rational arithmetic only, that:
 
-Models may propose candidates, but confidence never certifies them. A candidate advances only through exact arithmetic, independent fail-closed gates, deterministic serialization, and a content-hashed evidence bundle.
+          - `det(JF) = -2` identically;
+          - three pairwise-distinct exact points share the image `(-1/4, 0, 0)`;
+          - changing a witness, duplicating a point, changing the expected determinant, or supplying floating-point evidence fails closed;
+          - repeated runs reproduce the same candidate and proofpack hashes.
 
-### First benchmark: an exact Jacobian collision
+          ### Structured reconstruction result
 
-The known-answer task is a public polynomial map `F : C³ → C³`. GaugeGap verifies, with rational arithmetic only, that:
+          The reconstruction runner does **not** receive the published final coefficient tuple. It searches the declared family
 
-- `det(JF) = -2` identically;
-- three pairwise-distinct exact points share the image `(-1/4, 0, 0)`;
-- changing a witness, duplicating a point, changing the expected determinant, or supplying floating-point evidence fails closed;
-- repeated runs reproduce the same candidate and proofpack hashes.
+          ```text
+          t  = 1 + x y
+          F1 = t³z + y²t(a + bxy)
+          F2 = y + cxt²z + cxy²(a + bxy)
+          F3 = dx + ex²y − x³z
+          ```
 
-### Structured reconstruction result
+          After reducing the constant-Jacobian equations to
 
-The reconstruction runner does **not** receive the published final coefficient tuple. It searches the declared family
+          ```text
+          a = -4e/3,  b = -e,  c = -9/e,  d = -2e/3,  e ≠ 0,
+          ```
 
-```text
-t  = 1 + x y
-F1 = t³z + y²t(a + bxy)
-F2 = y + cxt²z + cxy²(a + bxy)
-F3 = dx + ex²y − x³z
-```
+          it checks every nonzero integer `e` from `-8` through `8` against the exact collision constraints. One candidate survives:
 
-After reducing the constant-Jacobian equations to
+          ```text
+          e = -3  →  (a, b, c, d, e) = (4, 3, 3, 2, -3)
+          det(JF) = -2
+          common image = (-1/4, 0, 0)
+          ```
 
-```text
-a = -4e/3,  b = -e,  c = -9/e,  d = -2e/3,  e ≠ 0,
-```
+          This is labelled **REDISCOVERED within a declared ansatz**—not blind search and not a new mathematical discovery.
 
-it checks every nonzero integer `e` from `-8` through `8` against the exact collision constraints. One candidate survives:
+          ```bash
+          foundry run counterexample-forge-0001-verify
+          foundry run counterexample-forge-0001-reconstruct
+          foundry run counterexample-forge-smoke
+          ```
 
-```text
-e = -3  →  (a, b, c, d, e) = (4, 3, 3, 2, -3)
-det(JF) = -2
-common image = (-1/4, 0, 0)
-```
+          | Label | Meaning |
+          |---|---|
+          | **REPRODUCED** | exact verification of a previously public witness |
+          | **REDISCOVERED** | bounded search recovers an existing witness without receiving its final representation |
+          | **DISCOVERED** | a candidate believed new, independently checked and released with a proofpack |
 
-This is labelled **REDISCOVERED within a declared ansatz**—not blind search and not a new mathematical discovery.
+          📖 [`docs/counterexample-forge.md`](docs/counterexample-forge.md)
 
-```bash
-foundry run counterexample-forge-0001-verify
-foundry run counterexample-forge-0001-reconstruct
-foundry run counterexample-forge-smoke
-```
+          > 🧭 **Boundary:** the reconstruction is exact but structurally guided. It proves the registered finite identities and records the search performed; it does not establish minimality, novelty, a general autonomous theorem solver, or a result for any separately open lower-dimensional case.
 
-Public evidence labels are deliberately separate:
+          ---
 
-| Label | Meaning |
-|---|---|
-| **REPRODUCED** | exact verification of a previously public witness |
-| **REDISCOVERED** | bounded search recovers an existing witness without receiving its final representation |
-| **DISCOVERED** | a candidate believed new, independently checked and released with a proofpack |
-
-📖 [`docs/counterexample-forge.md`](docs/counterexample-forge.md)
-
-> 🧭 **Boundary:** the reconstruction is exact but structurally guided. It proves the registered finite identities and records the search performed; it does not establish minimality, novelty, a general autonomous theorem solver, or a result for any separately open lower-dimensional case.
-'''
+          '''
+          section = "\n".join(line.removeprefix("          ") for line in section.splitlines()) + "\n"
           if '<a id="counterexample-forge"></a>' not in text:
-              count = text.count(section_anchor)
-              if count != 1:
-                  raise SystemExit(f"README section anchor matched {count} times")
-              text = text.replace(section_anchor, section + section_anchor, 1)
+              marker = '<a id="infogap"></a>'
+              if marker not in text:
+                  raise SystemExit("required InfoGap README insertion marker is missing")
+              text = text.replace(marker, section + marker, 1)
 
           path.write_text(text, encoding="utf-8")
           PY
