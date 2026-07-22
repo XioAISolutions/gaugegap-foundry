@@ -1,0 +1,27 @@
+version: 1
+
+units:
+  counterexample-forge-0002-aftershock:
+    track: counterexample-forge
+    hypothesis: counterexample-forge-0002
+    status: experimental
+    description: Verify a 25-monomial four-sheet Keller map, two exact fibers, and the unique monomial optimum in the normalized cubic seed family.
+    command:
+      ["{python}", "scripts/run_jacobian_aftershock.py",
+       "--output-dir", "artifacts/counterexample-forge-0002"]
+
+  counterexample-forge-0002-smoke:
+    track: counterexample-forge
+    hypothesis: counterexample-forge-0002
+    status: experimental
+    description: Reduced deterministic gate for the Jacobian Aftershock compact-map result.
+    command:
+      ["{python}", "scripts/run_jacobian_aftershock.py",
+       "--output-dir", "/tmp/counterexample-forge-0002-smoke"]
+
+groups:
+  jacobian-aftershock:
+    - counterexample-forge-0002-aftershock
+
+  counterexample-forge-release:
+    - counterexample-forge-0002-smoke
