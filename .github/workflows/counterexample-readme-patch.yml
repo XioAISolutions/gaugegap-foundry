@@ -1,0 +1,180 @@
+name: Apply Counterexample Forge README patch
+
+on:
+  push:
+    branches:
+      - feat/counterexample-forge-v1
+    paths:
+      - .github/workflows/counterexample-readme-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/counterexample-forge-v1
+          fetch-depth: 0
+
+      - name: Patch README fail closed
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("README.md")
+          text = path.read_text(encoding="utf-8")
+
+          def replace_once(old: str, new: str, label: str) -> None:
+              global text
+              if new in text:
+                  return
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"README patch anchor {label!r} matched {count} times")
+              text = text.replace(old, new, 1)
+
+          replace_once(
+              '  <a href="#search-forge">Search Forge</a> ·\n',
+              '  <a href="#search-forge">Search Forge</a> ·\n'
+              '  <a href="#counterexample-forge">Counterexample Forge</a> ·\n',
+              "nav",
+          )
+
+          replace_once(
+              '- **Search Forge** — certified Dijkstra/A* paths, scientific search spaces, and symbolic null controls.\n',
+              '- **Search Forge** — certified Dijkstra/A* paths, scientific search spaces, and symbolic null controls.\n'
+              '- **Counterexample Forge** — exact falsification witnesses, structured coefficient reconstruction, fail-closed gates, and hashed proofpacks.\n',
+              "track-list",
+          )
+
+          replace_once(
+              '    F --> S["🧭 Search Forge<br/>paths · proofs · pattern controls"]\n',
+              '    F --> S["🧭 Search Forge<br/>paths · proofs · pattern controls"]\n'
+              '    F --> CE["🧨 Counterexample Forge<br/>exact witnesses · reconstruction · proofpacks"]\n',
+              "map-node",
+          )
+
+          replace_once(
+              '    S --> S1["Dijkstra baseline · A* heuristic contract<br/>symbolic null models"]\n',
+              '    S --> S1["Dijkstra baseline · A* heuristic contract<br/>symbolic null models"]\n'
+              '    CE --> CE1["constant Jacobian gate · exact collision<br/>REPRODUCED → REDISCOVERED → DISCOVERED"]\n',
+              "map-detail",
+          )
+
+          replace_once(
+              '    class X,L,A,S,I,U,K,H,G,FL,C,N,P,D edge;\n',
+              '    class X,L,A,S,CE,I,U,K,H,G,FL,C,N,P,D edge;\n',
+              "map-class",
+          )
+
+          replace_once(
+              '- `src/gaugegap/symbolic_search.py` — historical ciphers and deterministic null-model controls;\n',
+              '- `src/gaugegap/symbolic_search.py` — historical ciphers and deterministic null-model controls;\n'
+              '- `src/gaugegap/counterexample_forge.py` — exact sparse-polynomial maps, symbolic Jacobian gates, collision witnesses, and deterministic proofpacks;\n'
+              '- `src/gaugegap/counterexample_reconstruct.py` — bounded structured reconstruction without supplying the final coefficient tuple;\n',
+              "substrate",
+          )
+
+          hero_old = '</p>\n\n---\n\n## 🎯 What this repository is'
+          hero_new = (
+              '</p>\n\n'
+              '> 🧨 **Now building: [Counterexample Forge](#counterexample-forge).** '
+              'The first exact run verifies the public three-variable Jacobian witness; '
+              'the second reconstructs its coefficient tuple from a declared sparse ansatz and exact constraints.\n\n'
+              '---\n\n## 🎯 What this repository is'
+          )
+          replace_once(hero_old, hero_new, "hero-callout")
+
+          section_anchor = '\n---\n\n<a id="infogap"></a>'
+          section = r'''
+
+---
+
+<a id="counterexample-forge"></a>
+## 🧨 Counterexample Forge — search for the smallest exact falsifier
+
+Counterexample Forge turns a universal mathematical claim into an executable question:
+
+> **What is the smallest explicit object that would make this statement false?**
+
+Models may propose candidates, but confidence never certifies them. A candidate advances only through exact arithmetic, independent fail-closed gates, deterministic serialization, and a content-hashed evidence bundle.
+
+### First benchmark: an exact Jacobian collision
+
+The known-answer task is a public polynomial map `F : C³ → C³`. GaugeGap verifies, with rational arithmetic only, that:
+
+- `det(JF) = -2` identically;
+- three pairwise-distinct exact points share the image `(-1/4, 0, 0)`;
+- changing a witness, duplicating a point, changing the expected determinant, or supplying floating-point evidence fails closed;
+- repeated runs reproduce the same candidate and proofpack hashes.
+
+### Structured reconstruction result
+
+The reconstruction runner does **not** receive the published final coefficient tuple. It searches the declared family
+
+```text
+t  = 1 + x y
+F1 = t³z + y²t(a + bxy)
+F2 = y + cxt²z + cxy²(a + bxy)
+F3 = dx + ex²y − x³z
+```
+
+After reducing the constant-Jacobian equations to
+
+```text
+a = -4e/3,  b = -e,  c = -9/e,  d = -2e/3,  e ≠ 0,
+```
+
+it checks every nonzero integer `e` from `-8` through `8` against the exact collision constraints. One candidate survives:
+
+```text
+e = -3  →  (a, b, c, d, e) = (4, 3, 3, 2, -3)
+det(JF) = -2
+common image = (-1/4, 0, 0)
+```
+
+This is labelled **REDISCOVERED within a declared ansatz**—not blind search and not a new mathematical discovery.
+
+```bash
+foundry run counterexample-forge-0001-verify
+foundry run counterexample-forge-0001-reconstruct
+foundry run counterexample-forge-smoke
+```
+
+Public evidence labels are deliberately separate:
+
+| Label | Meaning |
+|---|---|
+| **REPRODUCED** | exact verification of a previously public witness |
+| **REDISCOVERED** | bounded search recovers an existing witness without receiving its final representation |
+| **DISCOVERED** | a candidate believed new, independently checked and released with a proofpack |
+
+📖 [`docs/counterexample-forge.md`](docs/counterexample-forge.md)
+
+> 🧭 **Boundary:** the reconstruction is exact but structurally guided. It proves the registered finite identities and records the search performed; it does not establish minimality, novelty, a general autonomous theorem solver, or a result for any separately open lower-dimensional case.
+'''
+          if '<a id="counterexample-forge"></a>' not in text:
+              count = text.count(section_anchor)
+              if count != 1:
+                  raise SystemExit(f"README section anchor matched {count} times")
+              text = text.replace(section_anchor, section + section_anchor, 1)
+
+          path.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Commit README update
+        shell: bash
+        run: |
+          if git diff --quiet -- README.md; then
+            echo "README already patched"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "docs(readme): launch Counterexample Forge and reconstruction result"
+          git push origin HEAD:feat/counterexample-forge-v1
