@@ -170,7 +170,7 @@ def candidate_from_parameter(parameter_e: int | Fraction) -> PolynomialMap:
     return PolynomialMap(
         variables,
         (f1, f2, f3),
-        name=f"jacobian-structured-reconstruction-e={coefficients.e}",
+        name="jacobian-three-variable-public-benchmark",
     )
 
 
