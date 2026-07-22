@@ -23,5 +23,5 @@ groups:
   jacobian-aftershock:
     - counterexample-forge-0002-aftershock
 
-  counterexample-forge-release:
+  jacobian-aftershock-release:
     - counterexample-forge-0002-smoke
