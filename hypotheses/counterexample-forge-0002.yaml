@@ -1,0 +1,48 @@
+id: counterexample-forge-0002
+track: Counterexample Forge
+model: normalized_cubic_weighted_lift_C3
+scope: exact rational polynomial maps in one declared cubic weighted-lift normalization
+claim: >
+  The registered integer-coefficient map H:C^3->C^3 has exactly 25 expanded
+  monomials, constant Jacobian determinant 2, a short exact two-point collision,
+  and a separate exact four-point rational fiber. Within the declared normalized
+  cubic seed family p_g(w), g=6 is the unique valid parameter minimizing the
+  expanded monomial count, reducing the generic count from 33 to 25.
+prediction:
+  observable: exact_compact_keller_map_and_family_minimum
+  expected_shape: determinant_two_two_point_collision_four_point_fiber_unique_g_six_minimum
+controls:
+  arithmetic: exact_rational
+  dimensions: 3
+  generic_family_term_count: 33
+  expected_minimum_term_count: 25
+  expected_parameter: 6
+  evidence_label: DERIVED_EXACT
+  novelty_status: UNESTABLISHED
+validation:
+  required:
+    - jacobian_determinant_is_identically_two
+    - coordinate_term_counts_are_13_10_2
+    - coordinate_degrees_are_12_11_4
+    - two_short_rational_witnesses_share_one_exact_image
+    - four_distinct_rational_witnesses_share_one_exact_image
+    - factor_ledger_shows_g_zero_degree_drop_and_eight_g_minus_six_cancellations
+    - every_other_irreducible_coefficient_factor_occurs_once
+    - bounded_rational_regression_search_returns_only_g_six
+    - result_hash_is_reproducible
+kill_criteria:
+  - the Jacobian determinant is not the exact constant 2
+  - either registered fiber fails exact substitution
+  - the map contains more or fewer than 25 expanded monomials
+  - another valid cubic seed parameter shares eight or more coefficient cancellations
+  - repeated runs emit different result hashes
+status: active
+claim_boundary: >
+  Exact finite identities and a global monomial optimum only inside the explicitly
+  normalized cubic weighted-lift family. This does not establish literature
+  priority, global minimality among all Keller maps, or a solution of the separate
+  open two-dimensional Jacobian problem.
+notes:
+  - The map is derived from the public weighted-lift mechanism using seed p(w)=6w^3-12w^2+5w.
+  - Targeted web searches did not locate this exact seed or expanded map, but absence from search is not proof of novelty.
+  - Public wording must use DERIVED_EXACT and novelty_status UNESTABLISHED until independent literature review.
