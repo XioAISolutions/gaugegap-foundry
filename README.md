@@ -13,6 +13,7 @@
   <a href="#-lagrangian-forge--from-symmetry-to-matter">Lagrangian Forge</a> ·
   <a href="#anomaly-forge">Anomaly Forge</a> ·
   <a href="#search-forge">Search Forge</a> ·
+  <a href="#counterexample-forge">Counterexample Forge</a> ·
   <a href="#infogap">InfoGap</a> ·
   <a href="#-attractor-forge--nonlinear-dynamics-you-can-inspect">Attractor Forge</a> ·
   <a href="#-the-web-of-physical-limits">Physical limits</a> ·
@@ -42,6 +43,7 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 - **Lagrangian Forge** — an audited Standard Model field, sector, interaction, and tree-level mass atlas.
 - **Anomaly Forge** — exact rational charge-consistency tests, a hypercharge solver, and a live anomaly-free surface.
 - **Search Forge** — certified Dijkstra/A* paths, scientific search spaces, and symbolic null controls.
+- **Counterexample Forge** — exact falsification witnesses, structured coefficient reconstruction, fail-closed gates, and hashed proofpacks.
 - **InfoGap** — an exact finite realization of the quantum no-hiding theorem with a discharged Coq certificate.
 - **UQT Forge** — UQT-inspired finite algebra known-answer tasks with reversible and irreversible controls.
 - **Compactification Forge** — finite hidden-dimension toy spectra for KK/winding-mode explanations.
@@ -65,6 +67,7 @@ flowchart TD
     F --> L["🧬 Lagrangian Forge<br/>fields · vertices · symmetry breaking"]
     F --> A["⚖️ Anomaly Forge<br/>charges · constraints · cancellation"]
     F --> S["🧭 Search Forge<br/>paths · proofs · pattern controls"]
+    F --> CE["🧨 Counterexample Forge<br/>exact witnesses · reconstruction · proofpacks"]
     F --> I["🪞 InfoGap<br/>quantum no-hiding theorem"]
     F --> U["🧠 UQT Forge<br/>finite quantum algebra controls"]
     F --> K["🧵 Compactification Forge<br/>hidden-dimension spectra"]
@@ -80,6 +83,7 @@ flowchart TD
     L --> L1["SU(3)c × SU(2)L × U(1)Y<br/>interaction hypergraph · audits"]
     A --> A1["exact rational anomalies<br/>hypercharge solver · Witten parity"]
     S --> S1["Dijkstra baseline · A* heuristic contract<br/>symbolic null models"]
+    CE --> CE1["constant Jacobian gate · exact collision<br/>REPRODUCED → REDISCOVERED → DISCOVERED"]
     I --> I1["exact dilation · Bell pair<br/>recoverable state · Coq certificate"]
     U --> U1["Z11 · Z11* · S4<br/>reversibility ledger"]
     K --> K1["S1 · T2<br/>KK + winding towers"]
@@ -94,7 +98,7 @@ flowchart TD
     classDef main fill:#eef6ff,stroke:#0969da,color:#111;
     classDef edge fill:#f6f0ff,stroke:#6929c4,color:#111;
     class F main;
-    class X,L,A,S,I,U,K,H,G,FL,C,N,P,D edge;
+    class X,L,A,S,CE,I,U,K,H,G,FL,C,N,P,D edge;
 ```
 
 </details>
@@ -207,6 +211,8 @@ The supporting substrate is reusable outside the interface:
 - `src/gaugegap/search_forge.py` — deterministic weighted graphs, Dijkstra, A*, heuristic checks, and hashed certificates;
 - `src/gaugegap/scientific_search_spaces.py` — exact anomaly-repair and research-maturity search spaces;
 - `src/gaugegap/symbolic_search.py` — historical ciphers and deterministic null-model controls;
+- `src/gaugegap/counterexample_forge.py` — exact sparse-polynomial maps, symbolic Jacobian gates, collision witnesses, and deterministic proofpacks;
+- `src/gaugegap/counterexample_reconstruct.py` — bounded structured reconstruction without supplying the final coefficient tuple;
 - `src/gaugegap/quantum/uqt_forge.py` — UQT-inspired finite algebra tables, reversibility controls, and circuit accounting;
 - `src/gaugegap/compactification_forge.py` — finite compactification spectra and cutoff-visibility checks;
 - `src/gaugegap/perception_forge.py` — finite fitness-interface perception games with rich-truth controls;
@@ -350,6 +356,69 @@ foundry run symbolic-search-lab
 The offline bundle writes `site/search-forge/index.html`, a JSON evidence record, and a reproducible SVG preview. Every result includes the path, cost, expansion order, graph hash, heuristic metadata, result hash, and explicit claim boundary.
 
 > 🧭 **Boundary:** finding a path does not prove that the graph exhausts every physical theory, proof strategy, or interpretation. Symbolic equality does not establish causality, prediction, or a physical mechanism.
+
+---
+
+<a id="counterexample-forge"></a>
+## 🧨 Counterexample Forge — search for the smallest exact falsifier
+
+Counterexample Forge turns a universal mathematical claim into an executable question:
+
+> **What is the smallest explicit object that would make this statement false?**
+
+Models may propose candidates, but confidence never certifies them. A candidate advances only through exact arithmetic, independent fail-closed gates, deterministic serialization, and a content-hashed evidence bundle.
+
+### First benchmark: an exact Jacobian collision
+
+The known-answer task is a public polynomial map `F : C³ → C³`. GaugeGap verifies, with rational arithmetic only, that:
+
+- `det(JF) = -2` identically;
+- three pairwise-distinct exact points share the image `(-1/4, 0, 0)`;
+- changing a witness, duplicating a point, changing the expected determinant, or supplying floating-point evidence fails closed;
+- repeated runs reproduce the same candidate and proofpack hashes.
+
+### Structured reconstruction result
+
+The reconstruction runner does **not** receive the published final coefficient tuple. It searches the declared family
+
+```text
+t  = 1 + x y
+F1 = t³z + y²t(a + bxy)
+F2 = y + cxt²z + cxy²(a + bxy)
+F3 = dx + ex²y − x³z
+```
+
+After reducing the constant-Jacobian equations to
+
+```text
+a = -4e/3,  b = -e,  c = -9/e,  d = -2e/3,  e ≠ 0,
+```
+
+it checks every nonzero integer `e` from `-8` through `8` against the exact collision constraints. One candidate survives:
+
+```text
+e = -3  →  (a, b, c, d, e) = (4, 3, 3, 2, -3)
+det(JF) = -2
+common image = (-1/4, 0, 0)
+```
+
+This is labelled **REDISCOVERED within a declared ansatz**—not blind search and not a new mathematical discovery.
+
+```bash
+foundry run counterexample-forge-0001-verify
+foundry run counterexample-forge-0001-reconstruct
+foundry run counterexample-forge-smoke
+```
+
+| Label | Meaning |
+|---|---|
+| **REPRODUCED** | exact verification of a previously public witness |
+| **REDISCOVERED** | bounded search recovers an existing witness without receiving its final representation |
+| **DISCOVERED** | a candidate believed new, independently checked and released with a proofpack |
+
+📖 [`docs/counterexample-forge.md`](docs/counterexample-forge.md)
+
+> 🧭 **Boundary:** the reconstruction is exact but structurally guided. It proves the registered finite identities and records the search performed; it does not establish minimality, novelty, a general autonomous theorem solver, or a result for any separately open lower-dimensional case.
 
 ---
 
