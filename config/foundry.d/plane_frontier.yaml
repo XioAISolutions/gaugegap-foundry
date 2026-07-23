@@ -1,0 +1,29 @@
+version: 1
+
+units:
+  plane-frontier-0001-audit:
+    track: plane-jacobian-frontier
+    hypothesis: plane-frontier-0001
+    status: experimental
+    description: >
+      Reproduce the GGHV (72,108) reduced polygons, verify an exact degree-1
+      covector obstruction, and record claim-limited degree-2 modular evidence.
+    command:
+      ["{python}", "scripts/run_plane_frontier.py",
+       "--output-dir", "artifacts/plane-frontier-0001"]
+
+  plane-frontier-0001-smoke:
+    track: plane-jacobian-frontier
+    hypothesis: plane-frontier-0001
+    status: experimental
+    description: Deterministic CI gate for the exact and modular frontier audit.
+    command:
+      ["{python}", "scripts/run_plane_frontier.py",
+       "--output-dir", "/tmp/plane-frontier-0001-smoke"]
+
+groups:
+  plane-jacobian-frontier:
+    - plane-frontier-0001-audit
+
+  plane-jacobian-frontier-release:
+    - plane-frontier-0001-smoke
