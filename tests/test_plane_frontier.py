@@ -53,4 +53,6 @@ def test_full_audit_is_deterministic_and_claim_limited() -> None:
         == "FINITE_FIELD_EVIDENCE_NOT_Q_CERTIFICATE"
         for item in audit.degree2
     )
-    assert "does not" in audit.claim_boundary.lower()
+    boundary = audit.claim_boundary.lower()
+    assert "do not cover" in boundary
+    assert "solve jc(2)" in boundary
