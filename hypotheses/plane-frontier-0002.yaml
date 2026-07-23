@@ -1,0 +1,48 @@
+id: plane-frontier-0002
+track: Plane Jacobian Frontier
+model: gghv_reduced_degree2_exact_left_null_certificate
+scope: >
+  The parameter-degree-2 polynomial-covector subsystem on lower-operator support
+  {(0,1),(1,0),(3,5)} inside the declared H-restricted GGHV Proposition 4.3
+  reduction for the (72,108) frontier.
+claim: >
+  A deterministic sparse exact elimination derives a 102-row integer left-null
+  certificate. The certificate annihilates all 1485 coefficient columns in the
+  declared subsystem while pairing with the right-hand side to
+  -621160607786489971200. Therefore the subsystem is inconsistent over Q, and no
+  parameter-degree-2 polynomial covector can satisfy the full declared route.
+prediction:
+  observable: exact_degree2_left_null_certificate
+  expected_shape: 1250_equations_1485_unknowns_rank_874_102_row_certificate
+controls:
+  arithmetic: exact_rational
+  modular_row_selection_prime: 2147483629
+  evidence_label: DERIVED_EXACT
+  novelty_status: UNESTABLISHED
+validation:
+  required:
+    - full_support_subsystem_contains_1250_equations_and_1485_unknowns
+    - modular_selection_identifies_875_rows_and_rank_874
+    - selected_rows_lift_to_the_same_exact_rank
+    - primitive_integer_certificate_has_102_nonzero_rows
+    - exact_certificate_annihilates_every_coefficient_column
+    - exact_rhs_pairing_is_minus_621160607786489971200
+    - certificate_digest_is_reproducible
+    - public_wording_does_not_claim_closure_of_72_108_or_JC2
+kill_criteria:
+  - any exact coefficient residual remains nonzero
+  - the exact right-hand-side pairing vanishes
+  - exact and modular selected-subsystem ranks disagree
+  - repeated runs emit different certificates or hashes
+  - the result is described as eliminating all higher-degree or rational routes
+status: active
+claim_boundary: >
+  This exact left-null certificate proves that no parameter-degree-2 polynomial
+  covector satisfies the declared H-restricted subsystem on support
+  {(0,1),(1,0),(3,5)}. It does not exclude higher-degree, rational, or chartwise
+  certificates; cover all simultaneous interior coefficients; eliminate
+  (72,108); raise the global degree bound; or solve JC(2).
+notes:
+  - A modular contradiction is used only to select a compact row subsystem.
+  - The final certificate is derived and independently verified over exact rationals.
+  - Historical priority for this exact 102-row certificate has not been established.
