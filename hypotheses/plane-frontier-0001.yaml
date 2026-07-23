@@ -1,0 +1,54 @@
+id: plane-frontier-0001
+track: Plane Jacobian Frontier
+model: gghv_reduced_72_108_h_restricted_covector_route
+scope: >
+  The Newton polygons and H-restricted simultaneous-covector system associated
+  with GGHV Proposition 4.3 for the surviving degree pair (72,108).
+claim: >
+  The source-faithful polygon transcription has 61 P-lattice points, 125
+  Q-lattice points, and 51 lower operators. The base map has rank 124 and
+  kernel dimension 165. A ten-row integer covector exactly proves that the
+  declared parameter-degree-1 certificate system is inconsistent over Q.
+  The parameter-degree-2 support {(0,1),(1,0),(3,5)} is independently
+  inconsistent over each of two declared prime fields, which is recorded as
+  finite-field evidence rather than a rational certificate.
+prediction:
+  observable: exact_degree1_obstruction_and_two_prime_degree2_reproduction
+  expected_shape: rank_124_kernel_165_exact_pairing_minus_126023040_modular_rank_882
+controls:
+  arithmetic:
+    degree1: exact_rational
+    degree2: modular_two_prime
+  primes:
+    - 2147483629
+    - 2147483587
+  evidence_label: INDEPENDENT_REPRODUCTION
+validation:
+  required:
+    - p_polygon_contains_61_lattice_points
+    - q_polygon_contains_125_lattice_points
+    - lower_operator_inventory_contains_51_points
+    - base_rank_is_124
+    - base_kernel_dimension_is_165
+    - ten_row_integer_covector_annihilates_every_degree1_kernel_image
+    - exact_degree1_rhs_pairing_is_minus_126023040
+    - tampered_degree1_certificate_fails_closed
+    - degree2_support_is_infeasible_over_both_declared_prime_fields
+    - degree2_result_is_not_mislabeled_as_a_Q_certificate
+    - canonical_audit_digest_is_reproducible
+kill_criteria:
+  - the exact degree1 covector fails any annihilation identity
+  - the exact degree1 rhs pairing is zero
+  - either modular degree2 computation becomes feasible
+  - the public report treats finite-field evidence as a proof over Q
+  - repeated runs emit different canonical hashes
+status: active
+claim_boundary: >
+  The exact degree-1 certificate closes one polynomial-covector route in the
+  declared H-restricted system. The degree-2 result is a two-prime modular
+  reproduction only. These results do not cover every interior coefficient,
+  eliminate (72,108), raise the global degree bound, or solve JC(2).
+notes:
+  - The reduced Newton polygons are transcribed from GGHV Proposition 4.3.
+  - Comparison target: Felipe Santibanez-Leal's CAOS_RESEARCH experiment ledger.
+  - No priority or novelty claim is made for the underlying obstruction.
