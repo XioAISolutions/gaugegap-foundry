@@ -1,0 +1,77 @@
+{
+  "audit_digest": "e38d4168a6b14aed9d2533c0456eb13769127af4ad2e9f2bb5ef77ea3f55fe5e",
+  "base_kernel_dimension": 165,
+  "base_rank": 124,
+  "claim_boundary": "The exact degree-1 certificate closes one polynomial-covector route in the declared H-restricted system. The degree-2 result is a two-prime modular reproduction only. These results do not cover every interior coefficient, eliminate (72,108), raise the global degree bound, or solve JC(2).",
+  "degree1_exact_certificate": {
+    "annihilates_kernel_image": true,
+    "certificate": {
+      "0,8": 2516085,
+      "1,9": -19739720,
+      "2,1": -218790,
+      "2,10": 67474836,
+      "3,11": -130876200,
+      "4,12": 156726570,
+      "5,13": -117338760,
+      "6,14": 52072020,
+      "7,15": -11143704,
+      "9,17": 308880
+    },
+    "nonzero_rows": 10,
+    "operator": [
+      1,
+      0
+    ],
+    "rhs_pairing": -126023040,
+    "verified": true
+  },
+  "degree2_modular_evidence": [
+    {
+      "columns": 1486,
+      "infeasible": true,
+      "prime": 2147483629,
+      "proof_status": "FINITE_FIELD_EVIDENCE_NOT_Q_CERTIFICATE",
+      "rank": 882,
+      "rows": 1250,
+      "support": [
+        [0, 1],
+        [1, 0],
+        [3, 5]
+      ]
+    },
+    {
+      "columns": 1486,
+      "infeasible": true,
+      "prime": 2147483587,
+      "proof_status": "FINITE_FIELD_EVIDENCE_NOT_Q_CERTIFICATE",
+      "rank": 882,
+      "rows": 1250,
+      "support": [
+        [0, 1],
+        [1, 0],
+        [3, 5]
+      ]
+    }
+  ],
+  "evidence_label": "INDEPENDENT_REPRODUCTION",
+  "lower_operators": 51,
+  "p_lattice_points": 61,
+  "p_vertices": [
+    [0, 0],
+    [1, 0],
+    [8, 14],
+    [8, 16],
+    [0, 8]
+  ],
+  "passed": true,
+  "q_lattice_points": 125,
+  "q_vertices": [
+    [0, 0],
+    [2, 1],
+    [12, 21],
+    [12, 24],
+    [0, 12]
+  ],
+  "schema": "gaugegap.plane_frontier_audit.v1",
+  "source": "GGHV Proposition 4.3 reduced (8,28) / (72,108) frontier"
+}

@@ -1,0 +1,20 @@
+{
+  "active_columns": 924,
+  "certificate_digest": "18f96fbd550b2d48f3b4e4e035b7f8dbf05553a9f782743c30fc214a7d9904ad",
+  "certificate_nonzero_rows": 102,
+  "claim_boundary": "This exact left-null certificate proves that no parameter-degree-2 polynomial covector satisfies the declared H-restricted subsystem on support {(0,1),(1,0),(3,5)}. It does not exclude higher-degree, rational, or chartwise certificates; cover all simultaneous interior coefficients; eliminate (72,108); raise the global degree bound; or solve JC(2).",
+  "evidence_label": "DERIVED_EXACT",
+  "exact_rank_before_contradiction": 874,
+  "novelty_status": "UNESTABLISHED",
+  "rhs_pairing": -621160607786489971200,
+  "schema": "gaugegap.plane_frontier_degree2_exact.summary.v1",
+  "selected_rows": 875,
+  "support": [
+    [0, 1],
+    [1, 0],
+    [3, 5]
+  ],
+  "total_equations": 1250,
+  "total_unknowns": 1485,
+  "verified": true
+}

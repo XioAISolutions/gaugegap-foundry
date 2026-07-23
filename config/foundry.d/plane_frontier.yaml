@@ -1,0 +1,51 @@
+version: 1
+
+units:
+  plane-frontier-0001-audit:
+    track: plane-jacobian-frontier
+    hypothesis: plane-frontier-0001
+    status: experimental
+    description: >
+      Reproduce the GGHV (72,108) reduced polygons, verify an exact degree-1
+      covector obstruction, and record the original two-prime degree-2 audit.
+    command:
+      ["{python}", "scripts/run_plane_frontier.py",
+       "--output-dir", "artifacts/plane-frontier-0001"]
+
+  plane-frontier-0001-smoke:
+    track: plane-jacobian-frontier
+    hypothesis: plane-frontier-0001
+    status: experimental
+    description: Deterministic CI gate for the source and degree-1 audit.
+    command:
+      ["{python}", "scripts/run_plane_frontier.py",
+       "--output-dir", "/tmp/plane-frontier-0001-smoke"]
+
+  plane-frontier-0002-degree2-exact:
+    track: plane-jacobian-frontier
+    hypothesis: plane-frontier-0002
+    status: experimental
+    description: >
+      Derive and verify the exact 102-row left-null certificate excluding the
+      declared parameter-degree-2 polynomial-covector subsystem.
+    command:
+      ["{python}", "scripts/run_plane_frontier_degree2.py",
+       "--output-dir", "artifacts/plane-frontier-0002"]
+
+  plane-frontier-0002-smoke:
+    track: plane-jacobian-frontier
+    hypothesis: plane-frontier-0002
+    status: experimental
+    description: Deterministic exact-rational gate for the degree-2 certificate.
+    command:
+      ["{python}", "scripts/run_plane_frontier_degree2.py",
+       "--output-dir", "/tmp/plane-frontier-0002-smoke"]
+
+groups:
+  plane-jacobian-frontier:
+    - plane-frontier-0001-audit
+    - plane-frontier-0002-degree2-exact
+
+  plane-jacobian-frontier-release:
+    - plane-frontier-0001-smoke
+    - plane-frontier-0002-smoke

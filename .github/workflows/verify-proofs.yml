@@ -20,7 +20,20 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e '.[spectral,dev]'
       - name: Unit tests
-        run: foundry run tests
+        run: |
+          mkdir -p /tmp/test-diagnostics
+          set +e
+          foundry run tests > /tmp/test-diagnostics/unit-tests.log 2>&1
+          status=$?
+          tail -n 200 /tmp/test-diagnostics/unit-tests.log
+          exit $status
+      - name: Upload unit-test diagnostics
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-diagnostics
+          path: /tmp/test-diagnostics/
+          retention-days: 7
       - name: Reproduce canonical finite CurveRank screen
         run: foundry run curverank-proof-reproduction
       - name: Check certified mismatch floor
