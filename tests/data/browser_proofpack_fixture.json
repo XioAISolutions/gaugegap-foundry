@@ -1,0 +1,92 @@
+{
+  "schema": "gaugegap.browser_attractor_proofpack.v1",
+  "created_at_utc": "2026-07-13T00:00:00.000Z",
+  "page": {
+    "schema": "gaugegap.foundry_experience.v6",
+    "git_commit": "abc123",
+    "title": "GaugeGap Foundry"
+  },
+  "scene": {
+    "id": "lorenz",
+    "label": "Lorenz dynamics",
+    "equations": [
+      "x' = σ(y-x)",
+      "y' = x(ρ-z)-y",
+      "z' = xy-βz"
+    ]
+  },
+  "solver": {
+    "method": "RK4",
+    "dt": 0.01,
+    "steps": 12000,
+    "burn_in": 2500,
+    "sample_every": 4,
+    "initial_state": [
+      1,
+      1,
+      1.05
+    ]
+  },
+  "parameters": {
+    "sigma": 10,
+    "rho": 28.7154,
+    "beta": 2.6666666666666665
+  },
+  "display": {
+    "projection": "3d",
+    "density": 2200,
+    "speed": 6,
+    "trail": 83
+  },
+  "precomputed_diagnostics": {
+    "lyapunov": [
+      0.9057,
+      0.0001,
+      -14.5723
+    ],
+    "dmd": {
+      "rank": 3,
+      "reconstruction_error": 1.234e-7
+    },
+    "validated_step": {
+      "validated": true,
+      "maximum_endpoint_width": 3.5e-15,
+      "reason": "interval enclosure held"
+    }
+  },
+  "trajectory": {
+    "points": 2375,
+    "first": [
+      1.0123457,
+      -0.5,
+      0.25
+    ],
+    "last": [
+      -8.9999999,
+      12.25,
+      27.0000001
+    ],
+    "sha256": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+  },
+  "claim_boundary": {
+    "scene": null,
+    "global": "finite deterministic visualizations only"
+  },
+  "attribution": "Conceptual inspiration only: Ryoji Ikeda — supersymmetry.",
+  "notes": "per-browser floats: 1e-7 vs 0.00001 vs 1e+21 formatting must match",
+  "edge_numbers": [
+    1e-7,
+    0.000001,
+    0.00001,
+    10000000000000000,
+    1e+21,
+    1e+22,
+    -0.5,
+    1200,
+    0.1,
+    2.667,
+    -1.5e-15,
+    123456789012345680000
+  ],
+  "content_hash": "60d0caed96103a2fa9304ee84eba542fb1e5b78db8a6b463dea41059b6a9596f"
+}
