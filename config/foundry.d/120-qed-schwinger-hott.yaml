@@ -1,0 +1,47 @@
+version: 1
+
+units:
+  qed-loop-0001:
+    track: LoopForge
+    status: evidence_only
+    hypothesis: qed-loop-0001
+    description: Generate renormalized one-loop QED scans and Ward/transversality audits.
+    command:
+      - "{python}"
+      - scripts/run_qed_schwinger_hott.py
+      - qed
+
+  schwinger-matter-0001:
+    track: GaugeMatter
+    status: finite_reference
+    hypothesis: schwinger-matter-0001
+    description: Solve a finite staggered-fermion Schwinger Hamiltonian after exact Gauss-law projection.
+    command:
+      - "{python}"
+      - scripts/run_qed_schwinger_hott.py
+      - schwinger
+
+  cohesive-gauge-0001:
+    track: CohesiveGauge
+    status: evidence_only
+    hypothesis: cohesive-gauge-0001
+    description: Emit a finite U(1) gauge-groupoid transport certificate and HoTT interface status.
+    command:
+      - "{python}"
+      - scripts/run_qed_schwinger_hott.py
+      - cohesive
+
+groups:
+  loopforge:
+    - qed-loop-0001
+
+  gauge-matter:
+    - schwinger-matter-0001
+
+  cohesive-gauge:
+    - cohesive-gauge-0001
+
+  qed-schwinger-suite:
+    - qed-loop-0001
+    - schwinger-matter-0001
+    - cohesive-gauge-0001
