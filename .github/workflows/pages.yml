@@ -39,7 +39,51 @@ jobs:
           python scripts/generate_foundry_experience_complete.py \
             --output-dir site/foundry-experience \
             --preview figures/foundry-experience/preview.svg
-          test -s site/foundry-experience/index.html
+
+      # `test -s index.html` only proved the file was not empty. A generator that
+      # silently dropped scenes, or one that published without the claim
+      # boundary, would still have passed and shipped. These assert what the page
+      # is actually for.
+      - name: Verify the bundle before publishing
+        run: |
+          python - <<'PY'
+          import json
+          import pathlib
+          import sys
+
+          root = pathlib.Path("site/foundry-experience")
+          problems = []
+
+          index = root / "index.html"
+          data = root / "data.json"
+          for required in (index, data):
+              if not required.is_file() or required.stat().st_size == 0:
+                  problems.append(f"missing or empty: {required}")
+
+          if not problems:
+              payload = json.loads(data.read_text())
+              scenes = payload.get("scenes") or []
+              # Fifteen scenes ship today. Assert the floor rather than the exact
+              # count so adding one is not a build failure, but losing one is.
+              if len(scenes) < 15:
+                  problems.append(f"expected at least 15 scenes, generated {len(scenes)}")
+
+              boundary = payload.get("claim_boundary") or ""
+              if not boundary.strip():
+                  problems.append("data.json carries no claim boundary")
+              elif boundary not in index.read_text():
+                  # The boundary is the honest part of this page. It must reach
+                  # the published HTML, not just the dataset behind it.
+                  problems.append("claim boundary is absent from the published index.html")
+
+          if problems:
+              print("Foundry Experience bundle failed verification:")
+              for problem in problems:
+                  print(f"  - {problem}")
+              sys.exit(1)
+
+          print(f"bundle verified: {len(scenes)} scenes, claim boundary present")
+          PY
       - name: Add root redirect
         run: |
           cat > site/index.html <<'HTML'
