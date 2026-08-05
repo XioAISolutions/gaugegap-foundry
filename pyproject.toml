@@ -38,6 +38,8 @@ Repository = "https://github.com/XioAISolutions/gaugegap-foundry"
 [project.scripts]
 gaugegap-certify = "gaugegap.certify:main"
 foundry = "gaugegap.cli:main"
+gaugegap-jump-lab = "gaugegap.jump_lab.demo:main"
+gaugegap-jump-benchmark = "gaugegap.jump_lab.benchmark:main"
 
 [project.optional-dependencies]
 quantum = [
