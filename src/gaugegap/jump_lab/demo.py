@@ -5,10 +5,20 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+from typing import Any
 
 from .artifact import dump_artifact
 from .executive import AbductiveExecutive, ExecutiveConfig
 from .report import render_discovery_html, write_html
+
+
+def _load_memory(path: str | Path | None) -> dict[str, Any] | None:
+    if path is None:
+        return None
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("salience memory must be a JSON object")
+    return data
 
 
 def run_demo(
@@ -19,6 +29,7 @@ def run_demo(
     use_salience: bool = True,
     early_stop: bool = True,
     max_interventions: int | None = None,
+    salience_memory: dict[str, Any] | None = None,
 ) -> dict:
     artifact = AbductiveExecutive(
         seed=seed,
@@ -27,6 +38,7 @@ def run_demo(
             early_stop=early_stop,
             max_interventions=max_interventions,
         ),
+        salience_memory=salience_memory,
     ).run()
     if output is not None:
         dump_artifact(artifact, output)
@@ -40,6 +52,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--seed", type=int, default=927451)
     parser.add_argument("--out", default="artifacts/elevator-experiment.crumb.json")
     parser.add_argument("--html", default="artifacts/elevator-experiment.html")
+    parser.add_argument("--memory-in")
+    parser.add_argument("--memory-out")
     parser.add_argument("--no-salience", action="store_true")
     parser.add_argument("--no-early-stop", action="store_true")
     parser.add_argument("--max-interventions", type=int)
@@ -51,7 +65,16 @@ def main(argv: list[str] | None = None) -> int:
         use_salience=not args.no_salience,
         early_stop=not args.no_early_stop,
         max_interventions=args.max_interventions,
+        salience_memory=_load_memory(args.memory_in),
     )
+    if args.memory_out:
+        destination = Path(args.memory_out)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(
+            json.dumps(artifact["salience_memory"]["after"], indent=2, sort_keys=True)
+            + "\n",
+            encoding="utf-8",
+        )
     print(
         json.dumps(
             {
