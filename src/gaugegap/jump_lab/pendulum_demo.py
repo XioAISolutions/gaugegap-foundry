@@ -9,7 +9,8 @@ from pathlib import Path
 from .artifact import dump_artifact
 from .executive import ExecutiveConfig
 from .pendulum_executive import PendulumAbductiveExecutive
-from .report import render_discovery_html, write_html
+from .pendulum_report import render_pendulum_html
+from .report import write_html
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -32,7 +33,7 @@ def main(argv: list[str] | None = None) -> int:
     ).run()
     dump_artifact(artifact, args.out)
     if args.html:
-        write_html(render_discovery_html(artifact), args.html)
+        write_html(render_pendulum_html(artifact), args.html)
     print(
         json.dumps(
             {
