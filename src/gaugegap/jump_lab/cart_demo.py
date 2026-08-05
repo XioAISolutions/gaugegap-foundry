@@ -1,0 +1,100 @@
+"""Run the force-to-mass cart Jump Lab demonstration."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+from typing import Any
+
+from .artifact import dump_artifact
+from .cart_executive import CartAbductiveExecutive
+from .executive import ExecutiveConfig
+from .report import render_discovery_html, write_html
+
+
+def _load_memory(path: str | Path | None) -> dict[str, Any] | None:
+    if path is None:
+        return None
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("salience memory must be a JSON object")
+    return data
+
+
+def run_cart_demo(
+    *,
+    seed: int = 927451,
+    output: str | Path | None = None,
+    html_output: str | Path | None = None,
+    use_salience: bool = True,
+    early_stop: bool = True,
+    max_interventions: int | None = None,
+    salience_memory: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    artifact = CartAbductiveExecutive(
+        seed=seed,
+        config=ExecutiveConfig(
+            use_salience=use_salience,
+            early_stop=early_stop,
+            max_interventions=max_interventions,
+        ),
+        salience_memory=salience_memory,
+    ).run()
+    if output is not None:
+        dump_artifact(artifact, output)
+    if html_output is not None:
+        write_html(render_discovery_html(artifact), html_output)
+    return artifact
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Run GaugeGap Jump Lab: The Force/Mass Cart"
+    )
+    parser.add_argument("--seed", type=int, default=927451)
+    parser.add_argument("--out", default="artifacts/cart-experiment.crumb.json")
+    parser.add_argument("--html", default="artifacts/cart-experiment.html")
+    parser.add_argument("--memory-in")
+    parser.add_argument("--memory-out")
+    parser.add_argument("--no-salience", action="store_true")
+    parser.add_argument("--no-early-stop", action="store_true")
+    parser.add_argument("--max-interventions", type=int)
+    args = parser.parse_args(argv)
+    artifact = run_cart_demo(
+        seed=args.seed,
+        output=args.out,
+        html_output=args.html,
+        use_salience=not args.no_salience,
+        early_stop=not args.no_early_stop,
+        max_interventions=args.max_interventions,
+        salience_memory=_load_memory(args.memory_in),
+    )
+    if args.memory_out:
+        destination = Path(args.memory_out)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(
+            json.dumps(artifact["salience_memory"]["after"], indent=2, sort_keys=True)
+            + "\n",
+            encoding="utf-8",
+        )
+    print(
+        json.dumps(
+            {
+                "artifact": args.out,
+                "html": args.html,
+                "winner": artifact["metrics"]["winner"],
+                "winner_score": artifact["metrics"]["winner_score"],
+                "experiments_run": artifact["metrics"]["experiments_run"],
+                "discovery_complete": artifact["metrics"]["discovery_complete"],
+                "verdict": artifact["verification"]["verdict"],
+                "hash": artifact["provenance"]["artifact_hash"],
+            },
+            indent=2,
+        )
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
