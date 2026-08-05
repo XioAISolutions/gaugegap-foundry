@@ -34,10 +34,10 @@ def compile_pendulum_ratio_axiom() -> dict[str, Any]:
     return {
         "id": "simple-pendulum-length-gravity-ratio-001",
         "statement": (
-            "For an ideal simple pendulum in the tested small-angle regime, the "
-            "period is determined by the square root of the length-to-gravity ratio: "
-            "T is approximately 2*pi*sqrt(L/g). Systems with equal L/g therefore "
-            "have equal tested periods even when L and g differ."
+            "For an ideal simple pendulum in the tested local small-angle regime, "
+            "the period is determined by the square root of the length-to-gravity "
+            "ratio: T is approximately 2*pi*sqrt(L/g). Systems with equal L/g "
+            "therefore have equal tested periods even when L and g differ."
         ),
         "quantification": {
             "systems": "positive finite lengths and uniform positive gravity",
@@ -54,6 +54,7 @@ def compile_pendulum_ratio_axiom() -> dict[str, Any]:
             "Two tested ideal small-angle systems with equal L/g produce periods that differ beyond tolerance."
         ],
         "excluded_claims": [
+            "global or unrestricted pendulum behavior",
             "large-amplitude exactness",
             "damped or driven pendulums",
             "non-uniform gravitational fields",
