@@ -1,12 +1,12 @@
-# GaugeGap Jump Lab v0.3 — Multi-world E-J-A benchmarks
+# GaugeGap Jump Lab v0.4 — Blind holdout benchmarks
 
 Jump Lab adds an experimental **E → J → A → S** path beside GaugeGap's
 verification-first infrastructure:
 
 1. **Experience:** black-box worlds expose sensor readings and controllable
    interventions while causal state remains hidden from the executive.
-2. **Jump:** an auditable abductive executive preserves competing explanations
-   and selects discriminating experiments.
+2. **Jump:** an auditable executive preserves competing explanations or, in the
+   holdout lane, selects among anonymous pre-registered prediction models.
 3. **Axiom:** a winning explanation is compiled into an explicitly scoped,
    falsifiable machine-readable candidate only after evidence gates are met.
 4. **Systematic deduction:** a deterministic verifier sweeps the candidate's
@@ -14,14 +14,12 @@ verification-first infrastructure:
 5. **Salience:** a lightweight spiking controller ranks attention. It can retain
    bounded semantic preferences, but it never determines truth.
 
-## Worlds
+## Training worlds
 
 ### Einstein Elevator
 
 Two hidden causes—uniform gravity and upward frame acceleration—produce matching
-local mechanical readings. The executive tests sensor failure, object-specific
-forces, hidden uniform forces, and a local reference-frame equivalence. The
-candidate remains explicitly local and Newtonian.
+local mechanical readings.
 
 ```bash
 gaugegap-jump-lab \
@@ -33,8 +31,7 @@ gaugegap-jump-lab \
 ### Force/Mass Cart
 
 Two carts have different hidden force and mass values but the same initial
-force-to-mass ratio. Their kinematic trajectories match until interventions
-change that ratio or expose a latent parameter.
+force-to-mass ratio.
 
 ```bash
 gaugegap-jump-cart \
@@ -42,74 +39,104 @@ gaugegap-jump-cart \
   --html artifacts/cart.html
 ```
 
-The scoped candidate states that equal force-to-mass ratios and matched initial
-conditions produce equal tested kinematics in the frictionless constant-force
-toy model. It does not identify force and mass separately.
+## Blind pendulum holdout
 
-## Multi-world suite
+The new holdout uses two ideal pendulum boxes with different hidden length and
+gravity values but matching initial periods. During selection, the executive
+sees:
 
-The suite runs:
+- raw observations;
+- permitted interventions;
+- anonymous model IDs;
+- each model's pre-registered prediction fingerprint.
 
-- the elevator task with salience;
-- the cart task with cold salience memory;
-- the cart task with only semantic attention associations transferred from the
-  elevator run;
-- a fixed-order cart baseline.
+It does **not** see the semantic model statements, target formula, or hidden
+model-to-ID mapping. The mapping is randomized by deterministic seed and hashed.
+Semantic statements are revealed only after the run for audit and reporting.
 
 ```bash
-gaugegap-jump-suite \
-  --out-dir artifacts/jump-lab-suite \
-  --report artifacts/jump-lab-suite.json \
-  --html artifacts/jump-lab-suite.html
+gaugegap-jump-pendulum \
+  --out artifacts/pendulum-holdout.eja.json \
+  --html artifacts/pendulum-holdout.html
 ```
 
-Transferred memory contains bounded preferences such as `boundary_probe` and
-`parameter_probe`. It excludes hidden state, hypothesis scores, candidate
-axioms, and verifier verdicts. The suite reports neutral or harmful transfer as
-well as improvements; no positive result is assumed.
+The intervention set includes:
 
-Each warm cart artifact records the elevator artifact hash as a parent, giving
-CrumbLLM enough provenance to construct a discovery lineage graph.
+- stable repetition;
+- scaling length and gravity together;
+- adding the same length to both systems;
+- increasing amplitude to cross the small-angle boundary;
+- controlled exposure of a latent length sensor.
 
-## Salience-memory files
+The candidate axiom states, within the ideal tested small-angle scope, that the
+period follows the square root of the length-to-gravity ratio. The verifier also
+checks that large amplitude creates a measurable boundary and that equal periods
+do not imply identical latent parameters.
 
-Both direct demonstrations support memory import and export:
+This lane is honestly classified as **blinded pre-registered model selection**.
+It is not described as open-ended hypothesis invention.
+
+## Cross-world holdout suite
+
+The v0.4 suite runs, for each seed:
+
+1. elevator training with salience;
+2. cart training with only bounded semantic salience memory transferred;
+3. pendulum holdout with cold salience;
+4. pendulum holdout with trained salience memory;
+5. pendulum holdout with fixed intervention ordering.
 
 ```bash
-gaugegap-jump-lab --memory-out artifacts/memory.json
-gaugegap-jump-cart --memory-in artifacts/memory.json
+gaugegap-jump-holdout \
+  --out-dir artifacts/jump-lab-holdout \
+  --report artifacts/jump-lab-holdout.json \
+  --html artifacts/jump-lab-holdout.html
 ```
 
-A memory snapshot stores attention associations only. It cannot authorize an
-axiom or override evidence gates.
+The report measures:
 
-## Single-world policy benchmark
+- anonymous-model selection accuracy;
+- discovery-completion rate;
+- experiments required;
+- target-language leakage rate;
+- cold versus warm experiment savings;
+- warm versus fixed-order experiment savings;
+- agreement on the post-run semantic model;
+- parent-artifact lineage.
 
-The original paired intervention-ordering test remains available:
+Transferred memory contains only bounded attention associations such as
+`boundary_probe`, `parameter_probe`, `ratio_probe`, and `repeat_probe`. It
+excludes hidden state, candidate statements, model mappings, scores, axioms, and
+verifier verdicts.
+
+## Earlier benchmarks
+
+The v0.3 multi-world suite and v0.2 elevator policy benchmark remain available:
 
 ```bash
+gaugegap-jump-suite
 gaugegap-jump-benchmark
 ```
 
-It compares salience ordering with a fixed order inside the elevator world. The
-multi-world suite is a separate test and does not turn the single-world result
-into evidence of general SNN superiority.
+## CRUMB review workflow
 
-## CRUMB handoff
-
-Every run is a CRUMB EJA artifact:
+Every run is a CRUMB EJA artifact. A complete review flow is:
 
 ```bash
-crumblm eja validate artifacts/elevator.eja.json
-crumblm eja validate-pack artifacts/jump-lab-suite
-crumblm eja audit-pack artifacts/jump-lab-suite
-crumblm eja lineage-pack artifacts/jump-lab-suite
+crumblm eja validate-pack artifacts/jump-lab-holdout
+crumblm eja audit-pack artifacts/jump-lab-holdout
+crumblm eja evidence-pack artifacts/jump-lab-holdout \
+  --html artifacts/eja-evidence.html
+crumblm eja lineage-pack artifacts/jump-lab-holdout
+crumblm eja bundle-pack artifacts/jump-lab-holdout \
+  --out artifacts/eja-review-bundle.zip
 ```
 
 ## Honest claim boundary
 
-v0.3 proves that the same auditable software pattern can be exercised in two
-hand-authored deterministic toy worlds. It does **not** recreate historical
-scientific discoveries, establish open-ended machine abduction, validate the
-candidate axioms in real physical systems, or show that salience transfer will
-generalize beyond these benchmarks.
+v0.4 demonstrates a replayable, blinded model-selection benchmark on one new
+hand-authored deterministic holdout world. It improves resistance to phrase
+leakage and makes evidence references auditable. It does **not** establish
+open-ended machine abduction, autonomous invention of scientific hypotheses,
+real-world pendulum validation, general cross-domain transfer, or broad SNN
+superiority.
