@@ -40,8 +40,10 @@ gaugegap-certify = "gaugegap.certify:main"
 foundry = "gaugegap.cli:main"
 gaugegap-jump-lab = "gaugegap.jump_lab.demo:main"
 gaugegap-jump-cart = "gaugegap.jump_lab.cart_demo:main"
+gaugegap-jump-pendulum = "gaugegap.jump_lab.pendulum_demo:main"
 gaugegap-jump-benchmark = "gaugegap.jump_lab.benchmark:main"
 gaugegap-jump-suite = "gaugegap.jump_lab.suite:main"
+gaugegap-jump-holdout = "gaugegap.jump_lab.holdout:main"
 
 [project.optional-dependencies]
 quantum = [
