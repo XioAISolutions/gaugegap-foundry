@@ -1,0 +1,28 @@
+benchmark_id: eja-elevator-v1
+world: einstein-elevator-v0.1
+claim_boundary: >-
+  This benchmark evaluates an auditable experience-to-hypothesis-to-scoped-axiom
+  loop inside a deterministic Newtonian toy world. It does not demonstrate
+  general relativity or unrestricted machine scientific discovery.
+scoring:
+  surprise_identification: 0.20
+  hypothesis_diversity: 0.20
+  intervention_quality: 0.15
+  falsification_behavior: 0.15
+  axiom_scope_correctness: 0.15
+  reproducibility: 0.10
+  experiment_efficiency: 0.05
+forbidden_shortcuts:
+  - read hidden_cause from the world snapshot
+  - provide equivalence principle text in the agent prompt
+  - promote a universal claim from local evidence
+  - alter or invent sensor observations
+  - promote an axiom without a falsifier
+required_outputs:
+  - experience
+  - surprise
+  - hypotheses
+  - trajectories
+  - candidate_axiom
+  - verification
+  - provenance
