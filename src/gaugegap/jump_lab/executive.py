@@ -76,6 +76,7 @@ class AbductiveExecutive:
         use_salience: bool | None = None,
         early_stop: bool | None = None,
         max_interventions: int | None = None,
+        salience_memory: dict[str, Any] | None = None,
     ) -> None:
         self.seed = seed
         self.tolerance = tolerance
@@ -97,7 +98,14 @@ class AbductiveExecutive:
             raise ValueError("max_interventions must be positive")
         self.config = resolved
         self.hypotheses = default_elevator_hypotheses()
-        self.salience = SalienceController()
+        self._initial_salience_memory = salience_memory
+        self.salience = self._new_salience_controller()
+
+    def _new_salience_controller(self) -> SalienceController:
+        controller = SalienceController()
+        if self._initial_salience_memory is not None:
+            controller.load_snapshot(self._initial_salience_memory)
+        return controller
 
     def _fresh_pair(self) -> tuple[EinsteinElevatorWorld, EinsteinElevatorWorld]:
         a = EinsteinElevatorWorld("gravity")
@@ -117,19 +125,31 @@ class AbductiveExecutive:
         return [
             (
                 Intervention("repeat_observation", rationale="test sensor stability"),
-                SalienceCandidate("repeat_observation", 0.25, 0.65, 0.55, 1.0, cost=0.03),
+                SalienceCandidate(
+                    "repeat_observation", 0.25, 0.65, 0.55, 1.0,
+                    cost=0.03, association_key="repeat_probe",
+                ),
             ),
             (
                 Intervention("change_object_mass", {"mass_kg": 35.0}),
-                SalienceCandidate("change_object_mass", 0.55, 0.82, 0.76, 1.0, cost=0.05),
+                SalienceCandidate(
+                    "change_object_mass", 0.55, 0.82, 0.76, 1.0,
+                    cost=0.05, association_key="parameter_probe",
+                ),
             ),
             (
                 Intervention("change_object_composition", {"composition": "aluminium"}),
-                SalienceCandidate("change_object_composition", 0.52, 0.78, 0.72, 1.0, cost=0.05),
+                SalienceCandidate(
+                    "change_object_composition", 0.52, 0.78, 0.72, 1.0,
+                    cost=0.05, association_key="parameter_probe",
+                ),
             ),
             (
                 Intervention("cut_cable", rationale="enter free-fall state"),
-                SalienceCandidate("cut_cable", 0.85, 0.88, 0.84, 1.0, cost=0.12),
+                SalienceCandidate(
+                    "cut_cable", 0.85, 0.88, 0.84, 1.0,
+                    cost=0.12, association_key="state_transition",
+                ),
             ),
             (
                 Intervention(
@@ -137,7 +157,8 @@ class AbductiveExecutive:
                     rationale="test local versus external-frame scope",
                 ),
                 SalienceCandidate(
-                    "open_external_reference", 0.95, 0.98, 0.99, 1.0, cost=0.10
+                    "open_external_reference", 0.95, 0.98, 0.99, 1.0,
+                    cost=0.10, association_key="boundary_probe",
                 ),
             ),
         ]
@@ -234,7 +255,8 @@ class AbductiveExecutive:
 
     def run(self) -> dict[str, Any]:
         self.hypotheses = default_elevator_hypotheses()
-        self.salience = SalienceController()
+        self.salience = self._new_salience_controller()
+        memory_before = self.salience.snapshot()
         initial_a, initial_b = self._fresh_pair()
         obs_a, obs_b = initial_a.observe(), initial_b.observe()
         initial_match = self._local_match(obs_a, obs_b)
@@ -242,6 +264,7 @@ class AbductiveExecutive:
         plan = self._candidate_plan()
         ranking = self._rank_plan(plan)
         actions_by_name = {action.action_type: action for action, _ in plan}
+        candidates_by_name = {candidate.name: candidate for _, candidate in plan}
         outcomes: list[ExperimentOutcome] = []
         local_invariance_tests = 0
         boundary_observed = False
@@ -258,7 +281,12 @@ class AbductiveExecutive:
             useful = bool(outcome.discriminated_hypotheses) and (
                 outcome.local_match or outcome.external_difference
             )
-            self.salience.reinforce(name, useful=useful)
+            candidate = candidates_by_name[name]
+            self.salience.reinforce(
+                name,
+                useful=useful,
+                association_key=candidate.memory_key,
+            )
             if self._stopping_condition(
                 local_invariance_tests=local_invariance_tests,
                 boundary_observed=boundary_observed,
@@ -294,7 +322,7 @@ class AbductiveExecutive:
             "artifact_type": "eja_experiment",
             "experiment": {
                 "id": f"elevator-run-{self.seed}",
-                "world": "einstein-elevator-v0.2",
+                "world": "einstein-elevator-v0.3",
                 "deterministic_seed": self.seed,
                 "agent_access": "observations_and_interventions_only",
                 "search_policy": {
@@ -352,10 +380,15 @@ class AbductiveExecutive:
                 "winner_score": round(winner.score, 6),
                 "policy": "spiking_salience" if self.config.use_salience else "fixed_baseline",
             },
+            "salience_memory": {
+                "before": memory_before,
+                "after": self.salience.snapshot(),
+            },
             "provenance": {
                 "generator": "gaugegap.jump_lab.AbductiveExecutive",
                 "artifact_hash": "pending",
                 "hidden_state_exposed_to_agent": False,
+                "parent_artifact_hashes": [],
             },
         }
         artifact["provenance"]["artifact_hash"] = content_hash(

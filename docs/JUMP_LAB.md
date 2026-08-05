@@ -1,84 +1,115 @@
-# GaugeGap Jump Lab v0.2 — The Elevator
+# GaugeGap Jump Lab v0.3 — Multi-world E-J-A benchmarks
 
 Jump Lab adds an experimental **E → J → A → S** path beside GaugeGap's
 verification-first infrastructure:
 
-1. **Experience:** two black-box elevator worlds expose sensor readings and
-   controllable interventions, while causal state remains hidden from the agent.
+1. **Experience:** black-box worlds expose sensor readings and controllable
+   interventions while causal state remains hidden from the executive.
 2. **Jump:** an auditable abductive executive preserves competing explanations
    and selects discriminating experiments.
-3. **Axiom:** the winning explanation is compiled into an explicitly scoped,
-   falsifiable machine-readable candidate only after configurable evidence gates
-   are satisfied.
-4. **Systematic deduction:** GaugeGap sweeps masses and compositions, checks the
-   local claim, and separately probes a scope boundary using an external frame.
-5. **Salience:** a lightweight spiking controller ranks attention and learns
-   which interventions were useful. It never determines truth.
+3. **Axiom:** a winning explanation is compiled into an explicitly scoped,
+   falsifiable machine-readable candidate only after evidence gates are met.
+4. **Systematic deduction:** a deterministic verifier sweeps the candidate's
+   stated scope and separately probes an excluded boundary.
+5. **Salience:** a lightweight spiking controller ranks attention. It can retain
+   bounded semantic preferences, but it never determines truth.
 
-## What v0.2 adds
+## Worlds
 
-- configurable salience or fixed-order policies;
-- evidence-aware early stopping;
-- bounded runs that refuse to compile an axiom prematurely;
-- run metrics for experiment count, local invariance tests and scope-boundary
-  coverage;
-- a paired salience-versus-baseline benchmark;
-- portable five-panel HTML discovery reports;
-- portable HTML benchmark reports.
+### Einstein Elevator
 
-## Run the discovery demonstration
+Two hidden causes—uniform gravity and upward frame acceleration—produce matching
+local mechanical readings. The executive tests sensor failure, object-specific
+forces, hidden uniform forces, and a local reference-frame equivalence. The
+candidate remains explicitly local and Newtonian.
 
 ```bash
-python -m gaugegap.jump_lab \
-  --out artifacts/elevator-experiment.crumb.json \
-  --html artifacts/elevator-experiment.html
-
-# Installed console command
-gaugegap-jump-lab --out artifacts/run.json --html artifacts/run.html
+gaugegap-jump-lab \
+  --out artifacts/elevator.eja.json \
+  --html artifacts/elevator.html \
+  --memory-out artifacts/elevator-memory.json
 ```
 
-Run the fixed baseline or disable early stopping:
+### Force/Mass Cart
+
+Two carts have different hidden force and mass values but the same initial
+force-to-mass ratio. Their kinematic trajectories match until interventions
+change that ratio or expose a latent parameter.
 
 ```bash
-gaugegap-jump-lab --no-salience
-gaugegap-jump-lab --no-early-stop
-gaugegap-jump-lab --max-interventions 1
+gaugegap-jump-cart \
+  --out artifacts/cart.eja.json \
+  --html artifacts/cart.html
 ```
 
-A bounded run that does not meet the evidence threshold records
-`discovery_complete: false` and leaves `candidate_axiom` unset.
+The scoped candidate states that equal force-to-mass ratios and matched initial
+conditions produce equal tested kinematics in the frictionless constant-force
+toy model. It does not identify force and mass separately.
 
-## Benchmark the salience controller
+## Multi-world suite
+
+The suite runs:
+
+- the elevator task with salience;
+- the cart task with cold salience memory;
+- the cart task with only semantic attention associations transferred from the
+  elevator run;
+- a fixed-order cart baseline.
 
 ```bash
-python -m gaugegap.jump_lab.benchmark \
-  --out artifacts/jump-lab-benchmark.json \
-  --html artifacts/jump-lab-benchmark.html
+gaugegap-jump-suite \
+  --out-dir artifacts/jump-lab-suite \
+  --report artifacts/jump-lab-suite.json \
+  --html artifacts/jump-lab-suite.html
+```
 
-# Installed console command
+Transferred memory contains bounded preferences such as `boundary_probe` and
+`parameter_probe`. It excludes hidden state, hypothesis scores, candidate
+axioms, and verifier verdicts. The suite reports neutral or harmful transfer as
+well as improvements; no positive result is assumed.
+
+Each warm cart artifact records the elevator artifact hash as a parent, giving
+CrumbLLM enough provenance to construct a discovery lineage graph.
+
+## Salience-memory files
+
+Both direct demonstrations support memory import and export:
+
+```bash
+gaugegap-jump-lab --memory-out artifacts/memory.json
+gaugegap-jump-cart --memory-in artifacts/memory.json
+```
+
+A memory snapshot stores attention associations only. It cannot authorize an
+axiom or override evidence gates.
+
+## Single-world policy benchmark
+
+The original paired intervention-ordering test remains available:
+
+```bash
 gaugegap-jump-benchmark
 ```
 
-The paired benchmark gives both policies the same world, hypothesis updates,
-stop conditions and verifier. Only intervention ordering changes. The benchmark
-is deliberately narrow: it measures one hand-authored policy in one toy world,
-not general superiority of spiking neural networks.
+It compares salience ordering with a fixed order inside the elevator world. The
+multi-world suite is a separate test and does not turn the single-world result
+into evidence of general SNN superiority.
 
 ## CRUMB handoff
 
-The generated artifact is compatible with the CrumbLLM EJA validator and pack
-commands:
+Every run is a CRUMB EJA artifact:
 
 ```bash
-crumblm eja validate artifacts/elevator-experiment.crumb.json
-crumblm eja validate-pack artifacts --html artifacts/eja-pack.html
+crumblm eja validate artifacts/elevator.eja.json
+crumblm eja validate-pack artifacts/jump-lab-suite
+crumblm eja audit-pack artifacts/jump-lab-suite
+crumblm eja lineage-pack artifacts/jump-lab-suite
 ```
 
 ## Honest claim boundary
 
-This release is a deterministic Newtonian benchmark. It demonstrates a
-replayable architecture for moving from observations to competing hypotheses,
-interventions, a scoped candidate axiom, and verification. It does **not**
-recreate Einstein's historical discovery, prove that LLMs can or cannot perform
-abduction, establish that SNNs generally improve scientific search, or implement
-general relativity.
+v0.3 proves that the same auditable software pattern can be exercised in two
+hand-authored deterministic toy worlds. It does **not** recreate historical
+scientific discoveries, establish open-ended machine abduction, validate the
+candidate axioms in real physical systems, or show that salience transfer will
+generalize beyond these benchmarks.

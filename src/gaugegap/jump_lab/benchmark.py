@@ -64,8 +64,8 @@ def run_benchmark(seeds: Iterable[int] = DEFAULT_SEEDS) -> dict[str, Any]:
     if count == 0:
         raise ValueError("at least one seed is required")
     return {
-        "benchmark": "jump-lab-salience-ab-v0.2",
-        "world": "einstein-elevator-v0.2",
+        "benchmark": "jump-lab-salience-ab-v0.3",
+        "world": "einstein-elevator-v0.3",
         "controlled_variable": "intervention_ordering_policy",
         "runs": rows,
         "paired_summary": {

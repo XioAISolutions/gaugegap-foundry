@@ -1,4 +1,4 @@
-"""Run the complete GaugeGap Jump Lab elevator demonstration."""
+"""Run the force-to-mass cart Jump Lab demonstration."""
 
 from __future__ import annotations
 
@@ -8,7 +8,8 @@ from pathlib import Path
 from typing import Any
 
 from .artifact import dump_artifact
-from .executive import AbductiveExecutive, ExecutiveConfig
+from .cart_executive import CartAbductiveExecutive
+from .executive import ExecutiveConfig
 from .report import render_discovery_html, write_html
 
 
@@ -21,7 +22,7 @@ def _load_memory(path: str | Path | None) -> dict[str, Any] | None:
     return data
 
 
-def run_demo(
+def run_cart_demo(
     *,
     seed: int = 927451,
     output: str | Path | None = None,
@@ -30,8 +31,8 @@ def run_demo(
     early_stop: bool = True,
     max_interventions: int | None = None,
     salience_memory: dict[str, Any] | None = None,
-) -> dict:
-    artifact = AbductiveExecutive(
+) -> dict[str, Any]:
+    artifact = CartAbductiveExecutive(
         seed=seed,
         config=ExecutiveConfig(
             use_salience=use_salience,
@@ -48,17 +49,19 @@ def run_demo(
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run GaugeGap Jump Lab: The Elevator")
+    parser = argparse.ArgumentParser(
+        description="Run GaugeGap Jump Lab: The Force/Mass Cart"
+    )
     parser.add_argument("--seed", type=int, default=927451)
-    parser.add_argument("--out", default="artifacts/elevator-experiment.crumb.json")
-    parser.add_argument("--html", default="artifacts/elevator-experiment.html")
+    parser.add_argument("--out", default="artifacts/cart-experiment.crumb.json")
+    parser.add_argument("--html", default="artifacts/cart-experiment.html")
     parser.add_argument("--memory-in")
     parser.add_argument("--memory-out")
     parser.add_argument("--no-salience", action="store_true")
     parser.add_argument("--no-early-stop", action="store_true")
     parser.add_argument("--max-interventions", type=int)
     args = parser.parse_args(argv)
-    artifact = run_demo(
+    artifact = run_cart_demo(
         seed=args.seed,
         output=args.out,
         html_output=args.html,
