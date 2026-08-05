@@ -13,7 +13,39 @@ def _json(value: Any) -> str:
 
 
 def _winner(artifact: dict[str, Any]) -> dict[str, Any]:
-    return max(artifact.get("hypotheses", []), key=lambda item: item.get("score", 0.0))
+    hypotheses = artifact.get("hypotheses", [])
+    return max(hypotheses, key=lambda item: item.get("score", 0.0)) if hypotheses else {}
+
+
+def _world_copy(artifact: dict[str, Any]) -> tuple[str, str, str, str]:
+    world = str(artifact.get("experiment", {}).get("world", "unknown-world"))
+    if world.startswith("force-mass-cart"):
+        return (
+            "The Force/Mass Cart",
+            "1 · Synthetic force/mass cart world",
+            (
+                "Two black-box carts expose matching kinematics while force and "
+                "mass remain hidden until an allowed intervention probes them."
+            ),
+            (
+                "This is a frictionless constant-force Newtonian toy world. It "
+                "demonstrates scoped latent-parameter abduction; it does not validate "
+                "the candidate in real mechanical systems."
+            ),
+        )
+    return (
+        "The Elevator",
+        "1 · Synthetic elevator world",
+        (
+            "Two black boxes expose the same local mechanical interface while their "
+            "causal state remains hidden from the executive."
+        ),
+        (
+            "This is a deterministic Newtonian toy-world benchmark. It demonstrates "
+            "an auditable experience-to-hypothesis-to-scoped-axiom pipeline; it does "
+            "not implement general relativity or establish unrestricted machine discovery."
+        ),
+    )
 
 
 def render_discovery_html(artifact: dict[str, Any]) -> str:
@@ -27,17 +59,13 @@ def render_discovery_html(artifact: dict[str, Any]) -> str:
         "reason": "The configured evidence threshold was not reached.",
     }
     verification = artifact.get("verification", {})
-    claim_boundary = (
-        "This is a deterministic Newtonian toy-world benchmark. It demonstrates "
-        "an auditable experience-to-hypothesis-to-scoped-axiom pipeline; it does "
-        "not implement general relativity or establish unrestricted machine discovery."
-    )
+    world_title, panel_title, world_description, claim_boundary = _world_copy(artifact)
     trajectory_rows = "".join(
         "<tr>"
         f"<td>{index + 1}</td>"
         f"<td>{escape(str(item.get('intervention', {}).get('action_type', 'unknown')))}</td>"
         f"<td>{escape(str(item.get('local_match')))}</td>"
-        f"<td>{escape(str(item.get('external_difference')))}</td>"
+        f"<td>{escape(str(item.get('external_difference', item.get('latent_difference'))))}</td>"
         f"<td>{escape(', '.join(item.get('discriminated_hypotheses', [])))}</td>"
         "</tr>"
         for index, item in enumerate(trajectories)
@@ -77,16 +105,16 @@ table{{width:100%;border-collapse:collapse}} th,td{{text-align:left;padding:9px;
 </style>
 </head>
 <body><main>
-<header><div><div class="eyebrow">GaugeGap Jump Lab v0.2</div><h1>The Elevator</h1></div><div class="statline">
+<header><div><div class="eyebrow">GaugeGap Jump Lab v0.3</div><h1>{escape(world_title)}</h1></div><div class="statline">
 <span class="stat">Policy <strong>{escape(str(metrics.get('policy', 'unknown')))}</strong></span>
 <span class="stat">Experiments <strong>{escape(str(metrics.get('experiments_run', len(trajectories))))}</strong></span>
 <span class="stat">Winner <strong>{escape(str(winner.get('id', 'none')))}</strong></span>
 </div></header>
 <section class="grid">
-<article class="panel world"><h2>1 · Synthetic elevator world</h2><p>Two black boxes expose the same local mechanical interface while their causal state remains hidden from the executive.</p><pre>{_json(artifact.get('experiment', {}))}</pre></article>
+<article class="panel world"><h2>{escape(panel_title)}</h2><p>{escape(world_description)}</p><pre>{_json(artifact.get('experiment', {}))}</pre></article>
 <article class="panel sensors"><h2>2 · Sensor experience</h2><p>The raw observations remain separate from the later interpretation.</p><pre>{_json(observations)}</pre></article>
 <article class="panel hypotheses"><h2>3 · Competing hypotheses</h2><div class="hypothesis-grid">{hypothesis_cards}</div></article>
-<article class="panel interventions"><h2>4 · Interventions</h2><table><thead><tr><th>#</th><th>Action</th><th>Local match</th><th>External difference</th><th>Discriminates</th></tr></thead><tbody>{trajectory_rows}</tbody></table></article>
+<article class="panel interventions"><h2>4 · Interventions</h2><table><thead><tr><th>#</th><th>Action</th><th>Local match</th><th>Boundary difference</th><th>Discriminates</th></tr></thead><tbody>{trajectory_rows}</tbody></table></article>
 <article class="panel axiom"><h2>5 · Candidate axiom and deterministic verdict</h2><p class="verdict">{escape(str(verification.get('verdict', 'not_verified')))}</p><div class="grid"><div style="grid-column:span 7"><h3>Scoped candidate</h3><pre>{_json(axiom)}</pre></div><div style="grid-column:span 5"><h3>Verification</h3><pre>{_json(verification)}</pre></div></div></article>
 </section>
 <footer><strong>Claim boundary:</strong> {escape(claim_boundary)}<br>Artifact hash: {escape(str(artifact.get('provenance', {}).get('artifact_hash', 'missing')))}</footer>
