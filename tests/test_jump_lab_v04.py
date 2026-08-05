@@ -1,5 +1,6 @@
 from gaugegap.jump_lab import (
     ExecutiveConfig,
+    Intervention,
     PendulumAbductiveExecutive,
     PendulumWorld,
     forbidden_term_hits,
@@ -15,11 +16,7 @@ def test_pendulum_world_hides_latent_parameters_and_exposes_controlled_sensors()
     hidden = world.snapshot(include_hidden=True)
     assert "hidden_length_m" not in visible
     assert hidden["hidden_length_m"] == 1.0
-    observation = world.intervene(
-        __import__("gaugegap.jump_lab", fromlist=["Intervention"]).Intervention(
-            "expose_length_sensor"
-        )
-    ).observation
+    observation = world.intervene(Intervention("expose_length_sensor")).observation
     assert observation.sensor_readings["length_sensor_m"] == 1.0
 
 
@@ -28,18 +25,35 @@ def test_equal_ratio_period_is_invariant_then_equal_length_breaks_pair_match():
     right = PendulumWorld("strong_long")
     left.reset(11)
     right.reset(11)
-    assert left.observe().sensor_readings["period_s"] == right.observe().sensor_readings["period_s"]
+    initial_delta = abs(
+        left.observe().sensor_readings["period_s"]
+        - right.observe().sensor_readings["period_s"]
+    )
+    assert initial_delta < 1e-12
 
-    Intervention = __import__("gaugegap.jump_lab", fromlist=["Intervention"]).Intervention
-    scaled_left = left.intervene(Intervention("scale_length_and_gravity", {"factor": 2.0})).observation
-    scaled_right = right.intervene(Intervention("scale_length_and_gravity", {"factor": 2.0})).observation
-    assert scaled_left.sensor_readings["period_s"] == scaled_right.sensor_readings["period_s"]
+    scaled_left = left.intervene(
+        Intervention("scale_length_and_gravity", {"factor": 2.0})
+    ).observation
+    scaled_right = right.intervene(
+        Intervention("scale_length_and_gravity", {"factor": 2.0})
+    ).observation
+    assert abs(
+        scaled_left.sensor_readings["period_s"]
+        - scaled_right.sensor_readings["period_s"]
+    ) < 1e-12
 
     left.reset(11)
     right.reset(11)
-    changed_left = left.intervene(Intervention("add_equal_length", {"length_m": 1.0})).observation
-    changed_right = right.intervene(Intervention("add_equal_length", {"length_m": 1.0})).observation
-    assert changed_left.sensor_readings["period_s"] != changed_right.sensor_readings["period_s"]
+    changed_left = left.intervene(
+        Intervention("add_equal_length", {"length_m": 1.0})
+    ).observation
+    changed_right = right.intervene(
+        Intervention("add_equal_length", {"length_m": 1.0})
+    ).observation
+    assert abs(
+        changed_left.sensor_readings["period_s"]
+        - changed_right.sensor_readings["period_s"]
+    ) > 1e-3
 
 
 def test_blind_prompt_contains_no_target_language_and_mapping_is_posthoc():
