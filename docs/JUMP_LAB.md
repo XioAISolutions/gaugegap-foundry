@@ -1,4 +1,4 @@
-# GaugeGap Jump Lab v0.5 — Sealed challenge benchmarks
+# GaugeGap Jump Lab v0.6 — Frozen calibration and unseen challenge tests
 
 Jump Lab adds an experimental **E → J → A → S** path beside GaugeGap's
 verification-first infrastructure:
@@ -15,6 +15,8 @@ verification-first infrastructure:
    bounded preferences, but it never determines truth.
 6. **Abstention:** when the registered deck does not adequately explain the
    evidence, the executive must return `abstain` rather than inventing support.
+7. **Frozen calibration:** selection thresholds are chosen on a disjoint
+   calibration split, committed, and frozen before unseen test seeds run.
 
 ## Training worlds
 
@@ -26,49 +28,104 @@ gaugegap-jump-cart --out artifacts/cart.eja.json
 ```
 
 Only bounded attention associations may transfer between worlds. Hidden state,
-model mappings, scores, candidate axioms, and verifier verdicts are excluded.
+model mappings, scores, candidate axioms, answer keys, and verifier verdicts are
+excluded.
 
-## Blinded pendulum holdout
+## Blinded pendulum and sealed challenge lanes
 
-The v0.4 holdout remains available:
+The v0.4 and v0.5 commands remain available:
 
 ```bash
-gaugegap-jump-pendulum \
-  --out artifacts/pendulum-holdout.eja.json \
-  --html artifacts/pendulum-holdout.html
-
-gaugegap-jump-holdout \
-  --out-dir artifacts/jump-lab-holdout \
-  --report artifacts/jump-lab-holdout.json \
-  --html artifacts/jump-lab-holdout.html
+gaugegap-jump-pendulum
+gaugegap-jump-holdout
+gaugegap-jump-challenge
 ```
 
 The agent sees anonymous model IDs and prediction fingerprints, not semantic
-statements or the hidden model-to-ID mapping. This is pre-registered model
-selection, not open-ended hypothesis invention.
+statements or the hidden model-to-ID mapping. The sealed challenge additionally
+commits to the hidden case specification and expected answer before execution.
+These lanes are pre-registered model selection, not open-ended hypothesis
+invention.
 
-## Sealed answerable and none-of-the-above challenge
+## v0.6 disjoint threshold calibration
 
-v0.5 adds two committed case types:
-
-- `ratio_supported`: the pre-registered length/gravity-ratio model is adequate;
-- `hybrid_no_fit`: one controlled sensor perturbation creates mutually
-  inconsistent evidence, so no model in the deck clears the evidence and margin
-  gates.
-
-Before execution, the evaluator commits to both the hidden case specification
-and expected answer using canonical SHA-256 hashes. The agent sees neither. After
-submission, the evaluator reveals the case and answer payloads so reviewers can
-recompute both commitments.
+Earlier suites used hand-selected score and margin gates. v0.6 removes that
+researcher degree of freedom.
 
 ```bash
-gaugegap-jump-challenge \
-  --out-dir artifacts/jump-lab-challenge \
-  --report artifacts/jump-lab-challenge.json \
-  --html artifacts/jump-lab-challenge.html
+gaugegap-jump-calibrate \
+  --calibration-seeds 2101,2102,2103,2104 \
+  --test-seeds 2201,2202,2203,2204,2205 \
+  --max-false-discovery-rate 0 \
+  --out-dir artifacts/jump-lab-calibration \
+  --report artifacts/jump-lab-calibration/calibration-suite.json \
+  --html artifacts/jump-lab-calibration/calibration-suite.html
 ```
 
-For every seed, the suite runs both case types under:
+The calibration and test seed sets must be non-empty and disjoint. The suite
+calibrates one frozen threshold pair over three case kinds:
+
+- `ratio_supported`: the registered ratio model is adequate;
+- `deceptive_no_fit`: one repeat measurement violates the ratio model while its
+  raw score remains just above the legacy 0.70 confidence gate;
+- `hybrid_no_fit`: stronger mutually inconsistent evidence prevents the deck
+  from completing its evidence gates.
+
+The deceptive case makes calibration consequential. A legacy 0.70 gate may
+accept a false explanation, while a threshold selected under a zero
+false-discovery constraint must reject it without sacrificing the clean positive
+case.
+
+## Calibration protocol
+
+For each calibration seed, the system records a raw evidence-complete run and a
+canonical record containing:
+
+- expected outcome;
+- leading anonymous and semantic model identifiers after reveal;
+- top score and runner-up margin;
+- evidence-gate completion;
+- intervention count;
+- source artifact hash;
+- record hash.
+
+A deterministic grid evaluates candidate minimum-score and minimum-margin pairs.
+The selector then:
+
+1. maximizes calibration accuracy;
+2. enforces the configured maximum false-discovery rate;
+3. minimizes positive abstention;
+4. maximizes coverage;
+5. chooses the least restrictive tied threshold.
+
+The complete calibration record hashes, candidate grid, objective, false-
+discovery constraint, and selected threshold are committed with SHA-256 before
+any test run is executed.
+
+Each test artifact records:
+
+```json
+{
+  "calibration_protocol": {
+    "protocol": "disjoint_frozen_threshold_calibration_v1",
+    "split": "test",
+    "threshold_frozen_before_test": true,
+    "threshold_commitment_hash": "sha256:...",
+    "frozen_threshold": {
+      "minimum_score": 0.75,
+      "minimum_margin": 0.05
+    },
+    "test_answers_used_for_calibration": false
+  }
+}
+```
+
+The exact selected values are data-dependent; the example above illustrates the
+record shape rather than promising a result.
+
+## Test scorecard
+
+The unseen split runs each case under:
 
 1. cold salience;
 2. attention memory trained through elevator and cart;
@@ -76,64 +133,44 @@ For every seed, the suite runs both case types under:
 
 The report measures:
 
-- answerable-case selection accuracy;
-- none-of-the-above abstention accuracy;
-- false-discovery rate on no-fit cases;
-- policy coverage;
-- selection margin;
-- experiments required;
-- cold/warm/fixed policy comparisons;
-- commitment validity;
-- parent-artifact lineage.
+- overall and answerable accuracy;
+- abstention accuracy;
+- false-discovery and positive-abstention rates;
+- coverage and selective accuracy;
+- mean leading-model score;
+- frozen-decision reproduction rate;
+- coarse empirical reliability bins;
+- threshold-commitment validity;
+- calibration/test split disjointness.
 
-A no-fit run records:
+The reliability table is descriptive. Anonymous-model scores are not asserted to
+be calibrated probabilities.
 
-```json
-{
-  "candidate_axiom": null,
-  "metrics": {
-    "abstained": true,
-    "selected_outcome": "abstain",
-    "false_discovery": false
-  },
-  "verification": {
-    "verdict": "not_evaluated_due_to_abstention"
-  }
-}
-```
-
-The reference verifier may be retained for evaluator review, but it is explicitly
-withheld from selection and cannot authorize a candidate axiom after abstention.
-
-## Commitment verification
-
-Python callers can independently recompute the sealed commitments:
+## Python verification
 
 ```python
-from gaugegap.jump_lab import verify_challenge_commitments
+from gaugegap.jump_lab import verify_calibration_commitment
 
-checks = verify_challenge_commitments(artifact)
-assert all(checks.values())
+assert verify_calibration_commitment(report)
 ```
 
-The challenge artifact records separate hashes for:
-
-- hidden case specification;
-- hidden expected answer;
-- submitted selection and evidence references;
-- complete EJA artifact.
+The verifier recomputes the threshold commitment from the calibration seeds,
+case kinds, candidate grid, false-discovery constraint, record hashes, selected
+threshold, and deterministic selection objective.
 
 ## CRUMB review workflow
 
 ```bash
-crumblm eja validate-pack artifacts/jump-lab-challenge
-crumblm eja audit-pack artifacts/jump-lab-challenge
-crumblm eja evidence-pack artifacts/jump-lab-challenge
-crumblm eja challenge-pack artifacts/jump-lab-challenge \
-  --out artifacts/eja-challenge-audit.json \
-  --html artifacts/eja-challenge-audit.html
-crumblm eja bundle-pack artifacts/jump-lab-challenge \
-  --out artifacts/eja-review-bundle.zip
+crumblm eja validate-pack artifacts/jump-lab-calibration
+crumblm eja audit-pack artifacts/jump-lab-calibration
+crumblm eja evidence-pack artifacts/jump-lab-calibration
+crumblm eja challenge-pack artifacts/jump-lab-calibration
+crumblm eja calibration-pack \
+  artifacts/jump-lab-calibration/calibration-suite.json \
+  --out artifacts/jump-lab-calibration/calibration-audit.json \
+  --html artifacts/jump-lab-calibration/calibration-audit.html
+crumblm eja bundle-pack artifacts/jump-lab-calibration \
+  --out artifacts/jump-lab-calibration/review-bundle.zip
 ```
 
 ## Earlier suites
@@ -145,8 +182,10 @@ gaugegap-jump-benchmark
 
 ## Honest claim boundary
 
-v0.5 demonstrates replayable selection and calibrated abstention over a sealed,
-hand-authored deterministic challenge family. It improves resistance to answer
-leakage and false axiom compilation. It does **not** establish open-ended machine
-abduction, autonomous invention of scientific hypotheses, real-world physical
-validity, general cross-domain transfer, or broad SNN superiority.
+v0.6 demonstrates frozen threshold selection on a disjoint deterministic
+calibration split and evaluation on unseen deterministic seeds. It reduces
+post-hoc threshold tuning and directly measures false discoveries versus
+coverage. It does **not** establish real-world probability calibration,
+open-ended machine abduction, autonomous invention of scientific hypotheses,
+physical validity outside the toy worlds, general cross-domain transfer, or
+broad SNN superiority.
