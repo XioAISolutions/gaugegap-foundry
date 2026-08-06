@@ -5,6 +5,14 @@ from .benchmark import run_benchmark
 from .blind import BlindModelDeck, BlindModelSpec, forbidden_term_hits
 from .cart_axiom import compile_force_mass_ratio_axiom, verify_force_mass_ratio
 from .cart_executive import CartAbductiveExecutive
+from .challenge import (
+    CASE_HYBRID_NO_FIT,
+    CASE_RATIO_SUPPORTED,
+    SealedPendulumChallengeExecutive,
+    render_challenge_html,
+    run_challenge_suite,
+    verify_challenge_commitments,
+)
 from .contracts import Intervention, Observation, Transition
 from .elevator import EinsteinElevatorWorld
 from .executive import AbductiveExecutive, ExecutiveConfig
@@ -21,6 +29,8 @@ __all__ = [
     "AbductiveExecutive",
     "BlindModelDeck",
     "BlindModelSpec",
+    "CASE_HYBRID_NO_FIT",
+    "CASE_RATIO_SUPPORTED",
     "CartAbductiveExecutive",
     "EinsteinElevatorWorld",
     "ExecutiveConfig",
@@ -31,6 +41,7 @@ __all__ = [
     "PendulumWorld",
     "SalienceCandidate",
     "SalienceController",
+    "SealedPendulumChallengeExecutive",
     "Transition",
     "compile_force_mass_ratio_axiom",
     "compile_local_equivalence_axiom",
@@ -38,12 +49,15 @@ __all__ = [
     "forbidden_term_hits",
     "registered_tasks",
     "render_benchmark_html",
+    "render_challenge_html",
     "render_discovery_html",
     "render_holdout_html",
     "render_suite_html",
     "run_benchmark",
+    "run_challenge_suite",
     "run_holdout_suite",
     "run_suite",
+    "verify_challenge_commitments",
     "verify_force_mass_ratio",
     "verify_local_equivalence",
     "verify_pendulum_ratio",
