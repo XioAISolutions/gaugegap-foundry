@@ -26,7 +26,7 @@ def _raw(case_kind: str, seed: int = 41):
             confidence_threshold=0.70,
         ),
         minimum_selection_score=0.0,
-        minimum_selection_margin=-1.0,
+        minimum_selection_margin=0.0,
     ).run()
 
 
