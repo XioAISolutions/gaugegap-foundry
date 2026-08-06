@@ -45,6 +45,7 @@ gaugegap-jump-benchmark = "gaugegap.jump_lab.benchmark:main"
 gaugegap-jump-suite = "gaugegap.jump_lab.suite:main"
 gaugegap-jump-holdout = "gaugegap.jump_lab.holdout:main"
 gaugegap-jump-challenge = "gaugegap.jump_lab.challenge:main"
+gaugegap-jump-calibrate = "gaugegap.jump_lab.calibration:main"
 
 [project.optional-dependencies]
 quantum = [
