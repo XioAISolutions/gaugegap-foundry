@@ -1,142 +1,152 @@
-# GaugeGap Jump Lab v0.4 — Blind holdout benchmarks
+# GaugeGap Jump Lab v0.5 — Sealed challenge benchmarks
 
 Jump Lab adds an experimental **E → J → A → S** path beside GaugeGap's
 verification-first infrastructure:
 
 1. **Experience:** black-box worlds expose sensor readings and controllable
    interventions while causal state remains hidden from the executive.
-2. **Jump:** an auditable executive preserves competing explanations or, in the
-   holdout lane, selects among anonymous pre-registered prediction models.
-3. **Axiom:** a winning explanation is compiled into an explicitly scoped,
-   falsifiable machine-readable candidate only after evidence gates are met.
-4. **Systematic deduction:** a deterministic verifier sweeps the candidate's
-   stated scope and separately probes an excluded boundary.
+2. **Jump:** an auditable executive preserves competing explanations or selects
+   among anonymous pre-registered prediction models.
+3. **Axiom:** a winning explanation is compiled only after evidence, confidence,
+   margin, and scope gates are met.
+4. **Systematic deduction:** a deterministic verifier tests the candidate inside
+   its declared scope and separately probes an excluded boundary.
 5. **Salience:** a lightweight spiking controller ranks attention. It can retain
-   bounded semantic preferences, but it never determines truth.
+   bounded preferences, but it never determines truth.
+6. **Abstention:** when the registered deck does not adequately explain the
+   evidence, the executive must return `abstain` rather than inventing support.
 
 ## Training worlds
 
-### Einstein Elevator
-
-Two hidden causes—uniform gravity and upward frame acceleration—produce matching
-local mechanical readings.
+The Einstein elevator and force/mass cart remain the two training environments:
 
 ```bash
-gaugegap-jump-lab \
-  --out artifacts/elevator.eja.json \
-  --html artifacts/elevator.html \
-  --memory-out artifacts/elevator-memory.json
+gaugegap-jump-lab --out artifacts/elevator.eja.json
+gaugegap-jump-cart --out artifacts/cart.eja.json
 ```
 
-### Force/Mass Cart
+Only bounded attention associations may transfer between worlds. Hidden state,
+model mappings, scores, candidate axioms, and verifier verdicts are excluded.
 
-Two carts have different hidden force and mass values but the same initial
-force-to-mass ratio.
+## Blinded pendulum holdout
 
-```bash
-gaugegap-jump-cart \
-  --out artifacts/cart.eja.json \
-  --html artifacts/cart.html
-```
-
-## Blind pendulum holdout
-
-The new holdout uses two ideal pendulum boxes with different hidden length and
-gravity values but matching initial periods. During selection, the executive
-sees:
-
-- raw observations;
-- permitted interventions;
-- anonymous model IDs;
-- each model's pre-registered prediction fingerprint.
-
-It does **not** see the semantic model statements, target formula, or hidden
-model-to-ID mapping. The mapping is randomized by deterministic seed and hashed.
-Semantic statements are revealed only after the run for audit and reporting.
+The v0.4 holdout remains available:
 
 ```bash
 gaugegap-jump-pendulum \
   --out artifacts/pendulum-holdout.eja.json \
   --html artifacts/pendulum-holdout.html
-```
 
-The intervention set includes:
-
-- stable repetition;
-- scaling length and gravity together;
-- adding the same length to both systems;
-- increasing amplitude to cross the small-angle boundary;
-- controlled exposure of a latent length sensor.
-
-The candidate axiom states, within the ideal tested small-angle scope, that the
-period follows the square root of the length-to-gravity ratio. The verifier also
-checks that large amplitude creates a measurable boundary and that equal periods
-do not imply identical latent parameters.
-
-This lane is honestly classified as **blinded pre-registered model selection**.
-It is not described as open-ended hypothesis invention.
-
-## Cross-world holdout suite
-
-The v0.4 suite runs, for each seed:
-
-1. elevator training with salience;
-2. cart training with only bounded semantic salience memory transferred;
-3. pendulum holdout with cold salience;
-4. pendulum holdout with trained salience memory;
-5. pendulum holdout with fixed intervention ordering.
-
-```bash
 gaugegap-jump-holdout \
   --out-dir artifacts/jump-lab-holdout \
   --report artifacts/jump-lab-holdout.json \
   --html artifacts/jump-lab-holdout.html
 ```
 
+The agent sees anonymous model IDs and prediction fingerprints, not semantic
+statements or the hidden model-to-ID mapping. This is pre-registered model
+selection, not open-ended hypothesis invention.
+
+## Sealed answerable and none-of-the-above challenge
+
+v0.5 adds two committed case types:
+
+- `ratio_supported`: the pre-registered length/gravity-ratio model is adequate;
+- `hybrid_no_fit`: one controlled sensor perturbation creates mutually
+  inconsistent evidence, so no model in the deck clears the evidence and margin
+  gates.
+
+Before execution, the evaluator commits to both the hidden case specification
+and expected answer using canonical SHA-256 hashes. The agent sees neither. After
+submission, the evaluator reveals the case and answer payloads so reviewers can
+recompute both commitments.
+
+```bash
+gaugegap-jump-challenge \
+  --out-dir artifacts/jump-lab-challenge \
+  --report artifacts/jump-lab-challenge.json \
+  --html artifacts/jump-lab-challenge.html
+```
+
+For every seed, the suite runs both case types under:
+
+1. cold salience;
+2. attention memory trained through elevator and cart;
+3. fixed intervention ordering.
+
 The report measures:
 
-- anonymous-model selection accuracy;
-- discovery-completion rate;
+- answerable-case selection accuracy;
+- none-of-the-above abstention accuracy;
+- false-discovery rate on no-fit cases;
+- policy coverage;
+- selection margin;
 - experiments required;
-- target-language leakage rate;
-- cold versus warm experiment savings;
-- warm versus fixed-order experiment savings;
-- agreement on the post-run semantic model;
+- cold/warm/fixed policy comparisons;
+- commitment validity;
 - parent-artifact lineage.
 
-Transferred memory contains only bounded attention associations such as
-`boundary_probe`, `parameter_probe`, `ratio_probe`, and `repeat_probe`. It
-excludes hidden state, candidate statements, model mappings, scores, axioms, and
-verifier verdicts.
+A no-fit run records:
 
-## Earlier benchmarks
+```json
+{
+  "candidate_axiom": null,
+  "metrics": {
+    "abstained": true,
+    "selected_outcome": "abstain",
+    "false_discovery": false
+  },
+  "verification": {
+    "verdict": "not_evaluated_due_to_abstention"
+  }
+}
+```
 
-The v0.3 multi-world suite and v0.2 elevator policy benchmark remain available:
+The reference verifier may be retained for evaluator review, but it is explicitly
+withheld from selection and cannot authorize a candidate axiom after abstention.
+
+## Commitment verification
+
+Python callers can independently recompute the sealed commitments:
+
+```python
+from gaugegap.jump_lab import verify_challenge_commitments
+
+checks = verify_challenge_commitments(artifact)
+assert all(checks.values())
+```
+
+The challenge artifact records separate hashes for:
+
+- hidden case specification;
+- hidden expected answer;
+- submitted selection and evidence references;
+- complete EJA artifact.
+
+## CRUMB review workflow
+
+```bash
+crumblm eja validate-pack artifacts/jump-lab-challenge
+crumblm eja audit-pack artifacts/jump-lab-challenge
+crumblm eja evidence-pack artifacts/jump-lab-challenge
+crumblm eja challenge-pack artifacts/jump-lab-challenge \
+  --out artifacts/eja-challenge-audit.json \
+  --html artifacts/eja-challenge-audit.html
+crumblm eja bundle-pack artifacts/jump-lab-challenge \
+  --out artifacts/eja-review-bundle.zip
+```
+
+## Earlier suites
 
 ```bash
 gaugegap-jump-suite
 gaugegap-jump-benchmark
 ```
 
-## CRUMB review workflow
-
-Every run is a CRUMB EJA artifact. A complete review flow is:
-
-```bash
-crumblm eja validate-pack artifacts/jump-lab-holdout
-crumblm eja audit-pack artifacts/jump-lab-holdout
-crumblm eja evidence-pack artifacts/jump-lab-holdout \
-  --html artifacts/eja-evidence.html
-crumblm eja lineage-pack artifacts/jump-lab-holdout
-crumblm eja bundle-pack artifacts/jump-lab-holdout \
-  --out artifacts/eja-review-bundle.zip
-```
-
 ## Honest claim boundary
 
-v0.4 demonstrates a replayable, blinded model-selection benchmark on one new
-hand-authored deterministic holdout world. It improves resistance to phrase
-leakage and makes evidence references auditable. It does **not** establish
-open-ended machine abduction, autonomous invention of scientific hypotheses,
-real-world pendulum validation, general cross-domain transfer, or broad SNN
-superiority.
+v0.5 demonstrates replayable selection and calibrated abstention over a sealed,
+hand-authored deterministic challenge family. It improves resistance to answer
+leakage and false axiom compilation. It does **not** establish open-ended machine
+abduction, autonomous invention of scientific hypotheses, real-world physical
+validity, general cross-domain transfer, or broad SNN superiority.
