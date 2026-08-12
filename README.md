@@ -37,6 +37,12 @@
   <a href="https://xioaisolutions.github.io/gaugegap-foundry/foundry-experience/"><strong>▶ Live playground — open the Foundry Experience in your browser</strong></a>
 </p>
 
+<p align="center">
+  Companion site — the same claim-boundary discipline applied to text and to a live simulation:<br/>
+  <a href="https://www.brainsnn.com/evidence?utm_source=github&utm_medium=readme&utm_campaign=gaugegap-foundry">what the BrainSNN detector scores on text it has never seen</a> ·
+  <a href="https://www.brainsnn.com/lab?utm_source=github&utm_medium=readme&utm_campaign=gaugegap-foundry">build a spiking circuit in a falling-sand grid</a>
+</p>
+
 ---
 
 ## 🎯 What this repository is
