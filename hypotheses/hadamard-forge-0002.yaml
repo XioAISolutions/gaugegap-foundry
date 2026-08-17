@@ -1,0 +1,51 @@
+id: hadamard-forge-0002
+track: Hadamard Forge
+model: external_sign_matrix_witness
+scope: fail-closed ingestion and exact verification of an externally supplied Hadamard witness of a stated order
+claim: >
+  An externally supplied sign matrix is admitted as a witness for its order only
+  after it discharges the same exact integer gates as a locally constructed one:
+  the +-1 alphabet, the admissible-order condition, H @ H.T == n * I, the
+  transpose recomputation, and, when supplied, an expected packed-rows digest.
+  Nothing about the source of the witness is trusted.
+prediction:
+  observable: exact_gram_matrix_of_supplied_witness
+  expected_shape: diagonal_equals_order_and_all_off_diagonal_entries_are_zero
+controls:
+  arithmetic: exact_integer_popcount
+  ingestion_formats: [packed_rows_hex_json, signs_json, sign_text]
+  witness_source: external_file_supplied_at_run_time
+  release_label: REPRODUCED
+target_orders:
+  - order: 668
+    state: awaiting_witness
+    note: >
+      Not constructible by this repository's constructor set. The verification
+      lane is in place and fails closed until a witness file is supplied; no
+      claim of any kind is recorded for this order until one passes the gates.
+  - order: 92
+    state: awaiting_witness
+    note: Constructible in the literature by other methods; not covered by this repository's constructors.
+validation:
+  required:
+    - ingestion_rejects_any_entry_outside_plus_or_minus_one
+    - ingestion_rejects_non_square_input
+    - declared_order_matches_requested_order
+    - gram_diagonal_equals_order_exactly
+    - all_off_diagonal_gram_entries_are_exactly_zero
+    - supplied_rows_digest_matches_when_provided
+    - absent_witness_produces_no_certificate
+kill_criteria:
+  - a witness passes without the Gram identity holding exactly
+  - a run emits a certificate when no witness file was supplied
+  - a supplied digest disagrees with the ingested rows and the run still certifies
+status: awaiting_witness
+claim_boundary: >
+  This lane certifies the exact existence of one matrix of the order actually
+  supplied and verified. Orders listed as awaiting a witness carry no claim at
+  all: an order this repository cannot construct is a gap in this constructor
+  set, not an assertion that the order is open in the literature. No result here
+  bears on the Hadamard conjecture.
+notes:
+  - The verifier is the same code path used by the constructor lane, so ingestion adds no trusted surface.
+  - Verification time is dominated by the pairwise row products; order 672 verifies in well under a second.

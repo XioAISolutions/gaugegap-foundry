@@ -14,6 +14,7 @@
   <a href="#anomaly-forge">Anomaly Forge</a> ·
   <a href="#search-forge">Search Forge</a> ·
   <a href="#counterexample-forge">Counterexample Forge</a> ·
+  <a href="#hadamard-forge">Hadamard Forge</a> ·
   <a href="#infogap">InfoGap</a> ·
   <a href="#-attractor-forge--nonlinear-dynamics-you-can-inspect">Attractor Forge</a> ·
   <a href="#-the-web-of-physical-limits">Physical limits</a> ·
@@ -54,6 +55,7 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 - **Anomaly Forge** — exact rational charge-consistency tests, a hypercharge solver, and a live anomaly-free surface.
 - **Search Forge** — certified Dijkstra/A* paths, scientific search spaces, and symbolic null controls.
 - **Counterexample Forge** — exact falsification witnesses, structured coefficient reconstruction, fail-closed gates, and hashed proofpacks.
+- **Hadamard Forge** — exact integer existence witnesses: `H·Hᵀ = nI` over the integers, packed witnesses, and a hole-free Coq certificate for the arithmetic the verifier runs.
 - **InfoGap** — an exact finite realization of the quantum no-hiding theorem with a discharged Coq certificate.
 - **UQT Forge** — UQT-inspired finite algebra known-answer tasks with reversible and irreversible controls.
 - **Compactification Forge** — finite hidden-dimension toy spectra for KK/winding-mode explanations.
@@ -78,6 +80,7 @@ flowchart TD
     F --> A["⚖️ Anomaly Forge<br/>charges · constraints · cancellation"]
     F --> S["🧭 Search Forge<br/>paths · proofs · pattern controls"]
     F --> CE["🧨 Counterexample Forge<br/>exact witnesses · reconstruction · proofpacks"]
+    F --> HF["◻️ Hadamard Forge<br/>exact existence witnesses · H·Hᵀ = nI"]
     F --> I["🪞 InfoGap<br/>quantum no-hiding theorem"]
     F --> U["🧠 UQT Forge<br/>finite quantum algebra controls"]
     F --> K["🧵 Compactification Forge<br/>hidden-dimension spectra"]
@@ -94,6 +97,7 @@ flowchart TD
     A --> A1["exact rational anomalies<br/>hypercharge solver · Witten parity"]
     S --> S1["Dijkstra baseline · A* heuristic contract<br/>symbolic null models"]
     CE --> CE1["constant Jacobian gate · exact collision<br/>REPRODUCED → REDISCOVERED → DISCOVERED"]
+    HF --> HF1["±1 alphabet gate · exact Gram identity<br/>packed witnesses · constructor survey"]
     I --> I1["exact dilation · Bell pair<br/>recoverable state · Coq certificate"]
     U --> U1["Z11 · Z11* · S4<br/>reversibility ledger"]
     K --> K1["S1 · T2<br/>KK + winding towers"]
@@ -444,6 +448,48 @@ foundry run counterexample-forge-smoke
 
 ---
 
+<a id="hadamard-forge"></a>
+## ◻️ Hadamard Forge — exact existence witnesses
+
+Where Counterexample Forge certifies that something *cannot* hold, Hadamard Forge certifies that something *does* — with the same discipline. A Hadamard matrix of order `n` is an `n × n` matrix over `{+1, −1}` whose rows are pairwise orthogonal, so the whole claim is one finite integer identity:
+
+```text
+H · Hᵀ = n · I
+```
+
+No floating point is involved anywhere. Rows are arbitrary-precision bitmasks and every inner product is `n − 2·popcount(rowᵢ XOR rowⱼ)` — the exact integer form, machine-checked against the textbook definition in [`formal/hadamard/gram_identity.v`](formal/hadamard/gram_identity.v).
+
+| Concern | What it does | What it is trusted for |
+|---|---|---|
+| **Construction** | emits a witness (Sylvester, Paley I/II, Kronecker) | nothing — its output is verified like any other |
+| **Ingestion** | decodes an external witness file | nothing — every entry is re-checked |
+| **Verification** | discharges exact integer gates | this alone certifies |
+
+Gates: `±1` alphabet and square shape at ingestion, `n ∈ {1,2}` or `4 | n`, the Gram diagonal equal to `n`, every off-diagonal exactly `0`, an independent transpose recomputation, and an optional expected row digest. Flip one sign in an order-20 witness and the largest off-diagonal Gram entry moves from `0` to `2` — no proofpack is written.
+
+```bash
+foundry run hadamard-forge-smoke        # order 20, reduced CI gate
+foundry run hadamard-forge-0001-verify  # order 168, full proofpack
+foundry run hadamard-forge-0001-survey  # constructor coverage up to 2000
+```
+
+The survey records which admissible orders **this repository's constructor set** covers (350 up to 2000) and which it does not (152, including 668). Those are gaps in this constructor set, not claims about the literature — order 92 has been constructible since 1962 by methods not implemented here, and it appears in the same list. Uncovered orders are reachable through the ingestion lane, which verifies an external witness with the identical gates:
+
+```bash
+python scripts/run_hadamard_forge.py --witness path/to/witness.json \
+  --expected-order 668 --output-dir results/hadamard-forge-0002
+```
+
+`hadamard-forge-0002` sits at `status: awaiting_witness` and records **no claim** for order 668 until a witness file passes the gates. An empty result is the correct output when no witness exists locally.
+
+The Foundry Experience carries the order-168 witness as a scene that **re-verifies it in the browser** — decoding the packed rows and recomputing all 14,028 row pairs as integers, reporting `max |off-diagonal| = 0` beside the Python gate results.
+
+📖 [`docs/hadamard-forge.md`](docs/hadamard-forge.md)
+
+> 🧭 **Boundary:** verifying a witness of order `n` establishes the exact existence of one `n × n` Hadamard matrix. It is not a proof of the Hadamard conjecture, establishes no equivalence-class or minimality statement, and says nothing about orders for which no witness was verified. Reproducing a classical construction is labelled **REPRODUCED**.
+
+---
+
 <a id="infogap"></a>
 ## 🪞 InfoGap — the quantum no-hiding theorem, exactly
 
@@ -763,9 +809,29 @@ flowchart LR
 
 The current artifact rigorously rules out specified **finite truncations** under the displayed mismatch criterion. It does not prove or disprove the Riemann Hypothesis.
 
+### Certified coverage — proportions with their parameters attached
+
+`curverank-0002` asks the proportion-shaped version of the same question: of the first `k` zeros, how many are matched within a tolerance `τ` by a truncated candidate spectrum? Because a proportion is exactly the shape of claim that travels well and verifies badly, the lane reports a **pair of exact rational bounds** derived from interval enclosures — never a point estimate. A zero counts toward the lower bound only when *every* value in both enclosures is within `τ`; anything undecided at the working precision is charged to the upper bound.
+
+```bash
+foundry run curverank-0002-coverage
+```
+
+| `n` | certified coverage | covered / uncovered / undetermined | verdict |
+|---|---|---|---|
+| 16 | `[0.0000, 0.0000]` | 0 / 12 / 0 | `CERTIFIED_BELOW_THRESHOLD` |
+| 24 | `[0.0833, 0.0833]` | 1 / 11 / 0 | `CERTIFIED_BELOW_THRESHOLD` |
+| 32 | `[0.3333, 0.3333]` | 4 / 8 / 0 | `CERTIFIED_BELOW_THRESHOLD` |
+| 40 | `[0.0000, 0.0000]` | 0 / 12 / 0 | `CERTIFIED_BELOW_THRESHOLD` |
+
+Berry–Keating `xp`, first 12 zeros, `τ = 0.5`, comparison threshold `0.6725`. Coverage is **not monotone** in the truncation — 0%, then 33%, then 0% — which is the concrete reason a bare "X% matched" figure is not a result: the same operator family gives different percentages depending on a parameter the headline drops. The comparison threshold is an **input**, recorded in the certificate with an explicit `role` field so it cannot be reread later as a measurement. Each run also emits a Coq section per truncation, discharged by `lra` and closed with `Qed`.
+
+- 📘 [`docs/curverank-coverage.md`](docs/curverank-coverage.md)
 - 📘 [`docs/curverank-formal-proof.md`](docs/curverank-formal-proof.md)
 - 📚 [`docs/riemann-operator-landscape.md`](docs/riemann-operator-landscape.md)
 - 🖥️ [`docs/curverank-ibm-runbook.md`](docs/curverank-ibm-runbook.md)
+
+> 🧭 **Boundary:** published density theorems about the proportion of nontrivial zeta zeros on the critical line are statements about the zeros of the zeta function. This track neither evaluates, reproduces, nor contradicts any of them — it measures spectral coverage by one truncated candidate operator at one tolerance. A negative certificate rules out that one finite truncation and is not evidence for or against the Riemann Hypothesis.
 
 ---
 
