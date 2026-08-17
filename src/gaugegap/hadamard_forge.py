@@ -733,12 +733,17 @@ def build_hadamard_proofpack(
     release_label: str = "REPRODUCED",
     problem_id: str,
     embed_rows_max_order: int = 64,
+    search_record: Mapping[str, object] | None = None,
 ) -> dict[str, object]:
     """Assemble the content-hashed proofpack for a verified witness.
 
     Rows are embedded inline for small orders and referenced by SHA-256 for
     large ones; the digest of the packed rows is always present, so the
     companion witness file is verifiable against the proofpack either way.
+
+    ``search_record`` is attached when the witness came from a search rather
+    than a closed-form constructor, so the certificate carries what was examined
+    alongside what was verified.
     """
 
     if release_label not in RELEASE_LABELS:
@@ -755,6 +760,8 @@ def build_hadamard_proofpack(
         "arithmetic": "exact_integer_popcount",
         "claim_boundary": CLAIM_BOUNDARY,
     }
+    if search_record is not None:
+        payload["search"] = dict(search_record)
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     payload["proofpack_digest"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     return payload

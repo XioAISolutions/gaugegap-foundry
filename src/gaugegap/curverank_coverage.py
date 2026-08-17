@@ -252,9 +252,15 @@ def screen_family(
     tolerance: float,
     threshold: Fraction | float,
     zeros_method: str = "auto",
+    null_seeds: Sequence[int] = (),
     **family_kwargs,
 ) -> dict[str, object]:
-    """Run one certified coverage screen and return the certificate payload."""
+    """Run one certified coverage screen and return the certificate payload.
+
+    When ``null_seeds`` are supplied, the same coverage counter is run over
+    structureless spectra of the same size and the result is recorded beside the
+    candidate's, so the two numbers can never be quoted apart.
+    """
 
     if family not in FAMILIES:
         raise CurveRankCoverageError(
@@ -310,6 +316,22 @@ def screen_family(
         "verdict_meaning": _verdict_meaning(verdict),
         "claim_boundary": CLAIM_BOUNDARY,
     }
+    if null_seeds:
+        nonzero = payload["spectrum"]["nonzero_enclosures"]  # type: ignore[index]
+        payload["null_control"] = null_control(
+            k_zeros,
+            int(nonzero),
+            tolerance=tolerance,
+            seeds=null_seeds,
+            zeros_method=zeros_method,
+        )
+        payload["beats_null_control"] = (
+            coverage.lower_fraction
+            > Fraction(
+                int(payload["null_control"]["coverage_max"]["numerator"]),  # type: ignore[index]
+                int(payload["null_control"]["coverage_max"]["denominator"]),  # type: ignore[index]
+            )
+        )
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     payload["certificate_digest"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     return payload
@@ -333,6 +355,73 @@ def _verdict_meaning(verdict: str) -> str:
         "The certified bounds straddle the supplied threshold: the enclosures are too wide at "
         "this precision to decide. Increase the working precision or the truncation size."
     )
+
+
+def null_spectrum(
+    k_zeros: int,
+    n_values: int,
+    *,
+    seed: int,
+    zeros_method: str = "auto",
+) -> list[Interval]:
+    """A structureless spectrum with the same range as the zeros it is compared to.
+
+    The null draws ``n_values`` points uniformly from the interval spanned by the
+    first ``k_zeros`` zero enclosures, using a seeded generator so the control is
+    reproducible. It carries no spectral structure whatsoever: whatever coverage
+    it achieves is what counting alone buys, before any operator is credited.
+    """
+
+    import numpy as np
+
+    zeros = riemann_zero_intervals(k_zeros, method=zeros_method)
+    low = float(min(z.lower for z in zeros))
+    high = float(max(z.upper for z in zeros))
+    generator = np.random.default_rng(seed)
+    samples = sorted(generator.uniform(low, high, size=n_values))
+    return [Interval.from_bounds(value, value) for value in samples]
+
+
+def null_control(
+    k_zeros: int,
+    n_values: int,
+    *,
+    tolerance: float,
+    seeds: Sequence[int],
+    zeros_method: str = "auto",
+) -> dict[str, object]:
+    """Coverage achieved by structureless spectra of the same size and range.
+
+    A candidate operator's coverage is only informative if it beats what an
+    unstructured spectrum of the same size achieves by chance. This runs the
+    identical coverage counter over several seeded null draws and reports the
+    range, so the comparison is on the record next to the claim.
+    """
+
+    zeros = riemann_zero_intervals(k_zeros, method=zeros_method)
+    fractions: list[Fraction] = []
+    for seed in seeds:
+        spectrum = null_spectrum(
+            k_zeros, n_values, seed=seed, zeros_method=zeros_method
+        )
+        result = certified_coverage(spectrum, zeros, tolerance)
+        fractions.append(result.upper_fraction)
+    best = max(fractions)
+    worst = min(fractions)
+    mean = sum(fractions, Fraction(0)) / len(fractions)
+    return {
+        "model": "uniform draws over the range spanned by the first k zero enclosures",
+        "n_values": n_values,
+        "seeds": list(seeds),
+        "coverage_min_float": float(worst),
+        "coverage_max_float": float(best),
+        "coverage_mean_float": float(mean),
+        "coverage_max": {"numerator": best.numerator, "denominator": best.denominator},
+        "role": (
+            "null control: coverage reachable without any spectral structure. A candidate "
+            "that does not exceed this range has not demonstrated anything about the zeros."
+        ),
+    }
 
 
 def emit_coverage_coq(screens: Sequence[Mapping[str, object]]) -> str:

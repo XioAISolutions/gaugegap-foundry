@@ -1,5 +1,5 @@
 {
-  "bundle_digest": "ed958a2b659d6d00d9b452c480c7aafc66ca28de0f01c15c2b557b4732548f11",
+  "bundle_digest": "93b228e0af91117ba8bcad53f2213e05cff2da86eb6debb7c67a45954fa795cb",
   "claim_boundary": "Finite-truncation spectral screening only. This artifact measures how many of the first k certified Riemann-zero enclosures are matched within a stated tolerance by the certified spectrum of one truncated candidate operator. It is not a statement about the proportion of zeta zeros on the critical line, does not evaluate or contradict any published density theorem, and is not evidence for or against the Riemann Hypothesis. A negative certificate rules out exactly one finite truncation of one operator family at one tolerance.",
   "family": "xp",
   "k_zeros": 12,
@@ -8,7 +8,8 @@
   "screens": [
     {
       "arithmetic": "interval_enclosures_with_directed_rounding",
-      "certificate_digest": "75a5a9764473c1f0c45c30a70c0b93eef672acc25a037786bd376068c8240952",
+      "beats_null_control": false,
+      "certificate_digest": "a50d051999d3d13d7c8bbbbc91f5333bc3ee5ec5d847b10f0e757daa96df2769",
       "certified_mismatch": {
         "definition": "M_n = ||sort(|eig|)[:n] - zeros[:n]||_2 / sqrt(n), certified enclosure",
         "lower": 31.269891690852283,
@@ -107,6 +108,25 @@
         "undetermined": 0
       },
       "family": "xp",
+      "null_control": {
+        "coverage_max": {
+          "denominator": 12,
+          "numerator": 5
+        },
+        "coverage_max_float": 0.4166666666666667,
+        "coverage_mean_float": 0.31666666666666665,
+        "coverage_min_float": 0.16666666666666666,
+        "model": "uniform draws over the range spanned by the first k zero enclosures",
+        "n_values": 16,
+        "role": "null control: coverage reachable without any spectral structure. A candidate that does not exceed this range has not demonstrated anything about the zeros.",
+        "seeds": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
       "parameters": {
         "k_zeros": 12,
         "n_basis": 16,
@@ -130,7 +150,8 @@
     },
     {
       "arithmetic": "interval_enclosures_with_directed_rounding",
-      "certificate_digest": "a722289ba89be3f64199545ea41562c7c6a68f1de3e091cb41629d7768f8135d",
+      "beats_null_control": false,
+      "certificate_digest": "b259370d49d82e14ba76e1bc6941af73b0ab4a834ebd8f2bdef94f068adef1d2",
       "certified_mismatch": {
         "definition": "M_n = ||sort(|eig|)[:n] - zeros[:n]||_2 / sqrt(n), certified enclosure",
         "lower": 32.82729936148494,
@@ -229,6 +250,25 @@
         "undetermined": 0
       },
       "family": "xp",
+      "null_control": {
+        "coverage_max": {
+          "denominator": 2,
+          "numerator": 1
+        },
+        "coverage_max_float": 0.5,
+        "coverage_mean_float": 0.43333333333333335,
+        "coverage_min_float": 0.25,
+        "model": "uniform draws over the range spanned by the first k zero enclosures",
+        "n_values": 24,
+        "role": "null control: coverage reachable without any spectral structure. A candidate that does not exceed this range has not demonstrated anything about the zeros.",
+        "seeds": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
       "parameters": {
         "k_zeros": 12,
         "n_basis": 24,
@@ -252,7 +292,8 @@
     },
     {
       "arithmetic": "interval_enclosures_with_directed_rounding",
-      "certificate_digest": "78bb0722296399c4aac51e99c51ab10422498e877d959e58dd52edaf244b2b88",
+      "beats_null_control": false,
+      "certificate_digest": "b99140861bdd84875d6b98dd72e23bdec4ff3d929d1aead90fe5331a884d930d",
       "certified_mismatch": {
         "definition": "M_n = ||sort(|eig|)[:n] - zeros[:n]||_2 / sqrt(n), certified enclosure",
         "lower": 33.57429167704136,
@@ -351,6 +392,25 @@
         "undetermined": 0
       },
       "family": "xp",
+      "null_control": {
+        "coverage_max": {
+          "denominator": 3,
+          "numerator": 2
+        },
+        "coverage_max_float": 0.6666666666666666,
+        "coverage_mean_float": 0.5166666666666667,
+        "coverage_min_float": 0.3333333333333333,
+        "model": "uniform draws over the range spanned by the first k zero enclosures",
+        "n_values": 32,
+        "role": "null control: coverage reachable without any spectral structure. A candidate that does not exceed this range has not demonstrated anything about the zeros.",
+        "seeds": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
       "parameters": {
         "k_zeros": 12,
         "n_basis": 32,
@@ -374,7 +434,8 @@
     },
     {
       "arithmetic": "interval_enclosures_with_directed_rounding",
-      "certificate_digest": "eaf753ca2eb2b87f0ecb9039c3295ad7dd73d37bfe62fa1fe0d6adab9ed57a9e",
+      "beats_null_control": false,
+      "certificate_digest": "d3719b826ef63f83de7c172850eb297edf83ddd1ba0ed87d186d2ffe0f8e3839",
       "certified_mismatch": {
         "definition": "M_n = ||sort(|eig|)[:n] - zeros[:n]||_2 / sqrt(n), certified enclosure",
         "lower": 34.03710991830156,
@@ -473,6 +534,25 @@
         "undetermined": 0
       },
       "family": "xp",
+      "null_control": {
+        "coverage_max": {
+          "denominator": 3,
+          "numerator": 2
+        },
+        "coverage_max_float": 0.6666666666666666,
+        "coverage_mean_float": 0.6,
+        "coverage_min_float": 0.5,
+        "model": "uniform draws over the range spanned by the first k zero enclosures",
+        "n_values": 40,
+        "role": "null control: coverage reachable without any spectral structure. A candidate that does not exceed this range has not demonstrated anything about the zeros.",
+        "seeds": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
       "parameters": {
         "k_zeros": 12,
         "n_basis": 40,

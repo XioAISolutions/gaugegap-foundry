@@ -83,6 +83,39 @@ The certified mismatch is reported alongside, and it does increase across the
 panel: these truncations are getting *farther* from the zeros in the `L2` sense,
 not closer.
 
+## The null control, and why it is the whole story
+
+A coverage percentage only means something if structure produced it. So every
+screen runs the identical coverage counter over **structureless spectra of the
+same size**: points drawn uniformly, from a seeded generator, over the range
+spanned by the same zero enclosures. They are degenerate intervals, so they
+cannot borrow coverage from interval slack, and the seeds make the control
+reproducible.
+
+| `n` | operator coverage | null control (5 seeds) | beats null |
+| --- | --- | --- | --- |
+| 16 | `0.0000` | `[0.1667, 0.4167]` | **no** |
+| 24 | `0.0833` | `[0.2500, 0.5000]` | **no** |
+| 32 | `0.3333` | `[0.3333, 0.6667]` | **no** |
+| 40 | `0.0000` | `[0.5000, 0.6667]` | **no** |
+
+At every truncation the truncated Berry-Keating operator scores **at or below
+what uniform noise of the same size scores**. Its best showing, 4 of 12 zeros
+matched at `n = 32`, is the *floor* of what structureless points achieve with the
+same budget of values.
+
+This is the sharpest thing this lane has to say, and it is a statement about the
+metric rather than about the operator: at a fixed tolerance, coverage is mostly a
+function of how many values you have and what range they span. Enough
+structureless points reach 100%. A percentage with no null control attached is
+not weak evidence of spectral structure — it is no evidence at all, and the
+certificate records `beats_null_control` next to the headline so the two numbers
+cannot be separated.
+
+The control is enabled by default and switched off with `--null-seeds` (empty),
+in which case the certificate simply carries no `null_control` field — the claim
+is never quietly left standing alone.
+
 ## Formal artifact
 
 Each run emits `<label>-coverage.coq` next to the JSON: one Coq section per
@@ -123,8 +156,9 @@ line, any comparison with a published density result, any statement about a
 continuum limit.
 
 What it does earn: a finite-system benchmark, an enclosure rather than an
-estimate, a reproducible certificate digest, and a machine-checked inequality —
-all of which a screenshot of a percentage does not have.
+estimate, a null control the candidate fails to beat, a reproducible certificate
+digest, and a machine-checked inequality — all of which a screenshot of a
+percentage does not have.
 
 ## Commands
 

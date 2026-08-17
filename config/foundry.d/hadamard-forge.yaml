@@ -27,16 +27,52 @@ units:
     track: hadamard-forge
     hypothesis: hadamard-forge-0001
     status: experimental
-    description: Record which admissible orders up to 2000 this repository's constructor set covers.
+    description: Record which admissible orders up to 2000 this repository's constructor and search set covers.
     command:
       ["{python}", "scripts/run_hadamard_forge.py",
        "--survey", "2000",
        "--output-dir", "results/hadamard-forge-0001"]
 
+  hadamard-forge-search-smoke:
+    track: hadamard-forge
+    hypothesis: hadamard-forge-0003
+    status: experimental
+    description: Reduced CI gate for the Williamson search lane at order 44.
+    command:
+      ["{python}", "scripts/run_hadamard_forge.py",
+       "--williamson", "11",
+       "--output-dir", "/tmp/hadamard-forge-search-smoke",
+       "--release-label", "REDISCOVERED"]
+
+  hadamard-forge-0003-search-0052:
+    track: hadamard-forge
+    hypothesis: hadamard-forge-0003
+    status: experimental
+    description: Search the Williamson family for order 52, an order the closed-form constructors miss.
+    command:
+      ["{python}", "scripts/run_hadamard_forge.py",
+       "--williamson", "13",
+       "--output-dir", "results/hadamard-forge-0003",
+       "--release-label", "REDISCOVERED"]
+
+  hadamard-forge-0003-search-0092:
+    track: hadamard-forge
+    hypothesis: hadamard-forge-0003
+    status: experimental
+    description: Search the Williamson family for order 92 and verify the quadruple exactly.
+    command:
+      ["{python}", "scripts/run_hadamard_forge.py",
+       "--williamson", "23",
+       "--output-dir", "results/hadamard-forge-0003",
+       "--release-label", "REDISCOVERED"]
+
 groups:
   hadamard-forge:
     - hadamard-forge-0001-verify
     - hadamard-forge-0001-survey
+    - hadamard-forge-0003-search-0052
+    - hadamard-forge-0003-search-0092
 
   hadamard-forge-release:
     - hadamard-forge-smoke
+    - hadamard-forge-search-smoke

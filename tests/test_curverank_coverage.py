@@ -9,8 +9,11 @@ from gaugegap.curverank_coverage import (
     CurveRankCoverageError,
     certified_coverage,
     classify,
+    null_control,
+    null_spectrum,
     screen_family,
 )
+from gaugegap.curverank_spectral import riemann_zero_intervals
 from gaugegap.rigorous.interval_arithmetic import Interval
 
 
@@ -125,6 +128,60 @@ def test_truncated_xp_stays_below_the_reference_threshold() -> None:
     )
     assert payload["verdict"] == VERDICT_BELOW
     assert payload["coverage"]["coverage_upper_float"] < 0.6725
+
+
+def test_null_control_is_reproducible_from_its_seeds() -> None:
+    first = null_control(8, 20, tolerance=0.5, seeds=(1, 2, 3))
+    second = null_control(8, 20, tolerance=0.5, seeds=(1, 2, 3))
+    assert first == second
+    assert first["coverage_min_float"] <= first["coverage_mean_float"]
+    assert first["coverage_mean_float"] <= first["coverage_max_float"]
+
+
+def test_null_spectrum_lands_in_the_range_of_the_zeros() -> None:
+    zeros = riemann_zero_intervals(8)
+    low = float(min(z.lower for z in zeros))
+    high = float(max(z.upper for z in zeros))
+    spectrum = null_spectrum(8, 30, seed=7)
+    assert len(spectrum) == 30
+    assert all(low <= float(value.lower) <= high for value in spectrum)
+    # Degenerate enclosures: the null carries no width of its own, so it cannot
+    # borrow coverage from interval slack.
+    assert all(value.lower == value.upper for value in spectrum)
+
+
+def test_more_null_values_cover_more_zeros() -> None:
+    zeros = riemann_zero_intervals(10)
+    sparse = certified_coverage(null_spectrum(10, 4, seed=3), zeros, tolerance=0.5)
+    dense = certified_coverage(null_spectrum(10, 400, seed=3), zeros, tolerance=0.5)
+    assert dense.upper_fraction >= sparse.upper_fraction
+    # Enough structureless points blanket the range: coverage is about counting,
+    # which is exactly why a bare percentage is not evidence of structure.
+    assert dense.upper_fraction == Fraction(1, 1)
+
+
+def test_screen_records_the_null_control_beside_the_claim() -> None:
+    payload = screen_family(
+        "xp",
+        24,
+        12,
+        tolerance=0.5,
+        threshold=Fraction(6725, 10000),
+        null_seeds=(1, 2, 3),
+    )
+    null = payload["null_control"]
+    assert null["n_values"] == payload["spectrum"]["nonzero_enclosures"]
+    assert "null control" in null["role"]
+    assert isinstance(payload["beats_null_control"], bool)
+    # The truncated operator does not beat structureless points of the same size
+    # at this truncation; the certificate has to say so.
+    assert payload["beats_null_control"] is False
+
+
+def test_null_control_is_absent_unless_requested() -> None:
+    payload = screen_family("xp", 12, 6, tolerance=0.5, threshold=Fraction(1, 2))
+    assert "null_control" not in payload
+    assert "beats_null_control" not in payload
 
 
 def test_unknown_family_is_rejected() -> None:

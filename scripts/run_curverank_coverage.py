@@ -55,6 +55,13 @@ def parse_args() -> argparse.Namespace:
         default="auto",
         help="source of the certified zero enclosures",
     )
+    parser.add_argument(
+        "--null-seeds",
+        type=int,
+        nargs="*",
+        default=[1, 2, 3, 4, 5],
+        help="seeds for the structureless null control (empty list disables it)",
+    )
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(
         "--label",
@@ -79,6 +86,7 @@ def main() -> int:
                     tolerance=args.tolerance,
                     threshold=threshold,
                     zeros_method=args.zeros_method,
+                    null_seeds=tuple(args.null_seeds),
                 )
             )
         except CurveRankCoverageError as exc:
@@ -124,6 +132,13 @@ def main() -> int:
             f"M_n in [{mismatch['lower']:.4f}, {mismatch['upper']:.4f}]  "
             f"{screen['verdict']}"
         )
+        null = screen.get("null_control")
+        if null is not None:
+            print(
+                f"        null control ({null['n_values']} structureless values): "
+                f"[{null['coverage_min_float']:.4f}, {null['coverage_max_float']:.4f}]  "
+                f"beats null: {screen['beats_null_control']}"
+            )
         print(f"        certificate_digest: {screen['certificate_digest']}")
     print(f"bundle_digest: {bundle['bundle_digest']}")
     print(f"bundle: {path}")

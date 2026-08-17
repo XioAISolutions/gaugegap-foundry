@@ -1,5 +1,5 @@
 {
-  "claim_boundary": "This survey describes the constructor set implemented in this repository. An order listed as awaiting a witness is one Hadamard Forge cannot build itself; it is not a claim that the order is open in the literature.",
+  "claim_boundary": "This survey describes the constructor and search set implemented in this repository. A search-reachable order is one whose Williamson enumeration fits the candidate budget; the search may still return no quadruple, because the family is genuinely empty for some orders, or stop on its pair budget, which certifies nothing. Reachable is therefore an invitation to run the search, not a prediction of its outcome. An order listed as awaiting a witness is one Hadamard Forge cannot settle itself; it is not a claim that the order is open in the literature.",
   "constructible_orders": [
     1,
     2,
@@ -360,12 +360,6 @@
   ],
   "limit": 2000,
   "orders_awaiting_witness": [
-    52,
-    92,
-    100,
-    116,
-    156,
-    172,
     184,
     188,
     232,
@@ -513,5 +507,16 @@
     1976,
     1992
   ],
-  "schema": "gaugegap.hadamard_order_survey.v1"
+  "schema": "gaugegap.hadamard_order_survey.v2",
+  "search_reachable_orders": [
+    52,
+    92,
+    100,
+    116,
+    156,
+    172
+  ],
+  "searches": [
+    "williamson(symmetric circulant quadruples, order 4n)"
+  ]
 }

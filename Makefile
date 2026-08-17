@@ -7,7 +7,8 @@
 	landauer bekenstein physical-limits temporal-double-slit physical-limits-figures \
 	verify-certificates compile-coq sonification cherenkov lieb-robinson \
 	attractor-forge rossler lorenz thomas experience deep-boil deep-boil-smoke \
-	hadamard-forge hadamard-forge-smoke curverank-coverage curverank-coverage-smoke
+	hadamard-forge hadamard-forge-smoke hadamard-forge-search-smoke \
+	curverank-coverage curverank-coverage-smoke
 
 # Pin proof artifacts to the HEAD commit time so a fixed commit remains
 # byte-reproducible. The orchestration parameters live in config/foundry.yaml
@@ -163,3 +164,6 @@ curverank-coverage:
 
 curverank-coverage-smoke:
 	$(FOUNDRY) run curverank-coverage-smoke
+
+hadamard-forge-search-smoke:
+	$(FOUNDRY) run hadamard-forge-search-smoke

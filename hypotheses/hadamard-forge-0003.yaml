@@ -1,0 +1,49 @@
+id: hadamard-forge-0003
+track: Hadamard Forge
+model: symmetric_williamson_quadruple_search
+scope: >
+  bounded exhaustive search of the symmetric circulant Williamson family for a
+  witness of order 4n, with the found quadruple re-checked in exact integer
+  arithmetic before any label is attached
+claim: >
+  For the orders searched here, a symmetric Williamson quadruple is found without
+  being supplied, its autocorrelation identity holds exactly over the integers,
+  and the assembled matrix discharges every gate of hadamard-forge-0001. Orders
+  reached this way include ones the closed-form constructor set does not cover.
+prediction:
+  observable: exact_gram_matrix_of_searched_witness
+  expected_shape: diagonal_equals_order_and_all_off_diagonal_entries_are_zero
+controls:
+  arithmetic: exact_integer_autocorrelation
+  family: symmetric circulant quadruples with A^2 + B^2 + C^2 + D^2 = 4n I
+  enumeration: symmetric plus-minus-one rows with leading entry +1
+  prefilters:
+    - power spectral density bounded by 4n at every frequency
+    - row-sum magnitudes partitioned by sa^2 + sb^2 + sc^2 + sd^2 = 4n
+  release_label: REDISCOVERED
+validation:
+  required:
+    - search_receives_no_quadruple_and_no_target_matrix
+    - found_quadruple_satisfies_the_autocorrelation_identity_in_exact_integers
+    - assembled_matrix_passes_every_hadamard_forge_gate
+    - search_record_states_what_was_enumerated_and_what_survived
+    - budget_stops_are_reported_as_budget_stops_not_as_exhaustion
+    - tampered_quadruple_fails_closed
+kill_criteria:
+  - a witness is certified without the exact autocorrelation re-check
+  - an unfinished search is reported as an exhausted family
+  - a prefilter discards a candidate that satisfies the exact identity
+  - repeated runs on the same order emit different witnesses or hashes
+status: active
+claim_boundary: >
+  A found quadruple certifies the exact existence of one Hadamard matrix of order
+  4n. An exhausted search certifies only that the symmetric Williamson family
+  contains no quadruple for that order: other constructions may still produce a
+  matrix of the same order, and for several orders they do. A budget stop
+  certifies nothing at all. No outcome here bears on the Hadamard conjecture, and
+  rediscovering a quadruple that is already published is labelled REDISCOVERED,
+  never DISCOVERED.
+notes:
+  - The prefilters are necessary conditions used to prune; the exact identity is re-checked afterward, so pruning cannot manufacture a pass.
+  - Orders 52, 92, 100, 116, 124, and 132 are reachable by search but not by this repository's closed-form constructors.
+  - The search is over the symmetric family only; Williamson-type quadruples without the symmetry constraint are outside this scope.

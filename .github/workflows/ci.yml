@@ -34,6 +34,7 @@ jobs:
           foundry run curverank-screen-smoke
           foundry run curverank-coverage-smoke
           foundry run hadamard-forge-smoke
+          foundry run hadamard-forge-search-smoke
           foundry run deep-boil-smoke
       - name: Generate Foundry Experience smoke
         run: |
