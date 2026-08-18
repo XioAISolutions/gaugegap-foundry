@@ -98,6 +98,7 @@ def combination_features(numbers: Iterable[int], spec: SelectionSpec) -> dict[st
     values = _validate_numbers(numbers, spec)
     chosen = set(values)
     fib = fibonacci_numbers(spec.pool_size)
+    birthday_count = sum(value <= spec.birthday_cutoff for value in values)
     quartiles = [0, 0, 0, 0]
     for value in values:
         quartiles[min(3, (value - 1) * 4 // spec.pool_size)] += 1
@@ -108,7 +109,8 @@ def combination_features(numbers: Iterable[int], spec: SelectionSpec) -> dict[st
     for start in range(1, max(2, spec.pool_size - 8)):
         max_in_ten = max(max_in_ten, sum(start <= value <= start + 9 for value in values))
     return {
-        "birthday_count": float(sum(value <= spec.birthday_cutoff for value in values)),
+        "birthday_count": float(birthday_count),
+        "above_birthday_count": float(spec.pick_count - birthday_count),
         "all_birthday": float(all(value <= spec.birthday_cutoff for value in values)),
         "all_above_birthday": float(all(value > spec.birthday_cutoff for value in values)),
         "fibonacci_count": float(sum(value in fib for value in values)),
@@ -130,14 +132,18 @@ def combination_features(numbers: Iterable[int], spec: SelectionSpec) -> dict[st
 def shape_guardrails(numbers: Iterable[int], spec: SelectionSpec) -> bool:
     """Reject proxy-exploitation extremes without claiming they are less drawable.
 
-    The constraints are deliberately broad: at least one value on each side of the
-    birthday cutoff, a non-tiny span, no 3+ consecutive run, non-degenerate parity,
-    and at least three broad quartiles for games with five or more picks.
+    Birthday-tail concentration is bounded relative to its expectation under a
+    uniform fair draw. This stops the crowd-risk proxy from monotonically pushing
+    selections upward simply because dates are commonly chosen by humans. The
+    other constraints are broad shape sanity checks, not prediction features.
     """
     values = _validate_numbers(numbers, spec)
     f = combination_features(values, spec)
     if spec.birthday_cutoff and spec.birthday_cutoff < spec.pool_size:
-        if f["birthday_count"] < 1 or f["birthday_count"] >= spec.pick_count:
+        high_pool = spec.pool_size - spec.birthday_cutoff
+        expected_high = spec.pick_count * high_pool / spec.pool_size
+        max_high = min(spec.pick_count - 1, math.ceil(expected_high + 1.0))
+        if f["above_birthday_count"] < 1 or f["above_birthday_count"] > max_high:
             return False
     if f["range"] < 0.55 * spec.pool_size:
         return False
@@ -186,8 +192,16 @@ def crowd_risk_components(
 ) -> tuple[dict[str, float], dict[str, float]]:
     """Bound each behavioural proxy so no one feature can hijack the optimizer."""
     f = combination_features(numbers, spec)
+    expected_birthdays = spec.pick_count * spec.birthday_cutoff / spec.pool_size
+    free_birthdays = math.floor(expected_birthdays)
     components = {
-        "birthday": min(1.50, 0.22 * max(0.0, f["birthday_count"] - 1.0) + 0.85 * f["all_birthday"]),
+        # Do not charge every date-range number. Only unusually birthday-heavy
+        # shapes are penalized; otherwise the optimizer collapses to the high tail.
+        "birthday": min(
+            1.25,
+            0.18 * max(0.0, f["birthday_count"] - free_birthdays)
+            + 0.85 * f["all_birthday"],
+        ),
         "all_above_birthday": 0.55 * f["all_above_birthday"],
         "fibonacci": min(1.00, 0.28 * f["fibonacci_count"]),
         "lucky": min(0.80, 0.35 * f["lucky_count"]),
