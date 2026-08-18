@@ -8,10 +8,17 @@ from gaugegap.lottery_selection import (
 )
 
 
-def test_guardrails_block_all_high_optimizer_artifact():
+def test_guardrails_block_high_tail_optimizer_artifact():
     spec = SelectionSpec("649", 49, 6)
     assert not shape_guardrails((32, 37, 41, 43, 47, 49), spec)
-    assert shape_guardrails((9, 32, 37, 39, 43, 47), spec)
+    assert not shape_guardrails((9, 32, 37, 39, 43, 47), spec)
+    assert shape_guardrails((9, 27, 33, 38, 43, 47), spec)
+
+
+def test_daily_grand_caps_unsupported_high_tail_concentration():
+    spec = SelectionSpec("daily-grand", 49, 5)
+    assert not shape_guardrails((4, 32, 33, 38, 47), spec)
+    assert shape_guardrails((4, 26, 33, 38, 47), spec)
 
 
 def test_measured_popularity_penalty_prefers_less_overlap():
@@ -21,10 +28,18 @@ def test_measured_popularity_penalty_prefers_less_overlap():
     assert exact > partial
 
 
+def test_birthday_penalty_saturates_near_fair_draw_expectation():
+    spec = SelectionSpec("daily-grand", 49, 5)
+    three_birthdays = score_selection((4, 19, 26, 38, 47), spec)
+    four_birthdays = score_selection((4, 19, 26, 29, 47), spec)
+    assert three_birthdays.components["birthday"] == 0
+    assert four_birthdays.components["birthday"] > 0
+
+
 def test_long_run_penalty_only_starts_at_three():
     spec = SelectionSpec("649", 49, 6)
-    pair = score_selection((9, 32, 33, 38, 41, 47), spec)
-    run = score_selection((9, 32, 33, 34, 41, 47), spec)
+    pair = score_selection((9, 27, 32, 33, 41, 47), spec)
+    run = score_selection((9, 27, 32, 33, 34, 47), spec)
     assert pair.components["long_run"] == 0
     assert run.components["long_run"] > 0
 
@@ -40,7 +55,7 @@ def test_search_is_deterministic_and_robust():
 
 def test_features_expose_shape_not_prediction():
     spec = SelectionSpec("daily-grand", 49, 5)
-    features = combination_features((4, 32, 33, 37, 49), spec)
-    assert features["birthday_count"] == 1
-    assert features["longest_consecutive_run"] == 2
+    features = combination_features((4, 26, 33, 38, 47), spec)
+    assert features["birthday_count"] == 2
+    assert features["above_birthday_count"] == 3
     assert features["quartiles_occupied"] >= 3
