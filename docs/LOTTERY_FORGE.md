@@ -40,6 +40,23 @@ python scripts/run_lottery_forge.py \
 
 Lottery Forge fetches two official WCLC surfaces: the since-inception print/PDF historical snapshot and the current LOTTO 6/49 winning-numbers page. The current page supplements the snapshot so monthly publication lag does not silently omit the newest draws. Both raw payloads are SHA-256 hashed; parse counts and resolved date interval are embedded in the report.
 
+## Validated two-year reference run
+
+The dedicated GitHub Actions lane has successfully completed a live WCLC run on the PR implementation using 2,000 null trials, 64 DMD permutations, a deterministic 100,000-candidate anti-crowd sample, and 26/52/104-draw holdout windows.
+
+The validated snapshot contained **208 Classic draws from 2024-08-17 through 2026-08-15**. Results:
+
+- Fibonacci subset null p-value: **0.778611**;
+- temporal-order permutation p-value: **0.57921**;
+- DMD lower-error permutation p-value: **0.553846**;
+- pairs surviving BH q < 0.05: **0**;
+- strongest tested holdout: **hybrid / 104 draws**, mean hits **0.8269** versus exact chance **0.7347**, raw empirical p **0.122439**, Bonferroni-adjusted p **1.0**;
+- predictive evidence gate: **FALSE**;
+- top deterministic anti-crowd candidate in that 100,000-combination sample: **9-38-43-44-46-47**;
+- reference **32-37-41-43-47-49** ranks substantially worse under the explicit anti-crowd objective used in that run.
+
+The candidate ranking is a sharing-risk heuristic only. It is not evidence that the top candidate is more likely to be drawn.
+
 ## Outputs
 
 Every run writes:
@@ -47,7 +64,7 @@ Every run writes:
 - `draws.csv` — normalized exact input used by the analysis;
 - `analysis.json` — full diagnostics and source metadata;
 - `proofpack.json` — content-hashed result with a hard claim boundary;
-- `summary.md` — concise verdict, best corrected holdout, candidates, and reference comparisons.
+- `summary.md` — concise verdict, strongest corrected holdout, candidates, and reference comparisons.
 
 Verify a saved proofpack independently:
 
