@@ -1,0 +1,30 @@
+version: 1
+
+units:
+  lottery-forge-smoke:
+    track: inference-traps
+    hypothesis: lottery-forge-0001
+    status: evidence_only
+    description: Fair-null smoke test for Lottery Forge with reproducible proofpack output.
+    command:
+      ["{python}", "scripts/run_lottery_forge.py", "--demo-draws", "140",
+       "--null-trials", "128", "--candidate-samples", "2000",
+       "--candidate-top-k", "5", "--windows", "26,52",
+       "--dmd-trials", "16",
+       "--output-dir", "/tmp/lottery-forge-smoke"]
+
+  lottery-forge-649-live:
+    track: inference-traps
+    hypothesis: lottery-forge-0001
+    status: evidence_only
+    description: Source-hashed official WCLC two-calendar-year LOTTO 6/49 Classic analysis.
+    command:
+      ["{python}", "scripts/run_lottery_forge.py", "--wclc-live", "--years", "2",
+       "--null-trials", "5000", "--candidate-samples", "250000",
+       "--candidate-top-k", "10", "--windows", "26,52,104",
+       "--dmd-trials", "128", "--compare", "32,37,41,43,47,49",
+       "--output-dir", "results/lottery-forge-649"]
+
+groups:
+  lottery-forge:
+    - lottery-forge-smoke
