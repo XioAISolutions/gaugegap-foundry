@@ -1,0 +1,23 @@
+{
+  "schema": "gaugegap.lottery_forge.prospective_protocol.v1",
+  "protocol_id": "lottery-forge-0002-prospective-v1",
+  "game": {
+    "name": "lotto-6of49",
+    "pool_size": 49,
+    "pick_count": 6
+  },
+  "prediction_rule": {
+    "model": "hybrid",
+    "window": 104,
+    "description": "For each future draw, rank numbers using the frozen Lottery Forge hybrid score on exactly the previous 104 official Classic draws; select the deterministic top six. No parameter retuning is permitted during this protocol."
+  },
+  "draw_weekdays": [2, 5],
+  "decision_checkpoints": [26, 52, 104],
+  "family_wise_alpha": 0.01,
+  "checkpoint_correction": "Bonferroni across the three pre-declared cumulative checkpoints",
+  "primary_metric": "cumulative main-number hits versus the exact fixed-pick 6-of-49 hypergeometric null",
+  "anti_crowd_excluded_from_prediction": true,
+  "retuning_policy": "No changes to model, window, checkpoints, alpha, or metric until all 104 prospective draws are scored. Any change starts a new protocol id and cannot inherit this protocol's evidence.",
+  "seal_policy": "Each prediction must target a scheduled future draw, be generated no later than the preceding local calendar date, and be committed to the prospective ledger branch before the outcome exists.",
+  "claim_boundary": "A prospective prediction is evidence only if it was sealed before the target draw, the protocol and model parameters were fixed in advance, and a pre-declared checkpoint passes its family-wise corrected threshold. Individual hits, near-misses, interim p-values, or anti-crowd rankings do not establish predictive power."
+}
