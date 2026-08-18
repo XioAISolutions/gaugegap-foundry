@@ -1,0 +1,14 @@
+{
+  "chance_mean_hits": 0.7346938775510204,
+  "claim_boundary": "A prospective prediction is evidence only if it was sealed before the target draw, the protocol and model parameters were fixed in advance, and a pre-declared checkpoint passes its family-wise corrected threshold. Individual hits, near-misses, interim p-values, or anti-crowd rankings do not establish predictive power.",
+  "current_exact_upper_tail_p_descriptive_only": null,
+  "current_mean_hits": null,
+  "current_total_hits": 0,
+  "decision_checkpoints": [],
+  "next_checkpoint": 26,
+  "predictive_evidence_gate_passed": false,
+  "protocol_id": "lottery-forge-0002-prospective-v1",
+  "protocol_sha256": "455faee857ef9f4b5bd7984e06b336ec878d54e047f5d8c78051be4cbbbe4045",
+  "schema": "gaugegap.lottery_forge.prospective_evaluation.v1",
+  "scored_draws": 0
+}
