@@ -25,13 +25,18 @@ WCLC_DAILY_RECENT_URL = "https://www.wclc.com/winning-numbers/daily-grand-extra.
 
 _MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December"
 _DATE = rf"(?P<date>(?:{_MONTHS})\s+\d{{1,2}},\s+\d{{4}})"
+# Parse only the fields required to identify the main draw. We deliberately do
+# not require the EXTRA column because PDF text extraction can reorder that
+# rightmost column even though the official page visually presents it on the
+# same row. Date anchoring prevents bonus/MAXMILLIONS rows from being mistaken
+# for main draws.
 MAX_HISTORY_RE = re.compile(
     rf"{_DATE}\s+" + r"\s+".join(rf"(?P<n{i}>\d{{1,2}})" for i in range(1, 8))
-    + r"\s+(?P<bonus>\d{1,2})\s+\d{7}(?:\s|$)"
+    + r"\s+(?P<bonus>\d{1,2})(?:\s|$)"
 )
 DAILY_HISTORY_RE = re.compile(
     rf"{_DATE}\s+" + r"\s+".join(rf"(?P<n{i}>\d{{1,2}})" for i in range(1, 6))
-    + r"\s+(?P<grand>\d)\s+\d{7}(?:\s|$)"
+    + r"\s+(?P<grand>[1-7])(?:\s|$)"
 )
 DATE_TOKEN_RE = re.compile(rf"^(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\s+{_DATE}$")
 
@@ -125,6 +130,23 @@ def parse_max_recent_html(html: str) -> tuple[Draw, ...]:
     return tuple(by_date[key] for key in sorted(by_date))
 
 
+def _grand_from_tokens(tokens: list[str], index: int) -> int | None:
+    value = tokens[index]
+    direct = re.fullmatch(r"Grand\s*Number\s*([1-7])", value, flags=re.I)
+    if direct:
+        return int(direct.group(1))
+    if value.lower() == "grand" and index + 1 < len(tokens):
+        next_value = tokens[index + 1]
+        split = re.fullmatch(r"Number\s*([1-7])", next_value, flags=re.I)
+        if split:
+            return int(split.group(1))
+        if re.fullmatch(r"[1-7]", next_value):
+            return int(next_value)
+    if value.lower() == "grand number" and index + 1 < len(tokens) and re.fullmatch(r"[1-7]", tokens[index + 1]):
+        return int(tokens[index + 1])
+    return None
+
+
 def parse_daily_recent_html(html: str) -> tuple[MultiGameDraw, ...]:
     parser = _TextCollector(); parser.feed(html)
     tokens = parser.tokens
@@ -148,11 +170,9 @@ def parse_daily_recent_html(html: str) -> tuple[MultiGameDraw, ...]:
                 break
             if len(numbers) < 5 and re.fullmatch(r"\d{1,2}", value):
                 numbers.append(int(value)); j += 1; continue
-            match = re.fullmatch(r"Grand\s*Number\s*(\d)", value, flags=re.I)
-            if match:
-                grand = int(match.group(1)); break
-            if value.lower() in {"grand", "grand number"} and j + 1 < len(tokens) and re.fullmatch(r"[1-7]", tokens[j + 1]):
-                grand = int(tokens[j + 1]); break
+            grand = _grand_from_tokens(tokens, j)
+            if grand is not None:
+                break
             j += 1
         if len(numbers) == 5 and grand is not None:
             by_date[draw_date] = MultiGameDraw(Draw.from_numbers(numbers, draw_date=draw_date), grand)
