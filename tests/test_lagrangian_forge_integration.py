@@ -24,7 +24,7 @@ def test_complete_dataset_preserves_old_scenes_and_adds_all_extensions():
     dataset = module.build_dataset()
     ids = [scene["id"] for scene in dataset["scenes"]]
     assert dataset["schema"] == "gaugegap.foundry_experience.v6"
-    assert len(ids) == 15
+    assert len(ids) == 16
     assert ids == [
         "rossler",
         "lorenz",
@@ -40,6 +40,7 @@ def test_complete_dataset_preserves_old_scenes_and_adds_all_extensions():
         "perception-interface",
         "menger-sponge",
         "spectra",
+        "hadamard",
         "limits",
     ]
     lagrangian = next(scene for scene in dataset["scenes"] if scene["id"] == "standard-model")
@@ -69,7 +70,7 @@ def test_complete_generator_writes_interactive_extension_scenes(tmp_path: Path):
     data = json.loads((output / "data.json").read_text(encoding="utf-8"))
     html = (output / "index.html").read_text(encoding="utf-8")
     manifest = json.loads((output / "research_manifest.json").read_text(encoding="utf-8"))
-    assert len(data["scenes"]) == 15
+    assert len(data["scenes"]) == 16
     assert any(scene["id"] == "standard-model" for scene in data["scenes"])
     assert any(scene["id"] == "standard-model-anomalies" for scene in data["scenes"])
     assert any(scene["id"] == "no-hiding" for scene in data["scenes"])
@@ -78,6 +79,7 @@ def test_complete_generator_writes_interactive_extension_scenes(tmp_path: Path):
     assert any(scene["id"] == "compactification" for scene in data["scenes"])
     assert any(scene["id"] == "perception-interface" for scene in data["scenes"])
     assert any(scene["id"] == "menger-sponge" for scene in data["scenes"])
+    assert any(scene["id"] == "hadamard" for scene in data["scenes"])
     assert "drawLagrangian" in html
     assert "drawAnomaly" in html
     assert "drawNoHiding" in html
@@ -90,5 +92,7 @@ def test_complete_generator_writes_interactive_extension_scenes(tmp_path: Path):
     assert "Compact Hidden Dimensions" in html
     assert "Fitness Beats Truth Toy Game" in html
     assert "Menger Sponge Topology Gap" in html
-    assert manifest["claims"][0]["parameters"]["scene_count"] == 15
+    assert "drawHadamard" in html
+    assert "Hadamard orthogonality" in html
+    assert manifest["claims"][0]["parameters"]["scene_count"] == 16
     assert preview.exists()

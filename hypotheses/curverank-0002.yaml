@@ -1,0 +1,52 @@
+id: curverank-0002
+track: CurveRank
+model: berry_keating_xp_coverage
+scope: >
+  certified coverage screening of truncated candidate Hilbert-Polya operators
+  against certified enclosures of the first k Riemann zeros, at a stated
+  matching tolerance and against a supplied comparison threshold
+claim: >
+  For the truncations screened here, the certified upper bound on the fraction
+  of the first k zero enclosures matched within the stated tolerance is strictly
+  below the supplied comparison threshold. The finite model therefore cannot
+  reach that threshold at that truncation and tolerance, and the run emits a
+  negative-result certificate rather than a positive claim.
+prediction:
+  observable: certified_coverage_fraction_bounds
+  expected_shape: upper_bound_below_threshold_with_no_undetermined_zeros
+controls:
+  arithmetic: interval_enclosures_with_directed_rounding
+  families: [xp, dirac_rindler, quantum_graph]
+  n_basis_sweep: [16, 24, 32]
+  k_zeros: 12
+  tolerance: 0.5
+  comparison_threshold: 0.6725
+  zeros_method: auto
+validation:
+  required:
+    - coverage_counts_are_derived_from_interval_enclosures_only
+    - undetermined_zeros_are_charged_to_the_upper_bound_never_the_lower
+    - structural_zero_modes_are_filtered_before_matching
+    - certified_mismatch_is_reported_alongside_coverage
+    - certificate_digest_is_reproducible
+  future:
+    - arb_zero_enclosures_in_ci
+    - wider_truncation_sweep_with_higher_working_precision
+kill_criteria:
+  - a coverage bound is produced from point estimates rather than enclosures
+  - the lower bound counts a zero that is not certifiably matched
+  - repeated runs emit different certificate digests
+  - the comparison threshold is reported as a result rather than as an input
+status: active
+claim_boundary: >
+  The comparison threshold is an input to this screen, not a measurement.
+  Published density theorems about the proportion of nontrivial zeta zeros on
+  the critical line are statements about the zeros of the zeta function; this
+  hypothesis neither evaluates, reproduces, nor contradicts any of them. What is
+  measured is a different finite quantity: spectral coverage by one truncated
+  candidate operator at one tolerance. A negative certificate rules out that one
+  finite truncation. It is not evidence for or against the Riemann Hypothesis
+  and is not a statement about the Hilbert-Polya program as a whole.
+notes:
+  - Complements curverank-0001, which reports the certified mismatch M_n rather than a proportion.
+  - Coverage rising with truncation size is expected bookkeeping, not convergence evidence.

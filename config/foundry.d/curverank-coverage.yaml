@@ -1,0 +1,33 @@
+version: 1
+
+units:
+  curverank-coverage-smoke:
+    track: curverank
+    hypothesis: curverank-0002
+    status: experimental
+    description: Reduced CI gate for certified coverage bounds and a reproducible certificate digest.
+    command:
+      ["{python}", "scripts/run_curverank_coverage.py",
+       "--family", "xp", "--n-basis", "12", "--k-zeros", "6",
+       "--tolerance", "0.5", "--threshold", "0.6725",
+       "--label", "curverank-0002-smoke",
+       "--output-dir", "/tmp/curverank-coverage-smoke"]
+
+  curverank-0002-coverage:
+    track: curverank
+    hypothesis: curverank-0002
+    status: experimental
+    description: Certified coverage screen of the truncated Berry-Keating xp operator against the first 12 zeros.
+    command:
+      ["{python}", "scripts/run_curverank_coverage.py",
+       "--family", "xp", "--n-basis", "16", "24", "32", "40",
+       "--k-zeros", "12", "--tolerance", "0.5", "--threshold", "0.6725",
+       "--label", "curverank-0002",
+       "--output-dir", "results/curverank-coverage"]
+
+groups:
+  curverank-coverage:
+    - curverank-0002-coverage
+
+  curverank-coverage-release:
+    - curverank-coverage-smoke

@@ -1,0 +1,590 @@
+{
+  "bundle_digest": "93b228e0af91117ba8bcad53f2213e05cff2da86eb6debb7c67a45954fa795cb",
+  "claim_boundary": "Finite-truncation spectral screening only. This artifact measures how many of the first k certified Riemann-zero enclosures are matched within a stated tolerance by the certified spectrum of one truncated candidate operator. It is not a statement about the proportion of zeta zeros on the critical line, does not evaluate or contradict any published density theorem, and is not evidence for or against the Riemann Hypothesis. A negative certificate rules out exactly one finite truncation of one operator family at one tolerance.",
+  "family": "xp",
+  "k_zeros": 12,
+  "label": "curverank-0002",
+  "schema": "gaugegap.curverank_coverage_bundle.v1",
+  "screens": [
+    {
+      "arithmetic": "interval_enclosures_with_directed_rounding",
+      "beats_null_control": false,
+      "certificate_digest": "a50d051999d3d13d7c8bbbbc91f5333bc3ee5ec5d847b10f0e757daa96df2769",
+      "certified_mismatch": {
+        "definition": "M_n = ||sort(|eig|)[:n] - zeros[:n]||_2 / sqrt(n), certified enclosure",
+        "lower": 31.269891690852283,
+        "upper": 31.26989169085231
+      },
+      "claim_boundary": "Finite-truncation spectral screening only. This artifact measures how many of the first k certified Riemann-zero enclosures are matched within a stated tolerance by the certified spectrum of one truncated candidate operator. It is not a statement about the proportion of zeta zeros on the critical line, does not evaluate or contradict any published density theorem, and is not evidence for or against the Riemann Hypothesis. A negative certificate rules out exactly one finite truncation of one operator family at one tolerance.",
+      "coverage": {
+        "certainly_covered": 0,
+        "certainly_uncovered": 12,
+        "coverage_lower": {
+          "denominator": 1,
+          "numerator": 0
+        },
+        "coverage_lower_float": 0.0,
+        "coverage_upper": {
+          "denominator": 1,
+          "numerator": 0
+        },
+        "coverage_upper_float": 0.0,
+        "k_zeros": 12,
+        "per_zero": [
+          {
+            "index": 0,
+            "nearest_separation_lower": 2.1308666167173635,
+            "nearest_separation_upper": 2.1308666167173973,
+            "status": "uncovered"
+          },
+          {
+            "index": 1,
+            "nearest_separation_lower": 1.2580262879343833,
+            "nearest_separation_upper": 1.2580262879344382,
+            "status": "uncovered"
+          },
+          {
+            "index": 2,
+            "nearest_separation_lower": 2.7307916534396885,
+            "nearest_separation_upper": 2.7307916534397436,
+            "status": "uncovered"
+          },
+          {
+            "index": 3,
+            "nearest_separation_lower": 0.6557684036262961,
+            "nearest_separation_upper": 0.6557684036264011,
+            "status": "uncovered"
+          },
+          {
+            "index": 4,
+            "nearest_separation_lower": 1.8544170582532524,
+            "nearest_separation_upper": 1.854417058253343,
+            "status": "uncovered"
+          },
+          {
+            "index": 5,
+            "nearest_separation_lower": 6.505533629339734,
+            "nearest_separation_upper": 6.5055336293398245,
+            "status": "uncovered"
+          },
+          {
+            "index": 6,
+            "nearest_separation_lower": 9.838074482661558,
+            "nearest_separation_upper": 9.838074482661648,
+            "status": "uncovered"
+          },
+          {
+            "index": 7,
+            "nearest_separation_lower": 12.246428751429063,
+            "nearest_separation_upper": 12.246428751429153,
+            "status": "uncovered"
+          },
+          {
+            "index": 8,
+            "nearest_separation_lower": 16.924506351681224,
+            "nearest_separation_upper": 16.924506351681313,
+            "status": "uncovered"
+          },
+          {
+            "index": 9,
+            "nearest_separation_lower": 18.693187948186363,
+            "nearest_separation_upper": 18.693187948186456,
+            "status": "uncovered"
+          },
+          {
+            "index": 10,
+            "nearest_separation_lower": 21.889676948228523,
+            "nearest_separation_upper": 21.889676948228615,
+            "status": "uncovered"
+          },
+          {
+            "index": 11,
+            "nearest_separation_lower": 25.365603167577458,
+            "nearest_separation_upper": 25.365603167577547,
+            "status": "uncovered"
+          }
+        ],
+        "tolerance": 0.5,
+        "undetermined": 0
+      },
+      "family": "xp",
+      "null_control": {
+        "coverage_max": {
+          "denominator": 12,
+          "numerator": 5
+        },
+        "coverage_max_float": 0.4166666666666667,
+        "coverage_mean_float": 0.31666666666666665,
+        "coverage_min_float": 0.16666666666666666,
+        "model": "uniform draws over the range spanned by the first k zero enclosures",
+        "n_values": 16,
+        "role": "null control: coverage reachable without any spectral structure. A candidate that does not exceed this range has not demonstrated anything about the zeros.",
+        "seeds": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "parameters": {
+        "k_zeros": 12,
+        "n_basis": 16,
+        "tolerance": 0.5,
+        "zeros_method": "auto"
+      },
+      "schema": "gaugegap.curverank_coverage_certificate.v1",
+      "spectrum": {
+        "enclosures": 16,
+        "nonzero_enclosures": 16
+      },
+      "threshold": {
+        "denominator": 400,
+        "float": 0.6725,
+        "numerator": 269,
+        "role": "supplied comparison threshold; an input to this screen, not a result of it"
+      },
+      "verdict": "CERTIFIED_BELOW_THRESHOLD",
+      "verdict_meaning": "Negative result: at this truncation and tolerance the certified upper bound on matched zeros is strictly below the supplied threshold, so this finite model cannot reach it. No statement is made about other truncations, other operators, or the zeta zeros themselves.",
+      "working_precision_dps": 50
+    },
+    {
+      "arithmetic": "interval_enclosures_with_directed_rounding",
+      "beats_null_control": false,
+      "certificate_digest": "b259370d49d82e14ba76e1bc6941af73b0ab4a834ebd8f2bdef94f068adef1d2",
+      "certified_mismatch": {
+        "definition": "M_n = ||sort(|eig|)[:n] - zeros[:n]||_2 / sqrt(n), certified enclosure",
+        "lower": 32.82729936148494,
+        "upper": 32.82729936148499
+      },
+      "claim_boundary": "Finite-truncation spectral screening only. This artifact measures how many of the first k certified Riemann-zero enclosures are matched within a stated tolerance by the certified spectrum of one truncated candidate operator. It is not a statement about the proportion of zeta zeros on the critical line, does not evaluate or contradict any published density theorem, and is not evidence for or against the Riemann Hypothesis. A negative certificate rules out exactly one finite truncation of one operator family at one tolerance.",
+      "coverage": {
+        "certainly_covered": 1,
+        "certainly_uncovered": 11,
+        "coverage_lower": {
+          "denominator": 12,
+          "numerator": 1
+        },
+        "coverage_lower_float": 0.08333333333333333,
+        "coverage_upper": {
+          "denominator": 12,
+          "numerator": 1
+        },
+        "coverage_upper_float": 0.08333333333333333,
+        "k_zeros": 12,
+        "per_zero": [
+          {
+            "index": 0,
+            "nearest_separation_lower": 1.448467292199239,
+            "nearest_separation_upper": 1.448467292199289,
+            "status": "uncovered"
+          },
+          {
+            "index": 1,
+            "nearest_separation_lower": 0.3965039883862388,
+            "nearest_separation_upper": 0.39650398838633993,
+            "status": "covered"
+          },
+          {
+            "index": 2,
+            "nearest_separation_lower": 0.6744008235030146,
+            "nearest_separation_upper": 0.6744008235030851,
+            "status": "uncovered"
+          },
+          {
+            "index": 3,
+            "nearest_separation_lower": 1.406164106650973,
+            "nearest_separation_upper": 1.4061641066510677,
+            "status": "uncovered"
+          },
+          {
+            "index": 4,
+            "nearest_separation_lower": 1.1040213552286033,
+            "nearest_separation_upper": 1.104021355228699,
+            "status": "uncovered"
+          },
+          {
+            "index": 5,
+            "nearest_separation_lower": 2.0795209633616576,
+            "nearest_separation_upper": 2.079520963361767,
+            "status": "uncovered"
+          },
+          {
+            "index": 6,
+            "nearest_separation_lower": 1.253019889960022,
+            "nearest_separation_upper": 1.2530198899601372,
+            "status": "uncovered"
+          },
+          {
+            "index": 7,
+            "nearest_separation_lower": 3.661374158727526,
+            "nearest_separation_upper": 3.6613741587276416,
+            "status": "uncovered"
+          },
+          {
+            "index": 8,
+            "nearest_separation_lower": 2.8159461781525987,
+            "nearest_separation_upper": 2.815946178152749,
+            "status": "uncovered"
+          },
+          {
+            "index": 9,
+            "nearest_separation_lower": 1.0472645816474564,
+            "nearest_separation_upper": 1.0472645816476063,
+            "status": "uncovered"
+          },
+          {
+            "index": 10,
+            "nearest_separation_lower": 2.1492244183945255,
+            "nearest_separation_upper": 2.149224418394674,
+            "status": "uncovered"
+          },
+          {
+            "index": 11,
+            "nearest_separation_lower": 5.6251506377434595,
+            "nearest_separation_upper": 5.625150637743608,
+            "status": "uncovered"
+          }
+        ],
+        "tolerance": 0.5,
+        "undetermined": 0
+      },
+      "family": "xp",
+      "null_control": {
+        "coverage_max": {
+          "denominator": 2,
+          "numerator": 1
+        },
+        "coverage_max_float": 0.5,
+        "coverage_mean_float": 0.43333333333333335,
+        "coverage_min_float": 0.25,
+        "model": "uniform draws over the range spanned by the first k zero enclosures",
+        "n_values": 24,
+        "role": "null control: coverage reachable without any spectral structure. A candidate that does not exceed this range has not demonstrated anything about the zeros.",
+        "seeds": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "parameters": {
+        "k_zeros": 12,
+        "n_basis": 24,
+        "tolerance": 0.5,
+        "zeros_method": "auto"
+      },
+      "schema": "gaugegap.curverank_coverage_certificate.v1",
+      "spectrum": {
+        "enclosures": 24,
+        "nonzero_enclosures": 24
+      },
+      "threshold": {
+        "denominator": 400,
+        "float": 0.6725,
+        "numerator": 269,
+        "role": "supplied comparison threshold; an input to this screen, not a result of it"
+      },
+      "verdict": "CERTIFIED_BELOW_THRESHOLD",
+      "verdict_meaning": "Negative result: at this truncation and tolerance the certified upper bound on matched zeros is strictly below the supplied threshold, so this finite model cannot reach it. No statement is made about other truncations, other operators, or the zeta zeros themselves.",
+      "working_precision_dps": 50
+    },
+    {
+      "arithmetic": "interval_enclosures_with_directed_rounding",
+      "beats_null_control": false,
+      "certificate_digest": "b99140861bdd84875d6b98dd72e23bdec4ff3d929d1aead90fe5331a884d930d",
+      "certified_mismatch": {
+        "definition": "M_n = ||sort(|eig|)[:n] - zeros[:n]||_2 / sqrt(n), certified enclosure",
+        "lower": 33.57429167704136,
+        "upper": 33.57429167704141
+      },
+      "claim_boundary": "Finite-truncation spectral screening only. This artifact measures how many of the first k certified Riemann-zero enclosures are matched within a stated tolerance by the certified spectrum of one truncated candidate operator. It is not a statement about the proportion of zeta zeros on the critical line, does not evaluate or contradict any published density theorem, and is not evidence for or against the Riemann Hypothesis. A negative certificate rules out exactly one finite truncation of one operator family at one tolerance.",
+      "coverage": {
+        "certainly_covered": 4,
+        "certainly_uncovered": 8,
+        "coverage_lower": {
+          "denominator": 3,
+          "numerator": 1
+        },
+        "coverage_lower_float": 0.3333333333333333,
+        "coverage_upper": {
+          "denominator": 3,
+          "numerator": 1
+        },
+        "coverage_upper_float": 0.3333333333333333,
+        "k_zeros": 12,
+        "per_zero": [
+          {
+            "index": 0,
+            "nearest_separation_lower": 0.07684289169114905,
+            "nearest_separation_upper": 0.07684289169121254,
+            "status": "covered"
+          },
+          {
+            "index": 1,
+            "nearest_separation_lower": 0.004573870554391906,
+            "nearest_separation_upper": 0.004573870554463707,
+            "status": "covered"
+          },
+          {
+            "index": 2,
+            "nearest_separation_lower": 0.1480511195847758,
+            "nearest_separation_upper": 0.1480511195848524,
+            "status": "covered"
+          },
+          {
+            "index": 3,
+            "nearest_separation_lower": 0.591811661773413,
+            "nearest_separation_upper": 0.5918116617735082,
+            "status": "uncovered"
+          },
+          {
+            "index": 4,
+            "nearest_separation_lower": 2.2444982883617555,
+            "nearest_separation_upper": 2.2444982883618603,
+            "status": "uncovered"
+          },
+          {
+            "index": 5,
+            "nearest_separation_lower": 2.4066182827246148,
+            "nearest_separation_upper": 2.4066182827247227,
+            "status": "uncovered"
+          },
+          {
+            "index": 6,
+            "nearest_separation_lower": 0.4829277210742543,
+            "nearest_separation_upper": 0.4829277210743609,
+            "status": "covered"
+          },
+          {
+            "index": 7,
+            "nearest_separation_lower": 1.925426547693116,
+            "nearest_separation_upper": 1.9254265476932204,
+            "status": "uncovered"
+          },
+          {
+            "index": 8,
+            "nearest_separation_lower": 0.8414131464322684,
+            "nearest_separation_upper": 0.8414131464323783,
+            "status": "uncovered"
+          },
+          {
+            "index": 9,
+            "nearest_separation_lower": 0.9272684500727578,
+            "nearest_separation_upper": 0.9272684500728697,
+            "status": "uncovered"
+          },
+          {
+            "index": 10,
+            "nearest_separation_lower": 4.123757450114916,
+            "nearest_separation_upper": 4.123757450115028,
+            "status": "uncovered"
+          },
+          {
+            "index": 11,
+            "nearest_separation_lower": 1.7593043438906681,
+            "nearest_separation_upper": 1.7593043438908198,
+            "status": "uncovered"
+          }
+        ],
+        "tolerance": 0.5,
+        "undetermined": 0
+      },
+      "family": "xp",
+      "null_control": {
+        "coverage_max": {
+          "denominator": 3,
+          "numerator": 2
+        },
+        "coverage_max_float": 0.6666666666666666,
+        "coverage_mean_float": 0.5166666666666667,
+        "coverage_min_float": 0.3333333333333333,
+        "model": "uniform draws over the range spanned by the first k zero enclosures",
+        "n_values": 32,
+        "role": "null control: coverage reachable without any spectral structure. A candidate that does not exceed this range has not demonstrated anything about the zeros.",
+        "seeds": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "parameters": {
+        "k_zeros": 12,
+        "n_basis": 32,
+        "tolerance": 0.5,
+        "zeros_method": "auto"
+      },
+      "schema": "gaugegap.curverank_coverage_certificate.v1",
+      "spectrum": {
+        "enclosures": 32,
+        "nonzero_enclosures": 32
+      },
+      "threshold": {
+        "denominator": 400,
+        "float": 0.6725,
+        "numerator": 269,
+        "role": "supplied comparison threshold; an input to this screen, not a result of it"
+      },
+      "verdict": "CERTIFIED_BELOW_THRESHOLD",
+      "verdict_meaning": "Negative result: at this truncation and tolerance the certified upper bound on matched zeros is strictly below the supplied threshold, so this finite model cannot reach it. No statement is made about other truncations, other operators, or the zeta zeros themselves.",
+      "working_precision_dps": 50
+    },
+    {
+      "arithmetic": "interval_enclosures_with_directed_rounding",
+      "beats_null_control": false,
+      "certificate_digest": "d3719b826ef63f83de7c172850eb297edf83ddd1ba0ed87d186d2ffe0f8e3839",
+      "certified_mismatch": {
+        "definition": "M_n = ||sort(|eig|)[:n] - zeros[:n]||_2 / sqrt(n), certified enclosure",
+        "lower": 34.03710991830156,
+        "upper": 34.03710991830165
+      },
+      "claim_boundary": "Finite-truncation spectral screening only. This artifact measures how many of the first k certified Riemann-zero enclosures are matched within a stated tolerance by the certified spectrum of one truncated candidate operator. It is not a statement about the proportion of zeta zeros on the critical line, does not evaluate or contradict any published density theorem, and is not evidence for or against the Riemann Hypothesis. A negative certificate rules out exactly one finite truncation of one operator family at one tolerance.",
+      "coverage": {
+        "certainly_covered": 0,
+        "certainly_uncovered": 12,
+        "coverage_lower": {
+          "denominator": 1,
+          "numerator": 0
+        },
+        "coverage_lower_float": 0.0,
+        "coverage_upper": {
+          "denominator": 1,
+          "numerator": 0
+        },
+        "coverage_upper_float": 0.0,
+        "k_zeros": 12,
+        "per_zero": [
+          {
+            "index": 0,
+            "nearest_separation_lower": 1.3867952241203163,
+            "nearest_separation_upper": 1.3867952241204269,
+            "status": "uncovered"
+          },
+          {
+            "index": 1,
+            "nearest_separation_lower": 0.9958736728311866,
+            "nearest_separation_upper": 0.9958736728312827,
+            "status": "uncovered"
+          },
+          {
+            "index": 2,
+            "nearest_separation_lower": 0.6964231424379318,
+            "nearest_separation_upper": 0.6964231424380504,
+            "status": "uncovered"
+          },
+          {
+            "index": 3,
+            "nearest_separation_lower": 0.6678886695980413,
+            "nearest_separation_upper": 0.667888669598157,
+            "status": "uncovered"
+          },
+          {
+            "index": 4,
+            "nearest_separation_lower": 1.2858497067220749,
+            "nearest_separation_upper": 1.2858497067221952,
+            "status": "uncovered"
+          },
+          {
+            "index": 5,
+            "nearest_separation_lower": 1.5853989976521659,
+            "nearest_separation_upper": 1.5853989976522935,
+            "status": "uncovered"
+          },
+          {
+            "index": 6,
+            "nearest_separation_lower": 1.7471418556695144,
+            "nearest_separation_upper": 1.747141855669642,
+            "status": "uncovered"
+          },
+          {
+            "index": 7,
+            "nearest_separation_lower": 1.3827135558281918,
+            "nearest_separation_upper": 1.3827135558283896,
+            "status": "uncovered"
+          },
+          {
+            "index": 8,
+            "nearest_separation_lower": 2.97693283533103,
+            "nearest_separation_upper": 2.9769328353312003,
+            "status": "uncovered"
+          },
+          {
+            "index": 9,
+            "nearest_separation_lower": 1.2082512388258875,
+            "nearest_separation_upper": 1.2082512388260578,
+            "status": "uncovered"
+          },
+          {
+            "index": 10,
+            "nearest_separation_lower": 1.9882377612160664,
+            "nearest_separation_upper": 1.9882377612162236,
+            "status": "uncovered"
+          },
+          {
+            "index": 11,
+            "nearest_separation_lower": 1.769271436268434,
+            "nearest_separation_upper": 1.7692714362685724,
+            "status": "uncovered"
+          }
+        ],
+        "tolerance": 0.5,
+        "undetermined": 0
+      },
+      "family": "xp",
+      "null_control": {
+        "coverage_max": {
+          "denominator": 3,
+          "numerator": 2
+        },
+        "coverage_max_float": 0.6666666666666666,
+        "coverage_mean_float": 0.6,
+        "coverage_min_float": 0.5,
+        "model": "uniform draws over the range spanned by the first k zero enclosures",
+        "n_values": 40,
+        "role": "null control: coverage reachable without any spectral structure. A candidate that does not exceed this range has not demonstrated anything about the zeros.",
+        "seeds": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "parameters": {
+        "k_zeros": 12,
+        "n_basis": 40,
+        "tolerance": 0.5,
+        "zeros_method": "auto"
+      },
+      "schema": "gaugegap.curverank_coverage_certificate.v1",
+      "spectrum": {
+        "enclosures": 40,
+        "nonzero_enclosures": 40
+      },
+      "threshold": {
+        "denominator": 400,
+        "float": 0.6725,
+        "numerator": 269,
+        "role": "supplied comparison threshold; an input to this screen, not a result of it"
+      },
+      "verdict": "CERTIFIED_BELOW_THRESHOLD",
+      "verdict_meaning": "Negative result: at this truncation and tolerance the certified upper bound on matched zeros is strictly below the supplied threshold, so this finite model cannot reach it. No statement is made about other truncations, other operators, or the zeta zeros themselves.",
+      "working_precision_dps": 50
+    }
+  ],
+  "threshold": {
+    "denominator": 400,
+    "float": 0.6725,
+    "numerator": 269
+  },
+  "tolerance": 0.5,
+  "verdicts": {
+    "16": "CERTIFIED_BELOW_THRESHOLD",
+    "24": "CERTIFIED_BELOW_THRESHOLD",
+    "32": "CERTIFIED_BELOW_THRESHOLD",
+    "40": "CERTIFIED_BELOW_THRESHOLD"
+  }
+}

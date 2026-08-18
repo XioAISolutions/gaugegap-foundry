@@ -6,7 +6,9 @@
 	entanglement-speed-limit alcubierre-warp decoherence-branching ergotropy \
 	landauer bekenstein physical-limits temporal-double-slit physical-limits-figures \
 	verify-certificates compile-coq sonification cherenkov lieb-robinson \
-	attractor-forge rossler lorenz thomas experience deep-boil deep-boil-smoke
+	attractor-forge rossler lorenz thomas experience deep-boil deep-boil-smoke \
+	hadamard-forge hadamard-forge-smoke hadamard-forge-search-smoke \
+	curverank-coverage curverank-coverage-smoke
 
 # Pin proof artifacts to the HEAD commit time so a fixed commit remains
 # byte-reproducible. The orchestration parameters live in config/foundry.yaml
@@ -150,3 +152,18 @@ deep-boil:
 
 deep-boil-smoke:
 	$(FOUNDRY) run deep-boil-smoke
+
+hadamard-forge:
+	$(FOUNDRY) run hadamard-forge
+
+hadamard-forge-smoke:
+	$(FOUNDRY) run hadamard-forge-smoke
+
+curverank-coverage:
+	$(FOUNDRY) run curverank-coverage
+
+curverank-coverage-smoke:
+	$(FOUNDRY) run curverank-coverage-smoke
+
+hadamard-forge-search-smoke:
+	$(FOUNDRY) run hadamard-forge-search-smoke

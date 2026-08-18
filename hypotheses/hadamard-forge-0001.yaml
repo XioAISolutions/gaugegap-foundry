@@ -1,0 +1,47 @@
+id: hadamard-forge-0001
+track: Hadamard Forge
+model: exact_integer_sign_matrix
+scope: exact integer verification of finite Hadamard witnesses built by this repository's constructor set
+claim: >
+  For every order this repository can construct (Sylvester, Paley type I, Paley
+  type II, and Kronecker products of those), the emitted sign matrix satisfies
+  H @ H.T == n * I exactly over the integers, and the packed witness decodes
+  losslessly to the matrix that was verified.
+prediction:
+  observable: exact_gram_matrix
+  expected_shape: diagonal_equals_order_and_all_off_diagonal_entries_are_zero
+controls:
+  arithmetic: exact_integer_popcount
+  alphabet: [1, -1]
+  constructors:
+    - sylvester(2^k)
+    - paley_type_i(prime q = 3 mod 4)
+    - paley_type_ii(prime q = 1 mod 4)
+    - kronecker(constructible, constructible)
+  release_label: REPRODUCED
+validation:
+  required:
+    - every_entry_is_exactly_plus_or_minus_one
+    - order_satisfies_n_in_1_2_or_4_divides_n
+    - gram_diagonal_equals_order_exactly
+    - all_off_diagonal_gram_entries_are_exactly_zero
+    - transpose_recomputation_agrees
+    - packed_witness_round_trips_losslessly
+    - witness_and_proofpack_hashes_are_reproducible
+    - single_flipped_sign_fails_closed
+kill_criteria:
+  - any entry outside the exact integers +1 and -1 reaches the verifier
+  - any diagonal Gram entry differs from the declared order
+  - any off-diagonal Gram entry is nonzero
+  - the packed encoding does not decode to the verified matrix
+  - repeated runs emit different canonical hashes
+status: active
+claim_boundary: >
+  Verifying a witness of order n establishes the exact existence of one n x n
+  Hadamard matrix. It is not a proof of the Hadamard conjecture, establishes no
+  equivalence-class or minimality statement, and says nothing about orders for
+  which no witness was verified. Reproducing a classical construction is
+  labelled REPRODUCED, not a discovery.
+notes:
+  - Verification is deliberately independent of construction; the same gates run on external witnesses.
+  - The order survey describes this repository's constructor coverage, not the state of the literature.

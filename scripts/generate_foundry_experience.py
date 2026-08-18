@@ -236,6 +236,40 @@ def _physical_limits_dataset() -> dict[str, Any]:
     }
 
 
+def _hadamard_dataset() -> dict[str, Any]:
+    """Order-168 Paley witness, shipped packed so the browser can re-verify it."""
+    from gaugegap.hadamard_forge import (
+        construct_witness,
+        gram_summary,
+        verify_hadamard,
+    )
+
+    witness = construct_witness(168)
+    verification = verify_hadamard(witness, expected_order=168)
+    return {
+        "kind": "hadamard",
+        "id": "hadamard",
+        "label": "Hadamard orthogonality",
+        "description": "Order-168 witness: H · Hᵀ = 168 · I over the exact integers",
+        "order": witness.order,
+        "rows_hex": list(witness.packed_hex()),
+        "rows_sha256": witness.rows_digest(),
+        "provenance": witness.provenance,
+        "gram_block": gram_summary(witness, sample=6),
+        "gates": [gate.name for gate in verification.gates],
+        "verified": verification.passed,
+        "equations": [
+            "H[i][j] ∈ {+1, −1}",
+            "⟨row_i, row_j⟩ = n − 2 · popcount(row_i XOR row_j)",
+            "H · Hᵀ = n · I,  n = 168",
+        ],
+        "claim_boundary": (
+            "exact existence of one order-168 matrix, re-checked in the browser over the "
+            "integers; not a proof of the Hadamard conjecture"
+        ),
+    }
+
+
 def build_dataset() -> dict[str, Any]:
     scenes = [
         _attractor_dataset("rossler"),
@@ -244,6 +278,7 @@ def build_dataset() -> dict[str, Any]:
         _lattice_dataset(),
         _weights_dataset(),
         _spectra_dataset(),
+        _hadamard_dataset(),
         _physical_limits_dataset(),
     ]
     return {
@@ -332,16 +367,20 @@ function projectPoint(p,b){let [x,y,z]=p;const pr=projection.value;if(pr==='xy')
 function rhs(name,s,p){const[x,y,z]=s;if(name==='rossler')return[-y-z,x+p.a*y,p.b+z*(x-p.c)];if(name==='lorenz')return[p.sigma*(y-x),x*(p.rho-z)-y,x*y-p.beta*z];return[Math.sin(y)-p.b*x,Math.sin(z)-p.b*y,Math.sin(x)-p.b*z]}
 function rk4(name,s,dt,p){const k1=rhs(name,s,p),k2=rhs(name,s.map((v,i)=>v+dt*k1[i]/2),p),k3=rhs(name,s.map((v,i)=>v+dt*k2[i]/2),p),k4=rhs(name,s.map((v,i)=>v+dt*k3[i]),p);return s.map((v,i)=>v+dt*(k1[i]+2*k2[i]+2*k3[i]+k4[i])/6)}
 function integrateClient(sc){const p=attractorParams[sc.id]||{...sc.parameters},dt=sc.dt,steps=sc.id==='thomas'?18000:12000,burn=sc.id==='thomas'?4000:2500;let s=[...sc.defaults],out=[];for(let i=0;i<steps;i++){s=rk4(sc.id,s,dt,p);if(i>=burn&&i%4===0&&s.every(Number.isFinite))out.push([...s]);if(!s.every(Number.isFinite)||Math.max(...s.map(Math.abs))>1e8)break}return out}
+function hadamardBits(sc){if(sc._bits)return sc._bits;const n=sc.order,B=[];for(const hex of sc.rows_hex){const row=new Uint8Array(n);for(let j=0;j<n;j++){const nib=parseInt(hex[hex.length-1-(j>>2)],16);row[j]=(nib>>(j&3))&1}B.push(row)}sc._bits=B;return B}
+function hadamardCheck(sc){if(sc._check)return sc._check;const n=sc.order,B=hadamardBits(sc);let diagOk=true,maxOff=0,pairs=0;for(let i=0;i<n;i++)for(let j=i;j<n;j++){const a=B[i],b=B[j];let mis=0;for(let k=0;k<n;k++)if(a[k]!==b[k])mis++;const dot=n-2*mis;if(i===j){if(dot!==n)diagOk=false}else{if(Math.abs(dot)>maxOff)maxOff=Math.abs(dot);pairs++}}sc._check={diagOk:diagOk,maxOff:maxOff,pairs:pairs};return sc._check}
+function drawHadamard(sc){const n=sc.order,B=hadamardBits(sc),size=Math.min(canvas.width,canvas.height)*.72,cell=size/n,x0=(canvas.width-size)/2,y0=(canvas.height-size)/2;const reveal=mode==='experience'?Math.min(n,Math.max(1,Math.floor(frame*+speed.value/6)%(n+40))):n;for(let i=0;i<reveal;i++){const row=B[i];for(let j=0;j<n;j++){ctx.fillStyle=row[j]?'#12203f':'#f2ead0';ctx.fillRect(x0+j*cell,y0+i*cell,Math.ceil(cell),Math.ceil(cell))}}const c=hadamardCheck(sc);ctx.textAlign='left';ctx.fillStyle='#888';ctx.fillText(`H · H^T = ${n} · I   max |off-diagonal| = ${c.maxOff}`,x0,y0+size+22*devicePixelRatio);ctx.fillStyle='#666';ctx.fillText(`${n} × ${n} = ${n*n} exact signs · rows revealed ${reveal}/${n}`,x0,y0+size+40*devicePixelRatio)}
+function hadamardDiagnostics(sc){const c=hadamardCheck(sc);return metric('order',sc.order)+metric('browser Gram recheck',c.diagOk&&c.maxOff===0?'PASS':'FAIL')+metric('row pairs checked',c.pairs)+metric('max |off-diagonal|',c.maxOff)+metric('arithmetic','exact integers')}
 function liveDiagnostics(sc,P){if(sc.kind!=='attractor')return metric('scene type',sc.kind)+metric('samples',P.length);const p=attractorParams[sc.id]||sc.parameters;let div=0,cross=0;for(let i=1;i<P.length;i++){const q=P[i];if(sc.id==='rossler')div+=p.a+q[0]-p.c;else if(sc.id==='lorenz')div+=-(p.sigma+1+p.beta);else div+=-3*p.b;if(P[i-1][0]<=0&&q[0]>0)cross++}div/=Math.max(P.length,1);const b=bounds(P),span=Math.hypot(b[1][0]-b[0][0],b[1][1]-b[0][1],b[1][2]-b[0][2]);return metric('samples',P.length)+metric('mean divergence',round(div))+metric('x=0 crossings',cross)+metric('phase span',round(span))+metric('precomputed λ',sc.diagnostics.lyapunov.map(x=>round(x,4)).join(' / '))}
 function setScene(index){sceneIndex=(index+DATA.scenes.length)%DATA.scenes.length;sceneSel.value=sceneIndex;const sc=current();points=sc.points?sc.points.map(p=>p.slice(0,3)):[];frame=0;lastSwitch=performance.now();document.getElementById('bigIndex').textContent=String(sceneIndex).padStart(2,'0');document.getElementById('sceneTitle').innerHTML=`${sc.label}<span id="sceneSub">${sc.description||''}</span>`;boundaryEl.textContent=sc.claim_boundary||DATA.claim_boundary;equationsEl.textContent=(sc.equations||['finite geometric/spectral dataset']).join('\n');buildParams(sc);updatePanels();}
 function buildParams(sc){paramsEl.innerHTML='';if(sc.kind!=='attractor'){paramsEl.innerHTML='<div class="tiny">This scene uses a fixed finite dataset.</div>';return}attractorParams[sc.id]=attractorParams[sc.id]||{...sc.parameters};for(const [key,value] of Object.entries(sc.parameters)){const wrap=document.createElement('div');wrap.className='param';const span=Math.max(Math.abs(value)*.8,.5),min=value-span,max=value+span;wrap.innerHTML=`<div class="paramTop"><span>${key}</span><span id="pv-${key}">${round(attractorParams[sc.id][key],4)}</span></div><input data-key="${key}" type="range" min="${min}" max="${max}" step="${span/300}" value="${attractorParams[sc.id][key]}">`;paramsEl.appendChild(wrap);wrap.querySelector('input').oninput=e=>{attractorParams[sc.id][key]=+e.target.value;document.getElementById('pv-'+key).textContent=round(+e.target.value,4)}}}
-function updatePanels(){const sc=current();metricsEl.innerHTML=liveDiagnostics(sc,points);let evidence='';if(sc.kind==='attractor'){const d=sc.diagnostics;evidence+=metric('DMD rank',d.dmd.rank)+metric('DMD residual',round(d.dmd.reconstruction_error,6))+metric('validated step',d.validated_step.validated?'PASS':'FAIL')+metric('interval width',round(d.validated_step.maximum_endpoint_width,8));evidence+=`<pre>${JSON.stringify({dominant_modes:d.dominant_modes,validated_reason:d.validated_step.reason},null,2)}</pre>`}else if(sc.kind==='spectra'){for(const m of sc.models)evidence+=metric(m.id+' dim',m.audit.dimension)+metric(m.id+' gap',round(m.audit.spectral_gap,6))+metric('Hermitian',m.audit.hermitian?'PASS':'FAIL')}else evidence+=metric('dataset','finite / embedded');evidenceEl.innerHTML=evidence;document.getElementById('tickerInner').textContent=`${DATA.schema} // ${sc.id} // ${sc.claim_boundary||DATA.claim_boundary} // git ${DATA.git_commit||'unavailable'} // `}
+function updatePanels(){const sc=current();metricsEl.innerHTML=sc.kind==='hadamard'?hadamardDiagnostics(sc):liveDiagnostics(sc,points);let evidence='';if(sc.kind==='attractor'){const d=sc.diagnostics;evidence+=metric('DMD rank',d.dmd.rank)+metric('DMD residual',round(d.dmd.reconstruction_error,6))+metric('validated step',d.validated_step.validated?'PASS':'FAIL')+metric('interval width',round(d.validated_step.maximum_endpoint_width,8));evidence+=`<pre>${JSON.stringify({dominant_modes:d.dominant_modes,validated_reason:d.validated_step.reason},null,2)}</pre>`}else if(sc.kind==='hadamard'){const c=hadamardCheck(sc);evidence+=metric('provenance',sc.provenance)+metric('rows sha256',String(sc.rows_sha256).slice(0,16)+'…')+metric('python gates',sc.gates.length+' → '+(sc.verified?'PASS':'FAIL'))+metric('browser recheck',c.diagOk&&c.maxOff===0?'PASS':'FAIL');evidence+=`<pre>${JSON.stringify({gram_block:sc.gram_block,gates:sc.gates},null,2)}</pre>`}else if(sc.kind==='spectra'){for(const m of sc.models)evidence+=metric(m.id+' dim',m.audit.dimension)+metric(m.id+' gap',round(m.audit.spectral_gap,6))+metric('Hermitian',m.audit.hermitian?'PASS':'FAIL')}else evidence+=metric('dataset','finite / embedded');evidenceEl.innerHTML=evidence;document.getElementById('tickerInner').textContent=`${DATA.schema} // ${sc.id} // ${sc.claim_boundary||DATA.claim_boundary} // git ${DATA.git_commit||'unavailable'} // `}
 function drawAttractor(sc){const max=Math.min(+density.value,points.length),P=points.slice(0,max);if(!P.length)return;const b=bounds(P);ctx.lineWidth=devicePixelRatio*(drawLines?.72:1);ctx.strokeStyle='#f2f2f2';ctx.fillStyle='#fff';ctx.globalAlpha=.86;ctx.beginPath();const reveal=mode==='experience'?Math.max(20,Math.floor((frame*+speed.value)%P.length)):P.length;for(let i=0;i<reveal;i++){const q=projectPoint(P[i],b);if(drawLines){if(i===0)ctx.moveTo(q[0],q[1]);else ctx.lineTo(q[0],q[1])}else{ctx.fillRect(q[0],q[1],1.2*devicePixelRatio,1.2*devicePixelRatio)}}if(drawLines)ctx.stroke();ctx.globalAlpha=1;const idx=Math.min(reveal-1,P.length-1);if(soundOn&&idx>=0)updateSound(P[idx],b)}
 function drawLattice(sc){const P=sc.points,b=bounds(P);yaw+=.002*+speed.value;ctx.strokeStyle='#555';ctx.lineWidth=.55*devicePixelRatio;for(const e of sc.edges){const a=projectPoint(P[e[0]],b),d=projectPoint(P[e[1]],b);ctx.strokeStyle=e[2]?'#fff':'#343434';ctx.lineWidth=(e[2]?2:.55)*devicePixelRatio;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(d[0],d[1]);ctx.stroke()}ctx.fillStyle='#aaa';for(const p of P){const q=projectPoint(p,b);ctx.fillRect(q[0]-1,q[1]-1,2,2)}}
 function drawWeights(sc){const rows=(Math.floor(frame/600)%2?sc.decuplet:sc.octet),P=rows.map(r=>r.slice(0,3)),b=bounds(P);yaw+=.002*+speed.value;ctx.fillStyle='#fff';for(let i=0;i<P.length;i++){const q=projectPoint(P[i],b),mult=rows[i][3];ctx.beginPath();ctx.arc(q[0],q[1],(4+mult*2)*devicePixelRatio,0,7);ctx.fill();ctx.strokeStyle='#333';for(let r=1;r<mult;r++){ctx.beginPath();ctx.arc(q[0],q[1],(4+mult*2-r*2)*devicePixelRatio,0,7);ctx.stroke()}}}
 function drawSpectra(sc){const models=sc.models,gap=canvas.width/(models.length+1);models.forEach((m,mi)=>{const vals=m.eigenvalues,lo=Math.min(...vals),hi=Math.max(...vals),x=gap*(mi+1);ctx.fillStyle='#777';ctx.textAlign='center';ctx.fillText(m.id,x,canvas.height*.18);for(let i=0;i<vals.length;i++){const y=canvas.height*.78-(vals[i]-lo)/Math.max(hi-lo,1e-9)*canvas.height*.52;ctx.strokeStyle=i<2?'#fff':'#444';ctx.lineWidth=(i<2?2:1)*devicePixelRatio;ctx.beginPath();ctx.moveTo(x-80*devicePixelRatio,y);ctx.lineTo(x+80*devicePixelRatio,y);ctx.stroke();if(i<2){ctx.fillStyle='#aaa';ctx.fillText(round(vals[i],4),x+96*devicePixelRatio,y+3)}}})}
 function drawLimits(sc){const n=sc.log_mass.length,x0=canvas.width*.18,x1=canvas.width*.82,y0=canvas.height*.78,y1=canvas.height*.22;const map=(x,y)=>[x0+(x+6)/12*(x1-x0),y0-(y+6.5)/13*(y0-y1)];for(const [arr,label,style] of [[sc.log_schwarzschild,'Schwarzschild','#fff'],[sc.log_compton,'Compton','#777']]){ctx.strokeStyle=style;ctx.lineWidth=1.3*devicePixelRatio;ctx.beginPath();for(let i=0;i<n;i++){const q=map(sc.log_mass[i],arr[i]);i?ctx.lineTo(...q):ctx.moveTo(...q)}ctx.stroke();ctx.fillStyle=style;ctx.fillText(label,x1-80*devicePixelRatio,label==='Compton'?y1+20:y0-20)}}
-function draw(){const alpha=1-Math.min(+trail.value/100,.985);ctx.fillStyle=`rgba(3,3,3,${alpha})`;ctx.fillRect(0,0,canvas.width,canvas.height);ctx.font=`${11*devicePixelRatio}px ui-monospace,monospace`;const sc=current();if(sc.kind==='attractor')drawAttractor(sc);else if(sc.id==='lattice')drawLattice(sc);else if(sc.id==='su3')drawWeights(sc);else if(sc.kind==='spectra')drawSpectra(sc);else drawLimits(sc);frame++;if(mode==='experience'&&performance.now()-lastSwitch>12000)setScene(sceneIndex+1);requestAnimationFrame(draw)}
+function draw(){const alpha=1-Math.min(+trail.value/100,.985);ctx.fillStyle=`rgba(3,3,3,${alpha})`;ctx.fillRect(0,0,canvas.width,canvas.height);ctx.font=`${11*devicePixelRatio}px ui-monospace,monospace`;const sc=current();if(sc.kind==='attractor')drawAttractor(sc);else if(sc.id==='lattice')drawLattice(sc);else if(sc.id==='su3')drawWeights(sc);else if(sc.kind==='hadamard')drawHadamard(sc);else if(sc.kind==='spectra')drawSpectra(sc);else drawLimits(sc);frame++;if(mode==='experience'&&performance.now()-lastSwitch>12000)setScene(sceneIndex+1);requestAnimationFrame(draw)}
 function setMode(next){mode=next;body.className=next;document.getElementById('experience').classList.toggle('active',next==='experience');document.getElementById('experiment').classList.toggle('active',next==='experiment');lastSwitch=performance.now()}
 function startSound(){audio=audio||new AudioContext();oscA=audio.createOscillator();oscB=audio.createOscillator();gain=audio.createGain();const filter=audio.createBiquadFilter();oscA.type='sine';oscB.type='square';oscA.connect(filter);oscB.connect(filter);filter.connect(gain);gain.connect(audio.destination);gain.gain.value=.025;oscA.start();oscB.start();soundOn=true;document.getElementById('sound').textContent='Sound: on'}
 function stopSound(){if(gain)gain.gain.setTargetAtTime(0,audio.currentTime,.03);setTimeout(()=>{try{oscA.stop();oscB.stop()}catch(e){}},100);soundOn=false;document.getElementById('sound').textContent='Sound: off'}

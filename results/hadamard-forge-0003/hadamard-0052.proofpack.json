@@ -1,0 +1,210 @@
+{
+  "arithmetic": "exact_integer_popcount",
+  "claim_boundary": "Exact integer verification of a single finite Hadamard witness: H @ H.T == n * I over the integers. This certifies the existence of one matrix of that order. It is not a proof of the Hadamard conjecture, says nothing about equivalence classes, and makes no claim about orders for which no witness was verified.",
+  "order": 52,
+  "problem_id": "hadamard-forge-0052",
+  "proofpack_digest": "4eef8df9e4c53a77b71528ddee1e75511a4e5500625df2860f047bdb61417ff1",
+  "release_label": "REDISCOVERED",
+  "rows_sha256": "90baff1e21a3752f9259d69eea85c774e4b67b535c14d8871ddf452bf12dad62",
+  "schema": "gaugegap.hadamard_proofpack.v1",
+  "search": {
+    "arithmetic": "exact_integer_autocorrelation",
+    "claim_boundary": "Bounded search over the symmetric Williamson family only. A found quadruple is verified exactly and certifies the existence of one Hadamard matrix of order 4n. An exhausted search certifies only that this family contains no quadruple for that order; it is not a statement that no Hadamard matrix of that order exists, and it is not a statement about the Hadamard conjecture.",
+    "n": 13,
+    "order": 52,
+    "outcome": "QUADRUPLE_FOUND",
+    "quadruple": [
+      [
+        1,
+        -1,
+        1,
+        -1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        -1,
+        -1,
+        1,
+        -1
+      ],
+      [
+        1,
+        1,
+        -1,
+        1,
+        -1,
+        -1,
+        1,
+        1,
+        -1,
+        -1,
+        1,
+        -1,
+        1
+      ],
+      [
+        1,
+        -1,
+        -1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        -1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        -1,
+        -1,
+        -1,
+        -1,
+        1,
+        -1,
+        -1,
+        1,
+        -1,
+        -1,
+        -1,
+        -1
+      ]
+    ],
+    "schema": "gaugegap.williamson_search.v1",
+    "search_space": {
+      "admissible_row_sum_partitions": [
+        [
+          1,
+          1,
+          1,
+          7
+        ],
+        [
+          1,
+          1,
+          5,
+          5
+        ],
+        [
+          3,
+          3,
+          3,
+          5
+        ]
+      ],
+      "family": "symmetric circulant Williamson quadruples",
+      "pair_sums_indexed": 196,
+      "rows_enumerated": 64,
+      "rows_surviving_psd_bound": 52,
+      "symmetric_rows_with_leading_plus_one": 64
+    }
+  },
+  "verification": {
+    "claim_boundary": "Exact integer verification of a single finite Hadamard witness: H @ H.T == n * I over the integers. This certifies the existence of one matrix of that order. It is not a proof of the Hadamard conjecture, says nothing about equivalence classes, and makes no claim about orders for which no witness was verified.",
+    "gates": [
+      {
+        "detail": "order 52 satisfies the necessary condition n in {1, 2} or 4 | n.",
+        "name": "admissible_order",
+        "passed": true
+      },
+      {
+        "detail": "declared order 52 == requested order 52",
+        "name": "expected_order",
+        "passed": true
+      },
+      {
+        "detail": "52 rows of 52 entries, every entry exactly +1 or -1.",
+        "name": "square_pm1_alphabet",
+        "passed": true
+      },
+      {
+        "detail": "every diagonal entry of H @ H.T equals 52.",
+        "name": "gram_diagonal_equals_order",
+        "passed": true
+      },
+      {
+        "detail": "all off-diagonal entries of H @ H.T are exactly 0.",
+        "name": "row_orthogonality",
+        "passed": true
+      },
+      {
+        "detail": "H.T @ H == n * I holds exactly (independent recomputation on the transpose).",
+        "name": "column_orthogonality",
+        "passed": true
+      }
+    ],
+    "gram_diagonal": 52,
+    "gram_offdiagonal_max_abs": 0,
+    "order": 52,
+    "passed": true,
+    "schema": "gaugegap.hadamard_verification.v1",
+    "witness_digest": "ae1d706d21a46ea86a9ae6feb2cf8643ac8fa70822c63db48cd76d3ece9fd807"
+  },
+  "witness": {
+    "name": "williamson-52",
+    "order": 52,
+    "provenance": "search:williamson(n=13)",
+    "rows_hex": [
+      "f6f703966961a",
+      "edee076cd0c35",
+      "dbdc0ed9a386a",
+      "b7b81df3450d5",
+      "6f783ba68a1ab",
+      "def0770d16356",
+      "bde8ee1a2c6ac",
+      "7bd9dc3458d58",
+      "f7b3b828b3ab0",
+      "ef6f701167561",
+      "dedee062ccac3",
+      "bdbdc0c59b586",
+      "7b7b81cb34b0d",
+      "e070486c354cb",
+      "c0e890986a997",
+      "81d92130d532e",
+      "03ba4221aa65d",
+      "0774840356cba",
+      "0ee10846ad974",
+      "1dc2108d592e9",
+      "3b84211ab05d3",
+      "7700427560ba6",
+      "ee0084aac374c",
+      "dc09091586e99",
+      "b81a122b0dd32",
+      "703c24161ba65",
+      "a65d86bdbc3f1",
+      "4cbb0d7b7a7e2",
+      "99761ab6f6fc4",
+      "32ec356deff88",
+      "65d06adbdff11",
+      "cba0d5b7bde23",
+      "9749ab2f7bc47",
+      "2e9b561ef788f",
+      "5d36ac3ded11f",
+      "ba65587bda23f",
+      "74cab0f7b647e",
+      "e99561af6e8fc",
+      "d32ac35edf1f8",
+      "b0d2cd07e2121",
+      "61ad9a0fc4242",
+      "c353345f88484",
+      "86ae68bf10908",
+      "0d5cd17e23210",
+      "1ab1a2fc46421",
+      "356345b88e842",
+      "6ac68b311f084",
+      "d58516623e109",
+      "ab0a2cc47e212",
+      "561c5988fc424",
+      "ac30b351f8848",
+      "586966a3f1090"
+    ],
+    "rows_sha256": "90baff1e21a3752f9259d69eea85c774e4b67b535c14d8871ddf452bf12dad62",
+    "schema": "gaugegap.hadamard_witness.v1"
+  },
+  "witness_digest": "ae1d706d21a46ea86a9ae6feb2cf8643ac8fa70822c63db48cd76d3ece9fd807"
+}

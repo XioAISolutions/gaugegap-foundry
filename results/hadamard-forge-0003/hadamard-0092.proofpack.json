@@ -1,0 +1,190 @@
+{
+  "arithmetic": "exact_integer_popcount",
+  "claim_boundary": "Exact integer verification of a single finite Hadamard witness: H @ H.T == n * I over the integers. This certifies the existence of one matrix of that order. It is not a proof of the Hadamard conjecture, says nothing about equivalence classes, and makes no claim about orders for which no witness was verified.",
+  "order": 92,
+  "problem_id": "hadamard-forge-0092",
+  "proofpack_digest": "54221badc040b54491b671ff8f6554774f8a9eacbb74d1a4d6f0d121e998e310",
+  "release_label": "REDISCOVERED",
+  "rows_sha256": "304cfefb89763e67cf7d73e81f5dbd96d5983fb0a5ce0a83ae18a615b761f859",
+  "schema": "gaugegap.hadamard_proofpack.v1",
+  "search": {
+    "arithmetic": "exact_integer_autocorrelation",
+    "claim_boundary": "Bounded search over the symmetric Williamson family only. A found quadruple is verified exactly and certifies the existence of one Hadamard matrix of order 4n. An exhausted search certifies only that this family contains no quadruple for that order; it is not a statement that no Hadamard matrix of that order exists, and it is not a statement about the Hadamard conjecture.",
+    "n": 23,
+    "order": 92,
+    "outcome": "QUADRUPLE_FOUND",
+    "quadruple": [
+      [
+        1,
+        -1,
+        -1,
+        1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        1,
+        1,
+        -1,
+        -1,
+        -1,
+        1,
+        1,
+        -1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        -1,
+        -1,
+        1,
+        1,
+        -1,
+        -1,
+        -1,
+        1,
+        1
+      ],
+      [
+        1,
+        -1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        -1
+      ],
+      [
+        1,
+        -1,
+        -1,
+        1,
+        -1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        1,
+        1,
+        1,
+        -1,
+        -1,
+        1,
+        -1,
+        -1
+      ]
+    ],
+    "schema": "gaugegap.williamson_search.v1",
+    "search_space": {
+      "admissible_row_sum_partitions": [
+        [
+          1,
+          1,
+          3,
+          9
+        ],
+        [
+          3,
+          3,
+          5,
+          7
+        ]
+      ],
+      "family": "symmetric circulant Williamson quadruples",
+      "pair_sums_indexed": 64009,
+      "rows_enumerated": 2048,
+      "rows_surviving_psd_bound": 1212,
+      "symmetric_rows_with_leading_plus_one": 2048
+    }
+  },
+  "verification": {
+    "claim_boundary": "Exact integer verification of a single finite Hadamard witness: H @ H.T == n * I over the integers. This certifies the existence of one matrix of that order. It is not a proof of the Hadamard conjecture, says nothing about equivalence classes, and makes no claim about orders for which no witness was verified.",
+    "gates": [
+      {
+        "detail": "order 92 satisfies the necessary condition n in {1, 2} or 4 | n.",
+        "name": "admissible_order",
+        "passed": true
+      },
+      {
+        "detail": "declared order 92 == requested order 92",
+        "name": "expected_order",
+        "passed": true
+      },
+      {
+        "detail": "92 rows of 92 entries, every entry exactly +1 or -1.",
+        "name": "square_pm1_alphabet",
+        "passed": true
+      },
+      {
+        "detail": "every diagonal entry of H @ H.T equals 92.",
+        "name": "gram_diagonal_equals_order",
+        "passed": true
+      },
+      {
+        "detail": "all off-diagonal entries of H @ H.T are exactly 0.",
+        "name": "row_orthogonality",
+        "passed": true
+      },
+      {
+        "detail": "H.T @ H == n * I holds exactly (independent recomputation on the transpose).",
+        "name": "column_orthogonality",
+        "passed": true
+      }
+    ],
+    "gram_diagonal": 92,
+    "gram_offdiagonal_max_abs": 0,
+    "order": 92,
+    "passed": true,
+    "schema": "gaugegap.hadamard_verification.v1",
+    "witness_digest": "80ae19ef3af00fe461dd3b81d97663900ed377aafd473a5f9b92e543afa50e72"
+  },
+  "witness": {
+    "name": "williamson-92",
+    "order": 92,
+    "provenance": "search:williamson(n=23)",
+    "rows_sha256": "304cfefb89763e67cf7d73e81f5dbd96d5983fb0a5ce0a83ae18a615b761f859",
+    "schema": "gaugegap.hadamard_witness.v1"
+  },
+  "witness_digest": "80ae19ef3af00fe461dd3b81d97663900ed377aafd473a5f9b92e543afa50e72"
+}

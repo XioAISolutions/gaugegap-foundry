@@ -130,7 +130,7 @@ def test_complete_experience_contains_no_hiding_scene():
         "perception-interface",
         "menger-sponge",
     ]
-    assert len(ids) == 15
+    assert len(ids) == 16
     scene = next(scene for scene in dataset["scenes"] if scene["id"] == "no-hiding")
     assert scene["suite"]["passed"]
     assert scene["selected"]["recovery_fidelity"] == pytest.approx(1.0)

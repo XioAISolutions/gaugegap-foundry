@@ -1,0 +1,59 @@
+{
+  "arithmetic": "exact_integer_popcount",
+  "claim_boundary": "Exact integer verification of a single finite Hadamard witness: H @ H.T == n * I over the integers. This certifies the existence of one matrix of that order. It is not a proof of the Hadamard conjecture, says nothing about equivalence classes, and makes no claim about orders for which no witness was verified.",
+  "order": 168,
+  "problem_id": "hadamard-forge-0168",
+  "proofpack_digest": "ee2cceba68fb40ffbd96fea9a0c2cbd3a9067490246e6d1a64e063e61b458c97",
+  "release_label": "REPRODUCED",
+  "rows_sha256": "7082c8da329e4e00124a6fdcd73124cf7cd502805a751b229cec5b6fc00ab80d",
+  "schema": "gaugegap.hadamard_proofpack.v1",
+  "verification": {
+    "claim_boundary": "Exact integer verification of a single finite Hadamard witness: H @ H.T == n * I over the integers. This certifies the existence of one matrix of that order. It is not a proof of the Hadamard conjecture, says nothing about equivalence classes, and makes no claim about orders for which no witness was verified.",
+    "gates": [
+      {
+        "detail": "order 168 satisfies the necessary condition n in {1, 2} or 4 | n.",
+        "name": "admissible_order",
+        "passed": true
+      },
+      {
+        "detail": "declared order 168 == requested order 168",
+        "name": "expected_order",
+        "passed": true
+      },
+      {
+        "detail": "168 rows of 168 entries, every entry exactly +1 or -1.",
+        "name": "square_pm1_alphabet",
+        "passed": true
+      },
+      {
+        "detail": "every diagonal entry of H @ H.T equals 168.",
+        "name": "gram_diagonal_equals_order",
+        "passed": true
+      },
+      {
+        "detail": "all off-diagonal entries of H @ H.T are exactly 0.",
+        "name": "row_orthogonality",
+        "passed": true
+      },
+      {
+        "detail": "H.T @ H == n * I holds exactly (independent recomputation on the transpose).",
+        "name": "column_orthogonality",
+        "passed": true
+      }
+    ],
+    "gram_diagonal": 168,
+    "gram_offdiagonal_max_abs": 0,
+    "order": 168,
+    "passed": true,
+    "schema": "gaugegap.hadamard_verification.v1",
+    "witness_digest": "278725a1481f484ca70d91dc81b9a6a524b3a7ee975e5d5b57641e45f922d3e4"
+  },
+  "witness": {
+    "name": "paley-i-168",
+    "order": 168,
+    "provenance": "constructor:paley_type_i(q=167)",
+    "rows_sha256": "7082c8da329e4e00124a6fdcd73124cf7cd502805a751b229cec5b6fc00ab80d",
+    "schema": "gaugegap.hadamard_witness.v1"
+  },
+  "witness_digest": "278725a1481f484ca70d91dc81b9a6a524b3a7ee975e5d5b57641e45f922d3e4"
+}
