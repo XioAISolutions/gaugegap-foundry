@@ -218,7 +218,15 @@ def main(argv=None) -> int:
     fib = report["fibonacci"]["null_test"]
     temporal = report["temporal_order"]
     dmd = report["dmd_temporal_order"]
-    best = min(report["rolling_backtests"], key=lambda item: item["adjusted_p_value_bonferroni"], default=None)
+    best = min(
+        report["rolling_backtests"],
+        key=lambda item: (
+            item["adjusted_p_value_bonferroni"],
+            item["empirical_p_value"],
+            -item["mean_hits"],
+        ),
+        default=None,
+    )
     lines = [
         "# Lottery Forge result", "",
         f"- Draws: **{report['draw_count']}**",
@@ -230,8 +238,9 @@ def main(argv=None) -> int:
     ]
     if best:
         lines += [
-            f"- Best corrected holdout: **{best['model']} / {best['window']} draws**",
+            f"- Strongest tested holdout: **{best['model']} / {best['window']} draws**",
             f"- Mean hits: **{best['mean_hits']:.4f}** vs chance **{best['chance_mean_hits']:.4f}**",
+            f"- Raw empirical p-value: **{best['empirical_p_value']:.6g}**",
             f"- Bonferroni-adjusted p-value: **{best['adjusted_p_value_bonferroni']:.6g}**",
         ]
     lines += ["", "## Anti-crowd candidate heuristics", ""]
