@@ -64,7 +64,7 @@ Every run writes:
 - `draws.csv` — normalized exact input used by the analysis;
 - `analysis.json` — full diagnostics and source metadata;
 - `proofpack.json` — content-hashed result with a hard claim boundary;
-- `summary.md` — concise verdict, strongest corrected holdout, candidates, and reference comparisons.
+- `summary.md` — concise verdict, strongest tested holdout, candidates, and reference comparisons.
 
 Verify a saved proofpack independently:
 
