@@ -24,6 +24,7 @@ WCLC_DAILY_HISTORY_URL = "https://www.wclc.com/display-on/display-on-downloads/d
 WCLC_DAILY_RECENT_URL = "https://www.wclc.com/winning-numbers/daily-grand-extra.htm"
 
 _MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December"
+_WEEKDAYS = "Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday"
 _DATE = rf"(?P<date>(?:{_MONTHS})\s+\d{{1,2}},\s+\d{{4}})"
 # Parse only the fields required to identify the main draw. We deliberately do
 # not require the EXTRA column because PDF text extraction can reorder that
@@ -38,7 +39,7 @@ DAILY_HISTORY_RE = re.compile(
     rf"{_DATE}\s+" + r"\s+".join(rf"(?P<n{i}>\d{{1,2}})" for i in range(1, 6))
     + r"\s+(?P<grand>[1-7])(?:\s|$)"
 )
-DATE_TOKEN_RE = re.compile(rf"^(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\s+{_DATE}$")
+DATE_TOKEN_RE = re.compile(rf"^(?:{_WEEKDAYS}),\s+{_DATE}$")
 
 
 @dataclass(frozen=True)
@@ -68,7 +69,7 @@ def _fetch_bytes(url: str, *, timeout: float = 30.0) -> bytes:
 
 
 def _date(value: str) -> str:
-    value = re.sub(r"^(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),\s+", "", value)
+    value = re.sub(rf"^(?:{_WEEKDAYS}),\s+", "", value)
     return datetime.strptime(value, "%B %d, %Y").date().isoformat()
 
 
@@ -130,52 +131,29 @@ def parse_max_recent_html(html: str) -> tuple[Draw, ...]:
     return tuple(by_date[key] for key in sorted(by_date))
 
 
-def _grand_from_tokens(tokens: list[str], index: int) -> int | None:
-    value = tokens[index]
-    direct = re.fullmatch(r"Grand\s*Number\s*([1-7])", value, flags=re.I)
-    if direct:
-        return int(direct.group(1))
-    if value.lower() == "grand" and index + 1 < len(tokens):
-        next_value = tokens[index + 1]
-        split = re.fullmatch(r"Number\s*([1-7])", next_value, flags=re.I)
-        if split:
-            return int(split.group(1))
-        if re.fullmatch(r"[1-7]", next_value):
-            return int(next_value)
-    if value.lower() == "grand number" and index + 1 < len(tokens) and re.fullmatch(r"[1-7]", tokens[index + 1]):
-        return int(tokens[index + 1])
-    return None
-
-
 def parse_daily_recent_html(html: str) -> tuple[MultiGameDraw, ...]:
+    """Parse WCLC's recent cards after flattening markup into visible text.
+
+    WCLC renders the Grand Number label across nested elements (for example
+    `Grand` / `Number 5`). Joining visible text tokens makes this independent of
+    that presentational split while still anchoring every match to an official
+    dated MAIN DRAW card.
+    """
     parser = _TextCollector(); parser.feed(html)
-    tokens = parser.tokens
+    visible = " ".join(parser.tokens)
+    pattern = re.compile(
+        rf"(?:{_WEEKDAYS}),\s+{_DATE}\s+MAIN\s+DRAW\s+"
+        + r"\s+".join(rf"(?P<n{i}>\d{{1,2}})" for i in range(1, 6))
+        + r"\s+Grand\s+Number\s*(?P<grand>[1-7])(?:\s|$)",
+        flags=re.I,
+    )
     by_date: dict[str, MultiGameDraw] = {}
-    for i, token in enumerate(tokens):
-        if not DATE_TOKEN_RE.match(token):
-            continue
-        draw_date = _date(token)
-        main = None
-        for j in range(i + 1, min(i + 15, len(tokens))):
-            if tokens[j].upper() == "MAIN DRAW":
-                main = j; break
-        if main is None:
-            continue
-        numbers: list[int] = []
-        grand = None
-        j = main + 1
-        while j < min(main + 30, len(tokens)):
-            value = tokens[j]
-            if DATE_TOKEN_RE.match(value):
-                break
-            if len(numbers) < 5 and re.fullmatch(r"\d{1,2}", value):
-                numbers.append(int(value)); j += 1; continue
-            grand = _grand_from_tokens(tokens, j)
-            if grand is not None:
-                break
-            j += 1
-        if len(numbers) == 5 and grand is not None:
-            by_date[draw_date] = MultiGameDraw(Draw.from_numbers(numbers, draw_date=draw_date), grand)
+    for match in pattern.finditer(visible):
+        draw_date = _date(match.group("date"))
+        numbers = tuple(int(match.group(f"n{i}")) for i in range(1, 6))
+        by_date[draw_date] = MultiGameDraw(
+            Draw.from_numbers(numbers, draw_date=draw_date), int(match.group("grand"))
+        )
     return tuple(by_date[key] for key in sorted(by_date))
 
 
