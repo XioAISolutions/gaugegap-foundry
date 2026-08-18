@@ -1,0 +1,15 @@
+version: 1
+
+units:
+  lottery-forge-prospective-next:
+    track: inference-traps
+    hypothesis: lottery-forge-0002
+    status: evidence_only
+    description: Generate and verify the next pre-registered LOTTO 6/49 prediction from official WCLC data.
+    command:
+      ["{python}", "scripts/run_lottery_prospective.py", "predict",
+       "--output", "results/lottery-prospective/next-prediction.json"]
+
+groups:
+  lottery-forge-prospective:
+    - lottery-forge-prospective-next
