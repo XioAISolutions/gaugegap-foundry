@@ -1,106 +1,114 @@
 # Lottery Forge
 
-Lottery Forge is a verification-first experiment for studying apparent structure in historical lottery draws without turning post-hoc patterns into prediction claims.
+Lottery Forge is a verification-first experiment for studying apparent structure in LOTTO 6/49 history without turning post-hoc patterns into prediction claims.
 
 ## Three questions kept separate
 
-1. **Historical structure** — does a declared subset, pair pattern, or temporal statistic look unusual versus a fair independent-draw null?
-2. **Prediction** — does a deterministic rule trained only on earlier draws beat random valid picks on strictly later holdouts?
-3. **Sharing-risk heuristics** — if a person chooses to play anyway, which combinations look less conventional under an explicit human-selection proxy?
+1. **Historical diagnostics** — Fibonacci counts, number frequencies, pair co-occurrence, temporal ordering, and DMD/Koopman structure are compared with fair-draw or shuffled-order nulls.
+2. **Prediction tests** — deterministic rules are trained only on earlier draws and scored on strictly later draws. The gate corrects across every tested model/window combination.
+3. **Anti-crowd heuristics** — if someone plays anyway, combinations are ranked against explicit human-choice features and OLG's published top combinations. This is a sharing-risk heuristic only.
 
-A result in question 1 does not imply question 2. Question 3 never changes draw probability.
+A result in (1) cannot open the predictive gate. By default (3) has `--neutrality-weight 0`, so historical winning-number frequencies do not leak into candidate ranking.
 
-## Implemented analyses
+## Ready-to-run commands
 
-- per-number frequency and finite-sample z-scores;
-- pre-declared Fibonacci-subset Monte Carlo test;
-- all-pair co-occurrence scan with exact binomial upper tails and Benjamini-Hochberg FDR correction;
-- temporal-order test using maximum lag-1 correlation and whole-draw permutation controls;
-- DMD/Koopman one-step reconstruction diagnostic compared against shuffled draw order;
-- strict walk-forward backtests for frequency, cold-frequency, recency, and hybrid rules;
-- deterministic sampled or exhaustive candidate search;
-- anti-crowd proxy, historical-neutrality score, and optional measured-popularity proximity penalty;
-- content-hashed proofpacks with a hard claim boundary.
-
-## Fair-null smoke test
+Fair-null smoke test:
 
 ```bash
 foundry run lottery-forge-smoke
 ```
 
-Or directly:
+Official WCLC two-calendar-year run:
+
+```bash
+foundry run lottery-forge-649-live
+```
+
+Equivalent direct command:
 
 ```bash
 python scripts/run_lottery_forge.py \
-  --demo-draws 220 \
-  --null-trials 2000 \
-  --dmd-trials 64 \
-  --candidate-samples 100000 \
-  --popular-combinations data/lottery/olg_649_popular_2025-05-25_2026-05-25.csv \
-  --output-dir results/lottery-forge-null
+  --wclc-live \
+  --years 2 \
+  --null-trials 5000 \
+  --dmd-trials 128 \
+  --candidate-samples 250000 \
+  --windows 26,52,104 \
+  --compare 32,37,41,43,47,49 \
+  --output-dir results/lottery-forge-649
 ```
 
-A fair-null run should normally fail the predictive evidence gate. Individual small exploratory p-values can still appear when many statistics are inspected; pair scans therefore report BH-corrected q-values.
+Lottery Forge fetches two official WCLC surfaces: the since-inception print/PDF historical snapshot and the current LOTTO 6/49 winning-numbers page. The current page supplements the snapshot so monthly publication lag does not silently omit the newest draws. Both raw payloads are SHA-256 hashed; parse counts and resolved date interval are embedded in the report.
 
-## Historical 6/49 input
+## Outputs
 
-Prepare a CSV with one row per draw:
+Every run writes:
+
+- `draws.csv` — normalized exact input used by the analysis;
+- `analysis.json` — full diagnostics and source metadata;
+- `proofpack.json` — content-hashed result with a hard claim boundary;
+- `summary.md` — concise verdict, best corrected holdout, candidates, and reference comparisons.
+
+Verify a saved proofpack independently:
+
+```bash
+python scripts/verify_lottery_proofpack.py results/lottery-forge-649/proofpack.json
+```
+
+## Historical tests
+
+- per-number count and finite-sample z-score;
+- pre-declared Fibonacci subset count versus Monte Carlo fair histories;
+- all 1,176 pairs with exact binomial upper tails and Benjamini-Hochberg FDR q-values;
+- maximum absolute lag-1 correlation versus whole-draw order permutations;
+- finite-data DMD/Koopman reconstruction error versus shuffled draw order.
+
+These are diagnostics only.
+
+## Holdout family and gate
+
+Four pre-declared rules are evaluated at each requested window: `frequency`, `cold-frequency`, `recency`, and `hybrid`. For each later draw, a rule sees only its immediately preceding training window. Random valid 6/49 combinations form the null.
+
+The family-wise gate requires both:
+
+1. mean holdout hits above the exact fair expectation `6*6/49`;
+2. **Bonferroni-adjusted empirical p < 0.01** across all model/window tests.
+
+A gate pass would still require a newly sealed future holdout and replication. It would not establish a causal mechanism.
+
+## Anti-crowd model
+
+The transparent player-choice proxy audits birthday-heavy selections, Fibonacci/lucky numbers, round numbers, repeated last digits, arithmetic progressions, adjacency, and the simplistic all-above-31 rule. The repository also stores OLG's published top 10 LOTTO 6/49 combinations for May 25, 2025–May 25, 2026 and applies a soft penalty for exact or near overlap.
+
+OLG publishes only a top list, not the full ticket-choice distribution, so this remains bounded. Crowd data is never used as evidence that a number is more or less likely to be drawn.
+
+Use `--compare` to score a fixed set without treating it as a prediction:
+
+```bash
+--compare 32,37,41,43,47,49
+```
+
+Use `--candidate-exhaustive` to search all `13,983,816` valid 6/49 combinations. The default deterministic sampled search is faster and records its sample count and seed.
+
+## CSV mode
+
+A custom source can be supplied as:
 
 ```text
-date,n1,n2,n3,n4,n5,n6
-2026-08-15,4,12,19,27,33,46
-...
+date,n1,n2,n3,n4,n5,n6,bonus
+2026-08-15,1,9,17,34,36,43,24
 ```
-
-Then run:
 
 ```bash
 python scripts/run_lottery_forge.py \
   --input data/lotto649.csv \
-  --number-columns n1,n2,n3,n4,n5,n6 \
-  --date-column date \
-  --pool-size 49 \
-  --pick-count 6 \
-  --null-trials 10000 \
-  --dmd-trials 256 \
-  --candidate-samples 500000 \
-  --popular-combinations data/lottery/olg_649_popular_2025-05-25_2026-05-25.csv \
-  --windows 26,52,104 \
-  --output-dir results/lottery-forge-649
+  --start-date 2024-08-17 \
+  --end-date 2026-08-15 \
+  --output-dir results/lottery-forge-csv
 ```
 
-Outputs:
-
-- `analysis.json` — full diagnostics;
-- `proofpack.json` — same result with SHA-256 content hash;
-- `summary.md` — concise verdict and candidate heuristics.
-
-## Predictive gate
-
-The initial gate requires both:
-
-- empirical holdout p-value `< 0.01` versus random valid picks; and
-- mean holdout hits greater than the fair-draw expectation.
-
-A serious predictive claim would need more than this gate: pre-registration, correction for the number of models/windows tried, a fresh untouched future holdout, and replication.
-
-## Crowd model
-
-The baseline anti-crowd score is a transparent behavioural proxy. It penalizes birthday-heavy, Fibonacci/lucky-number-heavy, round-number, repeated-last-digit and simple-progression choices. Consecutive pairs get a small credit because people often avoid them even though fair draws do not. The scorer also penalizes the simplistic `all numbers above 31` strategy so the optimizer cannot merely rediscover one obvious rule.
-
-The bundled OLG snapshot contains the ten most-played LOTTO 6/49 combinations published for May 25, 2025 through May 25, 2026. When supplied, Lottery Forge applies a soft penalty for exact or near-exact overlap with those measured popular combinations. Because OLG publishes a top list rather than the complete ticket-selection distribution, this remains a bounded heuristic rather than an estimate of true ticket popularity.
-
-Crowd data is never used as evidence that any number is more or less likely to be drawn.
+The input file itself is hashed into source metadata.
 
 ## Claim boundary
 
-Every valid six-number LOTTO 6/49 combination has the same draw probability in a fair draw. Lottery Forge is designed to falsify apparent patterns first and to keep anti-sharing heuristics separate from prediction.
-
-## Next upgrades
-
-- ingest a source-hashed official WCLC/OLG historical draw dataset;
-- add exact feature-distribution controls for sums, gaps, parity and clustering;
-- add model-family multiple-testing correction to the predictive gate;
-- pre-register candidate rules before a sealed future holdout;
-- replace top-list crowd calibration with fuller measured ticket-selection data if a defensible dataset becomes available;
-- benchmark sampled candidate search against exhaustive enumeration of all 13,983,816 6/49 combinations.
+Every valid six-number combination has equal draw probability under a fair LOTTO 6/49 Classic draw. Lottery Forge is designed to falsify attractive historical stories, test whether a pre-declared rule survives later-draw testing, and separately explore player-choice sharing risk.
