@@ -1,0 +1,19 @@
+version: 1
+
+units:
+  lottery-forge-smoke:
+    track: inference-traps
+    hypothesis: lottery-forge-0001
+    status: evidence_only
+    description: Fair-null smoke test for Lottery Forge with reproducible proofpack output.
+    command:
+      ["{python}", "scripts/run_lottery_forge.py", "--demo-draws", "120",
+       "--null-trials", "64", "--candidate-samples", "1000",
+       "--candidate-top-k", "5", "--windows", "26,52",
+       "--dmd-trials", "16",
+       "--popular-combinations", "data/lottery/olg_649_popular_2025-05-25_2026-05-25.csv",
+       "--output-dir", "/tmp/lottery-forge-smoke"]
+
+groups:
+  lottery-forge:
+    - lottery-forge-smoke
