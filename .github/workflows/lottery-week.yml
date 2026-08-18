@@ -1,0 +1,53 @@
+name: Lottery Forge Weekly Screen
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/gaugegap/lottery_selection.py'
+      - 'src/gaugegap/lottery_multigame_sources.py'
+      - 'scripts/run_lottery_week.py'
+      - 'tests/test_lottery_selection.py'
+      - 'tests/test_lottery_multigame_sources.py'
+      - 'data/lottery/olg_max_popular_2025-05-25_2026-05-25.csv'
+      - '.github/workflows/lottery-week.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/gaugegap/lottery_selection.py'
+      - 'src/gaugegap/lottery_multigame_sources.py'
+      - 'scripts/run_lottery_week.py'
+      - 'tests/test_lottery_selection.py'
+      - 'tests/test_lottery_multigame_sources.py'
+      - 'data/lottery/olg_max_popular_2025-05-25_2026-05-25.csv'
+      - '.github/workflows/lottery-week.yml'
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  weekly-screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+      - name: Focused tests
+        run: python -m pytest -q tests/test_lottery_selection.py tests/test_lottery_multigame_sources.py
+      - name: Live official-source weekly screen
+        run: |
+          python scripts/run_lottery_week.py \
+            --selection-samples 250000 \
+            --backtest-trials 1000 \
+            --output-dir /tmp/lottery-week
+          cat /tmp/lottery-week/summary.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lottery-forge-weekly-screen
+          path: /tmp/lottery-week/
