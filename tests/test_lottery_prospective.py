@@ -78,9 +78,7 @@ def test_prediction_refuses_same_day_or_known_outcome():
 def test_score_and_verify():
     spec = LotterySpec()
     draws = dated_draws()
-    prediction = make_prediction(
-        draws, spec, protocol(), target_draw_date="2026-02-04", sealed_on_date="2026-01-31"
-    )
+    prediction = make_prediction(draws, spec, protocol(), target_draw_date="2026-02-04", sealed_on_date="2026-01-31")
     bonus = next(value for value in range(1, 50) if value not in prediction["predicted_numbers"])
     actual = Draw.from_numbers(prediction["predicted_numbers"], draw_date="2026-02-04", bonus=bonus)
     score = score_prediction(prediction, actual, protocol())
@@ -95,33 +93,15 @@ def test_exact_null_distribution_and_checkpoint_evaluation():
     assert exact_total_hits_upper_tail(0, 1, spec) == 1.0
 
     rows = []
-    for index in range(2):
-        body = {
-            "schema": "gaugegap.lottery_forge.prospective_score.v1",
-            "protocol_id": "test-protocol",
-            "protocol_sha256": None,
-            "prediction_hash": f"pred-{index}",
-            "target_draw_date": f"2026-03-{04 + index:02d}",
-            "predicted_numbers": [1, 2, 3, 4, 5, 6],
-            "actual_numbers": [1, 2, 3, 4, 5, 6],
-            "bonus": 7,
-            "hits": 6,
-            "claim_boundary": "x",
-        }
-        # Build a valid score through the public scorer instead of hard-coding hashes.
-        pred = make_prediction(dated_draws(seed=20 + index), spec, protocol(), target_draw_date="2026-02-04", sealed_on_date="2026-01-31")
-        actual = Draw.from_numbers(pred["predicted_numbers"], draw_date="2026-02-04", bonus=49 if 49 not in pred["predicted_numbers"] else 48)
-        score = score_prediction(pred, actual, protocol())
-        score["target_draw_date"] = f"2026-03-{4 + index:02d}"
-        # Re-score hash cannot be mutated; instead create distinct actual targets through target-specific predictions below.
-        rows = []
-        break
-
     for target, seed in (("2026-02-04", 20), ("2026-02-07", 21)):
-        pred = make_prediction(dated_draws(seed=seed), spec, protocol(), target_draw_date=target, sealed_on_date="2026-01-31")
+        pred = make_prediction(
+            dated_draws(seed=seed), spec, protocol(),
+            target_draw_date=target, sealed_on_date="2026-01-31",
+        )
         bonus = next(value for value in range(1, 50) if value not in pred["predicted_numbers"])
         actual = Draw.from_numbers(pred["predicted_numbers"], draw_date=target, bonus=bonus)
         rows.append(score_prediction(pred, actual, protocol()))
+
     evaluation = evaluate_scores(rows, spec, protocol())
     assert evaluation["scored_draws"] == 2
     assert evaluation["decision_checkpoints"][0]["draw_count"] == 2
