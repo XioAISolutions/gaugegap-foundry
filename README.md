@@ -505,7 +505,7 @@ python scripts/run_hadamard_forge.py --witness path/to/witness.json \
 
 The Foundry Experience carries the order-168 witness as a scene that **re-verifies it in the browser** — decoding the packed rows and recomputing all 14,028 row pairs as integers, reporting `max |off-diagonal| = 0` beside the Python gate results.
 
-📖 [`docs/hadamard-forge.md`](docs/hadamard-forge.md)
+📖 [`docs/hadamard-forge.md`](docs/hadamard-forge.md) · 📣 [`docs/share-kit.md`](docs/share-kit.md) — the numbers, the copy, and the phrases this work does not earn
 
 > 🧭 **Boundary:** verifying a witness of order `n` establishes the exact existence of one `n × n` Hadamard matrix. It is not a proof of the Hadamard conjecture, establishes no equivalence-class or minimality statement, and says nothing about orders for which no witness was verified. Reproducing a classical construction is labelled **REPRODUCED**.
 
