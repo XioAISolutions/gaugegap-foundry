@@ -1,14 +1,27 @@
 {
-  "chance_mean_hits": 0.7346938775510204,
+  "actual_numbers": [
+    2,
+    14,
+    30,
+    33,
+    41,
+    45
+  ],
+  "bonus": 39,
   "claim_boundary": "A prospective prediction is evidence only if it was sealed before the target draw, the protocol and model parameters were fixed in advance, and a pre-declared checkpoint passes its family-wise corrected threshold. Individual hits, near-misses, interim p-values, or anti-crowd rankings do not establish predictive power.",
-  "current_exact_upper_tail_p_descriptive_only": 0.38304710519444407,
-  "current_mean_hits": 1.0,
-  "current_total_hits": 3,
-  "decision_checkpoints": [],
-  "next_checkpoint": 26,
-  "predictive_evidence_gate_passed": false,
+  "hits": 2,
+  "predicted_numbers": [
+    9,
+    15,
+    28,
+    39,
+    41,
+    45
+  ],
+  "prediction_hash": "527d90593d3b30eeb47e48ee187445e699a939c55a0f39187d479767f26dccf1",
   "protocol_id": "lottery-forge-0002-prospective-v1",
   "protocol_sha256": "455faee857ef9f4b5bd7984e06b336ec878d54e047f5d8c78051be4cbbbe4045",
-  "schema": "gaugegap.lottery_forge.prospective_evaluation.v1",
-  "scored_draws": 3
+  "schema": "gaugegap.lottery_forge.prospective_score.v1",
+  "score_hash": "c686ed44914c6fd6dd50f930b50a99c9cd47b206b67cf1f1e8746b0a2871f998",
+  "target_draw_date": "2026-08-26"
 }
