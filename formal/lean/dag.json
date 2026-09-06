@@ -1,0 +1,101 @@
+{
+  "schema": "gaugegap.lean_dag.v1",
+  "project": "gaugegap-lean",
+  "target": "Anomaly Forge hypercharge uniqueness (declared finite inventory)",
+  "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
+  "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+  "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
+  "nodes": [
+    {
+      "id": "A01",
+      "statement": "Stmt_A01_SU3Automatic",
+      "proof": "a01_su3Automatic",
+      "depends_on": [],
+      "description": "Gauge-invariant up and down Yukawa terms make the SU(3)^2-U(1) coefficient vanish identically for every colour count."
+    },
+    {
+      "id": "A02",
+      "statement": "Stmt_A02_SU2FixesLepton",
+      "proof": "a02_su2FixesLepton",
+      "depends_on": [],
+      "description": "SU(2)^2-U(1) cancellation is equivalent to the lepton-doublet hypercharge YL = -(n * YQ)."
+    },
+    {
+      "id": "A03",
+      "statement": "Stmt_A03_GravReduces",
+      "proof": "a03_gravReduces",
+      "depends_on": [],
+      "description": "Under the Yukawa relations and YL = -(n * YQ), the gravity^2-U(1) coefficient collapses to YH - n * YQ."
+    },
+    {
+      "id": "A04",
+      "statement": "Stmt_A04_Uniqueness",
+      "proof": "a04_uniqueness",
+      "depends_on": [],
+      "description": "Uniqueness in division-free form: the Yukawa relations plus SU(2)^2 and gravity^2 cancellation force n*YQ = YH, YL = -YH, n*Yu = YH*(n+1), n*Yd = YH*(1-n), Ye = -2*YH."
+    },
+    {
+      "id": "A05",
+      "statement": "Stmt_A05_U1CubedAutomatic",
+      "proof": "a05_u1CubedAutomatic",
+      "depends_on": [],
+      "description": "At the assignment fixed by A04 the U(1)^3 coefficient vanishes for every colour count, so the cubic condition is implied rather than imposed."
+    },
+    {
+      "id": "A06",
+      "statement": "Stmt_A06_StandardModelPoint",
+      "proof": "a06_standardModelPoint",
+      "depends_on": [],
+      "description": "The Standard Model point n = 3, YH = 1/2, giving (1/6, 2/3, -1/3, -1/2, -1), is anomaly free."
+    },
+    {
+      "id": "A07",
+      "statement": "Stmt_A07_PerturbationRejected",
+      "proof": "a07_perturbationRejected",
+      "depends_on": [],
+      "description": "The audited perturbation Yu = 7/10 is rejected, mirroring run_anomaly_forge.py --y-u 7/10 --require-pass."
+    },
+    {
+      "id": "A08",
+      "statement": "Stmt_A08_RightNeutrinoFamily",
+      "proof": "a08_rightNeutrinoFamily",
+      "depends_on": [],
+      "description": "With a Dirac right-handed neutrino every YQ is anomaly free: uniqueness fails and a one-parameter family survives. This is the declared boundary on A04 and A13."
+    },
+    {
+      "id": "A09",
+      "statement": "Stmt_A09_FamilyMeetsStandardModel",
+      "proof": "a09_familyMeetsStandardModel",
+      "depends_on": [],
+      "description": "The A08 family meets the neutrino-free Standard Model exactly where the right-handed neutrino hypercharge vanishes."
+    },
+    {
+      "id": "A10",
+      "statement": "Stmt_A10_ChargeQuantisation",
+      "proof": "a10_chargeQuantisation",
+      "depends_on": [],
+      "description": "Electric and composite charges at the Standard Model point under Q = T3 + Y: u = 2/3, d = -1/3, e = -1, nu = 0, proton = 1, neutron = 0."
+    },
+    {
+      "id": "A11",
+      "statement": "Stmt_A11_WittenParity",
+      "proof": "a11_wittenParity",
+      "depends_on": [],
+      "description": "Witten global SU(2) parity: three generations of three colours give twelve left-handed doublets (even), two colours give nine (odd, inadmissible)."
+    },
+    {
+      "id": "A12",
+      "statement": "Stmt_A12_GenerationScaling",
+      "proof": "a12_generationScaling",
+      "depends_on": [],
+      "description": "The generation factor is a nonzero scalar, so per-generation cancellation decides generation-universal cancellation."
+    },
+    {
+      "id": "A13",
+      "statement": "Stmt_A13_MainTheorem",
+      "proof": "a13_mainTheorem",
+      "depends_on": ["A04", "A05"],
+      "description": "Flagship: the Yukawa relations plus SU(2)^2 and gravity^2 cancellation pin the assignment and leave SU(3)^2 and U(1)^3 cancelling automatically."
+    }
+  ]
+}
