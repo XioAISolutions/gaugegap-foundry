@@ -1,0 +1,156 @@
+{
+  "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
+  "content_hash": "9687f834eea4e6d028dfcff980079aaf2a54e7e11f87771dabda8bbc4b4c1e13",
+  "kernel_check": {
+    "detail": "lake not found on PATH; install elan and rerun, or use CI",
+    "returncode": null,
+    "status": "toolchain_missing"
+  },
+  "mirror": {
+    "all_hold": true,
+    "claim_boundary": "finite-grid exact rational check of the Lean statements; kernel verification requires lake build",
+    "grid_points": 100,
+    "nodes": {
+      "A01": true,
+      "A02": true,
+      "A03": true,
+      "A04": true,
+      "A05": true,
+      "A06": true,
+      "A07": true,
+      "A08": true,
+      "A09": true,
+      "A10": true,
+      "A11": true,
+      "A12": true,
+      "A13": true
+    },
+    "schema": "gaugegap.anomaly_theorem_mirror.v1"
+  },
+  "node_count": 13,
+  "nodes": [
+    {
+      "depends_on": [],
+      "id": "A01",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a01_su3Automatic",
+      "statement": "Stmt_A01_SU3Automatic"
+    },
+    {
+      "depends_on": [],
+      "id": "A02",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a02_su2FixesLepton",
+      "statement": "Stmt_A02_SU2FixesLepton"
+    },
+    {
+      "depends_on": [],
+      "id": "A03",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a03_gravReduces",
+      "statement": "Stmt_A03_GravReduces"
+    },
+    {
+      "depends_on": [],
+      "id": "A04",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a04_uniqueness",
+      "statement": "Stmt_A04_Uniqueness"
+    },
+    {
+      "depends_on": [],
+      "id": "A05",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a05_u1CubedAutomatic",
+      "statement": "Stmt_A05_U1CubedAutomatic"
+    },
+    {
+      "depends_on": [],
+      "id": "A06",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a06_standardModelPoint",
+      "statement": "Stmt_A06_StandardModelPoint"
+    },
+    {
+      "depends_on": [],
+      "id": "A07",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a07_perturbationRejected",
+      "statement": "Stmt_A07_PerturbationRejected"
+    },
+    {
+      "depends_on": [],
+      "id": "A08",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a08_rightNeutrinoFamily",
+      "statement": "Stmt_A08_RightNeutrinoFamily"
+    },
+    {
+      "depends_on": [],
+      "id": "A09",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a09_familyMeetsStandardModel",
+      "statement": "Stmt_A09_FamilyMeetsStandardModel"
+    },
+    {
+      "depends_on": [],
+      "id": "A10",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a10_chargeQuantisation",
+      "statement": "Stmt_A10_ChargeQuantisation"
+    },
+    {
+      "depends_on": [],
+      "id": "A11",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a11_wittenParity",
+      "statement": "Stmt_A11_WittenParity"
+    },
+    {
+      "depends_on": [],
+      "id": "A12",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a12_generationScaling",
+      "statement": "Stmt_A12_GenerationScaling"
+    },
+    {
+      "depends_on": [
+        "A04",
+        "A05"
+      ],
+      "id": "A13",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a13_mainTheorem",
+      "statement": "Stmt_A13_MainTheorem"
+    }
+  ],
+  "schema": "gaugegap.lean_forge.v1",
+  "sources": {
+    "formal/lean/GaugeGapLean.lean": "ea2732e0a10b7ffa81d89ceb40939898e7539c24a505500d66e666bec2eb4448",
+    "formal/lean/GaugeGapLean/AnomalyForge/Defs.lean": "4cd0c5510b035b94f34c2646fcd477c50c749d213a8737440f9262661c846076",
+    "formal/lean/GaugeGapLean/AnomalyForge/Proofs.lean": "c768d2eee43c79d08177680d7ed5760a797bd30a8b0b4a0059dd8791155a9ae9",
+    "formal/lean/GaugeGapLean/AnomalyForge/Statements.lean": "187361e0124497d948d40d8e3cd3e1f1b80e687f1dcb42d41732760477c99e52",
+    "formal/lean/dag.json": "b29f1e8736228ea609ca88aa4203dbf4983074c79ff344bb0a84b2cd0b72cfad",
+    "formal/lean/lake-manifest.json": "7470c3adc4ea51a1e16ef95e323e71aa900f43d9423d4841e50af17af110bb70",
+    "formal/lean/lakefile.toml": "ab6f003ad0d7256c44af11ad106c99d779eaa46bf890144aca533598dd39e24b",
+    "formal/lean/lean-toolchain": "7c7da413860f9ec1f8741d6d9d1e803bda6c664f6d954fe15f1a05087dd066f0"
+  },
+  "structure": {
+    "issues": [],
+    "ok": true
+  },
+  "target": "Anomaly Forge hypercharge uniqueness (declared finite inventory)"
+}

@@ -1,0 +1,43 @@
+version: 1
+
+units:
+  lean-forge:
+    track: integrity
+    status: production
+    description: >-
+      Check the Lean Anomaly Forge DAG structure, run the exact rational mirror,
+      and run lake build when a Lean toolchain is available. Never reports a
+      node as verified without a successful lake build.
+    command:
+      - "{python}"
+      - scripts/run_lean_forge.py
+      - --output-dir
+      - results/lean-forge
+
+  lean-forge-verify:
+    track: integrity
+    status: production
+    description: >-
+      Same gate, but fails unless Lean itself accepted every proof. Requires a
+      Lean toolchain (elan/lake) on PATH.
+    command:
+      - "{python}"
+      - scripts/run_lean_forge.py
+      - --output-dir
+      - results/lean-forge
+      - --require-verified
+
+  lean-dag-figure:
+    track: integrity
+    status: production
+    description: Render the Lean statement DAG, colouring nodes by recorded lake build status.
+    command:
+      - "{python}"
+      - scripts/generate_dag_viz.py
+      - --output
+      - figures/anomaly-forge/lean-dag.svg
+
+groups:
+  lean-forge-suite:
+    - lean-forge
+    - lean-dag-figure

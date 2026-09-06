@@ -78,3 +78,21 @@ The assumptions are returned with every solution rather than hidden inside the s
 ## Claim boundary
 
 Anomaly Forge proves exact cancellation only for the declared finite chiral field inventory, conventions, and assumptions. It does not show that the Standard Model is the only possible theory, construct the continuum quantum field theory, calculate loop amplitudes, or solve the Yang-Mills Millennium Prize problem.
+
+## Machine-checked statements
+
+The same conditions are restated in Lean 4 under `formal/lean` and checked by
+the Lean kernel, with the written argument in [blueprint-anomaly-uniqueness.md](blueprint-anomaly-uniqueness.md).
+
+```bash
+foundry run lean-forge          # DAG structure + exact rational mirror + lake build if present
+foundry run lean-dag-figure     # figures/anomaly-forge/lean-dag.svg
+```
+
+A node counts as verified only when `lake build` succeeds; without a Lean
+toolchain the report records `toolchain_missing`. CI runs the check in the
+`compile-lean` job of `.github/workflows/verify-proofs.yml`.
+
+Boundary: the Lean statements cover the declared finite inventory. `A08` states
+that admitting a Dirac right-handed neutrino leaves a one-parameter family, so
+the uniqueness statement is uniqueness under the listed assumptions only.

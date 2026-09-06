@@ -73,6 +73,33 @@ jobs:
       - name: Compile emitted Coq certificates
         run: foundry run compile-coq
 
+  compile-lean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the Lean Anomaly Forge
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: "formal/lean"
+          build: true
+          test: false
+          use-mathlib-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package
+        run: python -m pip install -e '.[dev]'
+      - name: Require a real kernel check
+        run: |
+          export PATH="$HOME/.elan/bin:$PATH"
+          python scripts/run_lean_forge.py --require-verified
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lean-forge-report
+          path: results/lean-forge/
+          retention-days: 7
+
   hard-gates:
     runs-on: ubuntu-latest
     steps:
