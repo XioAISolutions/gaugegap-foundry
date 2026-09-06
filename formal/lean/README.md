@@ -9,11 +9,17 @@ GaugeGapLean/AnomalyForge/Proofs.lean      one theorem per statement
 GaugeGapLean/InfoGap/Defs.lean             no-hiding circuit probabilities over ℝ
 GaugeGapLean/InfoGap/Statements.lean       one Prop per DAG node
 GaugeGapLean/InfoGap/Proofs.lean           one theorem per statement
+GaugeGapLean/Hadamard/Defs.lean            popcount inner product over lists of signs
+GaugeGapLean/Hadamard/Statements.lean      one Prop per DAG node
+GaugeGapLean/Hadamard/Proofs.lean          one theorem per statement
 dag.json                                   node structure (no verification status)
 ```
 
-Two tracks: `anomaly-forge` (13 nodes) and `infogap-no-hiding` (7 nodes, a
-second-prover check of `formal/infogap/no_hiding_finite.v`).
+Three tracks: `anomaly-forge` (13 nodes), `infogap-no-hiding` (7 nodes) and
+`hadamard-gram` (8 nodes). The latter two are second-prover checks of
+`formal/infogap/no_hiding_finite.v` and `formal/hadamard/gram_identity.v`;
+between them they cover every named result in every curated Coq source, which
+`tests/test_prover_correspondence.py` enforces.
 
 Statements and proofs are separate modules so that editing a proof does not
 force a recompile of the statements other nodes depend on.

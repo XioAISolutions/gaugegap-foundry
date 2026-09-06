@@ -1,6 +1,6 @@
 {
   "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
-  "content_hash": "e58136f66911339cb8ad77259c6cb12a79002ba355ad1fe0fce348530611beac",
+  "content_hash": "c6906f406f426ce9dacc16f73a3d49741448d8716dd7b767e9b3981b30e7305a",
   "kernel_check": {
     "detail": "lake not found on PATH; install elan and rerun, or use CI",
     "returncode": null,
@@ -29,11 +29,19 @@
       "B04": true,
       "B05": true,
       "B06": true,
-      "B07": true
+      "B07": true,
+      "C01": true,
+      "C02": true,
+      "C03": true,
+      "C04": true,
+      "C05": true,
+      "C06": true,
+      "C07": true,
+      "C08": true
     },
     "schema": "gaugegap.lean_mirror.v1"
   },
-  "node_count": 20,
+  "node_count": 28,
   "nodes": [
     {
       "depends_on": [],
@@ -225,18 +233,104 @@
       "proof": "b07_systemCarriesNoInformation",
       "statement": "Stmt_B07_SystemCarriesNoInformation",
       "track": "infogap-no-hiding"
+    },
+    {
+      "depends_on": [],
+      "id": "C01",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c01_disagreeBounds",
+      "statement": "Stmt_C01_DisagreeBounds",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [],
+      "id": "C02",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c02_productFromDisagree",
+      "statement": "Stmt_C02_ProductFromDisagree",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [
+        "C01"
+      ],
+      "id": "C03",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c03_mismatchesNonneg",
+      "statement": "Stmt_C03_MismatchesNonneg",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [
+        "C02"
+      ],
+      "id": "C04",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c04_innerEqPopcountForm",
+      "statement": "Stmt_C04_InnerEqPopcountForm",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [],
+      "id": "C05",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c05_mismatchesSelf",
+      "statement": "Stmt_C05_MismatchesSelf",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [
+        "C04",
+        "C05"
+      ],
+      "id": "C06",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c06_innerSelfEqLength",
+      "statement": "Stmt_C06_InnerSelfEqLength",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [
+        "C04"
+      ],
+      "id": "C07",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c07_orthogonalLengthTwicePopcount",
+      "statement": "Stmt_C07_OrthogonalLengthTwicePopcount",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [
+        "C07"
+      ],
+      "id": "C08",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c08_orthogonalLengthIsEven",
+      "statement": "Stmt_C08_OrthogonalLengthIsEven",
+      "track": "hadamard-gram"
     }
   ],
   "schema": "gaugegap.lean_forge.v2",
   "sources": {
-    "formal/lean/GaugeGapLean.lean": "f9877f4561daa9d2768b0c857c958f046eb87d807a0ce192adfbb93c1678c74c",
+    "formal/lean/GaugeGapLean.lean": "396774d3385bb3949b8f76983ebcb64b4a92a4e655defc6ca63af05b83dfb1b5",
     "formal/lean/GaugeGapLean/AnomalyForge/Defs.lean": "4cd0c5510b035b94f34c2646fcd477c50c749d213a8737440f9262661c846076",
     "formal/lean/GaugeGapLean/AnomalyForge/Proofs.lean": "c768d2eee43c79d08177680d7ed5760a797bd30a8b0b4a0059dd8791155a9ae9",
     "formal/lean/GaugeGapLean/AnomalyForge/Statements.lean": "187361e0124497d948d40d8e3cd3e1f1b80e687f1dcb42d41732760477c99e52",
+    "formal/lean/GaugeGapLean/Hadamard/Defs.lean": "cc8d5706cd9a0b391180e01736ad6ac9fe1bdbbf1bb35468a5e42dfdc4ec93ab",
+    "formal/lean/GaugeGapLean/Hadamard/Proofs.lean": "ea510d62309e6976553c6a44243922f43733aadc332824ee6c5a7b23cf1c6ff2",
+    "formal/lean/GaugeGapLean/Hadamard/Statements.lean": "9f3117351c4e94a311659f66d04c0b0133287cf454bb66497ac5129a20379d53",
     "formal/lean/GaugeGapLean/InfoGap/Defs.lean": "31a72b19a58494d96bd87f66e3916d34296f939dde5a241e44e501bce17a05a7",
     "formal/lean/GaugeGapLean/InfoGap/Proofs.lean": "fd181004a6031d3c571c82e6caba67ac5bb580f5ff84cd40d73e46487f2706a3",
     "formal/lean/GaugeGapLean/InfoGap/Statements.lean": "b2f71d2608c2579bdd7ddcc5e5fe613cfd67a93bbdcbf291eab573c930b76c56",
-    "formal/lean/dag.json": "a7070a0a057b537c8da76a94a0b377eb5162cb2d5ba7430dab4a6ff2dca50314",
+    "formal/lean/dag.json": "ac9eba66c40f689a8d5bd3f664d839867a8ff9d6d0f57a12e308968522c7cf60",
     "formal/lean/lake-manifest.json": "7470c3adc4ea51a1e16ef95e323e71aa900f43d9423d4841e50af17af110bb70",
     "formal/lean/lakefile.toml": "ab6f003ad0d7256c44af11ad106c99d779eaa46bf890144aca533598dd39e24b",
     "formal/lean/lean-toolchain": "7c7da413860f9ec1f8741d6d9d1e803bda6c664f6d954fe15f1a05087dd066f0"
@@ -247,6 +341,7 @@
   },
   "targets": {
     "anomaly-forge": "Anomaly Forge hypercharge uniqueness for a declared finite chiral field inventory",
+    "hadamard-gram": "Gram identity for the popcount inner product the Hadamard Forge verifier executes, cross-checking formal/hadamard/gram_identity.v",
     "infogap-no-hiding": "Finite no-hiding probability identities for the implemented three-qubit circuit, cross-checking formal/infogap/no_hiding_finite.v"
   }
 }

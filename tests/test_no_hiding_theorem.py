@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import json
 from fractions import Fraction
 from pathlib import Path
-import re
 import sys
 import unittest
 
@@ -14,9 +12,6 @@ if str(SRC) not in sys.path:
 
 from gaugegap import no_hiding_theorem as mirror  # noqa: E402
 from gaugegap.lean_mirror import NODE_CHECKS, mirror_summary  # noqa: E402
-
-COQ_SOURCE = ROOT / "formal" / "infogap" / "no_hiding_finite.v"
-DAG_PATH = ROOT / "formal" / "lean" / "dag.json"
 
 
 class NoHidingMirrorTests(unittest.TestCase):
@@ -54,26 +49,12 @@ class NoHidingMirrorTests(unittest.TestCase):
         )
 
 
-class CoqCorrespondenceTests(unittest.TestCase):
-    def test_every_coq_theorem_has_a_named_lean_counterpart(self) -> None:
-        """A Coq theorem with no Lean node makes the cross-prover claim false."""
-        coq_theorems = set(
-            re.findall(r"(?m)^Theorem\s+(\w+)", COQ_SOURCE.read_text(encoding="utf-8"))
-        )
-        self.assertTrue(coq_theorems)
-        described = " ".join(
-            node["description"]
-            for node in json.loads(DAG_PATH.read_text(encoding="utf-8"))["nodes"]
-            if node["track"] == "infogap-no-hiding"
-        )
-        missing = sorted(name for name in coq_theorems if name not in described)
-        self.assertEqual(missing, [], f"Coq theorems with no Lean node: {missing}")
-
-
 class CombinedMirrorTests(unittest.TestCase):
-    def test_registry_covers_both_tracks(self) -> None:
-        self.assertTrue(any(node_id.startswith("A") for node_id in NODE_CHECKS))
-        self.assertTrue(any(node_id.startswith("B") for node_id in NODE_CHECKS))
+    def test_registry_covers_every_track(self) -> None:
+        for prefix in ("A", "B", "C"):
+            self.assertTrue(
+                any(node_id.startswith(prefix) for node_id in NODE_CHECKS), prefix
+            )
         summary = mirror_summary()
         self.assertTrue(summary["all_hold"], summary["nodes"])
 

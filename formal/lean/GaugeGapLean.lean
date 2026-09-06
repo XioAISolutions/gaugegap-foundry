@@ -4,3 +4,6 @@ import GaugeGapLean.AnomalyForge.Proofs
 import GaugeGapLean.InfoGap.Defs
 import GaugeGapLean.InfoGap.Statements
 import GaugeGapLean.InfoGap.Proofs
+import GaugeGapLean.Hadamard.Defs
+import GaugeGapLean.Hadamard.Statements
+import GaugeGapLean.Hadamard.Proofs

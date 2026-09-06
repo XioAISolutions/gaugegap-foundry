@@ -47,8 +47,9 @@ Porting it as a separate Lean node would inflate the count without adding
 content, so it maps to `B02`, and `B03` states what the pair was reaching for —
 that the two branches exhaust the probability.
 
-`tests/test_no_hiding_theorem.py` fails if a `Theorem` appears in the Coq source
-with no Lean node naming it, so this table cannot silently rot.
+`tests/test_prover_correspondence.py` fails if any named result appears in a
+`formal/**/*.v` source with no Lean node naming it, so this table cannot
+silently rot.
 
 ## Nodes
 

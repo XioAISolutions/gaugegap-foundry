@@ -3,7 +3,8 @@
   "project": "GaugeGapLean",
   "targets": {
     "anomaly-forge": "Anomaly Forge hypercharge uniqueness for a declared finite chiral field inventory",
-    "infogap-no-hiding": "Finite no-hiding probability identities for the implemented three-qubit circuit, cross-checking formal/infogap/no_hiding_finite.v"
+    "infogap-no-hiding": "Finite no-hiding probability identities for the implemented three-qubit circuit, cross-checking formal/infogap/no_hiding_finite.v",
+    "hadamard-gram": "Gram identity for the popcount inner product the Hadamard Forge verifier executes, cross-checking formal/hadamard/gram_identity.v"
   },
   "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
   "nodes": [
@@ -217,6 +218,97 @@
         "B02"
       ],
       "description": "Not in the Coq source: the measured system statistics are identical for every normalised input, so the system retains no information about alpha and beta."
+    },
+    {
+      "id": "C01",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C01_DisagreeBounds",
+      "proof": "c01_disagreeBounds",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [],
+      "description": "A single popcount bit is zero or one. Coq: disagree_bounds."
+    },
+    {
+      "id": "C02",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C02_ProductFromDisagree",
+      "proof": "c02_productFromDisagree",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [],
+      "description": "The product of two signs in popcount form. Coq: product_from_disagree."
+    },
+    {
+      "id": "C03",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C03_MismatchesNonneg",
+      "proof": "c03_mismatchesNonneg",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [
+        "C01"
+      ],
+      "description": "A popcount is never negative. Coq: mismatches_nonnegative."
+    },
+    {
+      "id": "C04",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C04_InnerEqPopcountForm",
+      "proof": "c04_innerEqPopcountForm",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [
+        "C02"
+      ],
+      "description": "Core identity: on equal-length vectors the popcount form the verifier computes agrees with the sum-of-products inner product. Coq: inner_eq_popcount_form."
+    },
+    {
+      "id": "C05",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C05_MismatchesSelf",
+      "proof": "c05_mismatchesSelf",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [],
+      "description": "A vector never disagrees with itself. Coq: mismatches_self."
+    },
+    {
+      "id": "C06",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C06_InnerSelfEqLength",
+      "proof": "c06_innerSelfEqLength",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [
+        "C04",
+        "C05"
+      ],
+      "description": "Diagonal gate: every diagonal entry of H times H transpose equals the order. Coq: inner_self_eq_length."
+    },
+    {
+      "id": "C07",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C07_OrthogonalLengthTwicePopcount",
+      "proof": "c07_orthogonalLengthTwicePopcount",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [
+        "C04"
+      ],
+      "description": "Off-diagonal gate: orthogonal equal-length rows make the length twice the popcount. Coq: orthogonal_length_even."
+    },
+    {
+      "id": "C08",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C08_OrthogonalLengthIsEven",
+      "proof": "c08_orthogonalLengthIsEven",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [
+        "C07"
+      ],
+      "description": "Hence that length is even, the elementary half of the necessary condition on Hadamard orders. Coq: orthogonal_length_is_even."
     }
   ]
 }
