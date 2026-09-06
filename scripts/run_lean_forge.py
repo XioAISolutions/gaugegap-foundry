@@ -56,8 +56,17 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+# Dependency checkouts and build output live under the package directory but are
+# not this project's sources; Mathlib's own test files carry `sorry` on purpose.
+VENDORED_PARTS = {".lake", "lake-packages", "build"}
+
+
 def _lean_sources() -> list[Path]:
-    return sorted(LEAN_DIR.rglob("*.lean"))
+    return sorted(
+        path
+        for path in LEAN_DIR.rglob("*.lean")
+        if not VENDORED_PARTS & set(path.relative_to(LEAN_DIR).parts)
+    )
 
 
 def _strip_comments(text: str) -> str:

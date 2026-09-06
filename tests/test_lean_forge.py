@@ -6,6 +6,7 @@ import unittest
 
 from scripts.run_lean_forge import (
     HOLE_PATTERN,
+    _lean_sources,
     build_report,
     check_structure,
     run_lake,
@@ -48,6 +49,24 @@ class LeanForgeStructureTests(unittest.TestCase):
         dag["nodes"][0]["proof"] = "a01_does_not_exist"
         issues = check_structure(dag)
         self.assertTrue(any("missing proof" in item.problem for item in issues), issues)
+
+    def test_dependency_checkouts_are_not_scanned(self) -> None:
+        """Mathlib's own test files carry `sorry`; they are not our sources."""
+        vendored = (
+            ROOT / "formal" / "lean" / ".lake" / "packages" / "probe" / "Probe.lean"
+        )
+        vendored.parent.mkdir(parents=True, exist_ok=True)
+        vendored.write_text("theorem probe : True := by\n  sorry\n", encoding="utf-8")
+        try:
+            self.assertNotIn(
+                vendored, _lean_sources(), "dependency checkout was scanned"
+            )
+            self.assertEqual(check_structure(_dag()), [])
+        finally:
+            vendored.unlink()
+            for parent in (vendored.parent, vendored.parent.parent):
+                if not any(parent.iterdir()):
+                    parent.rmdir()
 
     def test_hole_pattern_detects_sorry_but_not_prose(self) -> None:
         self.assertTrue(HOLE_PATTERN.search("theorem t : P := by\n  sorry\n"))

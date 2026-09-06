@@ -52,7 +52,12 @@ def _iter_formal_files(root: Path) -> Iterable[Path]:
     for path in sorted(root.rglob("*")):
         if not path.is_file() or path.suffix.lower() not in FORMAL_SUFFIXES:
             continue
-        if any(part in {".git", ".venv", "site", "dist", "build"} for part in path.parts):
+        # ``.lake``/``lake-packages`` hold Lean dependency checkouts (Mathlib's own
+        # test files carry ``sorry`` deliberately), not artifacts of this project.
+        if any(
+            part in {".git", ".venv", "site", "dist", "build", ".lake", "lake-packages"}
+            for part in path.parts
+        ):
             continue
         yield path
 
