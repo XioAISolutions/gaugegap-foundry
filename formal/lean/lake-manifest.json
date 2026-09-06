@@ -87,6 +87,6 @@
    "configFile": "lakefile.lean"
   }
  ],
- "name": "gaugegap-lean",
+ "name": "GaugeGapLean",
  "lakeDir": ".lake"
 }

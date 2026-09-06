@@ -1,6 +1,6 @@
 {
   "schema": "gaugegap.lean_dag.v1",
-  "project": "gaugegap-lean",
+  "project": "GaugeGapLean",
   "target": "Anomaly Forge hypercharge uniqueness (declared finite inventory)",
   "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
   "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",

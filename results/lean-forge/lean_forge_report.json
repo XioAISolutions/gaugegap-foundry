@@ -1,6 +1,6 @@
 {
   "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
-  "content_hash": "4e50d2b48a8ac9a44e059c86efe180e29d3b48240580af56354c04987f371dd7",
+  "content_hash": "9687f834eea4e6d028dfcff980079aaf2a54e7e11f87771dabda8bbc4b4c1e13",
   "kernel_check": {
     "detail": "lake not found on PATH; install elan and rerun, or use CI",
     "returncode": null,
@@ -143,9 +143,9 @@
     "formal/lean/GaugeGapLean/AnomalyForge/Defs.lean": "4cd0c5510b035b94f34c2646fcd477c50c749d213a8737440f9262661c846076",
     "formal/lean/GaugeGapLean/AnomalyForge/Proofs.lean": "c768d2eee43c79d08177680d7ed5760a797bd30a8b0b4a0059dd8791155a9ae9",
     "formal/lean/GaugeGapLean/AnomalyForge/Statements.lean": "187361e0124497d948d40d8e3cd3e1f1b80e687f1dcb42d41732760477c99e52",
-    "formal/lean/dag.json": "88b162282e6af51f2561de1f7d87a5a8e20ff3407f6c2d622021c7ea0db9de8f",
-    "formal/lean/lake-manifest.json": "c9151085eed9d85e4f832b9ba7c14aba709f04acdffa04ba3b281a692780c745",
-    "formal/lean/lakefile.toml": "3bf7c76635d7a89dcdc23d53f58430b688db2225059abefca79dbff38227df4d",
+    "formal/lean/dag.json": "b29f1e8736228ea609ca88aa4203dbf4983074c79ff344bb0a84b2cd0b72cfad",
+    "formal/lean/lake-manifest.json": "7470c3adc4ea51a1e16ef95e323e71aa900f43d9423d4841e50af17af110bb70",
+    "formal/lean/lakefile.toml": "ab6f003ad0d7256c44af11ad106c99d779eaa46bf890144aca533598dd39e24b",
     "formal/lean/lean-toolchain": "7c7da413860f9ec1f8741d6d9d1e803bda6c664f6d954fe15f1a05087dd066f0"
   },
   "structure": {

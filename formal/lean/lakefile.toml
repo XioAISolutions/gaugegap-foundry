@@ -1,4 +1,4 @@
-name = "gaugegap-lean"
+name = "GaugeGapLean"
 defaultTargets = ["GaugeGapLean"]
 
 [[require]]
