@@ -33,16 +33,28 @@ class LeanForgeStructureTests(unittest.TestCase):
                 self.assertNotIn(word, {key.lower() for key in node})
         self.assertNotIn('"status"', text)
 
+    def test_dag_covers_every_declared_track(self) -> None:
+        dag = _dag()
+        tracks = {node["track"] for node in dag["nodes"]}
+        self.assertEqual(tracks, set(dag["targets"]))
+        for node in dag["nodes"]:
+            self.assertTrue((ROOT / "formal" / "lean" / node["statement_module"]).exists())
+            self.assertTrue((ROOT / "formal" / "lean" / node["proof_module"]).exists())
+
     def test_dependency_declaration_is_enforced(self) -> None:
         dag = _dag()
         for node in dag["nodes"]:
-            if node["id"] == "A13":
+            if node["id"] in {"A13", "B06"}:
                 node["depends_on"] = []
         issues = check_structure(dag)
-        self.assertTrue(
-            any(item.node_id == "A13" and "dependencies" in item.problem for item in issues),
-            issues,
-        )
+        for node_id in ("A13", "B06"):
+            self.assertTrue(
+                any(
+                    item.node_id == node_id and "dependencies" in item.problem
+                    for item in issues
+                ),
+                issues,
+            )
 
     def test_missing_proof_is_reported(self) -> None:
         dag = _dag()

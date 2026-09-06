@@ -49,19 +49,25 @@ def _depths(nodes: list[dict]) -> dict[str, int]:
 def render(dag: dict, statuses: dict[str, str]) -> str:
     nodes = dag["nodes"]
     depth = _depths(nodes)
-    layers: dict[int, list[dict]] = {}
+    tracks: dict[str, dict[int, list[dict]]] = {}
     for node in nodes:
-        layers.setdefault(depth[node["id"]], []).append(node)
+        tracks.setdefault(node["track"], {}).setdefault(depth[node["id"]], []).append(node)
 
-    width, top, row_height, radius = 960, 132, 118, 26
-    height = top + row_height * len(layers) + 96
+    width, radius, row_height = 1040, 26, 116
+    top, band_gap, label_gap = 148, 58, 34
     centres: dict[str, tuple[int, int]] = {}
-    for level in sorted(layers):
-        row = layers[level]
-        y = top + row_height * level
-        for index, node in enumerate(row):
-            x = int(width * (index + 1) / (len(row) + 1))
-            centres[node["id"]] = (x, y)
+    bands: list[tuple[str, int]] = []
+    y = top
+    for track in sorted(tracks):
+        bands.append((track, y - label_gap))
+        for level in sorted(tracks[track]):
+            row = tracks[track][level]
+            for index, node in enumerate(row):
+                x = int(width * (index + 1) / (len(row) + 1))
+                centres[node["id"]] = (x, y)
+            y += row_height
+        y += band_gap
+    height = y + 20
 
     edges = "".join(
         f'<line x1="{centres[parent][0]}" y1="{centres[parent][1] + radius}" '
@@ -79,6 +85,11 @@ def render(dag: dict, statuses: dict[str, str]) -> str:
         f'font-size="16">{node["id"]}</text>'
         for node in nodes
     )
+    labels = "".join(
+        f'<text x="44" y="{label_y}" fill="#58d7ff" font-family="ui-monospace,monospace" '
+        f'font-size="14">{track}</text>'
+        for track, label_y in bands
+    )
     legend = " · ".join(
         f"{name}: {sum(1 for value in statuses.values() if value == name)}"
         for name in ("verified", "failed")
@@ -88,10 +99,10 @@ def render(dag: dict, statuses: dict[str, str]) -> str:
     )
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
 <rect width="{width}" height="{height}" rx="20" fill="#0b0e14"/>
-<text x="44" y="54" fill="#e6edf3" font-family="system-ui" font-size="26" font-weight="700">Anomaly Forge statement DAG</text>
+<text x="44" y="54" fill="#e6edf3" font-family="system-ui" font-size="26" font-weight="700">Lean statement DAG</text>
 <text x="44" y="84" fill="#8b949e" font-family="system-ui" font-size="15">{len(nodes)} statements · {legend} · unchecked: {unchecked}</text>
-{edges}{circles}
-<text x="{width // 2}" y="{height - 34}" fill="#6e7681" text-anchor="middle" font-family="monospace" font-size="11">colour reflects lake build only · exact rational identities for a declared finite inventory</text>
+{edges}{circles}{labels}
+<text x="{width // 2}" y="{height - 24}" fill="#6e7681" text-anchor="middle" font-family="monospace" font-size="11">colour reflects lake build only · exact identities for declared finite systems</text>
 </svg>'''
 
 

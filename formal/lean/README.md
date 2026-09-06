@@ -6,8 +6,14 @@ Lean 4 + Mathlib formalisation of the Anomaly Forge hypercharge result.
 GaugeGapLean/AnomalyForge/Defs.lean        anomaly coefficients over ℚ
 GaugeGapLean/AnomalyForge/Statements.lean  one Prop per DAG node
 GaugeGapLean/AnomalyForge/Proofs.lean      one theorem per statement
+GaugeGapLean/InfoGap/Defs.lean             no-hiding circuit probabilities over ℝ
+GaugeGapLean/InfoGap/Statements.lean       one Prop per DAG node
+GaugeGapLean/InfoGap/Proofs.lean           one theorem per statement
 dag.json                                   node structure (no verification status)
 ```
+
+Two tracks: `anomaly-forge` (13 nodes) and `infogap-no-hiding` (7 nodes, a
+second-prover check of `formal/infogap/no_hiding_finite.v`).
 
 Statements and proofs are separate modules so that editing a proof does not
 force a recompile of the statements other nodes depend on.

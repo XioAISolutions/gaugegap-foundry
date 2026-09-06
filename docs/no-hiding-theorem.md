@@ -56,6 +56,22 @@ Canonical inputs are `|0>`, `|1>`, `|+>`, `|->`, `|+i>`, and `|-i>`, followed by
 - the recovery qubit preserves the input `|alpha|²` and `|beta|²` probabilities;
 - the recovered probabilities remain normalized.
 
+### Second-prover cross-check
+
+The same identities are restated in Lean 4 under
+`formal/lean/GaugeGapLean/InfoGap/`, so two independent kernels accept them.
+The node-by-node correspondence with the Coq theorems, and the two Lean nodes
+that have no Coq counterpart, are in
+[blueprint-no-hiding-lean.md](blueprint-no-hiding-lean.md).
+
+```bash
+foundry run compile-coq   # coqc
+foundry run lean-forge    # lake build, when a Lean toolchain is present
+```
+
+A test fails if a `Theorem` is added to the Coq source without a Lean node
+naming it, so the two sides cannot drift apart silently.
+
 This formal source is intentionally narrower than the general no-hiding theorem. It certifies the algebraic finite circuit used in this repository; it does not formalize arbitrary Hilbert spaces, Stinespring dilation, Schmidt decomposition, or the universal theorem.
 
 ## Experience / Experiment
