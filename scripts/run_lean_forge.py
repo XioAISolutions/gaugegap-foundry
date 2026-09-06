@@ -176,10 +176,17 @@ def build_report(lake: str | None, timeout: int, skip_lake: bool) -> dict[str, o
         if skip_lake
         else run_lake(lake, timeout)
     )
+    tracked = [*_lean_sources(), DAG_PATH]
+    # The toolchain and dependency pins decide what "checked" means, so they are
+    # part of the hashed evidence, not build scaffolding.
+    tracked += [
+        LEAN_DIR / name
+        for name in ("lean-toolchain", "lakefile.toml", "lake-manifest.json")
+        if (LEAN_DIR / name).exists()
+    ]
     sources = {
-        path.relative_to(ROOT).as_posix(): _sha256(path) for path in _lean_sources()
+        path.relative_to(ROOT).as_posix(): _sha256(path) for path in sorted(tracked)
     }
-    sources[DAG_PATH.relative_to(ROOT).as_posix()] = _sha256(DAG_PATH)
     content_hash = hashlib.sha256(
         json.dumps(sources, sort_keys=True).encode("utf-8")
     ).hexdigest()

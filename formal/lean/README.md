@@ -12,6 +12,11 @@ dag.json                                   node structure (no verification statu
 Statements and proofs are separate modules so that editing a proof does not
 force a recompile of the statements other nodes depend on.
 
+`lake-manifest.json` pins Mathlib to the `v4.11.0` tag
+(`20c73142afa995ac9c8fb80a9bb585a55ca38308`) and its transitive dependencies to
+the revisions that tag itself pins. Regenerate it with `lake update` after
+changing `lakefile.toml` or `lean-toolchain`.
+
 `dag.json` records structure only. Verification status is produced by
 `lake build` and written to `results/lean-forge/lean_forge_report.json`; it is
 never checked in as a property of a node.

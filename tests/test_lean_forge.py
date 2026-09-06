@@ -74,6 +74,8 @@ class LeanForgeGateTests(unittest.TestCase):
         tracked = set(report["sources"])
         self.assertIn("formal/lean/dag.json", tracked)
         self.assertIn("formal/lean/GaugeGapLean/AnomalyForge/Proofs.lean", tracked)
+        self.assertIn("formal/lean/lean-toolchain", tracked)
+        self.assertIn("formal/lean/lake-manifest.json", tracked)
         self.assertEqual(len(report["content_hash"]), 64)
 
     def test_every_node_has_a_python_mirror(self) -> None:
