@@ -4,7 +4,8 @@
   "targets": {
     "anomaly-forge": "Anomaly Forge hypercharge uniqueness for a declared finite chiral field inventory, and the two-dimensional span of hypercharge and B-L that replaces it once a right-handed neutrino is admitted",
     "infogap-no-hiding": "Finite no-hiding probability identities for the implemented three-qubit circuit, cross-checking formal/infogap/no_hiding_finite.v",
-    "hadamard-gram": "Gram identity for the popcount inner product the Hadamard Forge verifier executes, cross-checking formal/hadamard/gram_identity.v"
+    "hadamard-gram": "Gram identity for the popcount inner product the Hadamard Forge verifier executes, cross-checking formal/hadamard/gram_identity.v",
+    "gaugegap-variational": "Finite-dimensional variational bound underlying the certified eigenvalue brackets, replacing the Courant-Fischer step those certificates assume"
   },
   "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
   "nodes": [
@@ -353,6 +354,63 @@
         "C07"
       ],
       "description": "Hence that length is even, the elementary half of the necessary condition on Hadamard orders. Coq: orthogonal_length_is_even."
+    },
+    {
+      "id": "D01",
+      "track": "gaugegap-variational",
+      "statement": "Stmt_D01_RayleighLowerBound",
+      "proof": "d01_rayleighLowerBound",
+      "statement_module": "GaugeGapLean/Variational/Statements.lean",
+      "proof_module": "GaugeGapLean/Variational/Proofs.lean",
+      "depends_on": [],
+      "description": "A lower bound on every eigenvalue bounds the Rayleigh quotient from below, scaled by the squared norm."
+    },
+    {
+      "id": "D02",
+      "track": "gaugegap-variational",
+      "statement": "Stmt_D02_RayleighUpperBound",
+      "proof": "d02_rayleighUpperBound",
+      "statement_module": "GaugeGapLean/Variational/Statements.lean",
+      "proof_module": "GaugeGapLean/Variational/Proofs.lean",
+      "depends_on": [],
+      "description": "The dual upper bound."
+    },
+    {
+      "id": "D03",
+      "track": "gaugegap-variational",
+      "statement": "Stmt_D03_NormalisedBracket",
+      "proof": "d03_normalisedBracket",
+      "statement_module": "GaugeGapLean/Variational/Statements.lean",
+      "proof_module": "GaugeGapLean/Variational/Proofs.lean",
+      "depends_on": [
+        "D01",
+        "D02"
+      ],
+      "description": "For a normalised state the Rayleigh quotient lies between any bounds on the spectrum."
+    },
+    {
+      "id": "D04",
+      "track": "gaugegap-variational",
+      "statement": "Stmt_D04_VariationalPrinciple",
+      "proof": "d04_variationalPrinciple",
+      "statement_module": "GaugeGapLean/Variational/Statements.lean",
+      "proof_module": "GaugeGapLean/Variational/Proofs.lean",
+      "depends_on": [
+        "D01"
+      ],
+      "description": "The variational principle: no normalised trial state has a Rayleigh quotient below the ground energy. This is the step the emitted bracket certificates assume as variational_upper."
+    },
+    {
+      "id": "D05",
+      "track": "gaugegap-variational",
+      "statement": "Stmt_D05_CertifiedBracket",
+      "proof": "d05_certifiedBracket",
+      "statement_module": "GaugeGapLean/Variational/Statements.lean",
+      "proof_module": "GaugeGapLean/Variational/Proofs.lean",
+      "depends_on": [
+        "D04"
+      ],
+      "description": "The certified bracket with mathematics separated from numerics: the interval-arithmetic enclosure and the evaluated trial state stay hypotheses, the Courant-Fischer step between them is derived from D04."
     }
   ]
 }

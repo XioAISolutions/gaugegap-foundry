@@ -1,10 +1,10 @@
 {
   "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
-  "content_hash": "ab9d97588a88bdad074fb895c27aad2d00a45a2219f5c81da3eb577bd5a7bb01",
+  "content_hash": "92e9b69b431b12f21e68c4d87bebe87b66785616a04e5f52f901b099d10f28d7",
   "kernel_check": {
-    "detail": "lake build exited 0",
-    "returncode": 0,
-    "status": "verified"
+    "detail": "lake not found on PATH; install elan and rerun, or use CI",
+    "returncode": null,
+    "status": "toolchain_missing"
   },
   "mirror": {
     "all_hold": true,
@@ -41,16 +41,21 @@
       "C05": true,
       "C06": true,
       "C07": true,
-      "C08": true
+      "C08": true,
+      "D01": true,
+      "D02": true,
+      "D03": true,
+      "D04": true,
+      "D05": true
     },
     "schema": "gaugegap.lean_mirror.v1"
   },
-  "node_count": 32,
+  "node_count": 37,
   "nodes": [
     {
       "depends_on": [],
       "id": "A01",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a01_su3Automatic",
       "statement": "Stmt_A01_SU3Automatic",
@@ -59,7 +64,7 @@
     {
       "depends_on": [],
       "id": "A02",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a02_su2FixesLepton",
       "statement": "Stmt_A02_SU2FixesLepton",
@@ -68,7 +73,7 @@
     {
       "depends_on": [],
       "id": "A03",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a03_gravReduces",
       "statement": "Stmt_A03_GravReduces",
@@ -77,7 +82,7 @@
     {
       "depends_on": [],
       "id": "A04",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a04_uniqueness",
       "statement": "Stmt_A04_Uniqueness",
@@ -86,7 +91,7 @@
     {
       "depends_on": [],
       "id": "A05",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a05_u1CubedAutomatic",
       "statement": "Stmt_A05_U1CubedAutomatic",
@@ -95,7 +100,7 @@
     {
       "depends_on": [],
       "id": "A06",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a06_standardModelPoint",
       "statement": "Stmt_A06_StandardModelPoint",
@@ -104,7 +109,7 @@
     {
       "depends_on": [],
       "id": "A07",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a07_perturbationRejected",
       "statement": "Stmt_A07_PerturbationRejected",
@@ -113,7 +118,7 @@
     {
       "depends_on": [],
       "id": "A08",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a08_rightNeutrinoFamily",
       "statement": "Stmt_A08_RightNeutrinoFamily",
@@ -122,7 +127,7 @@
     {
       "depends_on": [],
       "id": "A09",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a09_familyMeetsStandardModel",
       "statement": "Stmt_A09_FamilyMeetsStandardModel",
@@ -131,7 +136,7 @@
     {
       "depends_on": [],
       "id": "A10",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a10_chargeQuantisation",
       "statement": "Stmt_A10_ChargeQuantisation",
@@ -140,7 +145,7 @@
     {
       "depends_on": [],
       "id": "A11",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a11_wittenParity",
       "statement": "Stmt_A11_WittenParity",
@@ -149,7 +154,7 @@
     {
       "depends_on": [],
       "id": "A12",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a12_generationScaling",
       "statement": "Stmt_A12_GenerationScaling",
@@ -161,7 +166,7 @@
         "A05"
       ],
       "id": "A13",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a13_mainTheorem",
       "statement": "Stmt_A13_MainTheorem",
@@ -170,7 +175,7 @@
     {
       "depends_on": [],
       "id": "A14",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a14_familySpannedByHyperchargeAndBL",
       "statement": "Stmt_A14_FamilySpannedByHyperchargeAndBL",
@@ -181,7 +186,7 @@
         "A08"
       ],
       "id": "A15",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a15_blDirectionAnomalyFree",
       "statement": "Stmt_A15_BLDirectionAnomalyFree",
@@ -192,7 +197,7 @@
         "A08"
       ],
       "id": "A16",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a16_hyperchargeDirectionAnomalyFree",
       "statement": "Stmt_A16_HyperchargeDirectionAnomalyFree",
@@ -201,7 +206,7 @@
     {
       "depends_on": [],
       "id": "A17",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a17_directionsIndependent",
       "statement": "Stmt_A17_DirectionsIndependent",
@@ -210,7 +215,7 @@
     {
       "depends_on": [],
       "id": "B01",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "b01_inputNormalised",
       "statement": "Stmt_B01_InputNormalised",
@@ -219,7 +224,7 @@
     {
       "depends_on": [],
       "id": "B02",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "b02_branchWeightHalf",
       "statement": "Stmt_B02_BranchWeightHalf",
@@ -230,7 +235,7 @@
         "B02"
       ],
       "id": "B03",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "b03_branchesExhaust",
       "statement": "Stmt_B03_BranchesExhaust",
@@ -239,7 +244,7 @@
     {
       "depends_on": [],
       "id": "B04",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "b04_recoveryAlpha",
       "statement": "Stmt_B04_RecoveryAlpha",
@@ -248,7 +253,7 @@
     {
       "depends_on": [],
       "id": "B05",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "b05_recoveryBeta",
       "statement": "Stmt_B05_RecoveryBeta",
@@ -261,7 +266,7 @@
         "B05"
       ],
       "id": "B06",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "b06_recoveredNormalised",
       "statement": "Stmt_B06_RecoveredNormalised",
@@ -272,7 +277,7 @@
         "B02"
       ],
       "id": "B07",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "b07_systemCarriesNoInformation",
       "statement": "Stmt_B07_SystemCarriesNoInformation",
@@ -281,7 +286,7 @@
     {
       "depends_on": [],
       "id": "C01",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "c01_disagreeBounds",
       "statement": "Stmt_C01_DisagreeBounds",
@@ -290,7 +295,7 @@
     {
       "depends_on": [],
       "id": "C02",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "c02_productFromDisagree",
       "statement": "Stmt_C02_ProductFromDisagree",
@@ -301,7 +306,7 @@
         "C01"
       ],
       "id": "C03",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "c03_mismatchesNonneg",
       "statement": "Stmt_C03_MismatchesNonneg",
@@ -312,7 +317,7 @@
         "C02"
       ],
       "id": "C04",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "c04_innerEqPopcountForm",
       "statement": "Stmt_C04_InnerEqPopcountForm",
@@ -321,7 +326,7 @@
     {
       "depends_on": [],
       "id": "C05",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "c05_mismatchesSelf",
       "statement": "Stmt_C05_MismatchesSelf",
@@ -333,7 +338,7 @@
         "C05"
       ],
       "id": "C06",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "c06_innerSelfEqLength",
       "statement": "Stmt_C06_InnerSelfEqLength",
@@ -344,7 +349,7 @@
         "C04"
       ],
       "id": "C07",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "c07_orthogonalLengthTwicePopcount",
       "statement": "Stmt_C07_OrthogonalLengthTwicePopcount",
@@ -355,16 +360,68 @@
         "C07"
       ],
       "id": "C08",
-      "lean_status": "verified",
+      "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "c08_orthogonalLengthIsEven",
       "statement": "Stmt_C08_OrthogonalLengthIsEven",
       "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [],
+      "id": "D01",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "d01_rayleighLowerBound",
+      "statement": "Stmt_D01_RayleighLowerBound",
+      "track": "gaugegap-variational"
+    },
+    {
+      "depends_on": [],
+      "id": "D02",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "d02_rayleighUpperBound",
+      "statement": "Stmt_D02_RayleighUpperBound",
+      "track": "gaugegap-variational"
+    },
+    {
+      "depends_on": [
+        "D01",
+        "D02"
+      ],
+      "id": "D03",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "d03_normalisedBracket",
+      "statement": "Stmt_D03_NormalisedBracket",
+      "track": "gaugegap-variational"
+    },
+    {
+      "depends_on": [
+        "D01"
+      ],
+      "id": "D04",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "d04_variationalPrinciple",
+      "statement": "Stmt_D04_VariationalPrinciple",
+      "track": "gaugegap-variational"
+    },
+    {
+      "depends_on": [
+        "D04"
+      ],
+      "id": "D05",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "d05_certifiedBracket",
+      "statement": "Stmt_D05_CertifiedBracket",
+      "track": "gaugegap-variational"
     }
   ],
   "schema": "gaugegap.lean_forge.v2",
   "sources": {
-    "formal/lean/GaugeGapLean.lean": "396774d3385bb3949b8f76983ebcb64b4a92a4e655defc6ca63af05b83dfb1b5",
+    "formal/lean/GaugeGapLean.lean": "0e879e6b69e655ce370b6c85ff047c810470876b4bbeac450ad43f0d90f8d462",
     "formal/lean/GaugeGapLean/AnomalyForge/Defs.lean": "aae08bc0692266298d3cfe0922922d42a5e8cebb25080aa38d0165fcf6ed5777",
     "formal/lean/GaugeGapLean/AnomalyForge/Proofs.lean": "875a468d0365b28d3bbbcf40863ff2ad544ba2293596a7dcf17f068b855dbe9b",
     "formal/lean/GaugeGapLean/AnomalyForge/Statements.lean": "4d7ac1c87cb0cd9ce5e652529ac4b0e348062cdeb3912f449e760b3e256a0751",
@@ -374,7 +431,10 @@
     "formal/lean/GaugeGapLean/InfoGap/Defs.lean": "31a72b19a58494d96bd87f66e3916d34296f939dde5a241e44e501bce17a05a7",
     "formal/lean/GaugeGapLean/InfoGap/Proofs.lean": "fd181004a6031d3c571c82e6caba67ac5bb580f5ff84cd40d73e46487f2706a3",
     "formal/lean/GaugeGapLean/InfoGap/Statements.lean": "b2f71d2608c2579bdd7ddcc5e5fe613cfd67a93bbdcbf291eab573c930b76c56",
-    "formal/lean/dag.json": "fb30d73bf2ea47d9112fd7eac453aa1c365e66e44d945fbef4c1669434eae522",
+    "formal/lean/GaugeGapLean/Variational/Defs.lean": "032289236ec6f5866d2be3bfcb908622597b1dac11a8c2a0657a786a495eefde",
+    "formal/lean/GaugeGapLean/Variational/Proofs.lean": "5407b116bae52ef9050ef74cbbb79a7460a3301e10982da7e0abbe312b2b3c65",
+    "formal/lean/GaugeGapLean/Variational/Statements.lean": "37b8dd4315f5fea65b430663a8bcb47bb43d7525bea09fea4eca81f2db247a60",
+    "formal/lean/dag.json": "322e4f3f4fd25b57d6771c6ec07336cf756e9bf2bee1d40f544e2ec4a51fd48b",
     "formal/lean/lake-manifest.json": "7470c3adc4ea51a1e16ef95e323e71aa900f43d9423d4841e50af17af110bb70",
     "formal/lean/lakefile.toml": "ab6f003ad0d7256c44af11ad106c99d779eaa46bf890144aca533598dd39e24b",
     "formal/lean/lean-toolchain": "7c7da413860f9ec1f8741d6d9d1e803bda6c664f6d954fe15f1a05087dd066f0"
@@ -385,6 +445,7 @@
   },
   "targets": {
     "anomaly-forge": "Anomaly Forge hypercharge uniqueness for a declared finite chiral field inventory, and the two-dimensional span of hypercharge and B-L that replaces it once a right-handed neutrino is admitted",
+    "gaugegap-variational": "Finite-dimensional variational bound underlying the certified eigenvalue brackets, replacing the Courant-Fischer step those certificates assume",
     "hadamard-gram": "Gram identity for the popcount inner product the Hadamard Forge verifier executes, cross-checking formal/hadamard/gram_identity.v",
     "infogap-no-hiding": "Finite no-hiding probability identities for the implemented three-qubit circuit, cross-checking formal/infogap/no_hiding_finite.v"
   }

@@ -7,9 +7,19 @@ from __future__ import annotations
 
 from typing import Callable
 
-from gaugegap import anomaly_theorem, gram_theorem, no_hiding_theorem
+from gaugegap import (
+    anomaly_theorem,
+    gram_theorem,
+    no_hiding_theorem,
+    variational_theorem,
+)
 
-MIRROR_MODULES = (anomaly_theorem, gram_theorem, no_hiding_theorem)
+MIRROR_MODULES = (
+    anomaly_theorem,
+    gram_theorem,
+    no_hiding_theorem,
+    variational_theorem,
+)
 
 NODE_CHECKS: dict[str, Callable[[], bool]] = {}
 for _module in MIRROR_MODULES:

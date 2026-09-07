@@ -7,3 +7,6 @@ import GaugeGapLean.InfoGap.Proofs
 import GaugeGapLean.Hadamard.Defs
 import GaugeGapLean.Hadamard.Statements
 import GaugeGapLean.Hadamard.Proofs
+import GaugeGapLean.Variational.Defs
+import GaugeGapLean.Variational.Statements
+import GaugeGapLean.Variational.Proofs
