@@ -1,6 +1,6 @@
 {
   "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
-  "content_hash": "210e6f064d40727818ea0853676abd722a0c04d7b80044d4ff8a99e4d9b0b86a",
+  "content_hash": "231331f17ffc4b6a9ba5101fe3d39594fde3b05f8d33be7bb1ca866ad2cf8221",
   "kernel_check": {
     "detail": "lake not found on PATH; install elan and rerun, or use CI",
     "returncode": null,
@@ -504,7 +504,7 @@
     "formal/lean/GaugeGapLean/InfoGap/Proofs.lean": "fd181004a6031d3c571c82e6caba67ac5bb580f5ff84cd40d73e46487f2706a3",
     "formal/lean/GaugeGapLean/InfoGap/Statements.lean": "b2f71d2608c2579bdd7ddcc5e5fe613cfd67a93bbdcbf291eab573c930b76c56",
     "formal/lean/GaugeGapLean/Reversibility/Defs.lean": "9cf418fbf574990b8dfdcdd4f3d35f13ff60a8dc0d57de3862b2bcc17a6b30bb",
-    "formal/lean/GaugeGapLean/Reversibility/Proofs.lean": "9590b8d0a9b60326e4fefc9e2adb2dbbb805d70495846a00bec5aea426121dff",
+    "formal/lean/GaugeGapLean/Reversibility/Proofs.lean": "60285086d532ff2feb383aff91baf1aef6a1d6bbc82c33f7cb5eb1995f70dade",
     "formal/lean/GaugeGapLean/Reversibility/Statements.lean": "ec07efdaec93ef8690288f64c33fa7db85222451e62afea3e3d28001e92db01f",
     "formal/lean/GaugeGapLean/Variational/Defs.lean": "032289236ec6f5866d2be3bfcb908622597b1dac11a8c2a0657a786a495eefde",
     "formal/lean/GaugeGapLean/Variational/Proofs.lean": "5407b116bae52ef9050ef74cbbb79a7460a3301e10982da7e0abbe312b2b3c65",

@@ -15,7 +15,13 @@ namespace GaugeGap.Reversibility
 theorem e01_andNotInjective : Stmt_E01_AndNotInjective := by
   unfold Stmt_E01_AndNotInjective
   refine ⟨rfl, by decide, fun h => ?_⟩
-  exact absurd (h (rfl : andGate (false, false) = andGate (false, true))) (by decide)
+  -- The collision has to be introduced by `have`, not by ascribing `rfl`: an
+  -- ascription does not change the term, so `rfl` would still carry the type
+  -- `andGate (false, false) = andGate (false, false)` and injectivity would
+  -- hand back the trivial equation instead of the collision.
+  have collide : andGate (false, false) = andGate (false, true) := rfl
+  have pair : ((false, false) : Bool × Bool) = (false, true) := h collide
+  exact absurd pair (by decide)
 
 theorem e02_andFibreSizes : Stmt_E02_AndFibreSizes := by
   unfold Stmt_E02_AndFibreSizes
