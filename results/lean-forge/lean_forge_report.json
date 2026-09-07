@@ -1,6 +1,6 @@
 {
   "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
-  "content_hash": "9687f834eea4e6d028dfcff980079aaf2a54e7e11f87771dabda8bbc4b4c1e13",
+  "content_hash": "231331f17ffc4b6a9ba5101fe3d39594fde3b05f8d33be7bb1ca866ad2cf8221",
   "kernel_check": {
     "detail": "lake not found on PATH; install elan and rerun, or use CI",
     "returncode": null,
@@ -8,8 +8,7 @@
   },
   "mirror": {
     "all_hold": true,
-    "claim_boundary": "finite-grid exact rational check of the Lean statements; kernel verification requires lake build",
-    "grid_points": 100,
+    "claim_boundary": "finite exact rational check of the Lean statements; kernel verification requires lake build",
     "nodes": {
       "A01": true,
       "A02": true,
@@ -23,11 +22,42 @@
       "A10": true,
       "A11": true,
       "A12": true,
-      "A13": true
+      "A13": true,
+      "A14": true,
+      "A15": true,
+      "A16": true,
+      "A17": true,
+      "B01": true,
+      "B02": true,
+      "B03": true,
+      "B04": true,
+      "B05": true,
+      "B06": true,
+      "B07": true,
+      "C01": true,
+      "C02": true,
+      "C03": true,
+      "C04": true,
+      "C05": true,
+      "C06": true,
+      "C07": true,
+      "C08": true,
+      "D01": true,
+      "D02": true,
+      "D03": true,
+      "D04": true,
+      "D05": true,
+      "E01": true,
+      "E02": true,
+      "E03": true,
+      "E04": true,
+      "E05": true,
+      "E06": true,
+      "E07": true
     },
-    "schema": "gaugegap.anomaly_theorem_mirror.v1"
+    "schema": "gaugegap.lean_mirror.v1"
   },
-  "node_count": 13,
+  "node_count": 44,
   "nodes": [
     {
       "depends_on": [],
@@ -35,7 +65,8 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a01_su3Automatic",
-      "statement": "Stmt_A01_SU3Automatic"
+      "statement": "Stmt_A01_SU3Automatic",
+      "track": "anomaly-forge"
     },
     {
       "depends_on": [],
@@ -43,7 +74,8 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a02_su2FixesLepton",
-      "statement": "Stmt_A02_SU2FixesLepton"
+      "statement": "Stmt_A02_SU2FixesLepton",
+      "track": "anomaly-forge"
     },
     {
       "depends_on": [],
@@ -51,7 +83,8 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a03_gravReduces",
-      "statement": "Stmt_A03_GravReduces"
+      "statement": "Stmt_A03_GravReduces",
+      "track": "anomaly-forge"
     },
     {
       "depends_on": [],
@@ -59,7 +92,8 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a04_uniqueness",
-      "statement": "Stmt_A04_Uniqueness"
+      "statement": "Stmt_A04_Uniqueness",
+      "track": "anomaly-forge"
     },
     {
       "depends_on": [],
@@ -67,7 +101,8 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a05_u1CubedAutomatic",
-      "statement": "Stmt_A05_U1CubedAutomatic"
+      "statement": "Stmt_A05_U1CubedAutomatic",
+      "track": "anomaly-forge"
     },
     {
       "depends_on": [],
@@ -75,7 +110,8 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a06_standardModelPoint",
-      "statement": "Stmt_A06_StandardModelPoint"
+      "statement": "Stmt_A06_StandardModelPoint",
+      "track": "anomaly-forge"
     },
     {
       "depends_on": [],
@@ -83,7 +119,8 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a07_perturbationRejected",
-      "statement": "Stmt_A07_PerturbationRejected"
+      "statement": "Stmt_A07_PerturbationRejected",
+      "track": "anomaly-forge"
     },
     {
       "depends_on": [],
@@ -91,7 +128,8 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a08_rightNeutrinoFamily",
-      "statement": "Stmt_A08_RightNeutrinoFamily"
+      "statement": "Stmt_A08_RightNeutrinoFamily",
+      "track": "anomaly-forge"
     },
     {
       "depends_on": [],
@@ -99,7 +137,8 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a09_familyMeetsStandardModel",
-      "statement": "Stmt_A09_FamilyMeetsStandardModel"
+      "statement": "Stmt_A09_FamilyMeetsStandardModel",
+      "track": "anomaly-forge"
     },
     {
       "depends_on": [],
@@ -107,7 +146,8 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a10_chargeQuantisation",
-      "statement": "Stmt_A10_ChargeQuantisation"
+      "statement": "Stmt_A10_ChargeQuantisation",
+      "track": "anomaly-forge"
     },
     {
       "depends_on": [],
@@ -115,7 +155,8 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a11_wittenParity",
-      "statement": "Stmt_A11_WittenParity"
+      "statement": "Stmt_A11_WittenParity",
+      "track": "anomaly-forge"
     },
     {
       "depends_on": [],
@@ -123,7 +164,8 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a12_generationScaling",
-      "statement": "Stmt_A12_GenerationScaling"
+      "statement": "Stmt_A12_GenerationScaling",
+      "track": "anomaly-forge"
     },
     {
       "depends_on": [
@@ -134,16 +176,340 @@
       "lean_status": "toolchain_missing",
       "mirror_holds": true,
       "proof": "a13_mainTheorem",
-      "statement": "Stmt_A13_MainTheorem"
+      "statement": "Stmt_A13_MainTheorem",
+      "track": "anomaly-forge"
+    },
+    {
+      "depends_on": [],
+      "id": "A14",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a14_familySpannedByHyperchargeAndBL",
+      "statement": "Stmt_A14_FamilySpannedByHyperchargeAndBL",
+      "track": "anomaly-forge"
+    },
+    {
+      "depends_on": [
+        "A08"
+      ],
+      "id": "A15",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a15_blDirectionAnomalyFree",
+      "statement": "Stmt_A15_BLDirectionAnomalyFree",
+      "track": "anomaly-forge"
+    },
+    {
+      "depends_on": [
+        "A08"
+      ],
+      "id": "A16",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a16_hyperchargeDirectionAnomalyFree",
+      "statement": "Stmt_A16_HyperchargeDirectionAnomalyFree",
+      "track": "anomaly-forge"
+    },
+    {
+      "depends_on": [],
+      "id": "A17",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a17_directionsIndependent",
+      "statement": "Stmt_A17_DirectionsIndependent",
+      "track": "anomaly-forge"
+    },
+    {
+      "depends_on": [],
+      "id": "B01",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "b01_inputNormalised",
+      "statement": "Stmt_B01_InputNormalised",
+      "track": "infogap-no-hiding"
+    },
+    {
+      "depends_on": [],
+      "id": "B02",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "b02_branchWeightHalf",
+      "statement": "Stmt_B02_BranchWeightHalf",
+      "track": "infogap-no-hiding"
+    },
+    {
+      "depends_on": [
+        "B02"
+      ],
+      "id": "B03",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "b03_branchesExhaust",
+      "statement": "Stmt_B03_BranchesExhaust",
+      "track": "infogap-no-hiding"
+    },
+    {
+      "depends_on": [],
+      "id": "B04",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "b04_recoveryAlpha",
+      "statement": "Stmt_B04_RecoveryAlpha",
+      "track": "infogap-no-hiding"
+    },
+    {
+      "depends_on": [],
+      "id": "B05",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "b05_recoveryBeta",
+      "statement": "Stmt_B05_RecoveryBeta",
+      "track": "infogap-no-hiding"
+    },
+    {
+      "depends_on": [
+        "B01",
+        "B04",
+        "B05"
+      ],
+      "id": "B06",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "b06_recoveredNormalised",
+      "statement": "Stmt_B06_RecoveredNormalised",
+      "track": "infogap-no-hiding"
+    },
+    {
+      "depends_on": [
+        "B02"
+      ],
+      "id": "B07",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "b07_systemCarriesNoInformation",
+      "statement": "Stmt_B07_SystemCarriesNoInformation",
+      "track": "infogap-no-hiding"
+    },
+    {
+      "depends_on": [],
+      "id": "C01",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c01_disagreeBounds",
+      "statement": "Stmt_C01_DisagreeBounds",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [],
+      "id": "C02",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c02_productFromDisagree",
+      "statement": "Stmt_C02_ProductFromDisagree",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [
+        "C01"
+      ],
+      "id": "C03",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c03_mismatchesNonneg",
+      "statement": "Stmt_C03_MismatchesNonneg",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [
+        "C02"
+      ],
+      "id": "C04",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c04_innerEqPopcountForm",
+      "statement": "Stmt_C04_InnerEqPopcountForm",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [],
+      "id": "C05",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c05_mismatchesSelf",
+      "statement": "Stmt_C05_MismatchesSelf",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [
+        "C04",
+        "C05"
+      ],
+      "id": "C06",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c06_innerSelfEqLength",
+      "statement": "Stmt_C06_InnerSelfEqLength",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [
+        "C04"
+      ],
+      "id": "C07",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c07_orthogonalLengthTwicePopcount",
+      "statement": "Stmt_C07_OrthogonalLengthTwicePopcount",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [
+        "C07"
+      ],
+      "id": "C08",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "c08_orthogonalLengthIsEven",
+      "statement": "Stmt_C08_OrthogonalLengthIsEven",
+      "track": "hadamard-gram"
+    },
+    {
+      "depends_on": [],
+      "id": "D01",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "d01_rayleighLowerBound",
+      "statement": "Stmt_D01_RayleighLowerBound",
+      "track": "gaugegap-variational"
+    },
+    {
+      "depends_on": [],
+      "id": "D02",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "d02_rayleighUpperBound",
+      "statement": "Stmt_D02_RayleighUpperBound",
+      "track": "gaugegap-variational"
+    },
+    {
+      "depends_on": [
+        "D01",
+        "D02"
+      ],
+      "id": "D03",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "d03_normalisedBracket",
+      "statement": "Stmt_D03_NormalisedBracket",
+      "track": "gaugegap-variational"
+    },
+    {
+      "depends_on": [
+        "D01"
+      ],
+      "id": "D04",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "d04_variationalPrinciple",
+      "statement": "Stmt_D04_VariationalPrinciple",
+      "track": "gaugegap-variational"
+    },
+    {
+      "depends_on": [
+        "D04"
+      ],
+      "id": "D05",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "d05_certifiedBracket",
+      "statement": "Stmt_D05_CertifiedBracket",
+      "track": "gaugegap-variational"
+    },
+    {
+      "depends_on": [],
+      "id": "E01",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e01_andNotInjective",
+      "statement": "Stmt_E01_AndNotInjective",
+      "track": "landauer-reversibility"
+    },
+    {
+      "depends_on": [],
+      "id": "E02",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e02_andFibreSizes",
+      "statement": "Stmt_E02_AndFibreSizes",
+      "track": "landauer-reversibility"
+    },
+    {
+      "depends_on": [],
+      "id": "E03",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e03_toffoliInvolutive",
+      "statement": "Stmt_E03_ToffoliInvolutive",
+      "track": "landauer-reversibility"
+    },
+    {
+      "depends_on": [
+        "E03"
+      ],
+      "id": "E04",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e04_toffoliBijective",
+      "statement": "Stmt_E04_ToffoliBijective",
+      "track": "landauer-reversibility"
+    },
+    {
+      "depends_on": [],
+      "id": "E05",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e05_toffoliComputesAnd",
+      "statement": "Stmt_E05_ToffoliComputesAnd",
+      "track": "landauer-reversibility"
+    },
+    {
+      "depends_on": [],
+      "id": "E06",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e06_reversibilityKeepsTheInputs",
+      "statement": "Stmt_E06_ReversibilityKeepsTheInputs",
+      "track": "landauer-reversibility"
+    },
+    {
+      "depends_on": [],
+      "id": "E07",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e07_fredkinInvolutive",
+      "statement": "Stmt_E07_FredkinInvolutive",
+      "track": "landauer-reversibility"
     }
   ],
-  "schema": "gaugegap.lean_forge.v1",
+  "schema": "gaugegap.lean_forge.v2",
   "sources": {
-    "formal/lean/GaugeGapLean.lean": "ea2732e0a10b7ffa81d89ceb40939898e7539c24a505500d66e666bec2eb4448",
-    "formal/lean/GaugeGapLean/AnomalyForge/Defs.lean": "4cd0c5510b035b94f34c2646fcd477c50c749d213a8737440f9262661c846076",
-    "formal/lean/GaugeGapLean/AnomalyForge/Proofs.lean": "c768d2eee43c79d08177680d7ed5760a797bd30a8b0b4a0059dd8791155a9ae9",
-    "formal/lean/GaugeGapLean/AnomalyForge/Statements.lean": "187361e0124497d948d40d8e3cd3e1f1b80e687f1dcb42d41732760477c99e52",
-    "formal/lean/dag.json": "b29f1e8736228ea609ca88aa4203dbf4983074c79ff344bb0a84b2cd0b72cfad",
+    "formal/lean/GaugeGapLean.lean": "6439949c16234e9d5e6d58ae75bd029ffae602e40d34aa0c2a5973aa55d80818",
+    "formal/lean/GaugeGapLean/AnomalyForge/Defs.lean": "aae08bc0692266298d3cfe0922922d42a5e8cebb25080aa38d0165fcf6ed5777",
+    "formal/lean/GaugeGapLean/AnomalyForge/Proofs.lean": "875a468d0365b28d3bbbcf40863ff2ad544ba2293596a7dcf17f068b855dbe9b",
+    "formal/lean/GaugeGapLean/AnomalyForge/Statements.lean": "4d7ac1c87cb0cd9ce5e652529ac4b0e348062cdeb3912f449e760b3e256a0751",
+    "formal/lean/GaugeGapLean/Hadamard/Defs.lean": "cc8d5706cd9a0b391180e01736ad6ac9fe1bdbbf1bb35468a5e42dfdc4ec93ab",
+    "formal/lean/GaugeGapLean/Hadamard/Proofs.lean": "ea510d62309e6976553c6a44243922f43733aadc332824ee6c5a7b23cf1c6ff2",
+    "formal/lean/GaugeGapLean/Hadamard/Statements.lean": "9f3117351c4e94a311659f66d04c0b0133287cf454bb66497ac5129a20379d53",
+    "formal/lean/GaugeGapLean/InfoGap/Defs.lean": "31a72b19a58494d96bd87f66e3916d34296f939dde5a241e44e501bce17a05a7",
+    "formal/lean/GaugeGapLean/InfoGap/Proofs.lean": "fd181004a6031d3c571c82e6caba67ac5bb580f5ff84cd40d73e46487f2706a3",
+    "formal/lean/GaugeGapLean/InfoGap/Statements.lean": "b2f71d2608c2579bdd7ddcc5e5fe613cfd67a93bbdcbf291eab573c930b76c56",
+    "formal/lean/GaugeGapLean/Reversibility/Defs.lean": "9cf418fbf574990b8dfdcdd4f3d35f13ff60a8dc0d57de3862b2bcc17a6b30bb",
+    "formal/lean/GaugeGapLean/Reversibility/Proofs.lean": "60285086d532ff2feb383aff91baf1aef6a1d6bbc82c33f7cb5eb1995f70dade",
+    "formal/lean/GaugeGapLean/Reversibility/Statements.lean": "ec07efdaec93ef8690288f64c33fa7db85222451e62afea3e3d28001e92db01f",
+    "formal/lean/GaugeGapLean/Variational/Defs.lean": "032289236ec6f5866d2be3bfcb908622597b1dac11a8c2a0657a786a495eefde",
+    "formal/lean/GaugeGapLean/Variational/Proofs.lean": "5407b116bae52ef9050ef74cbbb79a7460a3301e10982da7e0abbe312b2b3c65",
+    "formal/lean/GaugeGapLean/Variational/Statements.lean": "37b8dd4315f5fea65b430663a8bcb47bb43d7525bea09fea4eca81f2db247a60",
+    "formal/lean/dag.json": "5642b659883177a278e9206e78fc794917eac3ee0aa6e4e897c2a5882dc647da",
     "formal/lean/lake-manifest.json": "7470c3adc4ea51a1e16ef95e323e71aa900f43d9423d4841e50af17af110bb70",
     "formal/lean/lakefile.toml": "ab6f003ad0d7256c44af11ad106c99d779eaa46bf890144aca533598dd39e24b",
     "formal/lean/lean-toolchain": "7c7da413860f9ec1f8741d6d9d1e803bda6c664f6d954fe15f1a05087dd066f0"
@@ -152,5 +518,11 @@
     "issues": [],
     "ok": true
   },
-  "target": "Anomaly Forge hypercharge uniqueness (declared finite inventory)"
+  "targets": {
+    "anomaly-forge": "Anomaly Forge hypercharge uniqueness for a declared finite chiral field inventory, and the two-dimensional span of hypercharge and B-L that replaces it once a right-handed neutrino is admitted",
+    "gaugegap-variational": "Finite-dimensional variational bound underlying the certified eigenvalue brackets, replacing the Courant-Fischer step those certificates assume",
+    "hadamard-gram": "Gram identity for the popcount inner product the Hadamard Forge verifier executes, cross-checking formal/hadamard/gram_identity.v",
+    "infogap-no-hiding": "Finite no-hiding probability identities for the implemented three-qubit circuit, cross-checking formal/infogap/no_hiding_finite.v",
+    "landauer-reversibility": "Which finite Boolean gates actually destroy information, and what reversibility costs: the logical premise Landauer's bound is applied to, supplying the entropy that gaugegap.quantum.landauer turns into an energy"
+  }
 }

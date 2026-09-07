@@ -116,4 +116,50 @@ theorem a13_mainTheorem : Stmt_A13_MainTheorem := by
   · unfold su3U1; ring
   · exact a05_u1CubedAutomatic n YQ YH hq.symm
 
+/-- Helper, not a DAG node: two assignments agreeing componentwise are equal. -/
+theorem assignment_eq_of_components {p q : Assignment}
+    (hQ : p.YQ = q.YQ) (hu : p.Yu = q.Yu) (hd : p.Yd = q.Yd)
+    (hL : p.YL = q.YL) (he : p.Ye = q.Ye) (hn : p.Yn = q.Yn) : p = q := by
+  cases p
+  cases q
+  simp_all
+
+theorem a14_familySpannedByHyperchargeAndBL :
+    Stmt_A14_FamilySpannedByHyperchargeAndBL := by
+  unfold Stmt_A14_FamilySpannedByHyperchargeAndBL
+  intro n x h
+  refine assignment_eq_of_components ?_ ?_ ?_ ?_ ?_ ?_ <;>
+    simp only [Assignment.smul, Assignment.add, familyMember, smDirection,
+      blDirection] <;>
+    ring
+
+theorem a15_blDirectionAnomalyFree : Stmt_A15_BLDirectionAnomalyFree := by
+  unfold Stmt_A15_BLDirectionAnomalyFree IsAnomalyFreeAssignment blDirection
+  intro n
+  simpa using a08_rightNeutrinoFamily n 1 0
+
+theorem a16_hyperchargeDirectionAnomalyFree :
+    Stmt_A16_HyperchargeDirectionAnomalyFree := by
+  unfold Stmt_A16_HyperchargeDirectionAnomalyFree IsAnomalyFreeAssignment
+    smDirection
+  intro n
+  simpa using a08_rightNeutrinoFamily n 1 n
+
+theorem a17_directionsIndependent : Stmt_A17_DirectionsIndependent := by
+  unfold Stmt_A17_DirectionsIndependent
+  intro n a b hn heq
+  have hneutrino : (Assignment.add (Assignment.smul a (smDirection n))
+      (Assignment.smul b (blDirection n))).Yn = Assignment.zero.Yn := by rw [heq]
+  have hquark : (Assignment.add (Assignment.smul a (smDirection n))
+      (Assignment.smul b (blDirection n))).YQ = Assignment.zero.YQ := by rw [heq]
+  simp only [Assignment.add, Assignment.smul, Assignment.zero, smDirection,
+    blDirection] at hneutrino hquark
+  have hbn : b * n = 0 := by linear_combination -hneutrino
+  have hsum : a + b = 0 := by linear_combination hquark
+  have hb : b = 0 := by
+    rcases mul_eq_zero.mp hbn with hzero | hzero
+    · exact hzero
+    · exact absurd hzero hn
+  exact ⟨by linarith, hb⟩
+
 end GaugeGap.AnomalyForge

@@ -1,3 +1,15 @@
 import GaugeGapLean.AnomalyForge.Defs
 import GaugeGapLean.AnomalyForge.Statements
 import GaugeGapLean.AnomalyForge.Proofs
+import GaugeGapLean.InfoGap.Defs
+import GaugeGapLean.InfoGap.Statements
+import GaugeGapLean.InfoGap.Proofs
+import GaugeGapLean.Hadamard.Defs
+import GaugeGapLean.Hadamard.Statements
+import GaugeGapLean.Hadamard.Proofs
+import GaugeGapLean.Variational.Defs
+import GaugeGapLean.Variational.Statements
+import GaugeGapLean.Variational.Proofs
+import GaugeGapLean.Reversibility.Defs
+import GaugeGapLean.Reversibility.Statements
+import GaugeGapLean.Reversibility.Proofs

@@ -38,6 +38,67 @@ def test_error_budget_fails_closed():
     assert check.allowed_error == pytest.approx(0.001)
 
 
+def test_formal_registry_separates_assumptions_from_holes(tmp_path: Path):
+    """A file whose conclusion is asserted by axiom is hole-free and not
+    assumption-free. Counting only holes overstates what has been established."""
+    (tmp_path / "assumed.lean").write_text(
+        "axiom E : Nat\n"
+        "axiom bound : E > 3\n"
+        "theorem conclusion : E > 3 := bound\n",
+        encoding="utf-8",
+    )
+    registry = build_formal_registry(tmp_path)
+    artifact = registry.artifacts[0]
+    assert artifact.hole_free is True
+    assert artifact.assumption_free is False
+    assert artifact.trust_inputs == ("bound",)
+    assert artifact.assumed_constants == ("E",)
+    assert registry.hole_free_count == 1
+    assert registry.assumption_free_count == 0
+
+
+def test_formal_registry_separates_opaque_constants_from_assumed_facts(tmp_path: Path):
+    """`axiom E : R` posits a real, which was already true; `axiom h : E >= 3`
+    assumes something. Counting them alike overstates the assumptions."""
+    (tmp_path / "mixed.lean").write_text(
+        "axiom E : Real\naxiom lower : E \u2265 3\naxiom upper : E \u2264 9\n",
+        encoding="utf-8",
+    )
+    registry = build_formal_registry(tmp_path)
+    artifact = registry.artifacts[0]
+    assert artifact.assumed_constants == ("E",)
+    assert artifact.trust_inputs == ("lower", "upper")
+    assert registry.trust_input_count == 2
+
+
+def test_formal_registry_ignores_assumptions_named_only_in_prose(tmp_path: Path):
+    """A docstring promising there are no axioms is not an axiom."""
+    (tmp_path / "clean.lean").write_text(
+        "/-- No `sorry`, no `axiom`, no `native_decide` in this file. -/\n"
+        "theorem trivial_one : 1 = 1 := rfl\n",
+        encoding="utf-8",
+    )
+    registry = build_formal_registry(tmp_path)
+    assert registry.artifacts[0].hole_free is True
+    assert registry.artifacts[0].assumption_free is True
+
+
+def test_formal_registry_treats_coq_section_variables_as_quantifiers(tmp_path: Path):
+    """`Variable` inside a Section becomes a universal quantifier at `End`, so
+    it assumes nothing; the same keyword outside a section does."""
+    (tmp_path / "sectioned.v").write_text(
+        "Section S.\nVariable x : nat.\nHypothesis hx : x > 0.\n"
+        "Theorem t : x > 0. Proof. exact hx. Qed.\nEnd S.\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "global.v").write_text("Axiom oracle : forall n : nat, n > 0.\n", encoding="utf-8")
+    registry = build_formal_registry(tmp_path)
+    by_path = {item.path: item for item in registry.artifacts}
+    assert by_path["sectioned.v"].assumption_free is True
+    assert by_path["global.v"].assumption_free is False
+    assert by_path["global.v"].trust_inputs == ("oracle",)
+
+
 def test_formal_registry_detects_holes(tmp_path: Path):
     (tmp_path / "proof.lean").write_text("theorem ok : True := by trivial\n", encoding="utf-8")
     (tmp_path / "hole.v").write_text("Theorem x : True. Admitted.\n", encoding="utf-8")

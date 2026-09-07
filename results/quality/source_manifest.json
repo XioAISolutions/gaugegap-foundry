@@ -1,12 +1,17 @@
 {
   "claim_boundary": "deterministic source-input attestation only; identical source digests do not by themselves prove identical external toolchains or hardware",
-  "content_digest": "29014299cf2dde921e68a0bd3af3de35929f694b7d24d48ebc6a34d757b8fdbb",
-  "file_count": 426,
+  "content_digest": "e70310298866ac6c514fc5317a93739e8a5865d68577c017c368fd3d611ddc72",
+  "file_count": 558,
   "files": [
     {
       "path": "benchmarks/anomaly_known_answers.json",
       "sha256": "7c91de8824e405e23a18660352f248670bad592fc317ca6c7edb1a127ce7cb79",
       "size": 1182
+    },
+    {
+      "path": "benchmarks/eja-elevator-v1/benchmark_manifest.yaml",
+      "sha256": "30d11ca8fbc510b4fd5834b8024025f9021a76f8956949f1d360af9dfa56214b",
+      "size": 905
     },
     {
       "path": "benchmarks/known_answers.json",
@@ -74,6 +79,11 @@
       "size": 1112
     },
     {
+      "path": "config/foundry.d/97-lean-forge.yaml",
+      "sha256": "2a114b709418f5f55a110da34dffb9d05f51934cbf7163b8887f36a6f42273b6",
+      "size": 1128
+    },
+    {
       "path": "config/foundry.d/98-anomaly-forge.yaml",
       "sha256": "77190b5e7f56eafb233aadfaec1518caf96a6399e13f5da57a48d469060b89df",
       "size": 838
@@ -94,9 +104,54 @@
       "size": 2072
     },
     {
+      "path": "config/foundry.d/counterexample_forge.yaml",
+      "sha256": "7f1d1cf6416008c838acea94776587d47f01298dee52869ff4dfaa0d7aa89f28",
+      "size": 1008
+    },
+    {
+      "path": "config/foundry.d/counterexample_reconstruct.yaml",
+      "sha256": "531675f320fe95df8254bbe0db3707e66eb9910263d598b8b8afe1d9e8a2a708",
+      "size": 1138
+    },
+    {
+      "path": "config/foundry.d/curverank-coverage.yaml",
+      "sha256": "d6b4251f8cfc0695d84c0def7e1f685f3d98a5a6f870fdf18ccdd099bce00876",
+      "size": 1144
+    },
+    {
       "path": "config/foundry.d/deep-boil.yaml",
       "sha256": "1494e5afb4921a8f93ca5b3b8695a712c67d2a767266fe1a8941cef7b6404575",
       "size": 1297
+    },
+    {
+      "path": "config/foundry.d/fractal_reality.yaml",
+      "sha256": "4a493a9e995cc9acae56bdba6e225dfacd5b05ae1eda8863ea8a2debb1e4a712",
+      "size": 1373
+    },
+    {
+      "path": "config/foundry.d/hadamard-forge.yaml",
+      "sha256": "c4584479b477906abd6e6c4737b096c2a65da9eef42829db174957459ce87c7e",
+      "size": 2669
+    },
+    {
+      "path": "config/foundry.d/jacobian_aftershock.yaml",
+      "sha256": "62d6aa0095e0f6673bef2f722aaa78292152a290aa99b8cb8b368009dad2ebb9",
+      "size": 943
+    },
+    {
+      "path": "config/foundry.d/lottery_forge.yaml",
+      "sha256": "a21f3899fa04c32e660b4e1eb1c3fa6b57a910c8df1b5d80bf2d41cfefc34bf1",
+      "size": 1101
+    },
+    {
+      "path": "config/foundry.d/lottery_prospective.yaml",
+      "sha256": "473e8c724e4508dfee10832c4493bc28ab523b5ae8a4d42be75a29c5e92fe01a",
+      "size": 476
+    },
+    {
+      "path": "config/foundry.d/plane_frontier.yaml",
+      "sha256": "5ec7f09aa0c5795dcf845a200eb6ae24b5b390fa313f3c3aae7bf331845b3011",
+      "size": 1731
     },
     {
       "path": "config/foundry.yaml",
@@ -104,14 +159,129 @@
       "size": 12449
     },
     {
+      "path": "formal/hadamard/gram_identity.v",
+      "sha256": "4c18090cb068173ebf1ef2bb4db2b71d71a36da4a680dc171c6a708c489671b6",
+      "size": 4068
+    },
+    {
       "path": "formal/infogap/no_hiding_finite.v",
       "sha256": "30643451513a542c0596098570a2c80433a61de9fc4d71ecbd2b533cf3ea33e5",
       "size": 2430
     },
     {
+      "path": "formal/lean/.gitignore",
+      "sha256": "9bc2f47144665a283ac58c31f213fc5ae96cb2098836b734df6bebfae83aa796",
+      "size": 29
+    },
+    {
+      "path": "formal/lean/GaugeGapLean.lean",
+      "sha256": "6439949c16234e9d5e6d58ae75bd029ffae602e40d34aa0c2a5973aa55d80818",
+      "size": 583
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/AnomalyForge/Defs.lean",
+      "sha256": "aae08bc0692266298d3cfe0922922d42a5e8cebb25080aa38d0165fcf6ed5777",
+      "size": 4020
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/AnomalyForge/Proofs.lean",
+      "sha256": "875a468d0365b28d3bbbcf40863ff2ad544ba2293596a7dcf17f068b855dbe9b",
+      "size": 5293
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/AnomalyForge/Statements.lean",
+      "sha256": "4d7ac1c87cb0cd9ce5e652529ac4b0e348062cdeb3912f449e760b3e256a0751",
+      "size": 6494
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/Hadamard/Defs.lean",
+      "sha256": "cc8d5706cd9a0b391180e01736ad6ac9fe1bdbbf1bb35468a5e42dfdc4ec93ab",
+      "size": 1628
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/Hadamard/Proofs.lean",
+      "sha256": "ea510d62309e6976553c6a44243922f43733aadc332824ee6c5a7b23cf1c6ff2",
+      "size": 2431
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/Hadamard/Statements.lean",
+      "sha256": "9f3117351c4e94a311659f66d04c0b0133287cf454bb66497ac5129a20379d53",
+      "size": 2319
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/InfoGap/Defs.lean",
+      "sha256": "31a72b19a58494d96bd87f66e3916d34296f939dde5a241e44e501bce17a05a7",
+      "size": 1416
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/InfoGap/Proofs.lean",
+      "sha256": "fd181004a6031d3c571c82e6caba67ac5bb580f5ff84cd40d73e46487f2706a3",
+      "size": 1803
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/InfoGap/Statements.lean",
+      "sha256": "b2f71d2608c2579bdd7ddcc5e5fe613cfd67a93bbdcbf291eab573c930b76c56",
+      "size": 2735
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/Reversibility/Defs.lean",
+      "sha256": "9cf418fbf574990b8dfdcdd4f3d35f13ff60a8dc0d57de3862b2bcc17a6b30bb",
+      "size": 2283
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/Reversibility/Proofs.lean",
+      "sha256": "9590b8d0a9b60326e4fefc9e2adb2dbbb805d70495846a00bec5aea426121dff",
+      "size": 1780
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/Reversibility/Statements.lean",
+      "sha256": "ec07efdaec93ef8690288f64c33fa7db85222451e62afea3e3d28001e92db01f",
+      "size": 2527
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/Variational/Defs.lean",
+      "sha256": "032289236ec6f5866d2be3bfcb908622597b1dac11a8c2a0657a786a495eefde",
+      "size": 2065
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/Variational/Proofs.lean",
+      "sha256": "5407b116bae52ef9050ef74cbbb79a7460a3301e10982da7e0abbe312b2b3c65",
+      "size": 1590
+    },
+    {
+      "path": "formal/lean/GaugeGapLean/Variational/Statements.lean",
+      "sha256": "37b8dd4315f5fea65b430663a8bcb47bb43d7525bea09fea4eca81f2db247a60",
+      "size": 2173
+    },
+    {
+      "path": "formal/lean/README.md",
+      "sha256": "ce6b25d05d37547b7f9b2ca924c3e2169e86dfdfd5164b0285abeb1022c0ed09",
+      "size": 5601
+    },
+    {
+      "path": "formal/lean/dag.json",
+      "sha256": "5642b659883177a278e9206e78fc794917eac3ee0aa6e4e897c2a5882dc647da",
+      "size": 21741
+    },
+    {
+      "path": "formal/lean/lake-manifest.json",
+      "sha256": "7470c3adc4ea51a1e16ef95e323e71aa900f43d9423d4841e50af17af110bb70",
+      "size": 2462
+    },
+    {
+      "path": "formal/lean/lakefile.toml",
+      "sha256": "ab6f003ad0d7256c44af11ad106c99d779eaa46bf890144aca533598dd39e24b",
+      "size": 195
+    },
+    {
+      "path": "formal/lean/lean-toolchain",
+      "sha256": "7c7da413860f9ec1f8741d6d9d1e803bda6c664f6d954fe15f1a05087dd066f0",
+      "size": 25
+    },
+    {
       "path": "pyproject.toml",
-      "sha256": "87216b4fc1f6db54cfa33b526f6ba5216806b77890eaba7173e2401309fe0399",
-      "size": 2364
+      "sha256": "6971edd4e05600201bf446c425420640f311ddb4f0ef071c014f09386f9c68a7",
+      "size": 2907
     },
     {
       "path": "scripts/analyze_dynamics.py",
@@ -169,6 +339,11 @@
       "size": 126
     },
     {
+      "path": "scripts/check_fractal_reality_site.py",
+      "sha256": "4549632f389b5473ce3ce31af61fe76d85f0b74e1660b64c94550ac3ea251f03",
+      "size": 3370
+    },
+    {
       "path": "scripts/claim_boundary_audit.py",
       "sha256": "8d6887c6132f3d1b1488ca86ada63fcbe2a434f731d72d318b7a063dc8b31568",
       "size": 7032
@@ -185,13 +360,18 @@
     },
     {
       "path": "scripts/export_brainsnn_showcase.py",
-      "sha256": "b9fa40976781d2f2c4e2598ffd7029567991462526842db675ee99ca87e26e7e",
-      "size": 6625
+      "sha256": "7b592a732498b72f50ce7395f10a16284a0fe99cdf7938795d63c5592b4f9b81",
+      "size": 7989
+    },
+    {
+      "path": "scripts/generate_dag_viz.py",
+      "sha256": "c14d45cdf38412dca0d2322587c71ac0d837ad003c8e51b5c7b7dcdbaa054262",
+      "size": 5069
     },
     {
       "path": "scripts/generate_foundry_experience.py",
-      "sha256": "6fb12d5ce2fcff4723033e46c122ac8d897df2b970e945a001fccbb83e9a5dbf",
-      "size": 30833
+      "sha256": "1f5ef9c65fdc6f3f13dbe8571956756e4bcf53f73065c9ab5f183d591aaac9cc",
+      "size": 37034
     },
     {
       "path": "scripts/generate_foundry_experience_complete.py",
@@ -304,6 +484,16 @@
       "size": 6258
     },
     {
+      "path": "scripts/run_counterexample_forge.py",
+      "sha256": "90ba4d2bd0bcacec63e71090109d4ca85af97f97ff98ca8f44fe59d0034f1fd5",
+      "size": 2009
+    },
+    {
+      "path": "scripts/run_counterexample_reconstruction.py",
+      "sha256": "46df4498b96070678f43da801c0410e825de1bead742ac47ae24fe8b41e54965",
+      "size": 2140
+    },
+    {
       "path": "scripts/run_cudaq_benchmark.py",
       "sha256": "47ab5c04a91d6c08b6fb6321c335ffbbb2bff5a2751ab108490592ecccffabe7",
       "size": 2829
@@ -312,6 +502,11 @@
       "path": "scripts/run_curverank_complete.py",
       "sha256": "74af799d7c16efc31305a1a9f251f60eb05d1652925f743ed1f9113dc7be7dbe",
       "size": 29522
+    },
+    {
+      "path": "scripts/run_curverank_coverage.py",
+      "sha256": "f5bac405db4c9a8146c17795e5fcb3e717625614af109411284af31965581108",
+      "size": 5496
     },
     {
       "path": "scripts/run_curverank_formal_proof.py",
@@ -424,6 +619,11 @@
       "size": 4525
     },
     {
+      "path": "scripts/run_fractal_reality_lab.py",
+      "sha256": "77bc2a2cca91c0f3bcab6cac11539fb100b259f51d90a7f0b8bc7018c29aac8d",
+      "size": 3453
+    },
+    {
       "path": "scripts/run_gap_sweep.py",
       "sha256": "f825f6ab1a8c8194510286f5cd5b0b40d814d0a04817b6b0fea6330140bb783f",
       "size": 6617
@@ -459,9 +659,39 @@
       "size": 7806
     },
     {
+      "path": "scripts/run_hadamard_forge.py",
+      "sha256": "62d69b9e6840d1a648225eb6628bd459f8d24917d568d6ed1d433cd587bb91bb",
+      "size": 9341
+    },
+    {
+      "path": "scripts/run_jacobian_aftershock.py",
+      "sha256": "c81a417d19a9f6f35379e1280002884c6333f5152b23b9e43d99cf4a7992bffe",
+      "size": 1594
+    },
+    {
+      "path": "scripts/run_lean_forge.py",
+      "sha256": "4acd89f19cc995a7437608f41439e3f3b757afc5a72baade5c2db2a8a653351e",
+      "size": 9890
+    },
+    {
       "path": "scripts/run_lieb_robinson.py",
       "sha256": "fb0b2cc77b4f2f03dbebb141b405bb2e95cc4a860afe6644a4824511001d0d47",
       "size": 6177
+    },
+    {
+      "path": "scripts/run_lottery_forge.py",
+      "sha256": "9077eecbd6309a75828040167c1b2fe648cdce3599a0ad5f3ee5097c3b0ff1de",
+      "size": 13226
+    },
+    {
+      "path": "scripts/run_lottery_prospective.py",
+      "sha256": "d845350feb1bc2cbee21dc4bdbc0f1cf41e0d59736d43dad495824b60e0829c2",
+      "size": 7910
+    },
+    {
+      "path": "scripts/run_lottery_week.py",
+      "sha256": "fa2f39635dc08bd3ca10eb5c17a3077b1a4be9ec69877b448a8bb13927f52811",
+      "size": 8108
     },
     {
       "path": "scripts/run_menger_sponge_forge.py",
@@ -492,6 +722,16 @@
       "path": "scripts/run_physical_limits.py",
       "sha256": "6e30b6e82a7ac3b39a978f1ea709bfd2f8dbb417a5408ceea11690d1862e4205",
       "size": 15335
+    },
+    {
+      "path": "scripts/run_plane_frontier.py",
+      "sha256": "15a486a6b516cea27b3e4837f42eb08795cf97141141081244d8da4e2c843628",
+      "size": 1657
+    },
+    {
+      "path": "scripts/run_plane_frontier_degree2.py",
+      "sha256": "d4ff61370f6156b3a220a912433ddea71992044b9a501456038fd9e7f91821d4",
+      "size": 1722
     },
     {
       "path": "scripts/run_qiskit_candidate_validation.py",
@@ -609,9 +849,19 @@
       "size": 11707
     },
     {
+      "path": "scripts/verify_browser_proofpack.py",
+      "sha256": "79b5acfddd961740d1dd8a80ae2eea1c512f569a90681c463615f540d9ad972c",
+      "size": 1440
+    },
+    {
       "path": "scripts/verify_certificates.py",
       "sha256": "1f45fb0a1da1a8c6c61a2004b3223e16db1fd18102f774a54f79bcaaa2afc353",
       "size": 2838
+    },
+    {
+      "path": "scripts/verify_lottery_proofpack.py",
+      "sha256": "cd97744d9f0827942cec13cb9b97235c510ea379a1c1865cbe839c12398733c0",
+      "size": 716
     },
     {
       "path": "scripts/verify_proofpack.py",
@@ -664,6 +914,16 @@
       "size": 8861
     },
     {
+      "path": "src/gaugegap/anomaly_theorem.py",
+      "sha256": "33facf29e477750e233553d97af3715f9e8abb40704920d545e383493aa6263d",
+      "size": 9097
+    },
+    {
+      "path": "src/gaugegap/browser_proofpack.py",
+      "sha256": "17edd880e77b3611bee13622cbbb9ee9d5c85a122654f754db30f1361a18377c",
+      "size": 4503
+    },
+    {
       "path": "src/gaugegap/certified_bracket.py",
       "sha256": "be48202f257ec9518fe96375faaee21eefffb48813897c010de32451b61b7586",
       "size": 5223
@@ -699,9 +959,24 @@
       "size": 16882
     },
     {
+      "path": "src/gaugegap/counterexample_forge.py",
+      "sha256": "2d1283a33389fbc2f81341d35730ea3748d7b835f6e159dc9724591002f78618",
+      "size": 15719
+    },
+    {
+      "path": "src/gaugegap/counterexample_reconstruct.py",
+      "sha256": "359592fb623bb99518de681c926fbe1b1368600f754bcb3c207e417572343185",
+      "size": 7940
+    },
+    {
       "path": "src/gaugegap/curverank_certified.py",
       "sha256": "9e513cf9c2a173f6a5a085ebdb34fbb2141f8f858ad6701c6cde528e9a09104e",
       "size": 5209
+    },
+    {
+      "path": "src/gaugegap/curverank_coverage.py",
+      "sha256": "9119f7b1a6aaee762ac02849dac272371b2e9474d8da59f5255e2673e7d48497",
+      "size": 19739
     },
     {
       "path": "src/gaugegap/curverank_operators.py",
@@ -815,8 +1090,13 @@
     },
     {
       "path": "src/gaugegap/formal_registry.py",
-      "sha256": "565178a358632d67b57b5d0c971085429ee8df8a04656214bd5ad2a634563d48",
-      "size": 2848
+      "sha256": "7a19acec3fbdb28fa156a4e2dc069ca2a228dd7e31a85001af77315b0f02f95c",
+      "size": 8422
+    },
+    {
+      "path": "src/gaugegap/fractal_reality.py",
+      "sha256": "1192df0a9e67d17fcfa997d536efe9bf4e943bfa9311f67960922b52f53f5c07",
+      "size": 20260
     },
     {
       "path": "src/gaugegap/fractal_topology_forge.py",
@@ -849,6 +1129,21 @@
       "size": 5625
     },
     {
+      "path": "src/gaugegap/gram_theorem.py",
+      "sha256": "56ba3ccf7a33084b2bd94fc06fa008d353947ccfb069847d690458f57091369d",
+      "size": 2796
+    },
+    {
+      "path": "src/gaugegap/hadamard_forge.py",
+      "sha256": "fd3806053ee457ecc3f9a54c7cc57370eb307d72e907a326128446e1f7c65192",
+      "size": 27968
+    },
+    {
+      "path": "src/gaugegap/hadamard_williamson.py",
+      "sha256": "b41c0a19dff26a64c7f37208aede572c1bd263bf7d44706ccbf961e262d8ac55",
+      "size": 18374
+    },
+    {
       "path": "src/gaugegap/hamiltonian_factory.py",
       "sha256": "5601fecc63b749a08cbc7d9b919888d279d70d3ba2e31fdf62463156e7f6b040",
       "size": 8992
@@ -874,6 +1169,156 @@
       "size": 3782
     },
     {
+      "path": "src/gaugegap/jacobian_aftershock.py",
+      "sha256": "b2ecd70aa790c598e475adbbed883268767495211720a2d05f79beb9ce14b718",
+      "size": 16578
+    },
+    {
+      "path": "src/gaugegap/jump_lab/__init__.py",
+      "sha256": "9b384847a614d8b221a5fe38e62ace3896db53f92b34e75095a87d9f14fe63bd",
+      "size": 3589
+    },
+    {
+      "path": "src/gaugegap/jump_lab/__main__.py",
+      "sha256": "31e3c685b356e87cc6bc7b9a60a047bbda221b4ced76d33485b3b57e9a174ae4",
+      "size": 49
+    },
+    {
+      "path": "src/gaugegap/jump_lab/artifact.py",
+      "sha256": "45e3278123a273ee26562b1664506bf521b8c409a802d28dfbdaa496ab082715",
+      "size": 789
+    },
+    {
+      "path": "src/gaugegap/jump_lab/axiom.py",
+      "sha256": "00fa20773cddd9065790217919e4c52ab2cc41c8185701c620560df6d88fe0f9",
+      "size": 4384
+    },
+    {
+      "path": "src/gaugegap/jump_lab/benchmark.py",
+      "sha256": "c083a6e9d4eb772386f8b71c696f89375a6271bf946607dc9051d5754970bca0",
+      "size": 4624
+    },
+    {
+      "path": "src/gaugegap/jump_lab/blind.py",
+      "sha256": "c94670eddc35145db3b6d230fe3a14e28ba32d9771d4bac4922afde5db17b88c",
+      "size": 4602
+    },
+    {
+      "path": "src/gaugegap/jump_lab/calibration.py",
+      "sha256": "c70ea71586852d8b5972c2c345c3ea435e42a46062dfbd92405b69f84388b5be",
+      "size": 27019
+    },
+    {
+      "path": "src/gaugegap/jump_lab/cart_axiom.py",
+      "sha256": "42f9459a00f28a26ac8eebc89981f72dd628ae683928856f6f53f5d447624f2b",
+      "size": 3946
+    },
+    {
+      "path": "src/gaugegap/jump_lab/cart_demo.py",
+      "sha256": "344f72de81f954ad85a7687d7862d43b35fa8271db843177a943c065a7524a44",
+      "size": 3350
+    },
+    {
+      "path": "src/gaugegap/jump_lab/cart_executive.py",
+      "sha256": "27d10d3a9551e3a2a8f44b9f3a05f3888889f14c175b800f02c33131bed9036d",
+      "size": 15909
+    },
+    {
+      "path": "src/gaugegap/jump_lab/cart_hypotheses.py",
+      "sha256": "a3bb954e01ccedd5d989f57e111d36318e1a301113705af958a7bfff6e38cf5b",
+      "size": 1909
+    },
+    {
+      "path": "src/gaugegap/jump_lab/challenge.py",
+      "sha256": "0e888a6818b22dbbe9e0a5163bb1e59d422c6725834499028f44e8fb4ba96891",
+      "size": 22948
+    },
+    {
+      "path": "src/gaugegap/jump_lab/contracts.py",
+      "sha256": "85352c90abf281b713c95f17b7d88239efeaa44ca01082016b16e8bbf493cd1e",
+      "size": 2466
+    },
+    {
+      "path": "src/gaugegap/jump_lab/demo.py",
+      "sha256": "4d6e8f2d901d816f5ac47a4c660fa8fd5a81842f5258b48909ed5ea31f58099c",
+      "size": 3290
+    },
+    {
+      "path": "src/gaugegap/jump_lab/elevator.py",
+      "sha256": "df40bac8099556b9e796b4435b1ea291f6e9d2147fd50d5ec823ad2dc3c95f1c",
+      "size": 7466
+    },
+    {
+      "path": "src/gaugegap/jump_lab/executive.py",
+      "sha256": "d66d5192bd1cfabe8ceb7c894d04e8159144836e7daec4ec7a2c3233b57560fd",
+      "size": 16444
+    },
+    {
+      "path": "src/gaugegap/jump_lab/force_cart.py",
+      "sha256": "24ce6ae276e83a311041beb37301971fddff58ab91427f8ec4375fd0fba3a547",
+      "size": 7215
+    },
+    {
+      "path": "src/gaugegap/jump_lab/holdout.py",
+      "sha256": "9b97af1ccd7a86dc5f3c2c9d38970d16b9bf7be7f764045c46ec9b0bb9395a6d",
+      "size": 11548
+    },
+    {
+      "path": "src/gaugegap/jump_lab/hypotheses.py",
+      "sha256": "5e915cb8f8b2523dade7b4f3e46aea472b56a7b53c3be63bc7a9c4bba2856d4d",
+      "size": 2654
+    },
+    {
+      "path": "src/gaugegap/jump_lab/pendulum.py",
+      "sha256": "9583174a1a37b5674a09e53fd10889ba37493f6f40b47c1334be51bf9a2a21f7",
+      "size": 7167
+    },
+    {
+      "path": "src/gaugegap/jump_lab/pendulum_axiom.py",
+      "sha256": "9e9b3acc64d3b6f7ee4772aa1d65a706b2075a6a57bac0256d73e15e40e148c8",
+      "size": 4472
+    },
+    {
+      "path": "src/gaugegap/jump_lab/pendulum_demo.py",
+      "sha256": "44354609fdc337d56555078e39b799336e69980b1e5ba98bdfa6933daf358f57",
+      "size": 2172
+    },
+    {
+      "path": "src/gaugegap/jump_lab/pendulum_executive.py",
+      "sha256": "332b4eedf85514d23e7c7d956d63f75a07e673aa58468fadd29a94b370773d7e",
+      "size": 15407
+    },
+    {
+      "path": "src/gaugegap/jump_lab/pendulum_models.py",
+      "sha256": "38817d483290dc48d8b5d3ee621dcdbb9b796a5cf82efc59e9827542ce1e9a80",
+      "size": 3292
+    },
+    {
+      "path": "src/gaugegap/jump_lab/pendulum_report.py",
+      "sha256": "5b84e1c60b60ce75c1a0cf0b3b84ed3b594c7f4762ebfc7dca5c30bba968b9a0",
+      "size": 3277
+    },
+    {
+      "path": "src/gaugegap/jump_lab/report.py",
+      "sha256": "dbda352dd7b80cf7087ced473b38fea2fec562e8694a727c9d0417f4320d3012",
+      "size": 9853
+    },
+    {
+      "path": "src/gaugegap/jump_lab/salience.py",
+      "sha256": "efb1d3e14d2a86480ba4cd661a0c1f815ce1a3a98af3f56c50e9d518389bef85",
+      "size": 4121
+    },
+    {
+      "path": "src/gaugegap/jump_lab/suite.py",
+      "sha256": "8356cab2dd34c52713d2da5af29d46db353577e56a2f949a2f63e3bef82d2d8a",
+      "size": 12145
+    },
+    {
+      "path": "src/gaugegap/jump_lab/synthesis.py",
+      "sha256": "c5ea66912a28bba8b8e0eb38adbb91ac1f0cba98709635635ad1608f032298e7",
+      "size": 33765
+    },
+    {
       "path": "src/gaugegap/koopman.py",
       "sha256": "d41c039be4eb5eab9315e3b3c0be091a0e908ee1cc0edbeb96a98972aa7cb0e8",
       "size": 7540
@@ -889,9 +1334,39 @@
       "size": 9903
     },
     {
+      "path": "src/gaugegap/lean_mirror.py",
+      "sha256": "e23c17f39bb92b0eed9403ab31ce67329dc874d5529d573f8c53d9019e8b17fd",
+      "size": 1265
+    },
+    {
       "path": "src/gaugegap/ledger.py",
       "sha256": "d8875f9d02aafbaab66c5933ca7ab413728b1a6de03258b6425541653128f774",
       "size": 1956
+    },
+    {
+      "path": "src/gaugegap/lottery_forge.py",
+      "sha256": "17d1f988f661c4996a9ae638569f28c1be0292a6cbcf982ca77ea266f7ba12e7",
+      "size": 21143
+    },
+    {
+      "path": "src/gaugegap/lottery_multigame_sources.py",
+      "sha256": "e00b5801cc61abb3ecb0e641610980e3301a190df611c0885868c0fef0a8c693",
+      "size": 9527
+    },
+    {
+      "path": "src/gaugegap/lottery_prospective.py",
+      "sha256": "f1465ee58dd5e24c1c871f2f4b57d02976b091d8dae03aabd3ebc4002847f3b5",
+      "size": 14821
+    },
+    {
+      "path": "src/gaugegap/lottery_selection.py",
+      "sha256": "f606e14a2baac73670e38688c41201170af24d52998c1fe9aeb00678a8ea2f00",
+      "size": 11994
+    },
+    {
+      "path": "src/gaugegap/lottery_sources.py",
+      "sha256": "9334f28128412c98daed34f4909b4a5d630cadfccb9fbfbb85ecf8ddd4097b08",
+      "size": 8539
     },
     {
       "path": "src/gaugegap/mitigation/__init__.py",
@@ -919,9 +1394,24 @@
       "size": 8611
     },
     {
+      "path": "src/gaugegap/no_hiding_theorem.py",
+      "sha256": "7806d813c383e73d5bc81660282c579968cfe496f5ec9edc5101e771e6a06173",
+      "size": 3238
+    },
+    {
       "path": "src/gaugegap/perception_forge.py",
       "sha256": "24b0e880a3755f8e32ffac86a69171245d4525cc902d22f551f08db4b554d421",
       "size": 10029
+    },
+    {
+      "path": "src/gaugegap/plane_frontier.py",
+      "sha256": "6600c09faa808098ca3e444c9f4be510ad543d75e691ce35e1bc659e57a41e54",
+      "size": 19922
+    },
+    {
+      "path": "src/gaugegap/plane_frontier_degree2.py",
+      "sha256": "4161380994148b5466f59881c8f7bbef1e23fd30650a3ffe0f45471b044d727e",
+      "size": 14004
     },
     {
       "path": "src/gaugegap/plot_svg.py",
@@ -1279,6 +1769,11 @@
       "size": 7804
     },
     {
+      "path": "src/gaugegap/reversibility_theorem.py",
+      "sha256": "d8204294677f5eaeb4addc41f2f148bd1651642d69e6467256f74f9a685f2ae5",
+      "size": 11324
+    },
+    {
       "path": "src/gaugegap/rigorous/__init__.py",
       "sha256": "3b1808154f4774cd24480ad7caef0751a4b9b9f9a9d1a01eb758540c4da97ba4",
       "size": 2903
@@ -1439,6 +1934,11 @@
       "size": 10301
     },
     {
+      "path": "src/gaugegap/variational_theorem.py",
+      "sha256": "133dafc20fc665b92a78ff72f25ed7c88362c97b325a5e162e45df16ac5307cc",
+      "size": 3699
+    },
+    {
       "path": "src/gaugegap/verdict_lang/__init__.py",
       "sha256": "35f8ed010059c8ab9093b23d67d24ad38e64ce20261c31a45f4a71ab6d0815a2",
       "size": 527
@@ -1524,6 +2024,11 @@
       "size": 2027
     },
     {
+      "path": "tests/data/browser_proofpack_fixture.json",
+      "sha256": "43c847aafe11d0e94097e79536a8f942511266c394af5d8c67d1131b60784a01",
+      "size": 1867
+    },
+    {
       "path": "tests/test_advanced_quantum.py",
       "sha256": "d8c56f8921b7a205d8255a626b8a8a2927b737d85f78ce0311c2e7c537e4b462",
       "size": 12763
@@ -1559,6 +2064,11 @@
       "size": 1730
     },
     {
+      "path": "tests/test_anomaly_theorem.py",
+      "sha256": "1086f2ddd0b1f82c6dded9bfe97bda4f02f9d7ac18c7a88827c522fb0b03511a",
+      "size": 6020
+    },
+    {
       "path": "tests/test_arb_cross_check.py",
       "sha256": "93d32f65fd4597f71fb17ca52a1d02a501067680c887141046e8ec04eca47ae2",
       "size": 2965
@@ -1577,6 +2087,16 @@
       "path": "tests/test_berksons_paradox.py",
       "sha256": "fad5a0f936f992a1f50f022e74267aaa2566828cf9aade39e5323069d1ae60de",
       "size": 1569
+    },
+    {
+      "path": "tests/test_browser_proofpack.py",
+      "sha256": "39a4e86673921b4bfc4fc772b32015920445fd43b1a18ea536988f3dbefd4dc4",
+      "size": 2488
+    },
+    {
+      "path": "tests/test_browser_proofpack_verify.py",
+      "sha256": "455ba931330d93b966b44984667b4f723e71941cb2b9b16029ea88e3f419bda5",
+      "size": 2723
     },
     {
       "path": "tests/test_candidate_dossier.py",
@@ -1649,6 +2169,16 @@
       "size": 11964
     },
     {
+      "path": "tests/test_counterexample_forge.py",
+      "sha256": "9499ba31a9e69072f3a7088955b5cad11ebf3ffbc848ea34960b39835b455b2f",
+      "size": 3942
+    },
+    {
+      "path": "tests/test_counterexample_reconstruct.py",
+      "sha256": "f06ab855617c6f46911efdd3e2de2853193d693a09282fa24349765a3298c599",
+      "size": 2800
+    },
+    {
       "path": "tests/test_cudaq_adapter.py",
       "sha256": "963ff7ec5b404c761f2e6daddeb3a23d57c586220a825f522a52518b0618c3e9",
       "size": 4014
@@ -1657,6 +2187,11 @@
       "path": "tests/test_curverank_certified.py",
       "sha256": "9c17da77bb33a46645c7b906284933491461892a509a665a3054f1e298e2e4b8",
       "size": 8526
+    },
+    {
+      "path": "tests/test_curverank_coverage.py",
+      "sha256": "b15be758bbd0c4a62f92c4999e054d5e72f13da87073e5943268a5f46b0a9dca",
+      "size": 7938
     },
     {
       "path": "tests/test_curverank_formal_proof.py",
@@ -1764,6 +2299,11 @@
       "size": 1556
     },
     {
+      "path": "tests/test_experience_hadamard_scene.py",
+      "sha256": "56c51157d7e65c9d29233789f537151f60ea486c48319dabe06e7c9d81e0ffc5",
+      "size": 1979
+    },
+    {
       "path": "tests/test_finite_size_scaling.py",
       "sha256": "47c93bcd3a59f40149ea7ee6cecfd905460035ce779c30a3cc6d291aff214668",
       "size": 9905
@@ -1787,6 +2327,11 @@
       "path": "tests/test_foundry_cli.py",
       "sha256": "b85b34184efb42a64c9d3ba63a581140d75b97b5fd5ae1afbf5af513a65bd861",
       "size": 5345
+    },
+    {
+      "path": "tests/test_fractal_reality.py",
+      "sha256": "8f75bb234cd57e6e3907b4c450962066ea35d10ca2d9aa333d8c8748befc0f81",
+      "size": 3098
     },
     {
       "path": "tests/test_gap_certificate.py",
@@ -1824,6 +2369,21 @@
       "size": 9388
     },
     {
+      "path": "tests/test_gram_theorem.py",
+      "sha256": "57aef13cae1da918561fe1ed2a41df4cd1cbfd6f83e9e3ae2e7c64bc3ba9e411",
+      "size": 1610
+    },
+    {
+      "path": "tests/test_hadamard_forge.py",
+      "sha256": "207c26d899f71c118c44bf0f3b8eb63c9d585cc906d6c8bb371789d2a531c4c5",
+      "size": 8493
+    },
+    {
+      "path": "tests/test_hadamard_williamson.py",
+      "sha256": "8fbb4d54a6b2d1f7c984b54263d378957cff22ac2a313da17856d6a15026a59d",
+      "size": 5811
+    },
+    {
       "path": "tests/test_hamiltonian_factory.py",
       "sha256": "aeb7ee870ac38b132842793e8f70fa2a3c0499f72344e398f14143f316928a78",
       "size": 2695
@@ -1844,6 +2404,46 @@
       "size": 1532
     },
     {
+      "path": "tests/test_jacobian_aftershock.py",
+      "sha256": "7c8379e66fcf1c617e2183655a5f4e5184bd2fee2b312d35c3dea0a9a163a47d",
+      "size": 3296
+    },
+    {
+      "path": "tests/test_jump_lab.py",
+      "sha256": "f1a923f4c5016d45707518fe87e123d6243c01f955ed29ab7766a3e67f1bacc1",
+      "size": 2776
+    },
+    {
+      "path": "tests/test_jump_lab_v02.py",
+      "sha256": "84d6c30b2afaccead10835261d016de9ceec38c0782204d49225238b3e7e3040",
+      "size": 2469
+    },
+    {
+      "path": "tests/test_jump_lab_v03.py",
+      "sha256": "8859e489fb82cc2c479fcb8dc2fd44485145dbf89b50520da730c7b57fac124c",
+      "size": 4355
+    },
+    {
+      "path": "tests/test_jump_lab_v04.py",
+      "sha256": "1da1d8c57d8ed1bf018952992aba3252ef54e732a0c33f971c10c72490526278",
+      "size": 4541
+    },
+    {
+      "path": "tests/test_jump_lab_v05.py",
+      "sha256": "c75de02449548d01e89b25cebc0f3e3601d90b2eb8425dbf60cb3088bfad3824",
+      "size": 3661
+    },
+    {
+      "path": "tests/test_jump_lab_v06.py",
+      "sha256": "0cf2b422987f12378c4b7f33d75a6921237755d5e29f4e60a5560e16ecd52a95",
+      "size": 4806
+    },
+    {
+      "path": "tests/test_jump_lab_v07.py",
+      "sha256": "e5481cd284cf37e7c678e4fb1cbfef64feaf75b5046350e75de911380919af02",
+      "size": 4160
+    },
+    {
       "path": "tests/test_known_answers.py",
       "sha256": "0bc8adbfab1e69234a6388319354ea0b6718b23d49f21c49a5c60bbf789efd17",
       "size": 7689
@@ -1855,8 +2455,8 @@
     },
     {
       "path": "tests/test_lagrangian_forge_integration.py",
-      "sha256": "144e64329508c24773bacdcb33379f84a6b96ceda3342773caad7780a2442039",
-      "size": 3959
+      "sha256": "4f76ae2a2aea2160fd190e25927293e48abf3b7aee98460853419dd1e570feea",
+      "size": 4127
     },
     {
       "path": "tests/test_landauer.py",
@@ -1864,19 +2464,54 @@
       "size": 2015
     },
     {
+      "path": "tests/test_lean_forge.py",
+      "sha256": "e047817e74213bd224adf6f36e8bd3714ebd8ba818dafbb6f99e8f9e38bfc13b",
+      "size": 5769
+    },
+    {
       "path": "tests/test_lieb_robinson.py",
       "sha256": "6558c0b63b00690f1c3fcccbae138456c4dc66ed68a759f186128af37d24d82a",
       "size": 2080
     },
     {
+      "path": "tests/test_lottery_forge.py",
+      "sha256": "193696ce6cffbcf5d0208b14708708332e320bda1c2ee95fc37da28ff8143f31",
+      "size": 3854
+    },
+    {
+      "path": "tests/test_lottery_multigame_sources.py",
+      "sha256": "b92ac9aa219ded8a4b1fd13cac529a6cfe2a7153976db1ebd5a47eb08e569de5",
+      "size": 1361
+    },
+    {
+      "path": "tests/test_lottery_prospective.py",
+      "sha256": "d44a42dccb5c0bb24dc74324fb84bf2377387314740fbd6daf847e113c50fa13",
+      "size": 3934
+    },
+    {
+      "path": "tests/test_lottery_selection.py",
+      "sha256": "68e97ad3cc22fcfa594eff8962774db35100801bae049a8b338ad13658febeb1",
+      "size": 2382
+    },
+    {
+      "path": "tests/test_lottery_sources.py",
+      "sha256": "29cb1bba50e46337c26c5f6716dd4d25cd6b5eeb7fb8e434e747d5622a8b31f3",
+      "size": 1972
+    },
+    {
       "path": "tests/test_next_level_foundation.py",
-      "sha256": "5e668fe7467a0a7d8cbe14938107991383fa84315be32bcbcde6350b5e71f7b5",
-      "size": 3864
+      "sha256": "0dc9fb47ae18fbec5e1e8f46b4a16f3671d056d1fa3555ab58594a7dbd933578",
+      "size": 6583
     },
     {
       "path": "tests/test_no_hiding.py",
-      "sha256": "4961a0e3f67df971875a64de0e55d3cfa03a89772982d63f90aa0e52c60eb6a7",
+      "sha256": "d69cf00ddea92a7a3ce9ec9c70399ff0980445fa0e6e8d4bb10d33861f359e64",
       "size": 5006
+    },
+    {
+      "path": "tests/test_no_hiding_theorem.py",
+      "sha256": "5a44eb997e45e6e636392d53202be2e10aaaedd869c7f1cf912519cbb0689dad",
+      "size": 2384
     },
     {
       "path": "tests/test_open_system.py",
@@ -1909,6 +2544,16 @@
       "size": 1995
     },
     {
+      "path": "tests/test_plane_frontier.py",
+      "sha256": "3dd09c1237c68dd45c216c88f83ab522ed9ee95f704ba9a1f1d310889d731987",
+      "size": 1726
+    },
+    {
+      "path": "tests/test_plane_frontier_degree2.py",
+      "sha256": "748810a519f35de3d4a8f3abcdb0c4d57fb8c782872fc021c404221d153a8cf8",
+      "size": 1074
+    },
+    {
       "path": "tests/test_power_law.py",
       "sha256": "24871c1d8d1611f7b2e9b058df3a6fdee7dfb0ff5d9b9c51accf01e97625b020",
       "size": 3863
@@ -1917,6 +2562,11 @@
       "path": "tests/test_proofpack_deterministic.py",
       "sha256": "a8c6c31e1eb72af10eca0df9173a3c209599b111217438ec36315dc5bf1ad20e",
       "size": 2029
+    },
+    {
+      "path": "tests/test_prover_correspondence.py",
+      "sha256": "4141ca9efb49e1c588b83961ba61300b2fa428c808b177fed10e60d9fbe3066f",
+      "size": 2287
     },
     {
       "path": "tests/test_provider_facade.py",
@@ -2002,6 +2652,11 @@
       "path": "tests/test_research_maturity_audit.py",
       "sha256": "17ab469c11e820dfcdf55bb30db3f9415c49db40f55569e15b1c00eb44d6c2cb",
       "size": 1280
+    },
+    {
+      "path": "tests/test_reversibility_theorem.py",
+      "sha256": "738bc3357a4e39b34fdb20c94677a5499b26d4e5dbae72e8674d7f95cd37c8ca",
+      "size": 6755
     },
     {
       "path": "tests/test_reviewer_packet.py",
@@ -2102,6 +2757,11 @@
       "path": "tests/test_unified_pipeline.py",
       "sha256": "b463d92562ed51538fc31f16c73006ce0c71299918b0a9c80703722120b66b42",
       "size": 5351
+    },
+    {
+      "path": "tests/test_variational_theorem.py",
+      "sha256": "90ceb26bb0d8f333db0169a5e82195af7cfc909aef9f847bbfb29a561e0e4d4a",
+      "size": 1780
     },
     {
       "path": "tests/test_verdict_lang.py",

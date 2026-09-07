@@ -5,14 +5,14 @@
         "registered model equations and finite truncations"
       ],
       "claim_id": "deep-boil-0001",
-      "digest": "abcd89790116cd7915d72cadbc6355ea33378db5e7fedc0eab3ff28e2de9bf7a",
+      "digest": "a92200bab2e4c48ab2c00b6e5de6d24207c6240ac18cbf396b6d9499450b337b",
       "evidence": [
         {
-          "bytes": 27959,
+          "bytes": 61886,
           "description": "",
           "kind": "result",
           "path": "deep_boil.json",
-          "sha256": "bcb052affac8bd27fe74e1ccdafedf922bcf1a9f78769fab541d96d04496223e",
+          "sha256": "200b884a1369de7ede947414218583346175aaee7d3ef7fd804af3ed4fa19f30",
           "verifier": null
         },
         {
@@ -36,7 +36,7 @@
       ],
       "external_review": [],
       "finite_scope": "three finite-time ODE runs, two finite Hamiltonian matrices, finite UQT-inspired algebra tables, compactification toy spectra, finite perception games, finite Menger sponge stages, and a finite two-qubit Bell calculation",
-      "git_commit": "0ddefbcd5b03b2eca1eadf5211282ff292d08dbc",
+      "git_commit": "f6322265723f66edf9bbd6bf4cfa02ac1499b420",
       "level": "reproducible_finite_result",
       "methods": [
         "RK4",
@@ -51,7 +51,7 @@
         "weighted geometric synthesis"
       ],
       "parameters": {
-        "quantum_gap_score": 0.2333321284990673,
+        "quantum_gap_score": 0.2333321284990686,
         "smoke": false
       },
       "schema": "gaugegap.research_claim.v1",

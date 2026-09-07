@@ -1,8 +1,17 @@
 # SMT verification of the certificates
 
-The repo emits certificates as discharged Lean 4 / Coq (a single labelled trust
-input, no `sorry`/`Admitted`). CI greps those artifacts for holes, but it does not run
-a proof assistant. This layer adds a second, **automated** witness: an SMT solver
+The repo emits certificates as discharged Lean 4 / Coq (labelled trust inputs, no
+`sorry`/`Admitted`). CI greps those artifacts for holes, but it does not run
+a proof assistant.
+
+`scripts/build_formal_registry.py` reports those trust inputs rather than leaving
+them implicit: `trust_inputs` lists the assumed *facts*, `assumed_constants` the
+opaque constants (`axiom E : ℝ` posits a real number, which was already true, so
+it assumes nothing), and `assumption_free_count` counts the artifacts that need
+neither. Most certificates carry one assumed fact; a few carry several
+(`cherenkov_cone.lean` has three). Read `assumption_free_count`, not
+`hole_free_count`, as the number of artifacts that establish their statement
+outright. This layer adds a second, **automated** witness: an SMT solver
 (z3) independently proves each certified inequality valid over the reals — the negated
 conclusion is unsatisfiable.
 

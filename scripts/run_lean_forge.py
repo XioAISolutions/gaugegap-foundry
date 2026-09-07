@@ -37,7 +37,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from gaugegap.anomaly_theorem import NODE_CHECKS, mirror_summary  # noqa: E402
+from gaugegap.lean_mirror import NODE_CHECKS, mirror_summary  # noqa: E402
 
 LEAN_DIR = ROOT / "formal" / "lean"
 DAG_PATH = LEAN_DIR / "dag.json"
@@ -87,13 +87,15 @@ def _theorem_bodies(text: str) -> dict[str, str]:
 
 def check_structure(dag: dict) -> list[StructureIssue]:
     issues: list[StructureIssue] = []
-    statements = _strip_comments(
-        (LEAN_DIR / dag["statement_module"]).read_text(encoding="utf-8")
-    )
-    proofs_text = _strip_comments(
-        (LEAN_DIR / dag["proof_module"]).read_text(encoding="utf-8")
-    )
-    bodies = _theorem_bodies(proofs_text)
+    module_text: dict[str, str] = {}
+
+    def text_of(module: str) -> str:
+        if module not in module_text:
+            module_text[module] = _strip_comments(
+                (LEAN_DIR / module).read_text(encoding="utf-8")
+            )
+        return module_text[module]
+
     proof_by_node = {node["id"]: node["proof"] for node in dag["nodes"]}
 
     for source in _lean_sources():
@@ -106,6 +108,8 @@ def check_structure(dag: dict) -> list[StructureIssue]:
 
     for node in dag["nodes"]:
         node_id = node["id"]
+        statements = text_of(node["statement_module"])
+        bodies = _theorem_bodies(text_of(node["proof_module"]))
         if not re.search(rf"(?m)^def\s+{re.escape(node['statement'])}\b", statements):
             issues.append(StructureIssue(node_id, f"missing statement {node['statement']}"))
         body = bodies.get(node["proof"])
@@ -168,12 +172,14 @@ def run_lake(lake: str | None, timeout: int) -> dict[str, object]:
             "detail": f"could not run {executable}: {exc}",
             "returncode": None,
         }
+    if completed.returncode == 0:
+        # Deterministic on success: the build log varies between a cold and a
+        # warm cache, and this report is committed by CI, so a varying detail
+        # would produce an endless stream of no-op commits. On failure the log
+        # is the whole point, so it is kept.
+        return {"status": "verified", "detail": "lake build exited 0", "returncode": 0}
     tail = "\n".join((completed.stdout + completed.stderr).splitlines()[-40:])
-    return {
-        "status": "verified" if completed.returncode == 0 else "failed",
-        "detail": tail,
-        "returncode": completed.returncode,
-    }
+    return {"status": "failed", "detail": tail, "returncode": completed.returncode}
 
 
 def build_report(lake: str | None, timeout: int, skip_lake: bool) -> dict[str, object]:
@@ -201,12 +207,13 @@ def build_report(lake: str | None, timeout: int, skip_lake: bool) -> dict[str, o
     ).hexdigest()
     verified = kernel["status"] == "verified"
     return {
-        "schema": "gaugegap.lean_forge.v1",
-        "target": dag["target"],
+        "schema": "gaugegap.lean_forge.v2",
+        "targets": dag["targets"],
         "node_count": len(dag["nodes"]),
         "nodes": [
             {
                 "id": node["id"],
+                "track": node["track"],
                 "statement": node["statement"],
                 "proof": node["proof"],
                 "depends_on": node["depends_on"],

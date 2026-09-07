@@ -55,6 +55,45 @@ def protonCharge (YQ : ℚ) : ℚ := 3 * YQ + 1 / 2
 /-- Charge of the `udd` composite. -/
 def neutronCharge (YQ : ℚ) : ℚ := 3 * YQ - 1 / 2
 
+/-- A full hypercharge assignment for the declared inventory, so that the
+solution space can be talked about as a space rather than six loose numbers. -/
+structure Assignment where
+  YQ : ℚ
+  Yu : ℚ
+  Yd : ℚ
+  YL : ℚ
+  Ye : ℚ
+  Yn : ℚ
+  deriving DecidableEq
+
+/-- Componentwise scaling. -/
+def Assignment.smul (c : ℚ) (a : Assignment) : Assignment :=
+  ⟨c * a.YQ, c * a.Yu, c * a.Yd, c * a.YL, c * a.Ye, c * a.Yn⟩
+
+/-- Componentwise addition. -/
+def Assignment.add (a b : Assignment) : Assignment :=
+  ⟨a.YQ + b.YQ, a.Yu + b.Yu, a.Yd + b.Yd, a.YL + b.YL, a.Ye + b.Ye, a.Yn + b.Yn⟩
+
+/-- The all-zero assignment. -/
+def Assignment.zero : Assignment := ⟨0, 0, 0, 0, 0, 0⟩
+
+/-- The member of the right-handed-neutrino family at parameters `x = Y_Q` and
+`h = Y_H`, as in `Stmt_A08_RightNeutrinoFamily`. -/
+def familyMember (n x h : ℚ) : Assignment :=
+  ⟨x, x + h, x - h, -(n * x), -(n * x) - h, -(n * x) + h⟩
+
+/-- The Standard Model hypercharge direction, cleared of denominators: the
+family member at `x = 1`, `h = n`, where the right-handed neutrino decouples. -/
+def smDirection (n : ℚ) : Assignment := ⟨1, 1 + n, 1 - n, -n, -n - n, 0⟩
+
+/-- The `B - L` direction: quarks `1`, leptons `-n`. The family member at
+`x = 1`, `h = 0`. -/
+def blDirection (n : ℚ) : Assignment := ⟨1, 1, 1, -n, -n, -n⟩
+
+/-- All four registered coefficients vanish for a whole assignment. -/
+def IsAnomalyFreeAssignment (n : ℚ) (a : Assignment) : Prop :=
+  IsAnomalyFree n a.YQ a.Yu a.Yd a.YL a.Ye a.Yn
+
 /-- Left-handed weak doublets for `g` generations of `n` colours:
 `n` coloured quark doublets plus one lepton doublet per generation. -/
 def weakDoublets (n g : ℕ) : ℕ := g * (n + 1)

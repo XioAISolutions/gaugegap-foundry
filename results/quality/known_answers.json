@@ -69,8 +69,8 @@
           "path": "electric_charge_coupling"
         },
         {
-          "absolute_error": 1.0329452918190422e-13,
-          "actual": 1.0329452918190422e-13,
+          "absolute_error": 0.0,
+          "actual": 0.0,
           "allowed_error": 1e-09,
           "expected": 0.0,
           "passed": true,
@@ -109,24 +109,24 @@
           "path": "hermitian"
         },
         {
-          "absolute_error": 1.1102230246251565e-16,
-          "actual": -0.8000000000000002,
+          "absolute_error": 4.440892098500626e-16,
+          "actual": -0.8000000000000005,
           "allowed_error": 1e-12,
           "expected": -0.8,
           "passed": true,
           "path": "ground_energy"
         },
         {
-          "absolute_error": 1.6653345369377348e-16,
-          "actual": -0.4000000000000002,
+          "absolute_error": 5.551115123125783e-17,
+          "actual": -0.4000000000000001,
           "allowed_error": 1e-12,
           "expected": -0.4,
           "passed": true,
           "path": "first_excited_energy"
         },
         {
-          "absolute_error": 5.551115123125783e-17,
-          "actual": 0.39999999999999997,
+          "absolute_error": 3.885780586188048e-16,
+          "actual": 0.4000000000000004,
           "allowed_error": 1e-12,
           "expected": 0.4,
           "passed": true,
@@ -261,8 +261,8 @@
           "path": "system_entropy"
         },
         {
-          "absolute_error": 0.0,
-          "actual": 2.0,
+          "absolute_error": 4.440892098500626e-16,
+          "actual": 2.0000000000000004,
           "allowed_error": 1e-12,
           "expected": 2.0,
           "passed": true,

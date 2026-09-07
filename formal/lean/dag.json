@@ -1,101 +1,489 @@
 {
-  "schema": "gaugegap.lean_dag.v1",
+  "schema": "gaugegap.lean_dag.v2",
   "project": "GaugeGapLean",
-  "target": "Anomaly Forge hypercharge uniqueness (declared finite inventory)",
+  "targets": {
+    "anomaly-forge": "Anomaly Forge hypercharge uniqueness for a declared finite chiral field inventory, and the two-dimensional span of hypercharge and B-L that replaces it once a right-handed neutrino is admitted",
+    "infogap-no-hiding": "Finite no-hiding probability identities for the implemented three-qubit circuit, cross-checking formal/infogap/no_hiding_finite.v",
+    "hadamard-gram": "Gram identity for the popcount inner product the Hadamard Forge verifier executes, cross-checking formal/hadamard/gram_identity.v",
+    "gaugegap-variational": "Finite-dimensional variational bound underlying the certified eigenvalue brackets, replacing the Courant-Fischer step those certificates assume",
+    "landauer-reversibility": "Which finite Boolean gates actually destroy information, and what reversibility costs: the logical premise Landauer's bound is applied to, supplying the entropy that gaugegap.quantum.landauer turns into an energy"
+  },
   "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
-  "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
-  "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
   "nodes": [
     {
       "id": "A01",
+      "track": "anomaly-forge",
       "statement": "Stmt_A01_SU3Automatic",
       "proof": "a01_su3Automatic",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
       "depends_on": [],
       "description": "Gauge-invariant up and down Yukawa terms make the SU(3)^2-U(1) coefficient vanish identically for every colour count."
     },
     {
       "id": "A02",
+      "track": "anomaly-forge",
       "statement": "Stmt_A02_SU2FixesLepton",
       "proof": "a02_su2FixesLepton",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
       "depends_on": [],
       "description": "SU(2)^2-U(1) cancellation is equivalent to the lepton-doublet hypercharge YL = -(n * YQ)."
     },
     {
       "id": "A03",
+      "track": "anomaly-forge",
       "statement": "Stmt_A03_GravReduces",
       "proof": "a03_gravReduces",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
       "depends_on": [],
       "description": "Under the Yukawa relations and YL = -(n * YQ), the gravity^2-U(1) coefficient collapses to YH - n * YQ."
     },
     {
       "id": "A04",
+      "track": "anomaly-forge",
       "statement": "Stmt_A04_Uniqueness",
       "proof": "a04_uniqueness",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
       "depends_on": [],
       "description": "Uniqueness in division-free form: the Yukawa relations plus SU(2)^2 and gravity^2 cancellation force n*YQ = YH, YL = -YH, n*Yu = YH*(n+1), n*Yd = YH*(1-n), Ye = -2*YH."
     },
     {
       "id": "A05",
+      "track": "anomaly-forge",
       "statement": "Stmt_A05_U1CubedAutomatic",
       "proof": "a05_u1CubedAutomatic",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
       "depends_on": [],
       "description": "At the assignment fixed by A04 the U(1)^3 coefficient vanishes for every colour count, so the cubic condition is implied rather than imposed."
     },
     {
       "id": "A06",
+      "track": "anomaly-forge",
       "statement": "Stmt_A06_StandardModelPoint",
       "proof": "a06_standardModelPoint",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
       "depends_on": [],
       "description": "The Standard Model point n = 3, YH = 1/2, giving (1/6, 2/3, -1/3, -1/2, -1), is anomaly free."
     },
     {
       "id": "A07",
+      "track": "anomaly-forge",
       "statement": "Stmt_A07_PerturbationRejected",
       "proof": "a07_perturbationRejected",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
       "depends_on": [],
       "description": "The audited perturbation Yu = 7/10 is rejected, mirroring run_anomaly_forge.py --y-u 7/10 --require-pass."
     },
     {
       "id": "A08",
+      "track": "anomaly-forge",
       "statement": "Stmt_A08_RightNeutrinoFamily",
       "proof": "a08_rightNeutrinoFamily",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
       "depends_on": [],
       "description": "With a Dirac right-handed neutrino every YQ is anomaly free: uniqueness fails and a one-parameter family survives. This is the declared boundary on A04 and A13."
     },
     {
       "id": "A09",
+      "track": "anomaly-forge",
       "statement": "Stmt_A09_FamilyMeetsStandardModel",
       "proof": "a09_familyMeetsStandardModel",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
       "depends_on": [],
       "description": "The A08 family meets the neutrino-free Standard Model exactly where the right-handed neutrino hypercharge vanishes."
     },
     {
       "id": "A10",
+      "track": "anomaly-forge",
       "statement": "Stmt_A10_ChargeQuantisation",
       "proof": "a10_chargeQuantisation",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
       "depends_on": [],
       "description": "Electric and composite charges at the Standard Model point under Q = T3 + Y: u = 2/3, d = -1/3, e = -1, nu = 0, proton = 1, neutron = 0."
     },
     {
       "id": "A11",
+      "track": "anomaly-forge",
       "statement": "Stmt_A11_WittenParity",
       "proof": "a11_wittenParity",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
       "depends_on": [],
       "description": "Witten global SU(2) parity: three generations of three colours give twelve left-handed doublets (even), two colours give nine (odd, inadmissible)."
     },
     {
       "id": "A12",
+      "track": "anomaly-forge",
       "statement": "Stmt_A12_GenerationScaling",
       "proof": "a12_generationScaling",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
       "depends_on": [],
       "description": "The generation factor is a nonzero scalar, so per-generation cancellation decides generation-universal cancellation."
     },
     {
       "id": "A13",
+      "track": "anomaly-forge",
       "statement": "Stmt_A13_MainTheorem",
       "proof": "a13_mainTheorem",
-      "depends_on": ["A04", "A05"],
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
+      "depends_on": [
+        "A04",
+        "A05"
+      ],
       "description": "Flagship: the Yukawa relations plus SU(2)^2 and gravity^2 cancellation pin the assignment and leave SU(3)^2 and U(1)^3 cancelling automatically."
+    },
+    {
+      "id": "A14",
+      "track": "anomaly-forge",
+      "statement": "Stmt_A14_FamilySpannedByHyperchargeAndBL",
+      "proof": "a14_familySpannedByHyperchargeAndBL",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
+      "depends_on": [],
+      "description": "Every member of the A08 right-handed-neutrino family is a linear combination of the Standard Model hypercharge direction and B-L, stated cleared of denominators."
+    },
+    {
+      "id": "A15",
+      "track": "anomaly-forge",
+      "statement": "Stmt_A15_BLDirectionAnomalyFree",
+      "proof": "a15_blDirectionAnomalyFree",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
+      "depends_on": [
+        "A08"
+      ],
+      "description": "B-L is anomaly free on its own once a right-handed neutrino is present, which is why the A08 family exists: B-L becomes gaugeable."
+    },
+    {
+      "id": "A16",
+      "track": "anomaly-forge",
+      "statement": "Stmt_A16_HyperchargeDirectionAnomalyFree",
+      "proof": "a16_hyperchargeDirectionAnomalyFree",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
+      "depends_on": [
+        "A08"
+      ],
+      "description": "The Standard Model direction is anomaly free, with the right-handed neutrino hypercharge vanishing."
+    },
+    {
+      "id": "A17",
+      "track": "anomaly-forge",
+      "statement": "Stmt_A17_DirectionsIndependent",
+      "proof": "a17_directionsIndependent",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
+      "depends_on": [],
+      "description": "The hypercharge and B-L directions are independent for every nonzero colour count, so A14 exhibits a two-dimensional space rather than a disguised line."
+    },
+    {
+      "id": "B01",
+      "track": "infogap-no-hiding",
+      "statement": "Stmt_B01_InputNormalised",
+      "proof": "b01_inputNormalised",
+      "statement_module": "GaugeGapLean/InfoGap/Statements.lean",
+      "proof_module": "GaugeGapLean/InfoGap/Proofs.lean",
+      "depends_on": [],
+      "description": "The input probabilities partition unity. Coq: input_probability_normalized."
+    },
+    {
+      "id": "B02",
+      "track": "infogap-no-hiding",
+      "statement": "Stmt_B02_BranchWeightHalf",
+      "proof": "b02_branchWeightHalf",
+      "statement_module": "GaugeGapLean/InfoGap/Statements.lean",
+      "proof_module": "GaugeGapLean/InfoGap/Proofs.lean",
+      "depends_on": [],
+      "description": "A measured system branch has weight exactly 1/2. Coq: system_zero_probability, which system_one_probability restates verbatim."
+    },
+    {
+      "id": "B03",
+      "track": "infogap-no-hiding",
+      "statement": "Stmt_B03_BranchesExhaust",
+      "proof": "b03_branchesExhaust",
+      "statement_module": "GaugeGapLean/InfoGap/Statements.lean",
+      "proof_module": "GaugeGapLean/InfoGap/Proofs.lean",
+      "depends_on": [
+        "B02"
+      ],
+      "description": "The two system branches exhaust the probability; the fact the duplicated Coq pair was reaching for."
+    },
+    {
+      "id": "B04",
+      "track": "infogap-no-hiding",
+      "statement": "Stmt_B04_RecoveryAlpha",
+      "proof": "b04_recoveryAlpha",
+      "statement_module": "GaugeGapLean/InfoGap/Statements.lean",
+      "proof_module": "GaugeGapLean/InfoGap/Proofs.lean",
+      "depends_on": [],
+      "description": "Recovery on B returns |alpha|^2 exactly. Coq: recovery_zero_probability."
+    },
+    {
+      "id": "B05",
+      "track": "infogap-no-hiding",
+      "statement": "Stmt_B05_RecoveryBeta",
+      "proof": "b05_recoveryBeta",
+      "statement_module": "GaugeGapLean/InfoGap/Statements.lean",
+      "proof_module": "GaugeGapLean/InfoGap/Proofs.lean",
+      "depends_on": [],
+      "description": "Recovery on B returns |beta|^2 exactly. Coq: recovery_one_probability."
+    },
+    {
+      "id": "B06",
+      "track": "infogap-no-hiding",
+      "statement": "Stmt_B06_RecoveredNormalised",
+      "proof": "b06_recoveredNormalised",
+      "statement_module": "GaugeGapLean/InfoGap/Statements.lean",
+      "proof_module": "GaugeGapLean/InfoGap/Proofs.lean",
+      "depends_on": [
+        "B01",
+        "B04",
+        "B05"
+      ],
+      "description": "The recovered probabilities stay normalised. Coq: recovered_probability_normalized, chained the same way."
+    },
+    {
+      "id": "B07",
+      "track": "infogap-no-hiding",
+      "statement": "Stmt_B07_SystemCarriesNoInformation",
+      "proof": "b07_systemCarriesNoInformation",
+      "statement_module": "GaugeGapLean/InfoGap/Statements.lean",
+      "proof_module": "GaugeGapLean/InfoGap/Proofs.lean",
+      "depends_on": [
+        "B02"
+      ],
+      "description": "Not in the Coq source: the measured system statistics are identical for every normalised input, so the system retains no information about alpha and beta."
+    },
+    {
+      "id": "C01",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C01_DisagreeBounds",
+      "proof": "c01_disagreeBounds",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [],
+      "description": "A single popcount bit is zero or one. Coq: disagree_bounds."
+    },
+    {
+      "id": "C02",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C02_ProductFromDisagree",
+      "proof": "c02_productFromDisagree",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [],
+      "description": "The product of two signs in popcount form. Coq: product_from_disagree."
+    },
+    {
+      "id": "C03",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C03_MismatchesNonneg",
+      "proof": "c03_mismatchesNonneg",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [
+        "C01"
+      ],
+      "description": "A popcount is never negative. Coq: mismatches_nonnegative."
+    },
+    {
+      "id": "C04",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C04_InnerEqPopcountForm",
+      "proof": "c04_innerEqPopcountForm",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [
+        "C02"
+      ],
+      "description": "Core identity: on equal-length vectors the popcount form the verifier computes agrees with the sum-of-products inner product. Coq: inner_eq_popcount_form."
+    },
+    {
+      "id": "C05",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C05_MismatchesSelf",
+      "proof": "c05_mismatchesSelf",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [],
+      "description": "A vector never disagrees with itself. Coq: mismatches_self."
+    },
+    {
+      "id": "C06",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C06_InnerSelfEqLength",
+      "proof": "c06_innerSelfEqLength",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [
+        "C04",
+        "C05"
+      ],
+      "description": "Diagonal gate: every diagonal entry of H times H transpose equals the order. Coq: inner_self_eq_length."
+    },
+    {
+      "id": "C07",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C07_OrthogonalLengthTwicePopcount",
+      "proof": "c07_orthogonalLengthTwicePopcount",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [
+        "C04"
+      ],
+      "description": "Off-diagonal gate: orthogonal equal-length rows make the length twice the popcount. Coq: orthogonal_length_even."
+    },
+    {
+      "id": "C08",
+      "track": "hadamard-gram",
+      "statement": "Stmt_C08_OrthogonalLengthIsEven",
+      "proof": "c08_orthogonalLengthIsEven",
+      "statement_module": "GaugeGapLean/Hadamard/Statements.lean",
+      "proof_module": "GaugeGapLean/Hadamard/Proofs.lean",
+      "depends_on": [
+        "C07"
+      ],
+      "description": "Hence that length is even, the elementary half of the necessary condition on Hadamard orders. Coq: orthogonal_length_is_even."
+    },
+    {
+      "id": "D01",
+      "track": "gaugegap-variational",
+      "statement": "Stmt_D01_RayleighLowerBound",
+      "proof": "d01_rayleighLowerBound",
+      "statement_module": "GaugeGapLean/Variational/Statements.lean",
+      "proof_module": "GaugeGapLean/Variational/Proofs.lean",
+      "depends_on": [],
+      "description": "A lower bound on every eigenvalue bounds the Rayleigh quotient from below, scaled by the squared norm."
+    },
+    {
+      "id": "D02",
+      "track": "gaugegap-variational",
+      "statement": "Stmt_D02_RayleighUpperBound",
+      "proof": "d02_rayleighUpperBound",
+      "statement_module": "GaugeGapLean/Variational/Statements.lean",
+      "proof_module": "GaugeGapLean/Variational/Proofs.lean",
+      "depends_on": [],
+      "description": "The dual upper bound."
+    },
+    {
+      "id": "D03",
+      "track": "gaugegap-variational",
+      "statement": "Stmt_D03_NormalisedBracket",
+      "proof": "d03_normalisedBracket",
+      "statement_module": "GaugeGapLean/Variational/Statements.lean",
+      "proof_module": "GaugeGapLean/Variational/Proofs.lean",
+      "depends_on": [
+        "D01",
+        "D02"
+      ],
+      "description": "For a normalised state the Rayleigh quotient lies between any bounds on the spectrum."
+    },
+    {
+      "id": "D04",
+      "track": "gaugegap-variational",
+      "statement": "Stmt_D04_VariationalPrinciple",
+      "proof": "d04_variationalPrinciple",
+      "statement_module": "GaugeGapLean/Variational/Statements.lean",
+      "proof_module": "GaugeGapLean/Variational/Proofs.lean",
+      "depends_on": [
+        "D01"
+      ],
+      "description": "The variational principle: no normalised trial state has a Rayleigh quotient below the ground energy. This is the step the emitted bracket certificates assume as variational_upper."
+    },
+    {
+      "id": "D05",
+      "track": "gaugegap-variational",
+      "statement": "Stmt_D05_CertifiedBracket",
+      "proof": "d05_certifiedBracket",
+      "statement_module": "GaugeGapLean/Variational/Statements.lean",
+      "proof_module": "GaugeGapLean/Variational/Proofs.lean",
+      "depends_on": [
+        "D04"
+      ],
+      "description": "The certified bracket with mathematics separated from numerics: the interval-arithmetic enclosure and the evaluated trial state stay hypotheses, the Courant-Fischer step between them is derived from D04."
+    },
+    {
+      "id": "E01",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E01_AndNotInjective",
+      "proof": "e01_andNotInjective",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [],
+      "description": "AND destroys information: two named inputs share an output, so the map is not injective and the input cannot be recovered from the output."
+    },
+    {
+      "id": "E02",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E02_AndFibreSizes",
+      "proof": "e02_andFibreSizes",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [],
+      "description": "How much it destroys, as exact fibre sizes: three of the four inputs map to false and one to true. These are the counts the Shannon average H(X | Y) = (3/4) log2 3 is computed from."
+    },
+    {
+      "id": "E03",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E03_ToffoliInvolutive",
+      "proof": "e03_toffoliInvolutive",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [],
+      "description": "Toffoli is an involution: applying it twice is the identity on all eight states."
+    },
+    {
+      "id": "E04",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E04_ToffoliBijective",
+      "proof": "e04_toffoliBijective",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [
+        "E03"
+      ],
+      "description": "Hence Toffoli is a bijection, so it destroys nothing -- derived from the involution rather than checked again."
+    },
+    {
+      "id": "E05",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E05_ToffoliComputesAnd",
+      "proof": "e05_toffoliComputesAnd",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [],
+      "description": "And it still computes AND: with the target bit cleared, the third output is the conjunction of the first two inputs. Bennett's embedding."
+    },
+    {
+      "id": "E06",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E06_ReversibilityKeepsTheInputs",
+      "proof": "e06_reversibilityKeepsTheInputs",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [],
+      "description": "The price, stated rather than glossed: Toffoli is reversible because it carries its inputs forward. Reversible computation does not avoid the cost of erasure; it defers it to whenever those retained bits are cleared."
+    },
+    {
+      "id": "E07",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E07_FredkinInvolutive",
+      "proof": "e07_fredkinInvolutive",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [],
+      "description": "Fredkin is an involution too, so the result is not an accident of one gate."
     }
   ]
 }

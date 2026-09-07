@@ -212,6 +212,18 @@ answer.
 
 ## Formal artifact
 
+### Second-prover cross-check
+
+The same identity is restated in Lean 4 under
+`formal/lean/GaugeGapLean/Hadamard/`, so two independent kernels accept it. The
+node-by-node correspondence is in
+[blueprint-hadamard-gram-lean.md](blueprint-hadamard-gram-lean.md).
+
+```bash
+foundry run compile-coq   # coqc
+foundry run lean-forge    # lake build, when a Lean toolchain is present
+```
+
 [`formal/hadamard/gram_identity.v`](../formal/hadamard/gram_identity.v) is a
 hole-free Coq file (checked with `coqc` 8.18; `Print Assumptions` reports
 `Closed under the global context` for each theorem) proving, for finite `+-1`
