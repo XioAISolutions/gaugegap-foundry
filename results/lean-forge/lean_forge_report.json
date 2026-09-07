@@ -1,6 +1,6 @@
 {
   "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
-  "content_hash": "c6906f406f426ce9dacc16f73a3d49741448d8716dd7b767e9b3981b30e7305a",
+  "content_hash": "ab9d97588a88bdad074fb895c27aad2d00a45a2219f5c81da3eb577bd5a7bb01",
   "kernel_check": {
     "detail": "lake not found on PATH; install elan and rerun, or use CI",
     "returncode": null,
@@ -23,6 +23,10 @@
       "A11": true,
       "A12": true,
       "A13": true,
+      "A14": true,
+      "A15": true,
+      "A16": true,
+      "A17": true,
       "B01": true,
       "B02": true,
       "B03": true,
@@ -41,7 +45,7 @@
     },
     "schema": "gaugegap.lean_mirror.v1"
   },
-  "node_count": 28,
+  "node_count": 32,
   "nodes": [
     {
       "depends_on": [],
@@ -161,6 +165,46 @@
       "mirror_holds": true,
       "proof": "a13_mainTheorem",
       "statement": "Stmt_A13_MainTheorem",
+      "track": "anomaly-forge"
+    },
+    {
+      "depends_on": [],
+      "id": "A14",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a14_familySpannedByHyperchargeAndBL",
+      "statement": "Stmt_A14_FamilySpannedByHyperchargeAndBL",
+      "track": "anomaly-forge"
+    },
+    {
+      "depends_on": [
+        "A08"
+      ],
+      "id": "A15",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a15_blDirectionAnomalyFree",
+      "statement": "Stmt_A15_BLDirectionAnomalyFree",
+      "track": "anomaly-forge"
+    },
+    {
+      "depends_on": [
+        "A08"
+      ],
+      "id": "A16",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a16_hyperchargeDirectionAnomalyFree",
+      "statement": "Stmt_A16_HyperchargeDirectionAnomalyFree",
+      "track": "anomaly-forge"
+    },
+    {
+      "depends_on": [],
+      "id": "A17",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "a17_directionsIndependent",
+      "statement": "Stmt_A17_DirectionsIndependent",
       "track": "anomaly-forge"
     },
     {
@@ -321,16 +365,16 @@
   "schema": "gaugegap.lean_forge.v2",
   "sources": {
     "formal/lean/GaugeGapLean.lean": "396774d3385bb3949b8f76983ebcb64b4a92a4e655defc6ca63af05b83dfb1b5",
-    "formal/lean/GaugeGapLean/AnomalyForge/Defs.lean": "4cd0c5510b035b94f34c2646fcd477c50c749d213a8737440f9262661c846076",
-    "formal/lean/GaugeGapLean/AnomalyForge/Proofs.lean": "c768d2eee43c79d08177680d7ed5760a797bd30a8b0b4a0059dd8791155a9ae9",
-    "formal/lean/GaugeGapLean/AnomalyForge/Statements.lean": "187361e0124497d948d40d8e3cd3e1f1b80e687f1dcb42d41732760477c99e52",
+    "formal/lean/GaugeGapLean/AnomalyForge/Defs.lean": "aae08bc0692266298d3cfe0922922d42a5e8cebb25080aa38d0165fcf6ed5777",
+    "formal/lean/GaugeGapLean/AnomalyForge/Proofs.lean": "875a468d0365b28d3bbbcf40863ff2ad544ba2293596a7dcf17f068b855dbe9b",
+    "formal/lean/GaugeGapLean/AnomalyForge/Statements.lean": "4d7ac1c87cb0cd9ce5e652529ac4b0e348062cdeb3912f449e760b3e256a0751",
     "formal/lean/GaugeGapLean/Hadamard/Defs.lean": "cc8d5706cd9a0b391180e01736ad6ac9fe1bdbbf1bb35468a5e42dfdc4ec93ab",
     "formal/lean/GaugeGapLean/Hadamard/Proofs.lean": "ea510d62309e6976553c6a44243922f43733aadc332824ee6c5a7b23cf1c6ff2",
     "formal/lean/GaugeGapLean/Hadamard/Statements.lean": "9f3117351c4e94a311659f66d04c0b0133287cf454bb66497ac5129a20379d53",
     "formal/lean/GaugeGapLean/InfoGap/Defs.lean": "31a72b19a58494d96bd87f66e3916d34296f939dde5a241e44e501bce17a05a7",
     "formal/lean/GaugeGapLean/InfoGap/Proofs.lean": "fd181004a6031d3c571c82e6caba67ac5bb580f5ff84cd40d73e46487f2706a3",
     "formal/lean/GaugeGapLean/InfoGap/Statements.lean": "b2f71d2608c2579bdd7ddcc5e5fe613cfd67a93bbdcbf291eab573c930b76c56",
-    "formal/lean/dag.json": "ac9eba66c40f689a8d5bd3f664d839867a8ff9d6d0f57a12e308968522c7cf60",
+    "formal/lean/dag.json": "fb30d73bf2ea47d9112fd7eac453aa1c365e66e44d945fbef4c1669434eae522",
     "formal/lean/lake-manifest.json": "7470c3adc4ea51a1e16ef95e323e71aa900f43d9423d4841e50af17af110bb70",
     "formal/lean/lakefile.toml": "ab6f003ad0d7256c44af11ad106c99d779eaa46bf890144aca533598dd39e24b",
     "formal/lean/lean-toolchain": "7c7da413860f9ec1f8741d6d9d1e803bda6c664f6d954fe15f1a05087dd066f0"
@@ -340,7 +384,7 @@
     "ok": true
   },
   "targets": {
-    "anomaly-forge": "Anomaly Forge hypercharge uniqueness for a declared finite chiral field inventory",
+    "anomaly-forge": "Anomaly Forge hypercharge uniqueness for a declared finite chiral field inventory, and the two-dimensional span of hypercharge and B-L that replaces it once a right-handed neutrino is admitted",
     "hadamard-gram": "Gram identity for the popcount inner product the Hadamard Forge verifier executes, cross-checking formal/hadamard/gram_identity.v",
     "infogap-no-hiding": "Finite no-hiding probability identities for the implemented three-qubit circuit, cross-checking formal/infogap/no_hiding_finite.v"
   }

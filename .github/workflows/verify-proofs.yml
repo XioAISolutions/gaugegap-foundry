@@ -75,8 +75,14 @@ jobs:
 
   compile-lean:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
+      # Check out the branch tip rather than the default merge commit, so the
+      # verified report can be committed back to the branch it describes.
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
       - name: Build the Lean Anomaly Forge
         uses: leanprover/lean-action@v1
         with:
@@ -93,12 +99,35 @@ jobs:
         run: |
           export PATH="$HOME/.elan/bin:$PATH"
           python scripts/run_lean_forge.py --require-verified
+          python scripts/generate_dag_viz.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: lean-forge-report
           path: results/lean-forge/
           retention-days: 7
+      # The report and figure record what the Lean kernel accepted, so the
+      # copies in the repository should be the ones a real `lake build`
+      # produced rather than whatever a toolchain-less environment could
+      # generate. This step only ever runs after --require-verified passed.
+      # Both files are deterministic, so a rerun finds nothing to commit and
+      # the loop terminates after one push.
+      - name: Commit the verified report and figure
+        if: >-
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          if git diff --quiet -- results/lean-forge figures/anomaly-forge/lean-dag.svg; then
+            echo "verified report and figure already committed; nothing to do"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/lean-forge figures/anomaly-forge/lean-dag.svg
+          git commit \
+            -m "Record the verified Lean forge report and DAG figure" \
+            -m "Written by the compile-lean job after lake build accepted every node, so the checked-in evidence is what the kernel produced rather than what a toolchain-less environment could generate."
+          git push origin "HEAD:${{ github.head_ref }}"
 
   hard-gates:
     runs-on: ubuntu-latest

@@ -172,12 +172,14 @@ def run_lake(lake: str | None, timeout: int) -> dict[str, object]:
             "detail": f"could not run {executable}: {exc}",
             "returncode": None,
         }
+    if completed.returncode == 0:
+        # Deterministic on success: the build log varies between a cold and a
+        # warm cache, and this report is committed by CI, so a varying detail
+        # would produce an endless stream of no-op commits. On failure the log
+        # is the whole point, so it is kept.
+        return {"status": "verified", "detail": "lake build exited 0", "returncode": 0}
     tail = "\n".join((completed.stdout + completed.stderr).splitlines()[-40:])
-    return {
-        "status": "verified" if completed.returncode == 0 else "failed",
-        "detail": tail,
-        "returncode": completed.returncode,
-    }
+    return {"status": "failed", "detail": tail, "returncode": completed.returncode}
 
 
 def build_report(lake: str | None, timeout: int, skip_lake: bool) -> dict[str, object]:

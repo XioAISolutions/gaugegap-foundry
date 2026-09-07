@@ -88,6 +88,36 @@ cubic the `(nY_Q + Y_H)^3 + (nY_Q - Y_H)^3` pair cancels the rest. Uniqueness is
 gone; a one-parameter family (a hypercharge / `B-L` admixture) remains, matching
 `status = "underdetermined_family"` in `src/gaugegap/hypercharge_solver.py`.
 
+**Lemmas 11-14 (A14-A17): what that family is.** Saying uniqueness fails is only
+half a statement; these say what replaces it. Cleared of denominators, write
+
+```text
+Y_SM(n) = (1, 1+n, 1-n, -n, -2n, 0)        the hypercharge direction
+Y_BL(n) = (1, 1, 1, -n, -n, -n)            the B - L direction
+```
+
+`Y_SM(3)` is six times the Standard Model assignment `(1/6, 2/3, -1/3, -1/2, -1, 0)`,
+and `Y_BL(3)` is three times `B - L = (1/3, 1/3, 1/3, -1, -1, -1)`.
+
+- **A14** — every family member satisfies
+  `n * Y(x, h) = h * Y_SM(n) + (n*x - h) * Y_BL(n)`. Cleared of denominators, so
+  no hypothesis on `n` is needed.
+- **A15** — `Y_BL(n)` is anomaly free on its own. This is *why* the family
+  exists: with a right-handed neutrino, `B - L` becomes gaugeable, so any
+  multiple of it can be added to a solution and it stays a solution.
+- **A16** — `Y_SM(n)` is anomaly free, with the right-handed neutrino
+  hypercharge vanishing, recovering Lemma 9.
+- **A17** — the two directions are independent for `n != 0`, so A14 exhibits a
+  genuine plane rather than a disguised line.
+
+Together: the anomaly-free assignments for this inventory are exactly the span
+of hypercharge and `B - L`, a two-dimensional space. A15 and A16 are derived
+from A08 rather than reproved, which is what the two DAG edges record.
+
+Boundary: this is the solution space *for the declared inventory with generation-
+universal charges and the stated Yukawa terms*. It says nothing about which
+member nature chose, and nothing about theories outside this inventory.
+
 **Lemma 9 (A09).** That family meets the neutrino-free Standard Model exactly
 where `Y_nu = -n Y_Q + Y_H = 0`, i.e. at `Y_H = n Y_Q` — the Lemma 4 point.
 
@@ -116,10 +146,14 @@ other two coefficients cancelling on their own.
 | A11 | `Stmt_A11_WittenParity` | — | Lemma 10 |
 | A12 | `Stmt_A12_GenerationScaling` | — | generation factor |
 | A13 | `Stmt_A13_MainTheorem` | A04, A05 | Theorem |
+| A14 | `Stmt_A14_FamilySpannedByHyperchargeAndBL` | — | Lemma 11 |
+| A15 | `Stmt_A15_BLDirectionAnomalyFree` | A08 | Lemma 12 |
+| A16 | `Stmt_A16_HyperchargeDirectionAnomalyFree` | A08 | Lemma 13 |
+| A17 | `Stmt_A17_DirectionsIndependent` | — | Lemma 14 |
 
-The dependency column is thin on purpose, and `scripts/run_lean_forge.py` checks
-it against the proof terms actually referenced: a declared edge that the proof
-does not use, or a use that is not declared, fails the gate. This target is a
+`scripts/run_lean_forge.py` checks the dependency column against the proof terms
+actually referenced: a declared edge that the proof does not use, or a use that
+is not declared, fails the gate. This target is a
 finite equational problem, so its DAG is wide and shallow. It is not comparable
 in scale to a formalisation like the recent Fermat's Last Theorem effort, and
 the DAG here earns its place as a consistency check, not as a scheduling

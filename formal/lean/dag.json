@@ -2,7 +2,7 @@
   "schema": "gaugegap.lean_dag.v2",
   "project": "GaugeGapLean",
   "targets": {
-    "anomaly-forge": "Anomaly Forge hypercharge uniqueness for a declared finite chiral field inventory",
+    "anomaly-forge": "Anomaly Forge hypercharge uniqueness for a declared finite chiral field inventory, and the two-dimensional span of hypercharge and B-L that replaces it once a right-handed neutrino is admitted",
     "infogap-no-hiding": "Finite no-hiding probability identities for the implemented three-qubit circuit, cross-checking formal/infogap/no_hiding_finite.v",
     "hadamard-gram": "Gram identity for the popcount inner product the Hadamard Forge verifier executes, cross-checking formal/hadamard/gram_identity.v"
   },
@@ -140,6 +140,50 @@
         "A05"
       ],
       "description": "Flagship: the Yukawa relations plus SU(2)^2 and gravity^2 cancellation pin the assignment and leave SU(3)^2 and U(1)^3 cancelling automatically."
+    },
+    {
+      "id": "A14",
+      "track": "anomaly-forge",
+      "statement": "Stmt_A14_FamilySpannedByHyperchargeAndBL",
+      "proof": "a14_familySpannedByHyperchargeAndBL",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
+      "depends_on": [],
+      "description": "Every member of the A08 right-handed-neutrino family is a linear combination of the Standard Model hypercharge direction and B-L, stated cleared of denominators."
+    },
+    {
+      "id": "A15",
+      "track": "anomaly-forge",
+      "statement": "Stmt_A15_BLDirectionAnomalyFree",
+      "proof": "a15_blDirectionAnomalyFree",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
+      "depends_on": [
+        "A08"
+      ],
+      "description": "B-L is anomaly free on its own once a right-handed neutrino is present, which is why the A08 family exists: B-L becomes gaugeable."
+    },
+    {
+      "id": "A16",
+      "track": "anomaly-forge",
+      "statement": "Stmt_A16_HyperchargeDirectionAnomalyFree",
+      "proof": "a16_hyperchargeDirectionAnomalyFree",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
+      "depends_on": [
+        "A08"
+      ],
+      "description": "The Standard Model direction is anomaly free, with the right-handed neutrino hypercharge vanishing."
+    },
+    {
+      "id": "A17",
+      "track": "anomaly-forge",
+      "statement": "Stmt_A17_DirectionsIndependent",
+      "proof": "a17_directionsIndependent",
+      "statement_module": "GaugeGapLean/AnomalyForge/Statements.lean",
+      "proof_module": "GaugeGapLean/AnomalyForge/Proofs.lean",
+      "depends_on": [],
+      "description": "The hypercharge and B-L directions are independent for every nonzero colour count, so A14 exhibits a two-dimensional space rather than a disguised line."
     },
     {
       "id": "B01",

@@ -103,4 +103,35 @@ def Stmt_A13_MainTheorem : Prop :=
     su2U1 n YQ YL = 0 → gravU1 n YQ Yu Yd YL Ye 0 = 0 →
     n * YQ = YH ∧ IsAnomalyFree n YQ Yu Yd YL Ye 0
 
+/-- **A14** — every member of the right-handed-neutrino family of `A08` is a
+linear combination of the Standard Model hypercharge direction and `B - L`.
+Stated cleared of denominators, so it needs no hypothesis on `n`. -/
+def Stmt_A14_FamilySpannedByHyperchargeAndBL : Prop :=
+  ∀ n x h : ℚ,
+    Assignment.smul n (familyMember n x h) =
+      Assignment.add (Assignment.smul h (smDirection n))
+        (Assignment.smul (n * x - h) (blDirection n))
+
+/-- **A15** — `B - L` is anomaly free on its own once a right-handed neutrino
+is present. This is why the family in `A08` exists at all: `B - L` becomes a
+gaugeable symmetry, and adding any multiple of it preserves cancellation. -/
+def Stmt_A15_BLDirectionAnomalyFree : Prop :=
+  ∀ n : ℚ, IsAnomalyFreeAssignment n (blDirection n)
+
+/-- **A16** — the Standard Model direction is anomaly free, with the
+right-handed neutrino hypercharge vanishing. -/
+def Stmt_A16_HyperchargeDirectionAnomalyFree : Prop :=
+  ∀ n : ℚ, IsAnomalyFreeAssignment n (smDirection n)
+
+/-- **A17** — the two directions are independent for every nonzero colour
+count, so `A14` exhibits a genuinely two-dimensional space rather than a
+disguised line. Together with `A14`, `A15` and `A16` this is the precise
+content of "uniqueness fails once a right-handed neutrino is admitted": the
+anomaly-free assignments are exactly the span of hypercharge and `B - L`. -/
+def Stmt_A17_DirectionsIndependent : Prop :=
+  ∀ n a b : ℚ, n ≠ 0 →
+    Assignment.add (Assignment.smul a (smDirection n))
+        (Assignment.smul b (blDirection n)) = Assignment.zero →
+    a = 0 ∧ b = 0
+
 end GaugeGap.AnomalyForge

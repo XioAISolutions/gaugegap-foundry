@@ -220,6 +220,69 @@ def a13() -> bool:
     return True
 
 
+# --- the right-handed-neutrino family as a two-dimensional space (A14-A17) ---
+
+Assignment = tuple[Q, Q, Q, Q, Q, Q]  # (Y_Q, Y_u, Y_d, Y_L, Y_e, Y_nu)
+
+
+def smul(c: Q, a: Assignment) -> Assignment:
+    return tuple(c * value for value in a)  # type: ignore[return-value]
+
+
+def add(a: Assignment, b: Assignment) -> Assignment:
+    return tuple(x + y for x, y in zip(a, b))  # type: ignore[return-value]
+
+
+ZERO: Assignment = (Q(0), Q(0), Q(0), Q(0), Q(0), Q(0))
+
+
+def family_member(n: Q, x: Q, h: Q) -> Assignment:
+    return (x, x + h, x - h, -(n * x), -(n * x) - h, -(n * x) + h)
+
+
+def sm_direction(n: Q) -> Assignment:
+    """Standard Model hypercharge, cleared of denominators."""
+    return (Q(1), 1 + n, 1 - n, -n, -n - n, Q(0))
+
+
+def bl_direction(n: Q) -> Assignment:
+    """B - L: quarks 1, leptons -n."""
+    return (Q(1), Q(1), Q(1), -n, -n, -n)
+
+
+def is_anomaly_free_assignment(n: Q, a: Assignment) -> bool:
+    return is_anomaly_free(n, *a)
+
+
+def a14() -> bool:
+    """Every family member is a combination of hypercharge and B - L."""
+    return all(
+        smul(n, family_member(n, y_q, y_h))
+        == add(smul(y_h, sm_direction(n)), smul(n * y_q - y_h, bl_direction(n)))
+        for n, y_q, y_h in GRID
+    )
+
+
+def a15() -> bool:
+    return all(is_anomaly_free_assignment(n, bl_direction(n)) for n in COLOURS)
+
+
+def a16() -> bool:
+    return all(is_anomaly_free_assignment(n, sm_direction(n)) for n in COLOURS)
+
+
+def a17() -> bool:
+    """The two directions are independent, so A14 spans a plane not a line."""
+    coefficients = (Q(0), Q(1), Q(-3), Q(2, 7))
+    for n in COLOURS:
+        for a in coefficients:
+            for b in coefficients:
+                combined = add(smul(a, sm_direction(n)), smul(b, bl_direction(n)))
+                if (combined == ZERO) != (a == 0 and b == 0):
+                    return False
+    return True
+
+
 NODE_CHECKS: dict[str, Callable[[], bool]] = {
     "A01": a01,
     "A02": a02,
@@ -234,6 +297,10 @@ NODE_CHECKS: dict[str, Callable[[], bool]] = {
     "A11": a11,
     "A12": a12,
     "A13": a13,
+    "A14": a14,
+    "A15": a15,
+    "A16": a16,
+    "A17": a17,
 }
 
 

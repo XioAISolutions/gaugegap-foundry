@@ -92,5 +92,62 @@ class AnomalyTheoremMirrorTests(unittest.TestCase):
         self.assertEqual(y_h, Fraction(1, 2))
 
 
+class BMinusLSpanTests(unittest.TestCase):
+    """A14-A17: what the A08 family actually is."""
+
+    def test_hypercharge_direction_is_the_standard_model_assignment(self) -> None:
+        scaled = tuple(value / 6 for value in theorem.sm_direction(Fraction(3)))
+        self.assertEqual(
+            scaled,
+            (
+                Fraction(1, 6),
+                Fraction(2, 3),
+                Fraction(-1, 3),
+                Fraction(-1, 2),
+                Fraction(-1),
+                Fraction(0),
+            ),
+        )
+
+    def test_bl_direction_is_baryon_minus_lepton_number(self) -> None:
+        scaled = tuple(value / 3 for value in theorem.bl_direction(Fraction(3)))
+        quarks, leptons = scaled[:3], scaled[3:]
+        self.assertEqual(set(quarks), {Fraction(1, 3)})
+        self.assertEqual(set(leptons), {Fraction(-1)})
+
+    def test_both_directions_cancel_on_their_own(self) -> None:
+        for n in (Fraction(1), Fraction(3), Fraction(5)):
+            self.assertTrue(theorem.is_anomaly_free_assignment(n, theorem.sm_direction(n)))
+            self.assertTrue(theorem.is_anomaly_free_assignment(n, theorem.bl_direction(n)))
+
+    def test_the_span_is_a_plane_not_a_line(self) -> None:
+        """If the directions were proportional, A14 would say nothing new."""
+        n = Fraction(3)
+        sm, bl = theorem.sm_direction(n), theorem.bl_direction(n)
+        self.assertEqual(sm[0], bl[0])  # same first component
+        self.assertNotEqual(sm[1], bl[1])  # but not the same vector
+
+    def test_only_the_trivial_combination_vanishes(self) -> None:
+        n = Fraction(3)
+        for a in (Fraction(0), Fraction(1), Fraction(-2, 5)):
+            for b in (Fraction(0), Fraction(1), Fraction(7)):
+                combined = theorem.add(
+                    theorem.smul(a, theorem.sm_direction(n)),
+                    theorem.smul(b, theorem.bl_direction(n)),
+                )
+                self.assertEqual(combined == theorem.ZERO, a == 0 and b == 0)
+
+    def test_the_family_contains_assignments_outside_the_hypercharge_line(self) -> None:
+        """The physical content: B - L admixtures are genuinely new solutions."""
+        n, y_h = Fraction(3), Fraction(1, 2)
+        standard = theorem.family_member(n, y_h / n, y_h)
+        admixed = theorem.family_member(n, Fraction(1, 5), y_h)
+        self.assertTrue(theorem.is_anomaly_free_assignment(n, standard))
+        self.assertTrue(theorem.is_anomaly_free_assignment(n, admixed))
+        self.assertNotEqual(standard, admixed)
+        self.assertEqual(standard[5], 0)  # no right-handed neutrino charge
+        self.assertNotEqual(admixed[5], 0)  # the admixture switches it on
+
+
 if __name__ == "__main__":
     unittest.main()
