@@ -5,7 +5,8 @@
     "anomaly-forge": "Anomaly Forge hypercharge uniqueness for a declared finite chiral field inventory, and the two-dimensional span of hypercharge and B-L that replaces it once a right-handed neutrino is admitted",
     "infogap-no-hiding": "Finite no-hiding probability identities for the implemented three-qubit circuit, cross-checking formal/infogap/no_hiding_finite.v",
     "hadamard-gram": "Gram identity for the popcount inner product the Hadamard Forge verifier executes, cross-checking formal/hadamard/gram_identity.v",
-    "gaugegap-variational": "Finite-dimensional variational bound underlying the certified eigenvalue brackets, replacing the Courant-Fischer step those certificates assume"
+    "gaugegap-variational": "Finite-dimensional variational bound underlying the certified eigenvalue brackets, replacing the Courant-Fischer step those certificates assume",
+    "landauer-reversibility": "Which finite Boolean gates actually destroy information, and what reversibility costs: the logical premise Landauer's bound is applied to, supplying the entropy that gaugegap.quantum.landauer turns into an energy"
   },
   "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
   "nodes": [
@@ -411,6 +412,78 @@
         "D04"
       ],
       "description": "The certified bracket with mathematics separated from numerics: the interval-arithmetic enclosure and the evaluated trial state stay hypotheses, the Courant-Fischer step between them is derived from D04."
+    },
+    {
+      "id": "E01",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E01_AndNotInjective",
+      "proof": "e01_andNotInjective",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [],
+      "description": "AND destroys information: two named inputs share an output, so the map is not injective and the input cannot be recovered from the output."
+    },
+    {
+      "id": "E02",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E02_AndFibreSizes",
+      "proof": "e02_andFibreSizes",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [],
+      "description": "How much it destroys, as exact fibre sizes: three of the four inputs map to false and one to true. These are the counts the Shannon average H(X | Y) = (3/4) log2 3 is computed from."
+    },
+    {
+      "id": "E03",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E03_ToffoliInvolutive",
+      "proof": "e03_toffoliInvolutive",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [],
+      "description": "Toffoli is an involution: applying it twice is the identity on all eight states."
+    },
+    {
+      "id": "E04",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E04_ToffoliBijective",
+      "proof": "e04_toffoliBijective",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [
+        "E03"
+      ],
+      "description": "Hence Toffoli is a bijection, so it destroys nothing -- derived from the involution rather than checked again."
+    },
+    {
+      "id": "E05",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E05_ToffoliComputesAnd",
+      "proof": "e05_toffoliComputesAnd",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [],
+      "description": "And it still computes AND: with the target bit cleared, the third output is the conjunction of the first two inputs. Bennett's embedding."
+    },
+    {
+      "id": "E06",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E06_ReversibilityKeepsTheInputs",
+      "proof": "e06_reversibilityKeepsTheInputs",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [],
+      "description": "The price, stated rather than glossed: Toffoli is reversible because it carries its inputs forward. Reversible computation does not avoid the cost of erasure; it defers it to whenever those retained bits are cleared."
+    },
+    {
+      "id": "E07",
+      "track": "landauer-reversibility",
+      "statement": "Stmt_E07_FredkinInvolutive",
+      "proof": "e07_fredkinInvolutive",
+      "statement_module": "GaugeGapLean/Reversibility/Statements.lean",
+      "proof_module": "GaugeGapLean/Reversibility/Proofs.lean",
+      "depends_on": [],
+      "description": "Fredkin is an involution too, so the result is not an accident of one gate."
     }
   ]
 }

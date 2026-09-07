@@ -22,6 +22,7 @@
   <a href="#%EF%B8%8F-gaugegap-track--finite-gauge-system-benchmarks">Gauge systems</a> ·
   <a href="#-curverank-track--riemann-adjacent-spectral-screening">Spectral screening</a> ·
   <a href="#netgap">NetGap</a> ·
+  <a href="#-lean-forge--the-machine-checked-layer">Lean forge</a> ·
   <a href="#-run-the-foundry">Run the Foundry</a>
 </p>
 
@@ -66,6 +67,7 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 - **NetGap** — the exact unitary core of a photonic quantum switch: non-blocking routing, encoding conversion, and certified coherence preservation.
 - **Physical limits** — familiar physics claims reduced to their exact, bounded computational core.
 - **Spectra and Verdict DSLs** — small languages where certification and evidence are part of program semantics.
+- **Lean forge** — 44 Lean 4 + Mathlib nodes across five tracks, verified by the kernel in CI, with an exact Python mirror of every statement.
 
 > ⚠️ **Claim boundary:** this repository does **not** claim a solution to any Millennium Prize problem. A finite numerical experiment, a formal inequality, a symbolic catalog, and a continuum theorem are different achievements and are labelled separately throughout the project.
 
@@ -91,6 +93,7 @@ flowchart TD
     F --> N["🛰️ NetGap<br/>photonic quantum switch"]
     F --> P["🌐 Physical limits<br/>certified finite cores"]
     F --> D["🧩 DSLs<br/>Spectra · Verdict"]
+    F --> LN["🧾 Lean forge<br/>44 kernel-checked nodes"]
 
     X --> X1["Canvas · WebAudio · equations · manifests"]
     L --> L1["SU(3)c × SU(2)L × U(1)Y<br/>interaction hypergraph · audits"]
@@ -108,11 +111,12 @@ flowchart TD
     N --> N1["non-blocking routing unitary<br/>fidelity + entanglement preserved"]
     P --> P1["energy · time · information · geometry"]
     D --> D1["claims fail closed"]
+    LN --> LN1["anomaly · no-hiding · Gram<br/>variational · reversibility"]
 
     classDef main fill:#eef6ff,stroke:#0969da,color:#111;
     classDef edge fill:#f6f0ff,stroke:#6929c4,color:#111;
     class F main;
-    class X,L,A,S,CE,I,U,K,H,G,FL,C,N,P,D edge;
+    class X,L,A,S,CE,I,U,K,H,G,FL,C,N,P,D,LN edge;
 ```
 
 </details>
@@ -1031,6 +1035,55 @@ docker compose --profile curverank up curverank-track
 
 ---
 
+## 🧾 Lean forge — the machine-checked layer
+
+Rung 7 of the ladder below is "formalize the exact bounded statement". This is
+where that happens, and it is a hard gate rather than a claim: a node counts as
+verified only when the **Lean kernel** accepts it. There is no simulated proof
+mode in `scripts/run_lean_forge.py`, and `dag.json` carries no status field at
+all — status is something `lake build` produces, never something a file asserts
+about itself.
+
+**44 nodes, five tracks**, in [`formal/lean/`](formal/lean/):
+
+| Track | Nodes | What it establishes | Blueprint |
+|---|---|---|---|
+| `anomaly-forge` | A01–A17 | hypercharge is fixed up to scale by anomaly cancellation and Yukawa gauge invariance, for a declared chiral inventory — and node `A08` records that this **fails** once a right-handed neutrino is admitted, where the solution space becomes the two-dimensional span of `Y` and `B−L` | [`blueprint-anomaly-uniqueness.md`](docs/blueprint-anomaly-uniqueness.md) |
+| `infogap-no-hiding` | B01–B07 | second-prover check of [`formal/infogap/no_hiding_finite.v`](formal/infogap/no_hiding_finite.v) | [`blueprint-no-hiding-lean.md`](docs/blueprint-no-hiding-lean.md) |
+| `hadamard-gram` | C01–C08 | second-prover check of [`formal/hadamard/gram_identity.v`](formal/hadamard/gram_identity.v) | [`blueprint-hadamard-gram-lean.md`](docs/blueprint-hadamard-gram-lean.md) |
+| `gaugegap-variational` | D01–D05 | the Courant–Fischer step the emitted bracket certificates had been *assuming* as `variational_upper` | [`blueprint-variational-bound.md`](docs/blueprint-variational-bound.md) |
+| `landauer-reversibility` | E01–E07 | which finite gates destroy information, exactly how much, and what carrying the inputs forward buys | [`blueprint-reversibility-lean.md`](docs/blueprint-reversibility-lean.md) |
+
+Two of those tracks are not transliterations of existing Coq. `gaugegap-variational`
+**removes an assumption**: `results/certified-bracket/bracket_E0.lean` rested on
+three axioms, one of which was a theorem in disguise; the kernel now checks it.
+`landauer-reversibility` **supplies an input**: `gaugegap.quantum.landauer`
+computes an energy from an entropy, and the entropy — `H(X | Y) = (3/4) log₂ 3`
+for a uniform `AND`, exactly, as a rational combination of prime logarithms
+rather than a float — now comes from a machine-checked count.
+
+Every node also has an exact Python mirror in `src/gaugegap/*_theorem.py`
+(composed by `src/gaugegap/lean_mirror.py`), restating it over `Fraction` or by
+exhaustion over the whole finite domain. The mirror is a cross-check on the
+*statements* — it catches a Lean theorem that is true but says the wrong thing —
+and is explicitly **not** a substitute for the kernel.
+
+```bash
+cd formal/lean && lake exe cache get && lake build   # the kernel check
+python scripts/run_lean_forge.py --require-verified  # exits nonzero without it
+```
+
+The report lands in `results/lean-forge/lean_forge_report.json`, and CI commits it
+**on the default branch only**, after Lean has accepted every node. What
+accounting looks like when it is honest: `scripts/build_formal_registry.py`
+separates holes (`sorry`) from *assumed facts* (a propositional `axiom`) from
+*opaque constants* (`axiom E : ℝ`, which assumes nothing), because 16 artifacts
+in this repository are hole-free while still resting on assumptions, and counting
+those as established would be the exact failure mode this repository exists to
+avoid.
+
+---
+
 ## 🧭 Verification ladder
 
 Claims climb only after the rung below holds:
@@ -1042,7 +1095,7 @@ flowchart TD
     CMP --> CONV["4 · convergence / residual / interval checks"]
     CONV --> SIM["5 · optional noiseless and noisy simulation"]
     SIM --> HW["6 · optional hardware only after local checks"]
-    HW --> FORMAL["7 · formalize the exact bounded statement"]
+    HW --> FORMAL["7 · formalize the exact bounded statement<br/>Lean forge · kernel-checked"]
     FORMAL --> PUB["8 · publish reproducible artifacts<br/>with scope stated"]
     classDef gate fill:#eef6ff,stroke:#0969da,color:#111;
     class H,EX,CMP,CONV,SIM,HW,FORMAL,PUB gate;
@@ -1066,6 +1119,7 @@ flowchart LR
 ```text
 config/         canonical Foundry units and modular fragments
 docs/           architecture, methods, boundaries, and runbooks
+formal/         Coq certificates and the Lean 4 + Mathlib node DAG
 hypotheses/     registered finite-system hypotheses
 scripts/        reproducible experiment and interface entry points
 src/gaugegap/   scientific modules, DSLs, rigorous kernels, providers
@@ -1118,6 +1172,12 @@ The project becomes more credible by making the evidence **more explorable witho
 - [`docs/solution-gap-audit.md`](docs/solution-gap-audit.md) — honest gaps to stronger claims
 - [`docs/agent-work-orders.md`](docs/agent-work-orders.md) — execution-ready hardening work
 - [`docs/curverank-formal-proof.md`](docs/curverank-formal-proof.md) — finite spectral separation theorem
+- [`docs/blueprint-anomaly-uniqueness.md`](docs/blueprint-anomaly-uniqueness.md) — hypercharge uniqueness, and where it fails
+- [`docs/blueprint-no-hiding-lean.md`](docs/blueprint-no-hiding-lean.md) — the no-hiding identities, second-prover
+- [`docs/blueprint-hadamard-gram-lean.md`](docs/blueprint-hadamard-gram-lean.md) — the Gram identity the verifier executes
+- [`docs/blueprint-variational-bound.md`](docs/blueprint-variational-bound.md) — the assumption removed from the bracket certificates
+- [`docs/blueprint-reversibility-lean.md`](docs/blueprint-reversibility-lean.md) — what Landauer's bound is applied to, and three bridges that do not hold
+- [`formal/lean/README.md`](formal/lean/README.md) — the Lean project, its pinned toolchain, and its gate
 - [`docs/spectra-language.md`](docs/spectra-language.md) and [`docs/verdict-language.md`](docs/verdict-language.md)
 
 ## License

@@ -10,3 +10,6 @@ import GaugeGapLean.Hadamard.Proofs
 import GaugeGapLean.Variational.Defs
 import GaugeGapLean.Variational.Statements
 import GaugeGapLean.Variational.Proofs
+import GaugeGapLean.Reversibility.Defs
+import GaugeGapLean.Reversibility.Statements
+import GaugeGapLean.Reversibility.Proofs

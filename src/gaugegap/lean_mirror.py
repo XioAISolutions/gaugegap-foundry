@@ -11,6 +11,7 @@ from gaugegap import (
     anomaly_theorem,
     gram_theorem,
     no_hiding_theorem,
+    reversibility_theorem,
     variational_theorem,
 )
 
@@ -18,6 +19,7 @@ MIRROR_MODULES = (
     anomaly_theorem,
     gram_theorem,
     no_hiding_theorem,
+    reversibility_theorem,
     variational_theorem,
 )
 

@@ -57,6 +57,37 @@ make physical-limits
 python scripts/run_physical_limits.py --d 3 --temperature 1 --radius 2
 ```
 
+## What the Landauer bound is applied to
+
+The Landauer member above computes a cost *given* an entropy drop `ΔS`. Where
+that number comes from is a separate question, and a purely combinatorial one:
+which operations actually destroy information, and how much. The
+`landauer-reversibility` track of `formal/lean` (nodes E01–E07, mirrored exactly
+in `src/gaugegap/reversibility_theorem.py`) answers it for the three gates the
+argument is usually told with.
+
+Classical `AND` is irreversible because it is not injective — three of its four
+inputs map to `false`. With uniform inputs that costs exactly
+
+```
+H(X | Y) = (3/4) log₂ 3 ≈ 1.1887218755408671 bits
+```
+
+per evaluation, an irrational number the mirror stores as the exact rational
+combination `{3: 3/4}` rather than as a float. `Toffoli` computes the same `AND`
+reversibly, but only by carrying its inputs forward — node `E06` states that
+explicitly, because reversible computation does not avoid the cost of erasure,
+it defers it to whenever the retained bits are cleared.
+
+*Claim boundary:* those nodes are exact statements about finite Boolean
+functions and integer permutation matrices. They do not prove Landauer's
+principle (it is cited, above), do not compute a heat for any device, and make
+**no** claim that gauge invariance is information preservation, that a mass gap
+is a Landauer gap, or that truncating a lattice Hilbert space erases anything —
+a truncation is an approximation in a model, not a physical erasure. See
+`docs/blueprint-reversibility-lean.md`, which states each of those non-claims
+and why it fails.
+
 ## Claim boundary
 
 Finite-system / semiclassical demonstrations of **established** bounds, each

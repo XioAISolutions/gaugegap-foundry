@@ -1,6 +1,6 @@
 {
   "claim_boundary": "Exact rational cancellation conditions for a declared finite chiral field inventory. Not a statement about arbitrary chiral gauge theories, not a continuum construction, and not a Millennium Prize claim. A node is only 'verified' when lake build succeeds; the checked-in DAG records structure, never verification status.",
-  "content_hash": "92e9b69b431b12f21e68c4d87bebe87b66785616a04e5f52f901b099d10f28d7",
+  "content_hash": "210e6f064d40727818ea0853676abd722a0c04d7b80044d4ff8a99e4d9b0b86a",
   "kernel_check": {
     "detail": "lake not found on PATH; install elan and rerun, or use CI",
     "returncode": null,
@@ -46,11 +46,18 @@
       "D02": true,
       "D03": true,
       "D04": true,
-      "D05": true
+      "D05": true,
+      "E01": true,
+      "E02": true,
+      "E03": true,
+      "E04": true,
+      "E05": true,
+      "E06": true,
+      "E07": true
     },
     "schema": "gaugegap.lean_mirror.v1"
   },
-  "node_count": 37,
+  "node_count": 44,
   "nodes": [
     {
       "depends_on": [],
@@ -417,11 +424,76 @@
       "proof": "d05_certifiedBracket",
       "statement": "Stmt_D05_CertifiedBracket",
       "track": "gaugegap-variational"
+    },
+    {
+      "depends_on": [],
+      "id": "E01",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e01_andNotInjective",
+      "statement": "Stmt_E01_AndNotInjective",
+      "track": "landauer-reversibility"
+    },
+    {
+      "depends_on": [],
+      "id": "E02",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e02_andFibreSizes",
+      "statement": "Stmt_E02_AndFibreSizes",
+      "track": "landauer-reversibility"
+    },
+    {
+      "depends_on": [],
+      "id": "E03",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e03_toffoliInvolutive",
+      "statement": "Stmt_E03_ToffoliInvolutive",
+      "track": "landauer-reversibility"
+    },
+    {
+      "depends_on": [
+        "E03"
+      ],
+      "id": "E04",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e04_toffoliBijective",
+      "statement": "Stmt_E04_ToffoliBijective",
+      "track": "landauer-reversibility"
+    },
+    {
+      "depends_on": [],
+      "id": "E05",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e05_toffoliComputesAnd",
+      "statement": "Stmt_E05_ToffoliComputesAnd",
+      "track": "landauer-reversibility"
+    },
+    {
+      "depends_on": [],
+      "id": "E06",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e06_reversibilityKeepsTheInputs",
+      "statement": "Stmt_E06_ReversibilityKeepsTheInputs",
+      "track": "landauer-reversibility"
+    },
+    {
+      "depends_on": [],
+      "id": "E07",
+      "lean_status": "toolchain_missing",
+      "mirror_holds": true,
+      "proof": "e07_fredkinInvolutive",
+      "statement": "Stmt_E07_FredkinInvolutive",
+      "track": "landauer-reversibility"
     }
   ],
   "schema": "gaugegap.lean_forge.v2",
   "sources": {
-    "formal/lean/GaugeGapLean.lean": "0e879e6b69e655ce370b6c85ff047c810470876b4bbeac450ad43f0d90f8d462",
+    "formal/lean/GaugeGapLean.lean": "6439949c16234e9d5e6d58ae75bd029ffae602e40d34aa0c2a5973aa55d80818",
     "formal/lean/GaugeGapLean/AnomalyForge/Defs.lean": "aae08bc0692266298d3cfe0922922d42a5e8cebb25080aa38d0165fcf6ed5777",
     "formal/lean/GaugeGapLean/AnomalyForge/Proofs.lean": "875a468d0365b28d3bbbcf40863ff2ad544ba2293596a7dcf17f068b855dbe9b",
     "formal/lean/GaugeGapLean/AnomalyForge/Statements.lean": "4d7ac1c87cb0cd9ce5e652529ac4b0e348062cdeb3912f449e760b3e256a0751",
@@ -431,10 +503,13 @@
     "formal/lean/GaugeGapLean/InfoGap/Defs.lean": "31a72b19a58494d96bd87f66e3916d34296f939dde5a241e44e501bce17a05a7",
     "formal/lean/GaugeGapLean/InfoGap/Proofs.lean": "fd181004a6031d3c571c82e6caba67ac5bb580f5ff84cd40d73e46487f2706a3",
     "formal/lean/GaugeGapLean/InfoGap/Statements.lean": "b2f71d2608c2579bdd7ddcc5e5fe613cfd67a93bbdcbf291eab573c930b76c56",
+    "formal/lean/GaugeGapLean/Reversibility/Defs.lean": "9cf418fbf574990b8dfdcdd4f3d35f13ff60a8dc0d57de3862b2bcc17a6b30bb",
+    "formal/lean/GaugeGapLean/Reversibility/Proofs.lean": "9590b8d0a9b60326e4fefc9e2adb2dbbb805d70495846a00bec5aea426121dff",
+    "formal/lean/GaugeGapLean/Reversibility/Statements.lean": "ec07efdaec93ef8690288f64c33fa7db85222451e62afea3e3d28001e92db01f",
     "formal/lean/GaugeGapLean/Variational/Defs.lean": "032289236ec6f5866d2be3bfcb908622597b1dac11a8c2a0657a786a495eefde",
     "formal/lean/GaugeGapLean/Variational/Proofs.lean": "5407b116bae52ef9050ef74cbbb79a7460a3301e10982da7e0abbe312b2b3c65",
     "formal/lean/GaugeGapLean/Variational/Statements.lean": "37b8dd4315f5fea65b430663a8bcb47bb43d7525bea09fea4eca81f2db247a60",
-    "formal/lean/dag.json": "322e4f3f4fd25b57d6771c6ec07336cf756e9bf2bee1d40f544e2ec4a51fd48b",
+    "formal/lean/dag.json": "5642b659883177a278e9206e78fc794917eac3ee0aa6e4e897c2a5882dc647da",
     "formal/lean/lake-manifest.json": "7470c3adc4ea51a1e16ef95e323e71aa900f43d9423d4841e50af17af110bb70",
     "formal/lean/lakefile.toml": "ab6f003ad0d7256c44af11ad106c99d779eaa46bf890144aca533598dd39e24b",
     "formal/lean/lean-toolchain": "7c7da413860f9ec1f8741d6d9d1e803bda6c664f6d954fe15f1a05087dd066f0"
@@ -447,6 +522,7 @@
     "anomaly-forge": "Anomaly Forge hypercharge uniqueness for a declared finite chiral field inventory, and the two-dimensional span of hypercharge and B-L that replaces it once a right-handed neutrino is admitted",
     "gaugegap-variational": "Finite-dimensional variational bound underlying the certified eigenvalue brackets, replacing the Courant-Fischer step those certificates assume",
     "hadamard-gram": "Gram identity for the popcount inner product the Hadamard Forge verifier executes, cross-checking formal/hadamard/gram_identity.v",
-    "infogap-no-hiding": "Finite no-hiding probability identities for the implemented three-qubit circuit, cross-checking formal/infogap/no_hiding_finite.v"
+    "infogap-no-hiding": "Finite no-hiding probability identities for the implemented three-qubit circuit, cross-checking formal/infogap/no_hiding_finite.v",
+    "landauer-reversibility": "Which finite Boolean gates actually destroy information, and what reversibility costs: the logical premise Landauer's bound is applied to, supplying the entropy that gaugegap.quantum.landauer turns into an energy"
   }
 }

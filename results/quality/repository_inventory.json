@@ -1,8 +1,8 @@
 {
   "claim_boundary": "static repository reachability audit only; discovered units remain visible as migration debt and review candidates are not proof that code is unused",
-  "configured_unit_count": 96,
-  "discovered_unit_count": 17,
-  "module_count": 180,
+  "configured_unit_count": 123,
+  "discovered_unit_count": 18,
+  "module_count": 230,
   "modules": [
     {
       "entrypoint": true,
@@ -80,6 +80,24 @@
       "entrypoint": false,
       "imported": true,
       "mentioned_by_test": true,
+      "module": "gaugegap.anomaly_theorem",
+      "path": "src/gaugegap/anomaly_theorem.py",
+      "review_candidate": false,
+      "sha256": "33facf29e477750e233553d97af3715f9e8abb40704920d545e383493aa6263d"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.browser_proofpack",
+      "path": "src/gaugegap/browser_proofpack.py",
+      "review_candidate": false,
+      "sha256": "17edd880e77b3611bee13622cbbb9ee9d5c85a122654f754db30f1361a18377c"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
       "module": "gaugegap.certified_bracket",
       "path": "src/gaugegap/certified_bracket.py",
       "review_candidate": false,
@@ -143,10 +161,37 @@
       "entrypoint": false,
       "imported": true,
       "mentioned_by_test": true,
+      "module": "gaugegap.counterexample_forge",
+      "path": "src/gaugegap/counterexample_forge.py",
+      "review_candidate": false,
+      "sha256": "2d1283a33389fbc2f81341d35730ea3748d7b835f6e159dc9724591002f78618"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.counterexample_reconstruct",
+      "path": "src/gaugegap/counterexample_reconstruct.py",
+      "review_candidate": false,
+      "sha256": "359592fb623bb99518de681c926fbe1b1368600f754bcb3c207e417572343185"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
       "module": "gaugegap.curverank_certified",
       "path": "src/gaugegap/curverank_certified.py",
       "review_candidate": false,
       "sha256": "9e513cf9c2a173f6a5a085ebdb34fbb2141f8f858ad6701c6cde528e9a09104e"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.curverank_coverage",
+      "path": "src/gaugegap/curverank_coverage.py",
+      "review_candidate": false,
+      "sha256": "9119f7b1a6aaee762ac02849dac272371b2e9474d8da59f5255e2673e7d48497"
     },
     {
       "entrypoint": false,
@@ -353,7 +398,16 @@
       "module": "gaugegap.formal_registry",
       "path": "src/gaugegap/formal_registry.py",
       "review_candidate": false,
-      "sha256": "565178a358632d67b57b5d0c971085429ee8df8a04656214bd5ad2a634563d48"
+      "sha256": "7a19acec3fbdb28fa156a4e2dc069ca2a228dd7e31a85001af77315b0f02f95c"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.fractal_reality",
+      "path": "src/gaugegap/fractal_reality.py",
+      "review_candidate": false,
+      "sha256": "1192df0a9e67d17fcfa997d536efe9bf4e943bfa9311f67960922b52f53f5c07"
     },
     {
       "entrypoint": false,
@@ -413,6 +467,33 @@
       "entrypoint": false,
       "imported": true,
       "mentioned_by_test": true,
+      "module": "gaugegap.gram_theorem",
+      "path": "src/gaugegap/gram_theorem.py",
+      "review_candidate": false,
+      "sha256": "56ba3ccf7a33084b2bd94fc06fa008d353947ccfb069847d690458f57091369d"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.hadamard_forge",
+      "path": "src/gaugegap/hadamard_forge.py",
+      "review_candidate": false,
+      "sha256": "fd3806053ee457ecc3f9a54c7cc57370eb307d72e907a326128446e1f7c65192"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.hadamard_williamson",
+      "path": "src/gaugegap/hadamard_williamson.py",
+      "review_candidate": false,
+      "sha256": "b41c0a19dff26a64c7f37208aede572c1bd263bf7d44706ccbf961e262d8ac55"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
       "module": "gaugegap.hamiltonian_factory",
       "path": "src/gaugegap/hamiltonian_factory.py",
       "review_candidate": false,
@@ -458,6 +539,276 @@
       "entrypoint": false,
       "imported": true,
       "mentioned_by_test": true,
+      "module": "gaugegap.jacobian_aftershock",
+      "path": "src/gaugegap/jacobian_aftershock.py",
+      "review_candidate": false,
+      "sha256": "b2ecd70aa790c598e475adbbed883268767495211720a2d05f79beb9ce14b718"
+    },
+    {
+      "entrypoint": true,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab",
+      "path": "src/gaugegap/jump_lab/__init__.py",
+      "review_candidate": false,
+      "sha256": "9b384847a614d8b221a5fe38e62ace3896db53f92b34e75095a87d9f14fe63bd"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.__main__",
+      "path": "src/gaugegap/jump_lab/__main__.py",
+      "review_candidate": false,
+      "sha256": "31e3c685b356e87cc6bc7b9a60a047bbda221b4ced76d33485b3b57e9a174ae4"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.artifact",
+      "path": "src/gaugegap/jump_lab/artifact.py",
+      "review_candidate": false,
+      "sha256": "45e3278123a273ee26562b1664506bf521b8c409a802d28dfbdaa496ab082715"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.axiom",
+      "path": "src/gaugegap/jump_lab/axiom.py",
+      "review_candidate": false,
+      "sha256": "00fa20773cddd9065790217919e4c52ab2cc41c8185701c620560df6d88fe0f9"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.benchmark",
+      "path": "src/gaugegap/jump_lab/benchmark.py",
+      "review_candidate": false,
+      "sha256": "c083a6e9d4eb772386f8b71c696f89375a6271bf946607dc9051d5754970bca0"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.blind",
+      "path": "src/gaugegap/jump_lab/blind.py",
+      "review_candidate": false,
+      "sha256": "c94670eddc35145db3b6d230fe3a14e28ba32d9771d4bac4922afde5db17b88c"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.calibration",
+      "path": "src/gaugegap/jump_lab/calibration.py",
+      "review_candidate": false,
+      "sha256": "c70ea71586852d8b5972c2c345c3ea435e42a46062dfbd92405b69f84388b5be"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": false,
+      "module": "gaugegap.jump_lab.cart_axiom",
+      "path": "src/gaugegap/jump_lab/cart_axiom.py",
+      "review_candidate": false,
+      "sha256": "42f9459a00f28a26ac8eebc89981f72dd628ae683928856f6f53f5d447624f2b"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": false,
+      "module": "gaugegap.jump_lab.cart_demo",
+      "path": "src/gaugegap/jump_lab/cart_demo.py",
+      "review_candidate": false,
+      "sha256": "344f72de81f954ad85a7687d7862d43b35fa8271db843177a943c065a7524a44"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.cart_executive",
+      "path": "src/gaugegap/jump_lab/cart_executive.py",
+      "review_candidate": false,
+      "sha256": "27d10d3a9551e3a2a8f44b9f3a05f3888889f14c175b800f02c33131bed9036d"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": false,
+      "module": "gaugegap.jump_lab.cart_hypotheses",
+      "path": "src/gaugegap/jump_lab/cart_hypotheses.py",
+      "review_candidate": false,
+      "sha256": "a3bb954e01ccedd5d989f57e111d36318e1a301113705af958a7bfff6e38cf5b"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.challenge",
+      "path": "src/gaugegap/jump_lab/challenge.py",
+      "review_candidate": false,
+      "sha256": "0e888a6818b22dbbe9e0a5163bb1e59d422c6725834499028f44e8fb4ba96891"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.contracts",
+      "path": "src/gaugegap/jump_lab/contracts.py",
+      "review_candidate": false,
+      "sha256": "85352c90abf281b713c95f17b7d88239efeaa44ca01082016b16e8bbf493cd1e"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.demo",
+      "path": "src/gaugegap/jump_lab/demo.py",
+      "review_candidate": false,
+      "sha256": "4d6e8f2d901d816f5ac47a4c660fa8fd5a81842f5258b48909ed5ea31f58099c"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.elevator",
+      "path": "src/gaugegap/jump_lab/elevator.py",
+      "review_candidate": false,
+      "sha256": "df40bac8099556b9e796b4435b1ea291f6e9d2147fd50d5ec823ad2dc3c95f1c"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.executive",
+      "path": "src/gaugegap/jump_lab/executive.py",
+      "review_candidate": false,
+      "sha256": "d66d5192bd1cfabe8ceb7c894d04e8159144836e7daec4ec7a2c3233b57560fd"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": false,
+      "module": "gaugegap.jump_lab.force_cart",
+      "path": "src/gaugegap/jump_lab/force_cart.py",
+      "review_candidate": false,
+      "sha256": "24ce6ae276e83a311041beb37301971fddff58ab91427f8ec4375fd0fba3a547"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.holdout",
+      "path": "src/gaugegap/jump_lab/holdout.py",
+      "review_candidate": false,
+      "sha256": "9b97af1ccd7a86dc5f3c2c9d38970d16b9bf7be7f764045c46ec9b0bb9395a6d"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.hypotheses",
+      "path": "src/gaugegap/jump_lab/hypotheses.py",
+      "review_candidate": false,
+      "sha256": "5e915cb8f8b2523dade7b4f3e46aea472b56a7b53c3be63bc7a9c4bba2856d4d"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.pendulum",
+      "path": "src/gaugegap/jump_lab/pendulum.py",
+      "review_candidate": false,
+      "sha256": "9583174a1a37b5674a09e53fd10889ba37493f6f40b47c1334be51bf9a2a21f7"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": false,
+      "module": "gaugegap.jump_lab.pendulum_axiom",
+      "path": "src/gaugegap/jump_lab/pendulum_axiom.py",
+      "review_candidate": false,
+      "sha256": "9e9b3acc64d3b6f7ee4772aa1d65a706b2075a6a57bac0256d73e15e40e148c8"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": false,
+      "module": "gaugegap.jump_lab.pendulum_demo",
+      "path": "src/gaugegap/jump_lab/pendulum_demo.py",
+      "review_candidate": false,
+      "sha256": "44354609fdc337d56555078e39b799336e69980b1e5ba98bdfa6933daf358f57"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": false,
+      "module": "gaugegap.jump_lab.pendulum_executive",
+      "path": "src/gaugegap/jump_lab/pendulum_executive.py",
+      "review_candidate": false,
+      "sha256": "332b4eedf85514d23e7c7d956d63f75a07e673aa58468fadd29a94b370773d7e"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": false,
+      "module": "gaugegap.jump_lab.pendulum_models",
+      "path": "src/gaugegap/jump_lab/pendulum_models.py",
+      "review_candidate": false,
+      "sha256": "38817d483290dc48d8b5d3ee621dcdbb9b796a5cf82efc59e9827542ce1e9a80"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.pendulum_report",
+      "path": "src/gaugegap/jump_lab/pendulum_report.py",
+      "review_candidate": false,
+      "sha256": "5b84e1c60b60ce75c1a0cf0b3b84ed3b594c7f4762ebfc7dca5c30bba968b9a0"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.report",
+      "path": "src/gaugegap/jump_lab/report.py",
+      "review_candidate": false,
+      "sha256": "dbda352dd7b80cf7087ced473b38fea2fec562e8694a727c9d0417f4320d3012"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.salience",
+      "path": "src/gaugegap/jump_lab/salience.py",
+      "review_candidate": false,
+      "sha256": "efb1d3e14d2a86480ba4cd661a0c1f815ce1a3a98af3f56c50e9d518389bef85"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.suite",
+      "path": "src/gaugegap/jump_lab/suite.py",
+      "review_candidate": false,
+      "sha256": "8356cab2dd34c52713d2da5af29d46db353577e56a2f949a2f63e3bef82d2d8a"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.jump_lab.synthesis",
+      "path": "src/gaugegap/jump_lab/synthesis.py",
+      "review_candidate": false,
+      "sha256": "c5ea66912a28bba8b8e0eb38adbb91ac1f0cba98709635635ad1608f032298e7"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
       "module": "gaugegap.koopman",
       "path": "src/gaugegap/koopman.py",
       "review_candidate": false,
@@ -485,10 +836,64 @@
       "entrypoint": false,
       "imported": true,
       "mentioned_by_test": true,
+      "module": "gaugegap.lean_mirror",
+      "path": "src/gaugegap/lean_mirror.py",
+      "review_candidate": false,
+      "sha256": "e23c17f39bb92b0eed9403ab31ce67329dc874d5529d573f8c53d9019e8b17fd"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
       "module": "gaugegap.ledger",
       "path": "src/gaugegap/ledger.py",
       "review_candidate": false,
       "sha256": "d8875f9d02aafbaab66c5933ca7ab413728b1a6de03258b6425541653128f774"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.lottery_forge",
+      "path": "src/gaugegap/lottery_forge.py",
+      "review_candidate": false,
+      "sha256": "17d1f988f661c4996a9ae638569f28c1be0292a6cbcf982ca77ea266f7ba12e7"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.lottery_multigame_sources",
+      "path": "src/gaugegap/lottery_multigame_sources.py",
+      "review_candidate": false,
+      "sha256": "e00b5801cc61abb3ecb0e641610980e3301a190df611c0885868c0fef0a8c693"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.lottery_prospective",
+      "path": "src/gaugegap/lottery_prospective.py",
+      "review_candidate": false,
+      "sha256": "f1465ee58dd5e24c1c871f2f4b57d02976b091d8dae03aabd3ebc4002847f3b5"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.lottery_selection",
+      "path": "src/gaugegap/lottery_selection.py",
+      "review_candidate": false,
+      "sha256": "f606e14a2baac73670e38688c41201170af24d52998c1fe9aeb00678a8ea2f00"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.lottery_sources",
+      "path": "src/gaugegap/lottery_sources.py",
+      "review_candidate": false,
+      "sha256": "9334f28128412c98daed34f4909b4a5d630cadfccb9fbfbb85ecf8ddd4097b08"
     },
     {
       "entrypoint": true,
@@ -539,10 +944,37 @@
       "entrypoint": false,
       "imported": true,
       "mentioned_by_test": true,
+      "module": "gaugegap.no_hiding_theorem",
+      "path": "src/gaugegap/no_hiding_theorem.py",
+      "review_candidate": false,
+      "sha256": "7806d813c383e73d5bc81660282c579968cfe496f5ec9edc5101e771e6a06173"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
       "module": "gaugegap.perception_forge",
       "path": "src/gaugegap/perception_forge.py",
       "review_candidate": false,
       "sha256": "24b0e880a3755f8e32ffac86a69171245d4525cc902d22f551f08db4b554d421"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.plane_frontier",
+      "path": "src/gaugegap/plane_frontier.py",
+      "review_candidate": false,
+      "sha256": "6600c09faa808098ca3e444c9f4be510ad543d75e691ce35e1bc659e57a41e54"
+    },
+    {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.plane_frontier_degree2",
+      "path": "src/gaugegap/plane_frontier_degree2.py",
+      "review_candidate": false,
+      "sha256": "4161380994148b5466f59881c8f7bbef1e23fd30650a3ffe0f45471b044d727e"
     },
     {
       "entrypoint": false,
@@ -1184,6 +1616,15 @@
       "sha256": "1719b44e76d3b1a64300d960f92dde534e99d4e051f0923a374216944ffee722"
     },
     {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.reversibility_theorem",
+      "path": "src/gaugegap/reversibility_theorem.py",
+      "review_candidate": false,
+      "sha256": "d8204294677f5eaeb4addc41f2f148bd1651642d69e6467256f74f9a685f2ae5"
+    },
+    {
       "entrypoint": true,
       "imported": true,
       "mentioned_by_test": true,
@@ -1472,6 +1913,15 @@
       "sha256": "6fafb0a9ad0c144e04685df3564fe912efe4dbc9bed64da533b86eabfe4060a4"
     },
     {
+      "entrypoint": false,
+      "imported": true,
+      "mentioned_by_test": true,
+      "module": "gaugegap.variational_theorem",
+      "path": "src/gaugegap/variational_theorem.py",
+      "review_candidate": false,
+      "sha256": "133dafc20fc665b92a78ff72f25ed7c88362c97b325a5e162e45df16ac5307cc"
+    },
+    {
       "entrypoint": true,
       "imported": true,
       "mentioned_by_test": true,
@@ -1628,6 +2078,6 @@
   "passed": true,
   "review_candidates": [],
   "schema": "gaugegap.repository_inventory.v1",
-  "test_count": 122,
+  "test_count": 153,
   "unregistered_run_scripts": []
 }
