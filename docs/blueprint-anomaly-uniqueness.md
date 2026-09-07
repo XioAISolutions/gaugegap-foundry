@@ -171,6 +171,11 @@ Only the third layer is a machine check of the mathematics. Until it runs, the
 report records `toolchain_missing` and every node stays unverified; there is no
 code path that reports a verified node without a successful `lake build`.
 
+CI commits the regenerated report and figure on the default branch once that
+build passes, so `main` carries the kernel's own output. A test fails if the
+committed report's source hashes stop matching the files, so the checked-in
+evidence can be honest or absent but never stale.
+
 ## Reproduce
 
 ```bash

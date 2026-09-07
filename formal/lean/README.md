@@ -33,6 +33,16 @@ changing `lakefile.toml` or `lean-toolchain`.
 `lake build` and written to `results/lean-forge/lean_forge_report.json`; it is
 never checked in as a property of a node.
 
+That report is regenerated on every run and committed by CI **on the default
+branch only**, after `lake build` has accepted every node — so `main` carries
+evidence the kernel produced rather than whatever a toolchain-less environment
+could generate. It is deliberately not committed onto pull request heads: a
+push made with `GITHUB_TOKEN` does not trigger workflows, so doing that would
+leave the head with no checks at all. On a branch the report says whatever the
+author's environment could establish, usually `toolchain_missing`, and
+`tests/test_lean_forge.py` fails if its recorded source hashes no longer match
+the files — so it can be honest or absent, but never stale.
+
 ## Build
 
 ```bash

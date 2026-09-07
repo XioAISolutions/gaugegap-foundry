@@ -109,6 +109,26 @@ class LeanForgeGateTests(unittest.TestCase):
         self.assertIn("formal/lean/lake-manifest.json", tracked)
         self.assertEqual(len(report["content_hash"]), 64)
 
+    def test_committed_report_describes_the_current_sources(self) -> None:
+        """The committed report must not go stale.
+
+        CI only commits a regenerated report on the default branch, so a Lean
+        source edit that is not accompanied by `foundry run lean-forge` would
+        otherwise leave a report describing files that no longer exist in that
+        form. Comparing hashes catches that without requiring a toolchain.
+        """
+        committed = json.loads(
+            (ROOT / "results" / "lean-forge" / "lean_forge_report.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        fresh = build_report(lake=None, timeout=5, skip_lake=True)
+        self.assertEqual(
+            committed["sources"],
+            fresh["sources"],
+            "results/lean-forge is stale; rerun `foundry run lean-forge`",
+        )
+
     def test_every_node_has_a_python_mirror(self) -> None:
         report = build_report(lake=None, timeout=5, skip_lake=True)
         self.assertEqual(len(report["nodes"]), report["node_count"])

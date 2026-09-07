@@ -107,15 +107,22 @@ jobs:
           path: results/lean-forge/
           retention-days: 7
       # The report and figure record what the Lean kernel accepted, so the
-      # copies in the repository should be the ones a real `lake build`
+      # copies on the default branch should be the ones a real `lake build`
       # produced rather than whatever a toolchain-less environment could
       # generate. This step only ever runs after --require-verified passed.
-      # Both files are deterministic, so a rerun finds nothing to commit and
-      # the loop terminates after one push.
+      #
+      # Default branch only, deliberately. A push made with GITHUB_TOKEN does
+      # not trigger workflows, so committing onto a pull request head would
+      # leave that head with no checks at all and the pull request "unstable".
+      # On the default branch nothing is gated on the new head, and the same
+      # token behaviour is what stops the commit from looping.
+      #
+      # Pull requests keep whatever report the author committed; the freshness
+      # check in tests/test_lean_forge.py is what stops that copy going stale.
       - name: Commit the verified report and figure
         if: >-
-          github.event_name == 'pull_request' &&
-          github.event.pull_request.head.repo.full_name == github.repository
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main'
         run: |
           if git diff --quiet -- results/lean-forge figures/anomaly-forge/lean-dag.svg; then
             echo "verified report and figure already committed; nothing to do"
@@ -127,7 +134,7 @@ jobs:
           git commit \
             -m "Record the verified Lean forge report and DAG figure" \
             -m "Written by the compile-lean job after lake build accepted every node, so the checked-in evidence is what the kernel produced rather than what a toolchain-less environment could generate."
-          git push origin "HEAD:${{ github.head_ref }}"
+          git push origin HEAD:main
 
   hard-gates:
     runs-on: ubuntu-latest
