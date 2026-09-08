@@ -21,3 +21,6 @@ results/proofpack/
 *.glob
 .nra.cache
 .lia.cache
+
+# Coverage data
+.coverage

@@ -1,0 +1,23 @@
+version: 1
+
+units:
+  certifiedgap-0001-unified:
+    track: certifiedgap
+    hypothesis: certifiedgap-0001
+    status: production
+    description: The unified certified gap report - one certified QG = lower(O) - floor row per track (the program end to end).
+    command:
+      ["{python}", "scripts/run_certified_gap.py", "--emit-certificate",
+       "--output-dir", "results/certifiedgap-0001"]
+
+  certifiedgap-smoke:
+    track: certifiedgap
+    hypothesis: certifiedgap-0001
+    status: production
+    description: Reduced deterministic certified gap report for CI and local runs.
+    command:
+      ["{python}", "scripts/run_certified_gap.py", "--output-dir", "/tmp/certifiedgap-smoke"]
+
+groups:
+  certifiedgap:
+    - certifiedgap-0001-unified

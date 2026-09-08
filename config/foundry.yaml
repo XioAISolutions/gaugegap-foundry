@@ -10,8 +10,8 @@ units:
   tests:
     track: integrity
     status: production
-    description: Full Python test suite.
-    command: ["{python}", "-m", "pytest"]
+    description: Full Python test suite with a coverage floor.
+    command: ["{python}", "-m", "pytest", "--cov=gaugegap", "--cov-report=term", "--cov-fail-under=60"]
 
   claim-boundary:
     track: integrity

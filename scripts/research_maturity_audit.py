@@ -25,6 +25,9 @@ DEFAULT_EXCLUDE_PARTS = (
     ".pytest_cache",
     "node_modules",
     "results",
+    # Unmaintained historical snapshots (see docs/archive/README.md); their
+    # superseded claims are not active statements of this repository.
+    "archive",
 )
 
 # The audit scripts define the very patterns they scan for; scanning them
