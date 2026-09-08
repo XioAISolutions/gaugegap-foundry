@@ -63,6 +63,9 @@ quantinuum = [
 braket = [
   "amazon-braket-sdk>=1.80",
 ]
+originq = [
+  "pyqpanda>=3.8",
+]
 ionq = [
   "qiskit-ionq>=0.5",
 ]
@@ -93,11 +96,12 @@ smt = [
 ]
 dev = [
   "pytest>=8",
+  "pytest-cov>=5",
   "scipy>=1.11",
   "z3-solver>=4.12",
 ]
 all = [
-  "gaugegap-foundry[quantum,quantinuum,braket,ionq,flow,spectral,crosscheck,dev]",
+  "gaugegap-foundry[quantum,quantinuum,braket,originq,ionq,flow,spectral,crosscheck,dev]",
 ]
 
 [tool.setuptools.packages.find]

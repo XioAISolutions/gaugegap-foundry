@@ -23,7 +23,18 @@ PRODUCTION_ORPHANS = [
     ("advanced_qpe", "standard_qpe"),
     ("quantum_metrology", "heisenberg_limit_protocol"),
     ("advanced_hamiltonian_simulation", "first_order_trotter"),
+    # Triage 2026-06: substantive but unwired modules kept under guard.
+    ("circuit_optimization", "optimize_circuit"),
+    ("gauge_invariant_qec", "z2_toric_code"),
+    ("measurement_mitigation", "build_full_calibration_matrix"),
+    ("quantum_natural_gradient", "compute_parameter_shift_gradient"),
 ]
+
+
+def test_su2_matter_track_module_stays_healthy():
+    module = importlib.import_module("gaugegap.gaugegap_su2_matter")
+    assert hasattr(module, "SU2GaugeMatterLattice")
+    assert hasattr(module, "run_su2_gauge_matter_sweep")
 
 
 @pytest.mark.parametrize("suffix,attribute", PRODUCTION_ORPHANS)
