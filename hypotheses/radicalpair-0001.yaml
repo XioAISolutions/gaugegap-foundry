@@ -1,0 +1,88 @@
+id: radicalpair-0001
+track: Radical Pair Forge
+model: finite_radical_pair_singlet_yield_compass
+scope: >
+  two-electron plus declared-nuclear-inventory spin Hamiltonian, singlet
+  recombination yield swept over field direction at geomagnetic field strength
+claim: >
+  A finite radical-pair spin Hamiltonian reproduces the three structural
+  features that the radical-pair magnetoreception hypothesis requires: the
+  singlet yield depends on field direction only when a hyperfine tensor is
+  anisotropic, the yield is exactly invariant under field reversal so the
+  mechanism carries inclination but not polarity information, and the direction
+  dependence vanishes when recombination outruns electron precession.
+formula: >
+  H = gamma_e B.(S1 + S2) + sum_n S_(radical n) . A_n . I_n, with
+  Phi_S = (1/Z) sum_mn |<m|P_S|n>|^2 k^2 / (k^2 + omega_mn^2),
+  Z = Tr P_S and omega_mn = E_m - E_n for symmetric recombination k_S = k_T = k.
+prediction:
+  observable: singlet_yield_anisotropy
+  expected_shape: >
+    anisotropy_positive_for_anisotropic_hyperfine_and_identically_zero_for_isotropic_hyperfine_and_under_field_reversal
+controls:
+  field_microtesla: 50.0
+  recombination_rate_per_second: 1.0e6
+  direction_count: 200
+  isotropic_hyperfine_control:
+    - trace_preserving_isotropic_tensors_remove_all_direction_dependence
+  no_hyperfine_control:
+    - bare_zeeman_hamiltonian_commutes_with_the_singlet_projector
+    - singlet_yield_is_exactly_one_in_every_direction
+  fast_recombination_control:
+    - recombination_at_1e10_per_second_collapses_the_anisotropy
+  partner_radical_control:
+    - spin_free_partner_inventory_gives_a_stronger_compass_than_a_loaded_partner
+  cross_check:
+    - closed_form_matches_exact_liouvillian_solve_for_symmetric_rates
+    - asymmetric_rates_have_no_closed_form_and_must_differ
+  energy_audit:
+    - zeeman_quantum_over_kT_at_300K_recorded_for_50uT_and_5mT
+  analogy_boundary:
+    - entanglement_is_present_but_is_not_the_compass
+    - anisotropy_of_a_coupling_tensor_is_the_compass
+validation:
+  required:
+    - singlet_yield_anisotropy_positive_at_geomagnetic_field
+    - isotropic_hyperfine_control_anisotropy_below_tolerance
+    - polarity_residual_below_tolerance
+    - no_hyperfine_control_yield_is_unity_and_field_independent
+    - fast_recombination_control_anisotropy_below_tolerance
+    - spin_free_partner_anisotropy_exceeds_loaded_partner_anisotropy
+    - closed_form_and_liouvillian_yields_agree
+    - prompt_recombination_limit_equals_one
+    - zeeman_thermal_ratio_recorded
+kill_criteria:
+  - output describes the result as a magnetometer, sensor, or device design
+  - output quotes a sensitivity figure in tesla per root hertz
+  - output claims a measurement of cryptochrome, flavin, or any protein
+  - output claims quantum coherence was observed in living tissue
+  - output claims entanglement carries information or acts at a distance
+  - output attributes the compass to entanglement rather than hyperfine anisotropy
+  - output claims polarity discrimination from this mechanism
+  - artifact hides the symmetric-recombination or truncated-nuclear-inventory assumptions
+  - artifact hides that no spin relaxation and no protein orientational ordering are modelled
+  - anisotropy fails to vanish in the isotropic-hyperfine control
+status: active
+claim_boundary: >
+  Finite radical-pair spin-Hamiltonian calculation under symmetric Haberkorn
+  recombination only. It reproduces the anisotropy, the polarity degeneracy and
+  the lifetime window of the radical-pair compass model. It is not a
+  cryptochrome measurement, not evidence that any animal uses this mechanism,
+  not a demonstration of coherence in living tissue, and not a magnetometer or
+  sensor design.
+notes:
+  - >
+    The polarity degeneracy is exact rather than approximate. Spin time reversal
+    Theta is antiunitary with Theta S Theta^-1 = -S, the hyperfine term is
+    bilinear in spin and therefore even under Theta, and the singlet projector is
+    rotationally invariant, so Theta H(B) Theta^-1 = H(-B) preserves both the
+    spectrum and the transition weights. A term odd under Theta, such as a
+    chirality-induced spin selectivity term, would break it.
+  - >
+    Hyperfine values are literature-style order-of-magnitude model inputs and the
+    relative Euler orientations are illustrative. The structural results do not
+    depend on them; the recorded numerical yields do.
+  - >
+    Anisotropy persists as the recombination rate goes to zero because no spin
+    relaxation is modelled. A real pair is bounded at long lifetimes by T2 of
+    order microseconds, which this model omits.
