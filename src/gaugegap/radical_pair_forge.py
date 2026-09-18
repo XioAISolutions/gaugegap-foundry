@@ -213,6 +213,21 @@ LARMOR_COMPARABLE_RATE_PER_S = 1.0e6
 # the yield is FIELD-independent, which cannot be shown from a single magnitude
 # however many directions it sweeps, so the control is evaluated at two decades.
 NO_HYPERFINE_CONTROL_FIELDS_T = (GEOMAGNETIC_FIELD_T, 5.0e-3)
+# Relative tolerance for deciding whether a caller is already at a registered
+# parameter. Exact float equality is wrong here: the CLI computes 50.0 * 1e-6 =
+# 4.9999999999999996e-05, which is not == 50e-6, so an exact test silently sends
+# the default path down the recompute branch and puts two values for the same
+# quantity in one bundle.
+REGISTERED_PARAMETER_RTOL = 1e-9
+
+
+def _at_registered_conditions(field_tesla: float, rate_per_second: float) -> bool:
+    """True when both field and rate already match the registered conditions."""
+    return math.isclose(
+        field_tesla, GEOMAGNETIC_FIELD_T, rel_tol=REGISTERED_PARAMETER_RTOL
+    ) and math.isclose(
+        rate_per_second, DEFAULT_RATE_PER_S, rel_tol=REGISTERED_PARAMETER_RTOL
+    )
 
 
 PARTNER_PROBE_DIRECTIONS = 120
@@ -869,13 +884,16 @@ def run_radical_pair_forge(
     # 60 uT reports the geomagnetic condition true -- and `passed` certifies it --
     # without any 50 uT sweep having been computed. Reuse the primary sweep when
     # the caller is already at the registered field.
-    if field_tesla == GEOMAGNETIC_FIELD_T:
+    # The condition is registered at BOTH a field and a rate, so both must be
+    # honoured: a custom-rate run would otherwise decide it from the wrong rate.
+    geomagnetic_reused = _at_registered_conditions(field_tesla, rate_per_second)
+    if geomagnetic_reused:
         geomagnetic = sweep
     else:
         geomagnetic = sweep_field_directions(
             couplings=couplings,
             field_tesla=GEOMAGNETIC_FIELD_T,
-            rate_per_second=rate_per_second,
+            rate_per_second=DEFAULT_RATE_PER_S,
             direction_count=control_direction_count,
             keep_samples=False,
             inventory=inventory,
@@ -944,7 +962,8 @@ def run_radical_pair_forge(
         "symmetry_tolerance": SYMMETRY_TOLERANCE,
         "geomagnetic_field_microtesla": float(GEOMAGNETIC_FIELD_T * 1e6),
         "geomagnetic_anisotropy": geomagnetic.anisotropy,
-        "geomagnetic_sweep_reused_primary": field_tesla == GEOMAGNETIC_FIELD_T,
+        "geomagnetic_rate_per_second": float(DEFAULT_RATE_PER_S),
+        "geomagnetic_sweep_reused_primary": geomagnetic_reused,
         "primary_direction_count": int(direction_count),
         "control_direction_count": int(control_direction_count),
         "isotropic_hyperfine_anisotropy": isotropic.anisotropy,

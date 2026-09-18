@@ -634,3 +634,44 @@ def test_no_hyperfine_control_really_tests_field_independence():
     assert all(abs(value - 1.0) < SYMMETRY_TOLERANCE for value in yields)
     assert controls["no_hyperfine_field_spread"] < SYMMETRY_TOLERANCE
     assert controls["checks"]["no_hyperfine_control_yield_is_unity_and_field_independent"]
+
+
+def test_registered_conditions_are_matched_tolerantly_not_by_float_equality():
+    # The CLI computes 50.0 * 1e-6 = 4.9999999999999996e-05, which is NOT == 50e-6.
+    # An exact comparison sent the default path down the recompute branch and put
+    # two values for 50 uT in one bundle, regressing the rate-sweep consistency fix.
+    from gaugegap.radical_pair_forge import _at_registered_conditions
+
+    cli_value = 50.0 * 1e-6
+    assert cli_value != GEOMAGNETIC_FIELD_T  # the trap itself
+    assert _at_registered_conditions(cli_value, 1e6)
+    assert not _at_registered_conditions(60e-6, 1e6)
+    assert not _at_registered_conditions(GEOMAGNETIC_FIELD_T, 1e4)
+
+
+def test_no_bundle_holds_two_values_for_the_registered_conditions():
+    # The invariant that matters, stated once: whenever a run IS at the registered
+    # conditions -- however its field was arithmetically produced -- the
+    # geomagnetic condition must be the headline number, not a second opinion.
+    for field in (GEOMAGNETIC_FIELD_T, 50.0 * 1e-6, 50 * 1e-6):
+        report = run_radical_pair_forge(
+            field_tesla=field, direction_count=24, control_direction_count=10,
+            rate_points=(1e6,),
+        )
+        controls = report.controls
+        assert controls["geomagnetic_sweep_reused_primary"] is True, field
+        assert controls["geomagnetic_anisotropy"] == report.anisotropy, field
+
+
+def test_geomagnetic_condition_uses_the_registered_rate_not_the_caller_rate():
+    from gaugegap.radical_pair_forge import DEFAULT_RATE_PER_S
+
+    report = run_radical_pair_forge(
+        rate_per_second=1e4, direction_count=16, control_direction_count=10,
+        rate_points=(1e4,),
+    )
+    controls = report.controls
+    assert controls["geomagnetic_rate_per_second"] == DEFAULT_RATE_PER_S
+    assert controls["geomagnetic_sweep_reused_primary"] is False
+    # Decided from its own sweep, not the caller's 1e4 one.
+    assert controls["geomagnetic_anisotropy"] != report.anisotropy
