@@ -1018,6 +1018,82 @@ def test_a_rate_that_vanishes_inside_the_decay_operator_is_refused():
         singlet_yield_liouvillian(hamiltonian, projector, 4.5e-308, 4.5e-308)
 
 
+def test_the_hyperfine_bound_scales_with_the_nuclear_spin():
+    # Bounding only the MHz-to-radians conversion was wrong: the term that lands
+    # in the matrix is A_ij * (S_i @ I_j), and the nuclear operator entries grow
+    # with the spin. For multiplicity 18 the largest |I_z| entry is 8.5, so a
+    # principal value at the spin-1/2 bound overflowed build_hamiltonian -- the
+    # constructor called it safe and the finite-output backstop caught it.
+    from gaugegap.radical_pair_forge import (
+        MAX_HYPERFINE_MHZ,
+        HyperfineCoupling,
+        max_hyperfine_mhz,
+        spin_operators,
+    )
+
+    assert float(np.abs(spin_operators(18)[2]).max()) == pytest.approx(8.5)
+    assert max_hyperfine_mhz(18) < MAX_HYPERFINE_MHZ
+    assert max_hyperfine_mhz(2) == MAX_HYPERFINE_MHZ
+
+    # The value Codex's example used: legal for a spin-1/2 nucleus, refused for
+    # this one.
+    with pytest.raises(ValueError, match="magnitude at most"):
+        HyperfineCoupling(
+            name="high-spin-at-the-wrong-bound",
+            radical_index=0,
+            multiplicity=18,
+            principal_values_mhz=(0.0, 0.0, MAX_HYPERFINE_MHZ),
+        )
+
+    # At its own bound the Hamiltonian is finite -- the model is tight, not just
+    # conservative, so the bound is not hiding a wider problem.
+    for multiplicity in (2, 3, 6, 18):
+        coupling = HyperfineCoupling(
+            name=f"m{multiplicity}",
+            radical_index=0,
+            multiplicity=multiplicity,
+            principal_values_mhz=(0.0, 0.0, max_hyperfine_mhz(multiplicity)),
+        )
+        hamiltonian = build_hamiltonian(
+            field_tesla=GEOMAGNETIC_FIELD_T,
+            direction=(0.0, 0.0, 1.0),
+            couplings=(coupling,),
+        )
+        assert np.isfinite(hamiltonian).all()
+
+
+def test_the_operator_budget_counts_peak_simultaneous_allocations():
+    # Counting ONE matrix against the budget was the same error as counting four
+    # floats per direction: at the dimension a single-matrix budget allowed, the
+    # six embedded electron operators alone were 384 MiB.
+    from gaugegap.radical_pair_forge import (
+        MAX_HILBERT_DIMENSION,
+        MAX_SPIN_MULTIPLICITY,
+        OPERATOR_BUDGET_BYTES,
+    )
+
+    bytes_per_complex = 16
+    operators_at_peak = 13  # 6 electron + 3 nuclear + Hamiltonian + 3 temporaries
+    assert (
+        operators_at_peak * bytes_per_complex * MAX_HILBERT_DIMENSION**2
+        <= OPERATOR_BUDGET_BYTES
+    )
+    # One more dimension would not fit, so the cap is the budget's own answer
+    # rather than a round number underneath it.
+    assert (
+        operators_at_peak * bytes_per_complex * (MAX_HILBERT_DIMENSION + 1) ** 2
+        > OPERATOR_BUDGET_BYTES
+    )
+    # spin_operators returns (3, m, m) in one array, so its peak is its own.
+    assert 3 * bytes_per_complex * MAX_SPIN_MULTIPLICITY**2 <= OPERATOR_BUDGET_BYTES
+
+    # Still ample for every registered inventory.
+    for inventory in NUCLEAR_INVENTORIES:
+        assert int(np.prod(hilbert_dims(resolve_inventory(inventory)))) <= (
+            MAX_HILBERT_DIMENSION // 4
+        )
+
+
 def test_the_energy_audit_survives_a_field_small_enough_to_underflow():
     # The constants were multiplied out before dividing, so the NUMERATOR
     # underflowed first: at 1e-310 T the energy rounded to zero and the function
@@ -1086,6 +1162,7 @@ def test_a_count_that_cannot_be_allocated_is_refused_at_its_boundary():
     from gaugegap.radical_pair_forge import (
         MAX_DIRECTION_COUNT,
         MAX_HILBERT_DIMENSION,
+        MAX_SPIN_MULTIPLICITY,
         HyperfineCoupling,
         fibonacci_directions,
         spin_operators,
@@ -1101,7 +1178,11 @@ def test_a_count_that_cannot_be_allocated_is_refused_at_its_boundary():
         with pytest.raises(ValueError, match="at most"):
             run_radical_pair_forge(direction_count=oversized, rate_points=(1e6,))
 
-    for oversized in (2**20, MAX_HILBERT_DIMENSION + 1):
+    # A single spin's own peak is its (3, m, m) array, so that bound is looser
+    # than the Hilbert-space one below -- and each has to be applied where it
+    # belongs rather than one standing in for the other.
+    assert MAX_SPIN_MULTIPLICITY > MAX_HILBERT_DIMENSION
+    for oversized in (2**20, MAX_SPIN_MULTIPLICITY + 1):
         with pytest.raises(ValueError, match="at most"):
             spin_operators(oversized)
         with pytest.raises(ValueError, match="at most"):
@@ -1111,6 +1192,16 @@ def test_a_count_that_cannot_be_allocated_is_refused_at_its_boundary():
                 multiplicity=oversized,
                 principal_values_mhz=(1.0, 1.0, 1.0),
             )
+    # A multiplicity between the two bounds is a legal spin on its own and an
+    # illegal inventory, because the electron pair multiplies the dimension.
+    between = HyperfineCoupling(
+        name="between",
+        radical_index=0,
+        multiplicity=MAX_HILBERT_DIMENSION + 1,
+        principal_values_mhz=(1.0, 1.0, 1.0),
+    )
+    with pytest.raises(ValueError, match="Hilbert dimension"):
+        hilbert_dims((between,))
 
     # Each multiplicity can be legal while their PRODUCT is not.
     many = tuple(

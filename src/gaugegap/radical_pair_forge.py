@@ -90,7 +90,31 @@ MHZ_TO_RAD_PER_S = 2.0 * math.pi * 1e6
 _DOUBLE_MAX = float(np.finfo(float).max)
 MAX_FIELD_TESLA = _DOUBLE_MAX / GYROMAGNETIC_RATIO_E / 4.0
 MAX_RATE_PER_S = _DOUBLE_MAX / 4.0
-MAX_HYPERFINE_MHZ = _DOUBLE_MAX / MHZ_TO_RAD_PER_S / 4.0
+
+
+def max_hyperfine_mhz(multiplicity: int) -> float:
+    """Largest principal value whose Hamiltonian term stays finite.
+
+    Bounding only the MHz-to-radians conversion was wrong: the term that lands
+    in the matrix is ``A_ij * (S_i @ I_j)``, so the coefficient is multiplied by
+    the OPERATOR entries, and the nuclear ones grow with the spin.  For
+    ``multiplicity=18`` the largest ``I_z`` entry is 8.5, so a principal value
+    at the old flat bound overflowed ``build_hamiltonian`` -- accepted by the
+    constructor as safe, and only caught by the finite-output backstop.
+
+    Worst entry per coupling: 0.5 from the electron spin-1/2 operator, ``s``
+    from the nuclear operator, and nine ``(i, j)`` terms that add into the same
+    entry.  The final factor of two is headroom for the Zeeman term, which adds
+    into it as well.
+    """
+    spin = max((int(multiplicity) - 1) / 2, 0.5)
+    worst_entry = 0.5 * spin * 9.0
+    return _DOUBLE_MAX / MHZ_TO_RAD_PER_S / worst_entry / 2.0
+
+
+# Published value, for the spin-1/2 case; every coupling is checked against its
+# own multiplicity.
+MAX_HYPERFINE_MHZ = max_hyperfine_mhz(2)
 
 # Counts are bounded by what they allocate, for the same reason magnitudes are
 # bounded by what they overflow.  An accepted count that dies in an allocation
@@ -107,7 +131,23 @@ MAX_HYPERFINE_MHZ = _DOUBLE_MAX / MHZ_TO_RAD_PER_S / 4.0
 DIRECTION_GRID_BUDGET_BYTES = 64 * 1024 * 1024
 OPERATOR_BUDGET_BYTES = 64 * 1024 * 1024
 _BYTES_PER_COMPLEX = 16
-MAX_HILBERT_DIMENSION = math.isqrt(OPERATOR_BUDGET_BYTES // _BYTES_PER_COMPLEX)
+# Counting ONE matrix against the budget was wrong the same way the direction
+# accounting was: build_hamiltonian holds many at once.  At dimension d it has
+# six embedded electron operators, three embedded nuclear operators for the
+# coupling in hand, the accumulating Hamiltonian, and up to three temporaries
+# from `weight * (electron_ops[i] @ nuclear[j])` and the addition -- thirteen
+# d-by-d complex matrices live at peak, 384 MiB of electron operators alone at
+# the dimension a single-matrix budget would have allowed.
+_OPERATORS_HELD_AT_PEAK = 13
+MAX_HILBERT_DIMENSION = math.isqrt(
+    OPERATOR_BUDGET_BYTES // (_OPERATORS_HELD_AT_PEAK * _BYTES_PER_COMPLEX)
+)
+# spin_operators returns its three matrices in one (3, m, m) array, so a direct
+# call has its own, looser peak.
+_SPIN_OPERATOR_COUNT = 3
+MAX_SPIN_MULTIPLICITY = math.isqrt(
+    OPERATOR_BUDGET_BYTES // (_SPIN_OPERATOR_COUNT * _BYTES_PER_COMPLEX)
+)
 
 
 def _require_positive_finite(
@@ -256,17 +296,21 @@ class HyperfineCoupling:
             raise ValueError("radical_index must be 0 or 1")
         if self.multiplicity < 2:
             raise ValueError("multiplicity must be at least 2")
-        if self.multiplicity > MAX_HILBERT_DIMENSION:
+        if self.multiplicity > MAX_SPIN_MULTIPLICITY:
             raise ValueError(
-                f"{self.name}.multiplicity must be at most {MAX_HILBERT_DIMENSION}; "
+                f"{self.name}.multiplicity must be at most {MAX_SPIN_MULTIPLICITY}; "
                 f"got {self.multiplicity}"
             )
         principal = _require_three_vector(
             f"{self.name}.principal_values_mhz", self.principal_values_mhz
         )
+        # Against this nucleus's own bound, not the spin-1/2 one: the nuclear
+        # operator entries scale with the spin, so a high-spin nucleus overflows
+        # at a coefficient a spin-1/2 nucleus carries safely.
+        ceiling = max_hyperfine_mhz(self.multiplicity)
         for index, value in enumerate(principal):
             _require_finite_magnitude(
-                f"{self.name}.principal_values_mhz[{index}]", value, MAX_HYPERFINE_MHZ
+                f"{self.name}.principal_values_mhz[{index}]", value, ceiling
             )
         # No magnitude bound on the angles: any finite angle is meaningful. An
         # infinite one gives nan through cos/sin and a silently non-finite tensor.
@@ -442,10 +486,13 @@ def spin_operators(multiplicity: int) -> np.ndarray:
     if multiplicity < 2:
         raise ValueError("multiplicity must be at least 2")
     # Bounded as well as positive: multiplicity 2**20 asks for an 8 TiB operator
-    # and dies in numpy's allocator, with nothing naming the multiplicity.
-    if multiplicity > MAX_HILBERT_DIMENSION:
+    # and dies in numpy's allocator, with nothing naming the multiplicity.  The
+    # bound is this function's own peak -- the (3, m, m) array it returns -- and
+    # a nucleus inside an inventory is bounded again, more tightly, by the
+    # Hilbert-space product in hilbert_dims.
+    if multiplicity > MAX_SPIN_MULTIPLICITY:
         raise ValueError(
-            f"multiplicity must be at most {MAX_HILBERT_DIMENSION} so its "
+            f"multiplicity must be at most {MAX_SPIN_MULTIPLICITY} so its "
             f"operators fit the declared budget; got {multiplicity}"
         )
     spin = (multiplicity - 1) / 2
@@ -1392,7 +1439,8 @@ def run_radical_pair_forge(
         "symmetry_tolerance": SYMMETRY_TOLERANCE,
         "max_field_tesla": MAX_FIELD_TESLA,
         "max_rate_per_second": MAX_RATE_PER_S,
-        "max_hyperfine_mhz": MAX_HYPERFINE_MHZ,
+        # Spin-dependent, so the published key says which spin it is for.
+        "max_hyperfine_mhz_spin_half": MAX_HYPERFINE_MHZ,
         "registered_direction_count": REGISTERED_DIRECTION_COUNT,
         "geomagnetic_field_microtesla": float(GEOMAGNETIC_FIELD_T * 1e6),
         "geomagnetic_direction_count": geomagnetic.direction_count,

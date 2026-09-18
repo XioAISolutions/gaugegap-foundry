@@ -48,7 +48,7 @@
     "low_rate_field_microtesla": 50.0,
     "low_rate_per_second": 1000.0,
     "max_field_tesla": 2.5522948155707997e+296,
-    "max_hyperfine_mhz": 7.15279371439257e+300,
+    "max_hyperfine_mhz_spin_half": 6.35803885723784e+300,
     "max_rate_per_second": 4.4942328371557893e+307,
     "no_hyperfine_anisotropy": 4.218847493575595e-15,
     "no_hyperfine_control_fields_microtesla": [

@@ -204,7 +204,20 @@ on zero directions and died several frames later in a reduction.
 `MAX_DIRECTION_COUNT` and `MAX_HILBERT_DIMENSION` are arithmetic on a declared
 byte budget rather than chosen numbers, and the Hilbert bound is applied to the
 product of the multiplicities, not only to each one: enough individually legal
-couplings still asks for an operator no budget covers. The direction accounting
+couplings still asks for an operator no budget covers. Each bound counts the
+*peak* allocation rather than one of its terms — `build_hamiltonian` holds
+thirteen `d x d` complex matrices at once (six embedded electron operators,
+three nuclear, the accumulating Hamiltonian and three temporaries), and
+`spin_operators` returns its three in one array, so the two have different
+caps. A first version of this counted a single matrix and would have allowed a
+dimension at which the electron operators alone are 384 MiB.
+
+The hyperfine bound scales with the nuclear spin for the same reason. The term
+that lands in the matrix is `A_ij * (S_i @ I_j)`, so the coefficient is
+multiplied by the *operator* entries, and the nuclear ones grow with the spin:
+`multiplicity=18` has a largest `I_z` entry of 8.5, and a principal value at
+the spin-1/2 bound overflowed a Hamiltonian the constructor had accepted as
+safe. The direction accounting
 measures what a retained `DirectionSample` actually costs — object, `__dict__`
 and boxed floats, about 556 bytes — instead of counting its numbers: the first
 version of the cap counted 32 bytes per direction and so advertised a 64 MiB
