@@ -89,19 +89,31 @@ magnitude and orientation to test exactly that, and its output is recorded in
 every evidence bundle under `controls.partner_probe`, at a fixed
 `PARTNER_PROBE_DIRECTIONS` so the numbers cannot drift from this prose:
 
-| partner tensor | anisotropy | ratio to spin-free |
-|---|---|---|
-| axial aligned, 49 MHz | 0.06354 | 0.402 |
-| axial aligned, 20 MHz | 0.11561 | 0.731 |
-| axial aligned, 5 MHz | 0.13649 | 0.863 |
-| axial aligned, 1 MHz | 0.08597 | 0.544 |
-| axial perpendicular, 49 MHz | 0.04822 | 0.305 |
+The strength series is generated as **scalar multiples of one principal-value
+tuple**, so the transverse-to-axial ratio is held at `-0.056707` throughout and
+only the magnitude varies. Orientation is probed separately, at full strength.
 
-No probe point increases the anisotropy. But the dependence is **not monotonic**
-in partner coupling strength — a 1 MHz axial partner suppresses the compass more
-than a 5 MHz one. Non-monotonic behaviour over five samples is a reason to claim
-nothing general, not a reason to claim a robust sign.
-`test_partner_probe_backs_the_documented_non_monotonicity` pins both statements.
+| axis | partner tensor | ratio to spin-free |
+|---|---|---|
+| strength | axial 49.2 MHz | 0.402 |
+| strength | axial 20 MHz | 0.673 |
+| strength | axial 5 MHz | 0.858 |
+| strength | axial 1 MHz | **0.542** |
+| strength | axial 0.2 MHz | 0.726 |
+| orientation | 49.2 MHz at beta = 90 deg | 0.305 |
+
+No probe point increases the anisotropy. But suppression is **not monotonic in
+coupling strength**: it weakens from 49 to 5 MHz, strengthens again at 1 MHz,
+then weakens at 0.2 MHz — with shape and orientation held fixed, so this is a
+statement about strength alone.
+
+An earlier version of this probe hand-wrote each magnitude, which let the shape
+ratio drift from `-0.057` to `-0.100` across the series and confounded strength
+with shape; its non-monotonicity result could not be attributed to strength at
+all. The conclusion survived the fixed-shape redesign, but the earlier evidence
+for it was invalid. `test_the_strength_probe_holds_tensor_shape_fixed` now
+asserts the shape invariant so the confound cannot return, and
+`test_partner_probe_backs_the_documented_non_monotonicity` pins the result.
 
 ### The energy audit
 

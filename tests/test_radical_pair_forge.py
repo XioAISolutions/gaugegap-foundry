@@ -503,6 +503,20 @@ def test_kill_criteria_forbidding_sensor_language_are_honoured_by_the_claim_boun
     assert "not a magnetometer or sensor design" in lowered
 
 
+def test_the_strength_probe_holds_tensor_shape_fixed():
+    # Without this the probe confounds magnitude with shape and cannot support
+    # any conclusion about coupling strength. An earlier version hand-wrote each
+    # magnitude and let the transverse-to-axial ratio drift from -0.057 to -0.100.
+    from gaugegap.radical_pair_forge import probe_partner_suppression
+
+    strength = [p for p in probe_partner_suppression() if p.axis == "strength"]
+    assert len(strength) >= 4
+    shapes = {round(p.transverse_to_axial_ratio, 12) for p in strength}
+    assert len(shapes) == 1, f"shape varies across the strength series: {shapes}"
+    # And the magnitudes genuinely differ, or the series tests nothing.
+    assert len({round(p.axial_mhz, 9) for p in strength}) == len(strength)
+
+
 def test_partner_probe_backs_the_documented_non_monotonicity():
     # The docs quote this probe as the reason no general claim is made about the
     # direction of partner suppression, so the probe must be code, not pasted
@@ -510,18 +524,22 @@ def test_partner_probe_backs_the_documented_non_monotonicity():
     from gaugegap.radical_pair_forge import probe_partner_suppression
 
     points = {p.label: p for p in probe_partner_suppression()}
-    assert len(points) == 5
+    assert len(points) == 6
 
     # Claim 1: no probe tensor increases the anisotropy.
     assert not any(p.increases_anisotropy for p in points.values())
     assert all(p.ratio_to_spin_free < 1.0 for p in points.values())
 
-    # Claim 2: the dependence is NOT monotonic in partner coupling strength --
-    # 1 MHz suppresses more than 5 MHz. This is the reason the sign of the effect
-    # is not claimed to be robust.
+    # Claim 2: suppression is NOT monotonic in coupling strength, with shape and
+    # orientation held fixed -- 1 MHz suppresses more than 5 MHz. This survives
+    # the fixed-shape redesign, so it is a statement about strength alone.
     assert (
-        points["axial-aligned-1mhz"].ratio_to_spin_free
-        < points["axial-aligned-5mhz"].ratio_to_spin_free
+        points["strength-1mhz"].ratio_to_spin_free
+        < points["strength-5mhz"].ratio_to_spin_free
+    )
+    assert (
+        points["strength-0.2mhz"].ratio_to_spin_free
+        > points["strength-1mhz"].ratio_to_spin_free
     )
 
 
@@ -530,7 +548,7 @@ def test_probe_is_recorded_in_the_evidence_bundle():
         direction_count=12, control_direction_count=8, rate_points=(1e6,)
     )
     controls = report.controls
-    assert len(controls["partner_probe"]) == 5
+    assert len(controls["partner_probe"]) == 6
     assert controls["partner_probe_any_increase"] is False
     # Fixed direction count, so the recorded numbers cannot drift from the prose.
     assert controls["partner_probe_directions"] == 120

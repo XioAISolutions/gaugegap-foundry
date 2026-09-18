@@ -212,16 +212,25 @@ LARMOR_COMPARABLE_RATE_PER_S = 1.0e6
 
 
 PARTNER_PROBE_DIRECTIONS = 120
-# Axial partner tensors on radical 2, spanning magnitude and orientation. These
-# exist to test whether ANY partner coupling can increase the anisotropy, which
-# is what would refute a general claim about the direction of the effect.
-PARTNER_PROBE_TENSORS: tuple[tuple[str, tuple[float, float, float], tuple[float, float, float]], ...] = (
-    ("axial-aligned-49mhz", (-2.79, -2.79, 49.2), (0.0, 0.0, 0.0)),
-    ("axial-aligned-20mhz", (-1.0, -1.0, 20.0), (0.0, 0.0, 0.0)),
-    ("axial-aligned-5mhz", (-0.3, -0.3, 5.0), (0.0, 0.0, 0.0)),
-    ("axial-aligned-1mhz", (-0.1, -0.1, 1.0), (0.0, 0.0, 0.0)),
-    ("axial-perpendicular-49mhz", (-2.79, -2.79, 49.2), (0.0, 90.0, 0.0)),
-)
+# Base partner tensor. The strength series below is generated as scalar multiples
+# of this tuple, so the transverse-to-axial ratio -- the tensor SHAPE -- is held
+# exactly fixed and only the magnitude varies. An earlier version of this probe
+# hand-wrote each magnitude, which let shape drift from -0.057 to -0.100 across
+# the series and confounded strength with shape, so its non-monotonicity result
+# could not be attributed to coupling strength at all.
+PARTNER_PROBE_BASE_MHZ = (-2.79, -2.79, 49.2)
+PARTNER_PROBE_BASE_AXIAL_MHZ = 49.2
+# Axial magnitudes in MHz, all at the base shape and orientation.
+PARTNER_PROBE_STRENGTHS_MHZ = (49.2, 20.0, 5.0, 1.0, 0.2)
+# Orientations in ZYZ Euler degrees, all at full base strength, so orientation is
+# varied independently of magnitude.
+PARTNER_PROBE_ORIENTATIONS_DEG = ((0.0, 90.0, 0.0),)
+
+
+def _scaled_partner_tensor(axial_mhz: float) -> tuple[float, float, float]:
+    """Scale the base tensor to a target axial magnitude, preserving its shape."""
+    factor = axial_mhz / PARTNER_PROBE_BASE_AXIAL_MHZ
+    return tuple(float(value * factor) for value in PARTNER_PROBE_BASE_MHZ)  # type: ignore[return-value]
 
 
 def _euler_zyz(alpha_deg: float, beta_deg: float, gamma_deg: float) -> np.ndarray:
@@ -584,8 +593,14 @@ class PartnerProbePoint:
     """One axial partner tensor and the anisotropy it leaves."""
 
     label: str
+    # "strength" points vary magnitude at fixed shape and orientation;
+    # "orientation" points vary orientation at fixed magnitude and shape.
+    # Only the strength series supports a conclusion about coupling strength.
+    axis: str
     principal_values_mhz: tuple[float, float, float]
     euler_deg: tuple[float, float, float]
+    axial_mhz: float
+    transverse_to_axial_ratio: float
     anisotropy: float
     ratio_to_spin_free: float
     increases_anisotropy: bool
@@ -623,8 +638,28 @@ def probe_partner_suppression(
         keep_samples=False,
         inventory="spin-free-partner",
     ).anisotropy
+
+    specs: list[tuple[str, str, tuple[float, float, float], tuple[float, float, float]]] = [
+        (
+            f"strength-{magnitude:g}mhz",
+            "strength",
+            _scaled_partner_tensor(magnitude),
+            (0.0, 0.0, 0.0),
+        )
+        for magnitude in PARTNER_PROBE_STRENGTHS_MHZ
+    ]
+    specs.extend(
+        (
+            f"orientation-beta{euler[1]:g}deg",
+            "orientation",
+            PARTNER_PROBE_BASE_MHZ,
+            euler,
+        )
+        for euler in PARTNER_PROBE_ORIENTATIONS_DEG
+    )
+
     points = []
-    for label, principal, euler in PARTNER_PROBE_TENSORS:
+    for label, axis, principal, euler in specs:
         partner = HyperfineCoupling(
             name=f"probe-{label}",
             radical_index=1,
@@ -644,8 +679,11 @@ def probe_partner_suppression(
         points.append(
             PartnerProbePoint(
                 label=label,
+                axis=axis,
                 principal_values_mhz=principal,
                 euler_deg=euler,
+                axial_mhz=float(principal[2]),
+                transverse_to_axial_ratio=float(principal[0] / principal[2]),
                 anisotropy=anisotropy,
                 ratio_to_spin_free=float(anisotropy / baseline) if baseline else 0.0,
                 increases_anisotropy=anisotropy > baseline,
