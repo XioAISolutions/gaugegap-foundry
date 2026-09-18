@@ -62,6 +62,7 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 - **UQT Forge** — UQT-inspired finite algebra known-answer tasks with reversible and irreversible controls.
 - **Compactification Forge** — finite hidden-dimension toy spectra for KK/winding-mode explanations.
 - **Perception Forge** — finite fitness-interface simulations inspired by Hoffman's perception work, with explicit resource-budget controls.
+- **Radical Pair Forge** — the spin-chemistry core of the magnetoreception hypothesis: singlet-yield anisotropy over field direction, with an isotropic-hyperfine null control and an exact polarity degeneracy.
 - **GaugeGap** — finite lattice-gauge benchmarks from Z₂ through bounded SU(3) scaffolds.
 - **FlowGap** — finite PDE surrogates and nonlinear systems, including Rössler, Lorenz, and Thomas dynamics.
 - **CurveRank** — certified screening of finite operator truncations against zeta-zero-inspired targets.
@@ -88,6 +89,7 @@ flowchart TD
     F --> U["🧠 UQT Forge<br/>finite quantum algebra controls"]
     F --> K["🧵 Compactification Forge<br/>hidden-dimension spectra"]
     F --> H["👁️ Perception Forge<br/>fitness interface games"]
+    F --> RP["🧭 Radical Pair Forge<br/>spin-chemistry compass"]
     F --> G["⚛️ GaugeGap<br/>finite gauge systems"]
     F --> FL["🌊 FlowGap<br/>PDEs + nonlinear dynamics"]
     F --> C["📈 CurveRank<br/>finite spectral screening"]
@@ -106,6 +108,7 @@ flowchart TD
     U --> U1["Z11 · Z11* · S4<br/>reversibility ledger"]
     K --> K1["S1 · T2<br/>KK + winding towers"]
     H --> H1["truth-coded bins<br/>fitness-interface bins"]
+    RP --> RP1["anisotropic hyperfine → compass<br/>isotropic → nothing · Φ(B) = Φ(−B)"]
     G --> G1["Z₂ → U(1) → SU(2) → SU(3 scaffold"]
     FL --> FL1["Burgers · Rössler · Lorenz · Thomas"]
     C --> C1["interval eigenvalues<br/>negative-result certificates"]

@@ -1,0 +1,37 @@
+version: 1
+
+units:
+  radicalpair-0001-compass:
+    track: radical-pair-forge
+    hypothesis: radicalpair-0001
+    status: prototype_scaffold
+    description: Finite radical-pair singlet-yield compass sweep with isotropy, polarity and lifetime controls.
+    command:
+      ["{python}", "scripts/run_radical_pair_forge.py",
+       "--inventory", "cryptochrome-like",
+       "--output-dir", "results/radicalpair-0001-cryptochrome-compass"]
+
+  radicalpair-spin-free-partner:
+    track: radical-pair-forge
+    hypothesis: radicalpair-0001
+    status: prototype_scaffold
+    description: Same sweep with a spin-free partner radical, the favourable compass geometry.
+    command:
+      ["{python}", "scripts/run_radical_pair_forge.py",
+       "--inventory", "spin-free-partner",
+       "--output-dir", "results/radicalpair-0001-spin-free-partner"]
+
+  radicalpair-smoke:
+    track: radical-pair-forge
+    hypothesis: radicalpair-0001
+    status: prototype_scaffold
+    description: Reduced radical-pair compass smoke check.
+    command:
+      ["{python}", "scripts/run_radical_pair_forge.py",
+       "--direction-count", "40", "--rate-points", "4",
+       "--output-dir", "/tmp/radical-pair-smoke"]
+
+groups:
+  radical-pair-forge:
+    - radicalpair-0001-compass
+    - radicalpair-spin-free-partner

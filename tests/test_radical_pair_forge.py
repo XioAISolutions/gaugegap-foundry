@@ -1,0 +1,1541 @@
+from __future__ import annotations
+
+import dataclasses
+import json
+import math
+from pathlib import Path
+import subprocess
+import sys
+
+import numpy as np
+import pytest
+
+from gaugegap.radical_pair_forge import (
+    GEOMAGNETIC_FIELD_T,
+    HYPERFINE_REGISTRY,
+    NUCLEAR_INVENTORIES,
+    SYMMETRY_TOLERANCE,
+    DirectionSample,
+    build_hamiltonian,
+    fibonacci_directions,
+    hilbert_dims,
+    polarity_residual,
+    resolve_inventory,
+    run_radical_pair_forge,
+    singlet_projector,
+    singlet_yield_closed_form,
+    singlet_yield_liouvillian,
+    spin_operators,
+    sweep_field_directions,
+    zeeman_thermal_ratio,
+)
+
+ROOT = Path(__file__).resolve().parents[1]
+RATE = 1.0e6
+
+
+def test_spin_operators_satisfy_su2_algebra():
+    for multiplicity in (2, 3, 4):
+        sx, sy, sz = spin_operators(multiplicity)
+        spin = (multiplicity - 1) / 2
+        casimir = sx @ sx + sy @ sy + sz @ sz
+        assert np.allclose(casimir, spin * (spin + 1) * np.eye(multiplicity))
+        assert np.allclose(sx @ sy - sy @ sx, 1j * sz)
+        assert np.allclose(sx, sx.conj().T)
+
+
+def test_singlet_projector_is_a_rank_deficient_projector():
+    dims = hilbert_dims(resolve_inventory("cryptochrome-like"))
+    projector = singlet_projector(dims)
+    assert np.allclose(projector @ projector, projector)
+    assert np.allclose(projector, projector.conj().T)
+    # One electronic singlet state per nuclear configuration.
+    assert np.trace(projector).real == pytest.approx(int(np.prod(dims)) / 4)
+
+
+def test_anisotropic_hyperfine_gives_a_compass_and_isotropic_hyperfine_does_not():
+    couplings = resolve_inventory("cryptochrome-like")
+    live = sweep_field_directions(couplings=couplings, rate_per_second=RATE, direction_count=80)
+    control = sweep_field_directions(
+        couplings=couplings, rate_per_second=RATE, direction_count=80, isotropic=True
+    )
+    assert live.anisotropy > 1e-3
+    # The negative control: entanglement is untouched, the compass is gone.
+    assert control.anisotropy < SYMMETRY_TOLERANCE
+
+
+def test_singlet_yield_is_exactly_invariant_under_field_reversal():
+    couplings = resolve_inventory("cryptochrome-like")
+    residual = polarity_residual(couplings=couplings, rate_per_second=RATE, direction_count=40)
+    assert residual < SYMMETRY_TOLERANCE
+
+    # Spot-check one direction against its antipode at full precision.
+    projector = singlet_projector(hilbert_dims(couplings))
+    direction = np.array([0.37, -0.52, 0.77])
+    forward = singlet_yield_closed_form(
+        build_hamiltonian(
+            field_tesla=GEOMAGNETIC_FIELD_T, direction=direction, couplings=couplings
+        ),
+        projector,
+        RATE,
+    )
+    reversed_ = singlet_yield_closed_form(
+        build_hamiltonian(
+            field_tesla=GEOMAGNETIC_FIELD_T, direction=-direction, couplings=couplings
+        ),
+        projector,
+        RATE,
+    )
+    assert forward == pytest.approx(reversed_, abs=1e-12)
+
+
+def test_bare_zeeman_hamiltonian_traps_the_pair_in_the_singlet():
+    # With no hyperfine coupling H commutes with P_S, so nothing mixes and the
+    # yield is exactly one regardless of field direction or magnitude.
+    projector = singlet_projector(hilbert_dims(()))
+    for direction in fibonacci_directions(8):
+        for field in (GEOMAGNETIC_FIELD_T, 5e-3):
+            hamiltonian = build_hamiltonian(
+                field_tesla=field, direction=direction, couplings=()
+            )
+            # Compare the commutator to the scale of H: at 5 mT the entries are
+            # ~1e8 rad/s, so an absolute tolerance would say nothing.
+            commutator = hamiltonian @ projector - projector @ hamiltonian
+            assert np.abs(commutator).max() / np.abs(hamiltonian).max() < 1e-12
+            assert singlet_yield_closed_form(hamiltonian, projector, RATE) == pytest.approx(1.0)
+
+
+def test_closed_form_matches_exact_liouvillian_solve():
+    couplings = resolve_inventory("cryptochrome-like")
+    projector = singlet_projector(hilbert_dims(couplings))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.3, 0.4, 0.866), couplings=couplings
+    )
+    closed = singlet_yield_closed_form(hamiltonian, projector, RATE)
+    assert closed == pytest.approx(
+        singlet_yield_liouvillian(hamiltonian, projector, RATE, RATE), abs=1e-10
+    )
+    # Asymmetric rates have no closed form. Do NOT assert they must differ from
+    # the symmetric result -- that is false in general (see
+    # test_asymmetric_gate_is_an_independent_solve_not_a_difference_requirement).
+    # What is required is that they converge back to it as the rates are brought
+    # together, which is a genuine limit.
+    assert singlet_yield_liouvillian(
+        hamiltonian, projector, RATE * (1.0 + 1e-9), RATE
+    ) == pytest.approx(closed, abs=1e-8)
+
+
+def test_prompt_recombination_limit_is_unity():
+    couplings = resolve_inventory("cryptochrome-like")
+    projector = singlet_projector(hilbert_dims(couplings))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 1.0), couplings=couplings
+    )
+    assert singlet_yield_closed_form(hamiltonian, projector, 1e14) == pytest.approx(1.0, abs=1e-6)
+
+
+def test_fast_recombination_collapses_the_compass():
+    couplings = resolve_inventory("cryptochrome-like")
+    slow = sweep_field_directions(couplings=couplings, rate_per_second=RATE, direction_count=40)
+    fast = sweep_field_directions(couplings=couplings, rate_per_second=1e10, direction_count=40)
+    assert fast.anisotropy < 1e-6
+    assert fast.anisotropy < slow.anisotropy / 1000.0
+
+
+def test_loading_the_partner_radical_suppresses_the_compass():
+    spin_free = sweep_field_directions(
+        couplings=resolve_inventory("spin-free-partner"), rate_per_second=RATE, direction_count=60
+    )
+    loaded = sweep_field_directions(
+        couplings=resolve_inventory("cryptochrome-like"), rate_per_second=RATE, direction_count=60
+    )
+    assert spin_free.anisotropy > loaded.anisotropy
+    # Hyperfine coupling on the second radical costs close to an order of magnitude.
+    assert spin_free.anisotropy / loaded.anisotropy > 3.0
+
+
+def test_registry_tensors_are_symmetric_and_trace_preserved_by_the_isotropic_control():
+    for coupling in HYPERFINE_REGISTRY.values():
+        tensor = coupling.tensor_rad_per_s()
+        assert np.allclose(tensor, tensor.T)
+        isotropic = coupling.tensor_rad_per_s(isotropic=True)
+        assert np.trace(isotropic) == pytest.approx(np.trace(tensor))
+        assert np.allclose(isotropic, np.eye(3) * np.trace(tensor) / 3.0)
+        assert coupling.anisotropy_mhz > 0.0
+
+
+def test_zeeman_energy_is_negligible_against_thermal_energy():
+    assert zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T) == pytest.approx(2.2416e-7, rel=1e-3)
+    assert zeeman_thermal_ratio(5e-3) == pytest.approx(2.2416e-5, rel=1e-3)
+
+
+def test_report_passes_every_registered_check():
+    report = run_radical_pair_forge(
+        direction_count=80, rate_points=(1e4, 1e6, 1e8, 1e10)
+    )
+    assert report.passed
+    assert all(report.controls["checks"].values())
+    assert report.hilbert_dimension == 24
+    assert report.larmor_frequency_mhz == pytest.approx(1.4012, rel=1e-3)
+    assert report.relative_contrast > 0.01
+    summary = report.summary()
+    assert summary["claim_level"] == "reproducible_finite_result"
+    assert "not a magnetometer" in summary["claim_boundary"]
+    assert "samples" not in summary["sweep"]
+    assert "samples" in report.summary(include_samples=True)["sweep"]
+
+
+def test_samples_carry_antipodal_yields_that_demonstrate_the_degeneracy():
+    couplings = resolve_inventory("cryptochrome-like")
+    sweep = sweep_field_directions(couplings=couplings, rate_per_second=RATE, direction_count=40)
+    pairs = [(s.singlet_yield, s.antipodal_singlet_yield) for s in sweep.samples]
+    assert pairs
+    # Every direction agrees with its true antipode to machine precision.
+    assert max(abs(a - b) for a, b in pairs) < SYMMETRY_TOLERANCE
+
+
+def test_mirrored_polar_angle_is_not_the_antipode_for_a_rhombic_tensor():
+    # Guards the figure's honesty: the yield depends on azimuth too, so samples
+    # at mirrored polar angles are NOT antipodal pairs and must not be presented
+    # as evidence of the polarity degeneracy.
+    couplings = resolve_inventory("cryptochrome-like")
+    sweep = sweep_field_directions(couplings=couplings, rate_per_second=RATE, direction_count=120)
+    by_polar = sorted(sweep.samples, key=lambda s: s.polar_deg)
+    count = len(by_polar)
+    mirrored_gap = max(
+        abs(by_polar[i].singlet_yield - by_polar[count - 1 - i].singlet_yield)
+        for i in range(count // 2)
+    )
+    # The mirrored-index discrepancy is a large fraction of the whole signal.
+    assert mirrored_gap > 0.1 * sweep.anisotropy
+
+
+def test_loaded_inventory_avoids_the_dense_liouvillian_blowup():
+    # dim 72 would need a 5184-square dense Liouvillian (~1.6 GiB of temporaries
+    # and a cubic solve), so the cross-check must fall back and say so.
+    report = run_radical_pair_forge(
+        inventory="loaded", direction_count=12, rate_points=(1e6,)
+    )
+    controls = report.controls
+    assert report.hilbert_dimension == 72
+    assert controls["cross_check_hilbert_dimension"] <= controls["liouvillian_dim_limit"]
+    assert controls["cross_check_inventory"] == "cryptochrome-like"
+    assert controls["checks"]["closed_form_and_liouvillian_yields_agree"]
+    # The prompt-recombination limit still uses the selected inventory.
+    assert controls["checks"]["prompt_recombination_limit_equals_one"]
+
+
+def test_small_inventory_cross_checks_against_itself():
+    report = run_radical_pair_forge(
+        inventory="cryptochrome-like",
+        direction_count=12,
+        rate_points=(1e6,),
+    )
+    assert report.controls["cross_check_inventory"] == "cryptochrome-like"
+    assert report.controls["cross_check_hilbert_dimension"] == 24
+
+
+def test_claim_boundary_does_not_promise_a_lifetime_window():
+    from gaugegap.radical_pair_forge import CLAIM_BOUNDARY
+
+    assert "fast-recombination cutoff" in CLAIM_BOUNDARY
+    assert "lifetime window" in CLAIM_BOUNDARY  # only to disclaim it
+    assert "not a lifetime window" in CLAIM_BOUNDARY
+
+
+def test_anisotropy_does_not_peak_near_the_larmor_rate():
+    # Without relaxation there is no window: the low-rate end is not suppressed.
+    # This pins the honest claim so nobody re-adds a microsecond optimum.
+    couplings = resolve_inventory("cryptochrome-like")
+    slow = sweep_field_directions(couplings=couplings, rate_per_second=1e3, direction_count=40)
+    larmor = sweep_field_directions(couplings=couplings, rate_per_second=1e6, direction_count=40)
+    assert slow.anisotropy >= larmor.anisotropy
+
+
+def test_no_measured_field_can_be_silently_unpopulated():
+    # Root cause of three separate review findings: a measured quantity with a
+    # scalar default can be serialized unpopulated and read as a real result.
+    # Every measurement field must be required, so a forgetful code path raises.
+    import dataclasses
+
+    from gaugegap.radical_pair_forge import DirectionSweep, RatePoint
+
+    for cls in (DirectionSample, DirectionSweep, RatePoint):
+        for field in dataclasses.fields(cls):
+            if field.name == "samples":
+                continue  # a container, not a measurement
+            assert field.default is dataclasses.MISSING, (
+                f"{cls.__name__}.{field.name} has a default; measured fields must be "
+                "required so they cannot be silently unpopulated"
+            )
+
+
+def test_sweep_does_not_publish_a_control_it_never_computed():
+    # The isotropic control is a comparison between two sweeps and belongs to the
+    # report, not to a single sweep.  A single sweep must not carry a control field.
+    sweep = sweep_field_directions(
+        couplings=resolve_inventory("cryptochrome-like"), rate_per_second=RATE, direction_count=8
+    )
+    payload = sweep.summary()
+    assert "isotropic_control_anisotropy" not in payload
+    # The real control is published once, from an actual control sweep.
+    report = run_radical_pair_forge(
+        direction_count=12, rate_points=(1e6,)
+    )
+    assert 0.0 < report.controls["isotropic_hyperfine_anisotropy"] < SYMMETRY_TOLERANCE
+
+
+def test_unknown_inventory_fails_closed():
+    with pytest.raises(ValueError, match="unknown inventory"):
+        resolve_inventory("robin-eye-over-usb")
+
+
+def test_runner_emits_evidence_bundle(tmp_path: Path):
+    output = tmp_path / "radicalpair"
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "scripts" / "run_radical_pair_forge.py"),
+            "--direction-count",
+            "40",
+            "--rate-points",
+            "4",
+            "--output-dir",
+            str(output),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    summary = json.loads((output / "summary.json").read_text(encoding="utf-8"))
+    assert summary["passed"]
+    assert summary["controls"]["polarity_residual"] < SYMMETRY_TOLERANCE
+    assert len(summary["sweep"]["samples"]) == 40
+    assert summary["sources"]
+    assert (output / "directions.csv").exists()
+    assert (output / "radical_pair_forge.svg").exists()
+
+    # Both CSV headers must cover every field of the dataclass behind them. A
+    # hand-written fieldname list is how adding direction_count to RatePoint
+    # raised ValueError halfway through writing rate_sweep.csv and left a
+    # truncated file behind.
+    import csv
+    import dataclasses
+
+    from gaugegap.radical_pair_forge import RatePoint
+
+    with (output / "rate_sweep.csv").open(encoding="utf-8") as handle:
+        header = next(csv.reader(handle))
+    assert header == [field.name for field in dataclasses.fields(RatePoint)]
+    with (output / "directions.csv").open(encoding="utf-8") as handle:
+        direction_header = next(csv.reader(handle))
+    # directions.csv is a projection of DirectionSample, and it must be a total
+    # one: antipodal_singlet_yield was missing from it once, which is what let a
+    # figure plot mirrored polar angles as if they were antipodal pairs.
+    assert {field.name for field in dataclasses.fields(DirectionSample)} <= set(
+        direction_header
+    )
+
+
+def test_default_output_dir_follows_the_selected_inventory(tmp_path: Path):
+    # A valid CLI call must never overwrite another inventory's evidence bundle.
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "_rp_runner", ROOT / "scripts" / "run_radical_pair_forge.py"
+    )
+    runner = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(runner)
+
+    slugs = runner.OUTPUT_SLUGS
+    # Every registered inventory has its own distinct destination.
+    assert set(slugs) == set(NUCLEAR_INVENTORIES)
+    assert len(set(slugs.values())) == len(slugs)
+    # The default inventory keeps the slug its committed bundle already uses.
+    assert slugs["cryptochrome-like"] == "cryptochrome-compass"
+
+
+def test_every_declared_validation_is_implemented_and_vice_versa():
+    # Root cause of the registry-drift finding: validation.required in the
+    # hypothesis YAML and the checks dict in code were related only by intent,
+    # so the registry could declare a condition the code never evaluated. This
+    # reconciles them exactly, in both directions.
+    import yaml
+
+    hypothesis = yaml.safe_load(
+        (ROOT / "hypotheses" / "radicalpair-0001.yaml").read_text(encoding="utf-8")
+    )
+    declared = set(hypothesis["validation"]["required"])
+    report = run_radical_pair_forge(
+        direction_count=12, rate_points=(1e6,)
+    )
+    implemented = set(report.controls["checks"])
+
+    assert declared == implemented, (
+        f"declared but not implemented: {sorted(declared - implemented)}; "
+        f"implemented but not declared: {sorted(implemented - declared)}"
+    )
+
+
+def test_low_rate_condition_is_evaluated_even_when_the_caller_skips_that_rate():
+    # A caller passing a single high rate must not be able to leave the
+    # registered low-rate condition unevaluated while the report reads passed.
+    report = run_radical_pair_forge(
+        direction_count=12, rate_points=(1e6,)
+    )
+    controls = report.controls
+    assert len(report.rate_sweep) == 1  # caller's sweep really is a single point
+    # ...yet the condition was still computed, from its own rate points.
+    assert controls["low_rate_per_second"] < controls["larmor_comparable_rate_per_second"]
+    assert controls["low_rate_anisotropy"] >= controls["larmor_comparable_anisotropy"]
+    assert controls["checks"][
+        "anisotropy_at_low_rate_is_not_suppressed_relative_to_the_larmor_rate"
+    ]
+
+
+def test_non_positive_field_is_rejected_because_magnitudes_are_published():
+    for bad in (0.0, -50e-6):
+        with pytest.raises(ValueError, match="positive finite"):
+            run_radical_pair_forge(
+                field_tesla=bad, direction_count=8, rate_points=(1e6,)
+            )
+
+
+# Every phrase this track has retracted across review rounds. Each is
+# affirmative by construction, so a legitimate negated mention ("not a lifetime
+# window") does not match, while a reinstated claim does. The repo-level
+# claim_boundary_audit passed with zero high findings while two of these were
+# live in the artifacts, so track-specific prohibitions need a track-specific
+# guard.
+RETRACTED_PHRASES = (
+    "inclination sensor",          # own avoided-language list bans affirmative "sensor"
+    "is a sensor",
+    "window sits near",            # no lifetime window: no relaxation is modelled
+    "microsecond optimum",
+    "symmetric about 90",          # the figure plots antipodal pairs, not mirrored polar angles
+    "sign of the effect is robust",
+    "sign of that effect is robust",
+    "Three of the four",           # only three results are structural; the fourth is not
+)
+
+GUARDED_ARTIFACTS = (
+    "src/gaugegap/radical_pair_forge.py",
+    "scripts/run_radical_pair_forge.py",
+    "tests/test_radical_pair_forge.py",
+    "docs/radical-pair-forge.md",
+    "hypotheses/radicalpair-0001.yaml",
+)
+
+
+# A retracted phrase may legitimately appear inside its own prohibition ("Do not
+# read a microsecond optimum out of this"), inside a kill criterion, or inside a
+# recorded retraction quoting the old wording. Those are the artifact working as
+# intended, so an occurrence only counts as a violation when nothing in its
+# immediate context negates or forbids it.
+NEGATION_MARKERS = (
+    "not ",
+    "no ",
+    "never",
+    "avoid",
+    "forbid",
+    "removed",
+    "retract",
+    "earlier draft",
+    "output claims",
+    "over-claim",
+    "overstate",
+)
+
+
+# A phrase can also be legitimised by the block it sits in rather than by its own
+# sentence: an entry in an "Avoided language" list or under kill_criteria is a
+# prohibition even though the bullet itself reads affirmatively.
+PROHIBITION_SECTIONS = (
+    "avoided language",
+    "avoided:",
+    "kill_criteria",
+    "exclusions",
+    "must not",
+    "do not",
+)
+PROHIBITION_LOOKBACK = 14
+
+
+def _is_negated(context: str) -> bool:
+    lowered = context.lower()
+    return any(marker in lowered for marker in NEGATION_MARKERS)
+
+
+def _in_prohibition_block(lines: list[str], number: int) -> bool:
+    start = max(0, number - PROHIBITION_LOOKBACK)
+    window = " ".join(lines[start:number]).lower()
+    return any(marker in window for marker in PROHIBITION_SECTIONS)
+
+
+def test_no_retracted_claim_reappears_in_the_tracks_own_artifacts():
+    offenders = []
+    for relative in GUARDED_ARTIFACTS:
+        if relative.endswith("test_radical_pair_forge.py"):
+            continue  # this file necessarily holds the phrases as data
+        lines = (ROOT / relative).read_text(encoding="utf-8").splitlines()
+        for number, line in enumerate(lines):
+            for phrase in RETRACTED_PHRASES:
+                if phrase.lower() not in line.lower():
+                    continue
+                # Include the previous line: this prose is hard-wrapped, so a
+                # negation can sit just above the phrase it negates.
+                context = (lines[number - 1] if number else "") + " " + line
+                if not _is_negated(context) and not _in_prohibition_block(lines, number):
+                    offenders.append(f"{relative}:{number + 1}: {phrase!r}")
+    assert not offenders, "retracted claims reappeared unnegated: " + "; ".join(offenders)
+
+
+def test_the_retracted_claim_guard_actually_catches_an_affirmative_claim(tmp_path: Path):
+    # A guard that never fires is worthless, and this one was written after it
+    # over-triggered on legitimate negations, so prove both directions.
+    affirmative = tmp_path / "affirmative.md"
+    affirmative.write_text("The model is an inclination sensor.\n", encoding="utf-8")
+    lines = affirmative.read_text(encoding="utf-8").splitlines()
+    assert not _is_negated(lines[0])
+
+    negated = tmp_path / "negated.md"
+    negated.write_text("This is not an inclination sensor.\n", encoding="utf-8")
+    assert _is_negated(negated.read_text(encoding="utf-8").splitlines()[0])
+
+    # A bullet under an "Avoided language" heading is a prohibition even though
+    # the bullet itself reads affirmatively.
+    block = ["Avoided language:", "", "- a microsecond optimum"]
+    assert _in_prohibition_block(block, 2)
+    assert not _in_prohibition_block(["Results:", "", "- a microsecond optimum"], 2)
+
+
+def test_kill_criteria_forbidding_sensor_language_are_honoured_by_the_claim_boundary():
+    # The registry forbids describing the result as a sensor; the module's own
+    # CLAIM_BOUNDARY must therefore only ever mention "sensor" in the negative.
+    from gaugegap.radical_pair_forge import CLAIM_BOUNDARY
+
+    lowered = CLAIM_BOUNDARY.lower()
+    assert "sensor" in lowered  # it is disclaimed explicitly
+    assert "not a magnetometer or sensor design" in lowered
+
+
+def test_the_strength_probe_holds_tensor_shape_fixed():
+    # Without this the probe confounds magnitude with shape and cannot support
+    # any conclusion about coupling strength. An earlier version hand-wrote each
+    # magnitude and let the transverse-to-axial ratio drift from -0.057 to -0.100.
+    from gaugegap.radical_pair_forge import probe_partner_suppression
+
+    strength = [p for p in probe_partner_suppression() if p.axis == "strength"]
+    assert len(strength) >= 4
+    shapes = {round(p.transverse_to_axial_ratio, 12) for p in strength}
+    assert len(shapes) == 1, f"shape varies across the strength series: {shapes}"
+    # And the magnitudes genuinely differ, or the series tests nothing.
+    assert len({round(p.axial_mhz, 9) for p in strength}) == len(strength)
+
+
+def test_partner_probe_backs_the_documented_non_monotonicity():
+    # The docs quote this probe as the reason no general claim is made about the
+    # direction of partner suppression, so the probe must be code, not pasted
+    # shell output. These assertions pin the exact statements the prose makes.
+    from gaugegap.radical_pair_forge import probe_partner_suppression
+
+    points = {p.label: p for p in probe_partner_suppression()}
+    assert len(points) == 6
+
+    # Claim 1: no probe tensor increases the anisotropy.
+    assert not any(p.increases_anisotropy for p in points.values())
+    assert all(p.ratio_to_spin_free < 1.0 for p in points.values())
+
+    # Claim 2: suppression is NOT monotonic in coupling strength, with shape and
+    # orientation held fixed -- 1 MHz suppresses more than 5 MHz. This survives
+    # the fixed-shape redesign, so it is a statement about strength alone.
+    assert (
+        points["strength-1mhz"].ratio_to_spin_free
+        < points["strength-5mhz"].ratio_to_spin_free
+    )
+    assert (
+        points["strength-0.2mhz"].ratio_to_spin_free
+        > points["strength-1mhz"].ratio_to_spin_free
+    )
+
+
+def test_probe_is_recorded_in_the_evidence_bundle():
+    report = run_radical_pair_forge(
+        direction_count=12, rate_points=(1e6,)
+    )
+    controls = report.controls
+    assert len(controls["partner_probe"]) == 6
+    assert controls["partner_probe_any_increase"] is False
+    # Fixed direction count, so the recorded numbers cannot drift from the prose.
+    assert controls["partner_probe_directions"] == 120
+
+
+def test_each_inventory_gets_a_distinct_benchmark_id():
+    # Guards the class that keeps recurring: a value fixed at construction where
+    # a derived one is needed. Two inventories must never be identifiable as the
+    # same run, or consumers keyed on benchmark_id conflate or overwrite them.
+    ids = {}
+    for inventory in sorted(NUCLEAR_INVENTORIES):
+        report = run_radical_pair_forge(
+            inventory=inventory, direction_count=8, rate_points=(1e6,)
+        )
+        ids[inventory] = report.benchmark_id
+        assert report.inventory == inventory
+    assert len(set(ids.values())) == len(ids), f"benchmark_id collision: {ids}"
+    assert ids["cryptochrome-like"] == "radicalpair-0001-cryptochrome-compass"
+
+
+def test_rate_sweep_is_consistent_with_the_headline_sweep():
+    # A bundle must not carry two different values for the same physical
+    # quantity. The rate series runs at the headline resolution, so the point at
+    # the report's own recombination rate is exactly the headline anisotropy --
+    # not merely close. Previously the series ran at the control resolution and
+    # differed by 1.17% with nothing in the JSON explaining it.
+    rate = 1e6
+    report = run_radical_pair_forge(
+        direction_count=60, rate_points=(1e3, rate, 1e10)
+    )
+    at_report_rate = [p for p in report.rate_sweep if p.rate_per_second == rate]
+    assert len(at_report_rate) == 1
+    assert at_report_rate[0].anisotropy == report.anisotropy
+    # And every point records the resolution it was computed at.
+    assert all(p.direction_count == report.sweep.direction_count for p in report.rate_sweep)
+    assert report.controls["primary_direction_count"] == 60
+
+
+def test_geomagnetic_condition_is_evaluated_at_the_registered_field():
+    # The registered condition names the geomagnetic field, so it must be
+    # computed there regardless of --field-ut. Previously a run at 60 uT read
+    # passed=True with the geomagnetic condition never evaluated at 50 uT.
+    key = "singlet_yield_anisotropy_positive_at_geomagnetic_field"
+
+    custom = run_radical_pair_forge(
+        field_tesla=500e-6, direction_count=16, rate_points=(1e6,)
+    )
+    from gaugegap.radical_pair_forge import REGISTERED_DIRECTION_COUNT
+    assert custom.field_microtesla == pytest.approx(500.0)
+    assert custom.controls["geomagnetic_field_microtesla"] == pytest.approx(50.0)
+    # A dedicated sweep was run, not the 500 uT one.
+    assert custom.controls["geomagnetic_sweep_reused_primary"] is False
+    assert custom.controls["geomagnetic_anisotropy"] != custom.anisotropy
+    assert custom.controls["checks"][key] is (custom.controls["geomagnetic_anisotropy"] > 1e-6)
+
+    # The gate always runs at the REGISTERED resolution, so a reduced run does
+    # not reuse the primary sweep -- anisotropy is max-minus-min over the grid,
+    # so a 16-direction sweep does not measure the registered quantity.
+    assert custom.controls["geomagnetic_direction_count"] == REGISTERED_DIRECTION_COUNT
+
+    # At the registered field, rate AND resolution the primary sweep is reused.
+    default = run_radical_pair_forge(
+        direction_count=REGISTERED_DIRECTION_COUNT,
+        rate_points=(1e6,),
+    )
+    assert default.controls["geomagnetic_sweep_reused_primary"] is True
+    assert default.controls["geomagnetic_anisotropy"] == default.anisotropy
+
+
+def test_no_hyperfine_control_really_tests_field_independence():
+    # Found by auditing every check name against what it computes, after the
+    # geomagnetic finding showed that renaming keys to match the registry aligned
+    # labels without aligning evaluations. This condition claims the yield is
+    # FIELD-independent, which a single magnitude cannot establish however many
+    # directions it sweeps.
+    from gaugegap.radical_pair_forge import NO_HYPERFINE_CONTROL_FIELDS_T
+
+    assert len(NO_HYPERFINE_CONTROL_FIELDS_T) >= 2
+    assert len(set(NO_HYPERFINE_CONTROL_FIELDS_T)) == len(NO_HYPERFINE_CONTROL_FIELDS_T)
+    # Spanning at least a decade, so "independent" means something.
+    assert max(NO_HYPERFINE_CONTROL_FIELDS_T) / min(NO_HYPERFINE_CONTROL_FIELDS_T) >= 10.0
+
+    report = run_radical_pair_forge(
+        direction_count=12, rate_points=(1e6,)
+    )
+    controls = report.controls
+    yields = controls["no_hyperfine_mean_yield_per_field"]
+    assert len(yields) == len(NO_HYPERFINE_CONTROL_FIELDS_T)
+    assert all(abs(value - 1.0) < SYMMETRY_TOLERANCE for value in yields)
+    assert controls["no_hyperfine_field_spread"] < SYMMETRY_TOLERANCE
+    assert controls["checks"]["no_hyperfine_control_yield_is_unity_and_field_independent"]
+
+
+def test_registered_conditions_are_matched_tolerantly_not_by_float_equality():
+    # The CLI computes 50.0 * 1e-6 = 4.9999999999999996e-05, which is NOT == 50e-6.
+    # An exact comparison sent the default path down the recompute branch and put
+    # two values for 50 uT in one bundle, regressing the rate-sweep consistency fix.
+    from gaugegap.radical_pair_forge import (
+        REGISTERED_DIRECTION_COUNT,
+        _at_registered_conditions,
+    )
+
+    n = REGISTERED_DIRECTION_COUNT
+    cli_value = 50.0 * 1e-6
+    assert cli_value != GEOMAGNETIC_FIELD_T  # the trap itself
+    assert _at_registered_conditions(cli_value, 1e6, n)
+    assert not _at_registered_conditions(60e-6, 1e6, n)
+    assert not _at_registered_conditions(GEOMAGNETIC_FIELD_T, 1e4, n)
+    # Resolution is part of the registered conditions too: anisotropy is the
+    # sampled max minus min, so a coarser grid measures a different quantity.
+    assert not _at_registered_conditions(GEOMAGNETIC_FIELD_T, 1e6, 40)
+
+
+def test_no_bundle_holds_two_values_for_the_registered_conditions():
+    # The invariant that matters, stated once: whenever a run IS at the registered
+    # conditions -- however its field was arithmetically produced -- the
+    # geomagnetic condition must be the headline number, not a second opinion.
+    from gaugegap.radical_pair_forge import REGISTERED_DIRECTION_COUNT
+
+    for field in (GEOMAGNETIC_FIELD_T, 50.0 * 1e-6, 50 * 1e-6):
+        report = run_radical_pair_forge(
+            field_tesla=field,
+            direction_count=REGISTERED_DIRECTION_COUNT,
+            rate_points=(1e6,),
+        )
+        controls = report.controls
+        assert controls["geomagnetic_sweep_reused_primary"] is True, field
+        assert controls["geomagnetic_anisotropy"] == report.anisotropy, field
+
+
+def test_geomagnetic_condition_uses_the_registered_rate_not_the_caller_rate():
+    from gaugegap.radical_pair_forge import DEFAULT_RATE_PER_S
+
+    report = run_radical_pair_forge(
+        rate_per_second=1e4, direction_count=16,        rate_points=(1e4,),
+    )
+    controls = report.controls
+    assert controls["geomagnetic_rate_per_second"] == DEFAULT_RATE_PER_S
+    assert controls["geomagnetic_sweep_reused_primary"] is False
+    # Decided from its own sweep, not the caller's 1e4 one.
+    assert controls["geomagnetic_anisotropy"] != report.anisotropy
+
+
+def test_asymmetric_gate_is_an_independent_solve_not_a_difference_requirement():
+    # The old gate required the asymmetric yield to DIFFER from the symmetric
+    # closed form. That is false in general: with no hyperfine coupling the
+    # Hamiltonian preserves the singlet and both give unit yield, so the gate
+    # would have failed a correct calculation. Validate against an independent
+    # algorithm instead.
+    from gaugegap.radical_pair_forge import (
+        singlet_yield_liouvillian,
+        singlet_yield_liouvillian_eigen,
+    )
+
+    for couplings in (resolve_inventory("cryptochrome-like"), ()):
+        projector = singlet_projector(hilbert_dims(couplings))
+        hamiltonian = build_hamiltonian(
+            field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.3, 0.4, 0.87), couplings=couplings
+        )
+        by_solve = singlet_yield_liouvillian(hamiltonian, projector, 2e6, 1e6)
+        by_eigen = singlet_yield_liouvillian_eigen(hamiltonian, projector, 2e6, 1e6)
+        assert abs(by_solve - by_eigen) < 1e-9
+
+    # The specific counterexample: no hyperfine -> symmetric and asymmetric agree.
+    projector = singlet_projector(hilbert_dims(()))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.3, 0.4, 0.87), couplings=()
+    )
+    symmetric = singlet_yield_liouvillian(hamiltonian, projector, 1e6, 1e6)
+    asymmetric = singlet_yield_liouvillian(hamiltonian, projector, 2e6, 1e6)
+    assert abs(asymmetric - symmetric) < 1e-12  # the old gate demanded > 1e-6
+
+
+def test_low_rate_condition_is_evaluated_at_the_registered_field():
+    from gaugegap.radical_pair_forge import REGISTERED_DIRECTION_COUNT
+
+    report = run_radical_pair_forge(
+        field_tesla=500e-6, direction_count=16,        rate_points=(1e6,),
+    )
+    controls = report.controls
+    assert controls["low_rate_field_microtesla"] == pytest.approx(50.0)
+    assert controls["low_rate_direction_count"] == REGISTERED_DIRECTION_COUNT
+
+
+def test_non_finite_field_is_rejected_before_it_reaches_the_eigensolver():
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="positive finite"):
+            run_radical_pair_forge(
+                field_tesla=bad, direction_count=8,                rate_points=(1e6,),
+            )
+
+
+def test_no_caller_parameter_can_change_a_registered_condition():
+    # Eight registered controls silently inherited the caller's field, rate or
+    # resolution, and each was found separately by review -- the last two after
+    # a helper was introduced to make a further escape impossible, because they
+    # did not route through it.  So this no longer enumerates mechanisms: it
+    # asserts the property itself, over the whole decision surface, from a
+    # hostile configuration.  At 5 T the previous code failed two registered
+    # conditions -- the Zeeman/kT ratio on the caller's field and the asymmetric
+    # solve on conditioning -- neither of which says anything about the model.
+    from gaugegap.radical_pair_forge import DEFAULT_RATE_PER_S, REGISTERED_DIRECTION_COUNT
+
+    hostile = run_radical_pair_forge(
+        field_tesla=5.0, rate_per_second=1e9, direction_count=13, rate_points=(1e9,),
+    )
+    registered = run_radical_pair_forge(
+        field_tesla=GEOMAGNETIC_FIELD_T,
+        rate_per_second=DEFAULT_RATE_PER_S,
+        direction_count=REGISTERED_DIRECTION_COUNT,
+        rate_points=(DEFAULT_RATE_PER_S,),
+    )
+
+    # Every registered condition, decided identically: one dict comparison, so a
+    # condition added later is covered without touching this test.
+    assert hostile.controls["checks"] == registered.controls["checks"]
+    assert hostile.passed and registered.passed
+
+    # And the recorded evidence behind those conditions, value by value.
+    for key in (
+        "isotropic_hyperfine_anisotropy",
+        "no_hyperfine_field_spread",
+        "fast_recombination_anisotropy",
+        "spin_free_partner_anisotropy",
+        "loaded_partner_anisotropy",
+        "geomagnetic_anisotropy",
+        "low_rate_anisotropy",
+        "larmor_comparable_anisotropy",
+        "polarity_residual",
+        "closed_form_vs_liouvillian_residual",
+        "asymmetric_solve_residual",
+        "prompt_recombination_limit",
+        "zeeman_thermal_ratio_300k_at_geomagnetic_field",
+        "registered_antipodal_residual",
+        "partner_probe",
+    ):
+        assert hostile.controls[key] == registered.controls[key], key
+
+    # The primary sweep's antipodal residual is caller-specific, so it is
+    # recorded rather than gated -- and asserted here, because the degeneracy is
+    # exact for every field and must hold in the serialized samples too.
+    assert hostile.controls["primary_antipodal_residual"] < SYMMETRY_TOLERANCE
+    assert registered.controls["primary_antipodal_residual"] < SYMMETRY_TOLERANCE
+
+    # The conditions each one was decided at are published, so a reader does not
+    # have to read the source to find out.
+    for key in (
+        "polarity_field_microtesla",
+        "partner_probe_field_microtesla",
+        "cross_check_field_microtesla",
+        "prompt_recombination_field_microtesla",
+        "zeeman_gate_field_microtesla",
+    ):
+        assert hostile.controls[key] == pytest.approx(50.0), key
+    assert hostile.controls["polarity_direction_count"] == REGISTERED_DIRECTION_COUNT
+    for key in (
+        "polarity_rate_per_second",
+        "partner_probe_rate_per_second",
+        "cross_check_rate_per_second",
+    ):
+        assert hostile.controls[key] == DEFAULT_RATE_PER_S, key
+
+    # The caller's own configuration is still recorded -- pinning the gates must
+    # not silently relabel the run as a geomagnetic one.
+    assert hostile.field_microtesla == pytest.approx(5.0e6)
+    assert hostile.controls["zeeman_thermal_ratio_300k"] > 1e-3
+
+
+def test_extreme_recombination_rates_do_not_overflow_the_closed_form():
+    # k**2 is a Python float squaring, so above ~1.34e154 the Lorentzian raised
+    # OverflowError and aborted the run instead of saturating at the
+    # k -> infinity limit.  The scaled form must reach both limits.
+    couplings = resolve_inventory("cryptochrome-like")
+    projector = singlet_projector(hilbert_dims(couplings))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 1.0), couplings=couplings
+    )
+    for fast in (1e150, 1e155, 1e300):
+        assert singlet_yield_closed_form(hamiltonian, projector, fast) == pytest.approx(
+            1.0, abs=1e-12
+        )
+
+    # The other end: a denormal-small rate overflows the ratio to inf, which must
+    # clip to the k -> 0 limit rather than serialize NaN.
+    energies, vectors = np.linalg.eigh(hamiltonian)
+    diagonal = np.abs(np.diag(vectors.conj().T @ projector @ vectors)) ** 2
+    slow_limit = float(diagonal.sum() / float(np.trace(projector).real))
+    for slow in (1e-200, 1e-300, 5e-324):
+        assert singlet_yield_closed_form(hamiltonian, projector, slow) == pytest.approx(
+            slow_limit, rel=1e-9
+        )
+
+    # And a whole run at such a rate stays finite end to end.
+    report = run_radical_pair_forge(
+        direction_count=8, rate_points=(1e-300, 1e200), inventory="spin-free-partner"
+    )
+    assert "NaN" not in json.dumps(report.summary(include_samples=True))
+
+
+def test_an_input_that_would_overflow_an_operator_is_rejected_not_silently_nan():
+    # Finiteness of the input is not the property that matters -- finiteness of
+    # the OPERATOR built from it is. k = 1e308 is positive and finite, and the
+    # direct Liouvillian solve returned nan for it rather than raising, which
+    # would have serialized as a measured yield. Every numeric boundary that
+    # feeds a matrix is checked here, not only the one a finding named.
+    from gaugegap.radical_pair_forge import (
+        MAX_FIELD_TESLA,
+        MAX_HYPERFINE_MHZ,
+        MAX_RATE_PER_S,
+        HyperfineCoupling,
+        singlet_yield_liouvillian_eigen,
+        zeeman_thermal_ratio,
+    )
+
+    couplings = resolve_inventory("spin-free-partner")
+    projector = singlet_projector(hilbert_dims(couplings))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 1.0), couplings=couplings
+    )
+
+    for bad_field in (1e308, MAX_FIELD_TESLA * 1.01):
+        with pytest.raises(ValueError, match="stay finite"):
+            build_hamiltonian(
+                field_tesla=bad_field, direction=(0.0, 0.0, 1.0), couplings=couplings
+            )
+        with pytest.raises(ValueError, match="stay finite"):
+            run_radical_pair_forge(
+                field_tesla=bad_field, direction_count=8, rate_points=(1e6,)
+            )
+        with pytest.raises(ValueError, match="stay finite"):
+            zeeman_thermal_ratio(bad_field)
+
+    for bad_rate in (1e308, MAX_RATE_PER_S * 1.01):
+        for solver in (singlet_yield_liouvillian, singlet_yield_liouvillian_eigen):
+            with pytest.raises(ValueError, match="stay finite"):
+                solver(hamiltonian, projector, bad_rate, 1e6)
+            with pytest.raises(ValueError, match="stay finite"):
+                solver(hamiltonian, projector, 1e6, bad_rate)
+        with pytest.raises(ValueError, match="stay finite"):
+            singlet_yield_closed_form(hamiltonian, projector, bad_rate)
+        with pytest.raises(ValueError, match="stay finite"):
+            run_radical_pair_forge(direction_count=8, rate_points=(1e6, bad_rate))
+
+    # Hyperfine values reach the same matrices and are routinely negative, so the
+    # bound is on magnitude.
+    for bad_coupling in (1e308, -MAX_HYPERFINE_MHZ * 1.01):
+        with pytest.raises(ValueError, match="stay finite"):
+            HyperfineCoupling(
+                name="overflowing",
+                radical_index=0,
+                multiplicity=2,
+                principal_values_mhz=(0.0, 0.0, bad_coupling),
+            )
+    with pytest.raises(ValueError, match="must be finite"):
+        HyperfineCoupling(
+            name="infinite-orientation",
+            radical_index=0,
+            multiplicity=2,
+            principal_values_mhz=(1.0, 1.0, 1.0),
+            euler_deg=(0.0, float("inf"), 0.0),
+        )
+    with pytest.raises(ValueError, match="must be finite"):
+        build_hamiltonian(
+            field_tesla=GEOMAGNETIC_FIELD_T,
+            direction=(0.0, float("nan"), 1.0),
+            couplings=couplings,
+        )
+
+    # The energy audit divides by the temperature.
+    for bad_temperature in (0.0, -300.0, float("nan")):
+        with pytest.raises(ValueError, match="positive finite"):
+            zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T, bad_temperature)
+
+    # Just inside every bound, the calculation still runs and stays finite.
+    assert math.isfinite(
+        singlet_yield_liouvillian(hamiltonian, projector, MAX_RATE_PER_S, 1e6)
+    )
+    assert math.isfinite(
+        singlet_yield_closed_form(hamiltonian, projector, MAX_RATE_PER_S)
+    )
+    assert math.isfinite(zeeman_thermal_ratio(MAX_FIELD_TESLA))
+
+
+def test_a_computed_quantity_is_checked_for_finiteness_not_just_its_inputs():
+    # Bounding the inputs is not the whole property. Three ways a run with
+    # in-bounds inputs still went wrong: a direction whose components are finite
+    # but whose NORM overflows, so the unit vector came out (0, 0, 0) and the
+    # Zeeman term silently vanished from a Hamiltonian that stayed finite; a
+    # temperature whose product with k_B underflows to zero; and a ratio that
+    # overflows from a legal field and a legal temperature.
+    from gaugegap.radical_pair_forge import zeeman_thermal_ratio
+
+    couplings = resolve_inventory("spin-free-partner")
+    huge = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(1e308, 0.0, 0.0), couplings=couplings
+    )
+    unit = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(1.0, 0.0, 0.0), couplings=couplings
+    )
+    assert np.allclose(huge, unit)
+    # Tiny components normalize the same way, from the other end.
+    tiny = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(1e-320, 0.0, 0.0), couplings=couplings
+    )
+    assert np.allclose(tiny, unit)
+    with pytest.raises(ValueError, match="non-zero"):
+        build_hamiltonian(
+            field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 0.0), couplings=couplings
+        )
+
+    # k_B * T underflows to exactly zero here, so the division would raise
+    # ZeroDivisionError rather than report anything.
+    for underflowing in (1e-310, 1e-320, 5e-324):
+        with pytest.raises(ValueError, match="representable"):
+            zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T, underflowing)
+    # Both in bounds individually, non-finite in combination.
+    with pytest.raises(ValueError, match="not finite"):
+        zeeman_thermal_ratio(1e290, 1e-300)
+    assert zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T, 300.0) == pytest.approx(2.2416e-7, rel=1e-3)
+
+
+def test_a_rate_that_vanishes_inside_the_decay_operator_is_refused():
+    # k = 5e-324 is positive and finite, but the singlet projector's entries are
+    # 0.5, so the product underflows to exactly zero: the singlet block drops out
+    # of the decay operator, the Liouvillian is singular, and BOTH solvers
+    # returned nan without raising. The floor is derived from the smallest
+    # nonzero entry the rate multiplies, not from a rate chosen in advance.
+    from gaugegap.radical_pair_forge import singlet_yield_liouvillian_eigen
+
+    couplings = resolve_inventory("spin-free-partner")
+    projector = singlet_projector(hilbert_dims(couplings))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 1.0), couplings=couplings
+    )
+    floor = float(np.finfo(float).tiny) / 0.5
+    for underflowing in (5e-324, 1e-320, 1e-310, floor / 2):
+        for solver in (singlet_yield_liouvillian, singlet_yield_liouvillian_eigen):
+            with pytest.raises(ValueError, match="relative coefficients"):
+                solver(hamiltonian, projector, underflowing, underflowing)
+            with pytest.raises(ValueError, match="relative coefficients"):
+                solver(hamiltonian, projector, RATE, underflowing)
+
+    # Just above the floor the rate no longer vanishes, but the Liouvillian is
+    # still singular to working precision and np.linalg.solve returns nan rather
+    # than raising -- which no input bound can predict, so the returned value is
+    # checked too.
+    with pytest.raises(ValueError, match="not finite"):
+        singlet_yield_liouvillian(hamiltonian, projector, 4.5e-308, 4.5e-308)
+
+
+def test_the_hyperfine_bound_scales_with_the_nuclear_spin():
+    # Bounding only the MHz-to-radians conversion was wrong: the term that lands
+    # in the matrix is A_ij * (S_i @ I_j), and the nuclear operator entries grow
+    # with the spin. For multiplicity 18 the largest |I_z| entry is 8.5, so a
+    # principal value at the spin-1/2 bound overflowed build_hamiltonian -- the
+    # constructor called it safe and the finite-output backstop caught it.
+    from gaugegap.radical_pair_forge import (
+        MAX_HYPERFINE_MHZ,
+        HyperfineCoupling,
+        max_hyperfine_mhz,
+        spin_operators,
+    )
+
+    assert float(np.abs(spin_operators(18)[2]).max()) == pytest.approx(8.5)
+    assert max_hyperfine_mhz(18) < MAX_HYPERFINE_MHZ
+    assert max_hyperfine_mhz(2) == MAX_HYPERFINE_MHZ
+
+    # The value Codex's example used: legal for a spin-1/2 nucleus, refused for
+    # this one.
+    with pytest.raises(ValueError, match="magnitude at most"):
+        HyperfineCoupling(
+            name="high-spin-at-the-wrong-bound",
+            radical_index=0,
+            multiplicity=18,
+            principal_values_mhz=(0.0, 0.0, MAX_HYPERFINE_MHZ),
+        )
+
+    # At its own bound the Hamiltonian is finite -- the model is tight, not just
+    # conservative, so the bound is not hiding a wider problem.
+    for multiplicity in (2, 3, 6, 18):
+        coupling = HyperfineCoupling(
+            name=f"m{multiplicity}",
+            radical_index=0,
+            multiplicity=multiplicity,
+            principal_values_mhz=(0.0, 0.0, max_hyperfine_mhz(multiplicity)),
+        )
+        hamiltonian = build_hamiltonian(
+            field_tesla=GEOMAGNETIC_FIELD_T,
+            direction=(0.0, 0.0, 1.0),
+            couplings=(coupling,),
+        )
+        assert np.isfinite(hamiltonian).all()
+
+
+def test_the_operator_budget_counts_peak_simultaneous_allocations():
+    # Counting ONE matrix against the budget was the same error as counting four
+    # floats per direction. Counting thirteen by reading the expressions was the
+    # same error again, smaller: the measured peak is 13.32, and the
+    # spin-operator count of three -- the returned (3, m, m) array -- was really
+    # 8.00, because s_z, s_plus, the conjugate copy behind s_minus, the two
+    # divided results and the stacked array all coexist during the return.
+    #
+    # So this test MEASURES both peaks rather than re-deriving them, and fails
+    # if the real allocation ever exceeds what the module declares.
+    import tracemalloc
+
+    from gaugegap.radical_pair_forge import (
+        _BYTES_PER_COMPLEX,
+        _HAMILTONIAN_PEAK_MATRICES,
+        _SPIN_OPERATOR_PEAK_MATRICES,
+        HyperfineCoupling,
+        MAX_HILBERT_DIMENSION,
+        MAX_SPIN_MULTIPLICITY,
+        OPERATOR_BUDGET_BYTES,
+        spin_operators,
+    )
+
+    def peak_matrices(call, dimension):
+        tracemalloc.start()
+        try:
+            call()
+            peak = tracemalloc.get_traced_memory()[1]
+        finally:
+            tracemalloc.stop()
+        return peak / (_BYTES_PER_COMPLEX * dimension**2)
+
+    # spin_operators, at a size where the fixed overhead is negligible.
+    measured = peak_matrices(lambda: spin_operators(256), 256)
+    assert measured <= _SPIN_OPERATOR_PEAK_MATRICES, measured
+    assert measured > 3, "the returned array alone is not the peak"
+
+    # build_hamiltonian, over inventory shapes at one dimension: the peak
+    # depends on how many couplings there are, not only on the dimension.
+    for multiplicities in ((36,), (2, 18), (2, 2, 9), (2, 2, 3, 3)):
+        couplings = tuple(
+            HyperfineCoupling(
+                name=f"n{index}",
+                radical_index=index % 2,
+                multiplicity=multiplicity,
+                principal_values_mhz=(1.0, 2.0, 3.0),
+                euler_deg=(0.0, 30.0, 0.0),
+            )
+            for index, multiplicity in enumerate(multiplicities)
+        )
+        dimension = int(np.prod(hilbert_dims(couplings)))
+        measured = peak_matrices(
+            lambda: build_hamiltonian(
+                field_tesla=GEOMAGNETIC_FIELD_T,
+                direction=(0.3, -0.5, 0.8),
+                couplings=couplings,
+            ),
+            dimension,
+        )
+        assert measured <= _HAMILTONIAN_PEAK_MATRICES, (multiplicities, measured)
+
+    # Each cap is the budget's own answer in both directions.
+    for count, cap in (
+        (_HAMILTONIAN_PEAK_MATRICES, MAX_HILBERT_DIMENSION),
+        (_SPIN_OPERATOR_PEAK_MATRICES, MAX_SPIN_MULTIPLICITY),
+    ):
+        assert count * _BYTES_PER_COMPLEX * cap**2 <= OPERATOR_BUDGET_BYTES
+        assert count * _BYTES_PER_COMPLEX * (cap + 1) ** 2 > OPERATOR_BUDGET_BYTES
+
+    # Still ample for every registered inventory.
+    for inventory in NUCLEAR_INVENTORIES:
+        assert int(np.prod(hilbert_dims(resolve_inventory(inventory)))) <= (
+            MAX_HILBERT_DIMENSION // 4
+        )
+
+
+def test_the_energy_audit_survives_a_field_small_enough_to_underflow():
+    # The constants were multiplied out before dividing, so the NUMERATOR
+    # underflowed first: at 1e-310 T the energy rounded to zero and the function
+    # published 0.0 as a measured ratio, although 4.48e-313 is representable.
+    # A fabricated zero is worse than an error.
+    from gaugegap.radical_pair_forge import (
+        BOLTZMANN_J_PER_K,
+        GYROMAGNETIC_RATIO_E,
+        PLANCK_J_S,
+        zeeman_thermal_ratio,
+    )
+
+    tiny = 1e-310
+    naive = PLANCK_J_S * (GYROMAGNETIC_RATIO_E / (2.0 * math.pi)) * tiny
+    assert naive == 0.0, "the ordering this test guards against must still underflow"
+    assert zeeman_thermal_ratio(tiny) == pytest.approx(4.4832850656e-313, rel=1e-6)
+    assert zeeman_thermal_ratio(tiny) > 0.0
+
+    # Below that, no ordering saves it, so it raises rather than publishing zero.
+    for unrepresentable in (5e-324, 1e-322):
+        with pytest.raises(ValueError, match="representable"):
+            zeeman_thermal_ratio(unrepresentable)
+
+    # The registered value is unchanged by the reordering.
+    assert zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T) == pytest.approx(2.2416e-7, rel=1e-3)
+
+
+def test_the_direction_budget_counts_what_a_direction_actually_costs():
+    # The first version of this accounting counted four float64 values per
+    # direction, 32 bytes, against a retained DirectionSample that really costs
+    # ~556: the cap advertised as fitting 64 MiB would have needed about 1.1 GiB.
+    import sys as _sys
+
+    from gaugegap.radical_pair_forge import (
+        BYTES_PER_DIRECTION,
+        DIRECTION_GRID_BUDGET_BYTES,
+        MAX_DIRECTION_COUNT,
+        REGISTERED_DIRECTION_COUNT,
+    )
+
+    sample = DirectionSample(
+        index=0,
+        x=0.0,
+        y=0.0,
+        z=1.0,
+        polar_deg=0.0,
+        azimuth_deg=0.0,
+        singlet_yield=0.0,
+        antipodal_singlet_yield=0.0,
+    )
+    # The accounting must cover the retained object itself, not just its numbers.
+    assert BYTES_PER_DIRECTION >= _sys.getsizeof(sample)
+    assert BYTES_PER_DIRECTION > 8 * len(dataclasses.fields(DirectionSample))
+    # And the cap must actually fit the budget it is derived from.
+    assert MAX_DIRECTION_COUNT * BYTES_PER_DIRECTION <= DIRECTION_GRID_BUDGET_BYTES
+    # Still generous: the registered resolution is 200.
+    assert MAX_DIRECTION_COUNT > 100 * REGISTERED_DIRECTION_COUNT
+
+
+def test_a_count_that_cannot_be_allocated_is_refused_at_its_boundary():
+    # An accepted count that dies in an allocation is the same defect as an
+    # accepted rate that dies in a solve, and it need not be loud: on numpy 2.4.6
+    # a direction count of 2**63 overflows int64 inside np.arange and returns an
+    # EMPTY grid, so the sweep ran on zero directions and failed later in a
+    # reduction. Both caps are arithmetic on a declared budget.
+    from gaugegap.radical_pair_forge import (
+        MAX_DIRECTION_COUNT,
+        MAX_HILBERT_DIMENSION,
+        MAX_SPIN_MULTIPLICITY,
+        HyperfineCoupling,
+        fibonacci_directions,
+        spin_operators,
+    )
+
+    assert fibonacci_directions(MAX_DIRECTION_COUNT // 1024).shape == (
+        MAX_DIRECTION_COUNT // 1024,
+        3,
+    )
+    for oversized in (2**63, MAX_DIRECTION_COUNT + 1, 2**40):
+        with pytest.raises(ValueError, match="at most"):
+            fibonacci_directions(oversized)
+        with pytest.raises(ValueError, match="at most"):
+            run_radical_pair_forge(direction_count=oversized, rate_points=(1e6,))
+
+    # A single spin's own peak is its (3, m, m) array, so that bound is looser
+    # than the Hilbert-space one below -- and each has to be applied where it
+    # belongs rather than one standing in for the other.
+    assert MAX_SPIN_MULTIPLICITY > MAX_HILBERT_DIMENSION
+    for oversized in (2**20, MAX_SPIN_MULTIPLICITY + 1):
+        with pytest.raises(ValueError, match="at most"):
+            spin_operators(oversized)
+        with pytest.raises(ValueError, match="at most"):
+            HyperfineCoupling(
+                name="oversized",
+                radical_index=0,
+                multiplicity=oversized,
+                principal_values_mhz=(1.0, 1.0, 1.0),
+            )
+    # A multiplicity between the two bounds is a legal spin on its own and an
+    # illegal inventory, because the electron pair multiplies the dimension.
+    between = HyperfineCoupling(
+        name="between",
+        radical_index=0,
+        multiplicity=MAX_HILBERT_DIMENSION + 1,
+        principal_values_mhz=(1.0, 1.0, 1.0),
+    )
+    with pytest.raises(ValueError, match="Hilbert dimension"):
+        hilbert_dims((between,))
+
+    # Each multiplicity can be legal while their PRODUCT is not.
+    many = tuple(
+        HyperfineCoupling(
+            name=f"n{index}",
+            radical_index=index % 2,
+            multiplicity=3,
+            principal_values_mhz=(1.0, 1.0, 1.0),
+        )
+        for index in range(8)
+    )
+    with pytest.raises(ValueError, match="Hilbert dimension"):
+        hilbert_dims(many)
+
+    # Every registered inventory stays well inside both budgets.
+    for inventory in NUCLEAR_INVENTORIES:
+        dims = hilbert_dims(resolve_inventory(inventory))
+        assert int(np.prod(dims)) <= MAX_HILBERT_DIMENSION
+
+
+def test_the_eigen_route_refuses_rates_where_it_is_silently_inaccurate():
+    # Found while checking the underflow report: at small rates the two solve
+    # routes DISAGREE, both finite, with nothing raised. Inverting eigenvalues of
+    # a Liouvillian whose spectrum spans |H| down to k carries a relative error
+    # of order eps * |H| / k, so the eigen route returned 0.1667 where the truth
+    # is 0.4958. The direct solve matches the closed form at every rate here.
+    from gaugegap.radical_pair_forge import singlet_yield_liouvillian_eigen
+
+    couplings = resolve_inventory("spin-free-partner")
+    projector = singlet_projector(hilbert_dims(couplings))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 1.0), couplings=couplings
+    )
+    floor = math.sqrt(float(np.finfo(float).eps)) * float(np.abs(hamiltonian).max())
+
+    # The direct route has no such limit: it tracks the closed form over twenty
+    # decades of rate, which is what makes it the one the report gates on.
+    for exponent in range(-20, 7, 2):
+        rate = 10.0**exponent
+        assert singlet_yield_liouvillian(
+            hamiltonian, projector, rate, rate
+        ) == pytest.approx(singlet_yield_closed_form(hamiltonian, projector, rate), abs=1e-9)
+
+    for below in (floor / 2, floor / 1e6, 1e-10):
+        with pytest.raises(ValueError, match="eigendecomposition route"):
+            singlet_yield_liouvillian_eigen(hamiltonian, projector, below, below)
+
+    # Above the floor it agrees with the closed form again, which is the regime
+    # the registered cross-check runs in.
+    for rate in (floor * 4, 1e3, RATE):
+        assert singlet_yield_liouvillian_eigen(
+            hamiltonian, projector, rate, rate
+        ) == pytest.approx(singlet_yield_closed_form(hamiltonian, projector, rate), abs=1e-9)
+    assert RATE > floor * 1e5
+
+
+def test_a_three_vector_argument_must_actually_be_a_three_vector():
+    # Sequence[float] is not a shape check. A four-component direction was
+    # normalized using all four components while the Zeeman sum read the first
+    # three, so the field contribution came out a factor of sqrt(2) small with
+    # nothing raised; two components failed later with IndexError; and a
+    # hyperfine tuple of the wrong length could be constructed and stored, only
+    # failing when a tensor was built from it.
+    from gaugegap.radical_pair_forge import HyperfineCoupling
+
+    couplings = resolve_inventory("spin-free-partner")
+    for bad in ((1.0, 0.0, 0.0, 1.0), (1.0, 0.0), (1.0,), np.zeros((3, 1)), ()):
+        with pytest.raises(ValueError, match="exactly three components"):
+            build_hamiltonian(
+                field_tesla=GEOMAGNETIC_FIELD_T, direction=bad, couplings=couplings
+            )
+
+    for principal, euler in (
+        ((1.0, 2.0, 3.0, 4.0), (0.0, 0.0, 0.0)),
+        ((1.0, 2.0), (0.0, 0.0, 0.0)),
+        ((1.0, 2.0, 3.0), (0.0, 0.0)),
+        ((1.0, 2.0, 3.0), (0.0, 0.0, 0.0, 0.0)),
+    ):
+        with pytest.raises(ValueError, match="exactly three components"):
+            HyperfineCoupling(
+                name="wrong-shape",
+                radical_index=0,
+                multiplicity=2,
+                principal_values_mhz=principal,
+                euler_deg=euler,
+            )
+
+    # The shape check must not have narrowed what a legitimate direction is: a
+    # list, a tuple and an array all still describe the same Hamiltonian.
+    reference = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.3, -0.5, 0.8), couplings=couplings
+    )
+    for same in ([0.3, -0.5, 0.8], np.array([0.3, -0.5, 0.8]), (0.6, -1.0, 1.6)):
+        assert np.allclose(
+            build_hamiltonian(
+                field_tesla=GEOMAGNETIC_FIELD_T, direction=same, couplings=couplings
+            ),
+            reference,
+        )
+
+
+def test_cli_counts_are_argument_errors_not_tracebacks():
+    # --rate-points 307 evaluated 10.0 ** 309 while building the argument, so it
+    # raised OverflowError before the report could apply its own rate bound, and
+    # --direction-count 1 died inside fibonacci_directions. Both are argument
+    # errors and must read as argument errors.
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "_rp_runner_counts", ROOT / "scripts" / "run_radical_pair_forge.py"
+    )
+    assert spec is not None and spec.loader is not None
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+
+    # The upper bound is derived from the module's rate bound, not chosen here.
+    from gaugegap.radical_pair_forge import MAX_RATE_PER_S
+
+    assert 10.0 ** (runner.RATE_SWEEP_BASE_DECADE + runner.MAX_RATE_POINTS - 1) <= MAX_RATE_PER_S
+    with pytest.raises(OverflowError):
+        10.0 ** (runner.RATE_SWEEP_BASE_DECADE + runner.MAX_RATE_POINTS + 2)
+
+    for argument, value in (
+        ("--rate-points", str(runner.MAX_RATE_POINTS + 2)),
+        ("--rate-points", "1"),
+        ("--direction-count", "1"),
+        ("--direction-count", "0"),
+        ("--direction-count", "9223372036854775808"),
+        ("--field-ut", "1e308"),
+        ("--field-ut", "-1"),
+        # Positive and finite in microtesla, exactly 0.0 once converted to
+        # tesla: the argument is fine and the value it produces is not.
+        ("--field-ut", "5e-324"),
+    ):
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "run_radical_pair_forge.py"),
+                argument,
+                value,
+                "--output-dir",
+                "/tmp/radical-pair-should-not-exist",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert completed.returncode == 2, (argument, value, completed.stdout + completed.stderr)
+        assert f"argument {argument}" in completed.stderr
+        assert "Traceback" not in completed.stderr
+
+
+def test_the_antipodal_gate_is_decided_at_the_registered_resolution():
+    # A 12-direction run would otherwise certify a registered condition from 12
+    # samples. The gate reads the registered 200-direction sweep; the primary
+    # sweep's residual is recorded as caller-specific output, exactly as the
+    # samples it describes are.
+    from gaugegap.radical_pair_forge import REGISTERED_DIRECTION_COUNT
+
+    small = run_radical_pair_forge(
+        field_tesla=200e-6, rate_per_second=1e5, direction_count=12, rate_points=(1e5,)
+    )
+    assert small.controls["geomagnetic_direction_count"] == REGISTERED_DIRECTION_COUNT
+    assert len(small.sweep.samples) == 12
+    assert small.controls["checks"]["antipodal_yield_recorded_per_sampled_direction"]
+    assert small.controls["registered_antipodal_residual"] < SYMMETRY_TOLERANCE
+    assert small.controls["primary_antipodal_residual"] < SYMMETRY_TOLERANCE
+
+    registered = run_radical_pair_forge(
+        direction_count=REGISTERED_DIRECTION_COUNT, rate_points=(1e6,)
+    )
+    assert (
+        small.controls["registered_antipodal_residual"]
+        == registered.controls["registered_antipodal_residual"]
+    )
+
+
+def test_the_two_solve_routes_agree_across_field_scales():
+    # The registered cross-check gate is decided at 50 uT, so the field
+    # dependence of the agreement is asserted here instead of there.  Both
+    # routes are exact expressions; what grows with the field is the
+    # conditioning of the dim^2 solve, so the tolerance scales with the
+    # Liouvillian's own spectral spread rather than being a flat 1e-9 that
+    # happens to hold at one field.
+    from gaugegap.radical_pair_forge import singlet_yield_liouvillian_eigen
+
+    couplings = resolve_inventory("spin-free-partner")
+    projector = singlet_projector(hilbert_dims(couplings))
+    for field in (GEOMAGNETIC_FIELD_T, 5e-3, 0.5, 5.0):
+        hamiltonian = build_hamiltonian(
+            field_tesla=field, direction=(0.3, -0.5, 0.8), couplings=couplings
+        )
+        closed = singlet_yield_closed_form(hamiltonian, projector, RATE)
+        exact = singlet_yield_liouvillian(hamiltonian, projector, RATE, RATE)
+        assert closed == pytest.approx(exact, abs=1e-9)
+        asymmetric = singlet_yield_liouvillian(hamiltonian, projector, 2 * RATE, RATE)
+        independent = singlet_yield_liouvillian_eigen(
+            hamiltonian, projector, 2 * RATE, RATE
+        )
+        scale = max(1.0, float(np.abs(hamiltonian).max()) / RATE)
+        assert abs(asymmetric - independent) < 1e-12 * scale
+
+
+def test_the_figure_captions_follow_the_data_they_caption():
+    # The rate-axis labels were once hardcoded at 1e3..1e10 while --rate-points 4
+    # swept 1e3..1e6, and a caption once asserted a symmetry the numbers beside
+    # it contradicted. Any prose printed next to a number has to be derived from
+    # that number, so both are checked here from a run chosen to break them.
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "run_radical_pair_forge_under_test",
+        ROOT / "scripts" / "run_radical_pair_forge.py",
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    hostile = run_radical_pair_forge(
+        field_tesla=5.0, rate_per_second=1e5, direction_count=8,
+        rate_points=(1e3, 1e4, 1e5),
+    )
+    svg = module._render_svg(hostile.summary(include_samples=True))
+    assert "10^3 s-1" in svg and "10^5 s-1" in svg
+    assert "10^10 s-1" not in svg
+    # At 5 T the Zeeman quantum is ~2e-2 of k_B T, so the figure must not print
+    # the opposite of the ratio it is captioning.
+    assert hostile.controls["zeeman_thermal_ratio_300k"] > 1e-3
+    assert "no thermal mechanism is available" not in svg
+    assert "not the geomagnetic case" in svg
+
+    registered = run_radical_pair_forge(direction_count=8, rate_points=(1e3, 1e6))
+    svg = module._render_svg(registered.summary(include_samples=True))
+    assert "no thermal mechanism is available" in svg
+    assert "10^6 s-1" in svg
+
+
+def test_the_partner_probe_note_describes_the_data_in_the_same_bundle():
+    # An earlier caption said the yield was "symmetric about 90 degrees" while
+    # the numbers beside it said otherwise.  The probe's note makes a claim about
+    # the direction of the effect, so the claim and the data must be checked
+    # against each other -- from a hostile field, where the probe ratios differ
+    # by an order of magnitude if the probe is not pinned.
+    report = run_radical_pair_forge(
+        field_tesla=0.5, rate_per_second=1e5, direction_count=12, rate_points=(1e5,)
+    )
+    controls = report.controls
+    claims_no_increase = "No probe point increases the anisotropy" in str(
+        controls["partner_probe_note"]
+    )
+    assert claims_no_increase is not bool(controls["partner_probe_any_increase"])
+    assert not any(point["increases_anisotropy"] for point in controls["partner_probe"])
+    assert controls["partner_probe_field_microtesla"] == pytest.approx(50.0)
+
+
+def test_non_finite_rates_are_rejected_everywhere():
+    # nan and inf both pass a bare positivity test. An infinite rate gives
+    # inf/inf in the Lorentzian and serializes NaN into the bundle, and `passed`
+    # never inspects rate_sweep.
+    from gaugegap.radical_pair_forge import (
+        singlet_yield_closed_form,
+        singlet_yield_liouvillian,
+    )
+
+    couplings = resolve_inventory("cryptochrome-like")
+    projector = singlet_projector(hilbert_dims(couplings))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 1.0), couplings=couplings
+    )
+    for bad in (float("nan"), float("inf"), 0.0, -1.0):
+        with pytest.raises(ValueError, match="positive finite"):
+            singlet_yield_closed_form(hamiltonian, projector, bad)
+        with pytest.raises(ValueError, match="positive finite"):
+            singlet_yield_liouvillian(hamiltonian, projector, bad, 1e6)
+        with pytest.raises(ValueError, match="positive finite"):
+            run_radical_pair_forge(
+                rate_per_second=bad, direction_count=8,
+                rate_points=(1e6,),
+            )
+        # And every entry of rate_points, not just the primary rate.
+        with pytest.raises(ValueError, match="positive finite"):
+            run_radical_pair_forge(
+                direction_count=8, rate_points=(1e6, bad),
+            )
+
+
+def test_no_nan_reaches_the_evidence_bundle():
+    report = run_radical_pair_forge(
+        direction_count=12, rate_points=(1e3, 1e6)
+    )
+    payload = json.dumps(report.summary(include_samples=True))
+    assert "NaN" not in payload and "Infinity" not in payload
