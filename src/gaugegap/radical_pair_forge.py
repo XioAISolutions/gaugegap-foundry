@@ -351,7 +351,12 @@ class DirectionSample:
     # Yield at the true antipode (180 - theta, phi + 180).  Carried per sample so
     # the evidence bundle demonstrates the polarity degeneracy instead of merely
     # asserting it: the polar angle alone does not determine the yield.
-    antipodal_singlet_yield: float = 0.0
+    #
+    # Deliberately REQUIRED, with no default.  A measured quantity that defaults
+    # to 0.0 can be serialized unpopulated and read as a real measurement, which
+    # is fabricated evidence; making it required means a code path that forgets
+    # it fails loudly instead.
+    antipodal_singlet_yield: float
 
     def summary(self) -> dict[str, Any]:
         return asdict(self)
@@ -369,7 +374,13 @@ class DirectionSweep:
     mean_yield: float
     anisotropy: float
     relative_contrast: float
-    isotropic_control_anisotropy: float
+    # NOTE: the isotropic-hyperfine control is deliberately NOT a field here.
+    # It is a report-level comparison between two sweeps, computed once in
+    # run_radical_pair_forge and published as
+    # controls["isotropic_hyperfine_anisotropy"].  A per-sweep field would have
+    # to be either recomputed on every call (the rate sweep alone runs eight) or
+    # left unpopulated, and an unpopulated control field in an evidence bundle is
+    # fabricated evidence.
     samples: tuple[DirectionSample, ...] = dataclass_field(default=(), repr=False)
 
     def summary(self, *, include_samples: bool = False) -> dict[str, Any]:
@@ -512,7 +523,6 @@ def sweep_field_directions(
         mean_yield=mean_yield,
         anisotropy=anisotropy,
         relative_contrast=float(anisotropy / mean_yield) if mean_yield else 0.0,
-        isotropic_control_anisotropy=0.0,
         samples=samples,
     )
 

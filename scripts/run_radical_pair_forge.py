@@ -20,6 +20,16 @@ from gaugegap.radical_pair_forge import (  # noqa: E402
     run_radical_pair_forge,
 )
 
+# Directory slug per inventory, so the default --output-dir tracks the selected
+# model.  "cryptochrome-like" keeps the "cryptochrome-compass" slug its committed
+# evidence bundle already uses rather than orphaning that directory.
+OUTPUT_SLUGS = {
+    "cryptochrome-like": "cryptochrome-compass",
+    "spin-free-partner": "spin-free-partner",
+    "loaded": "loaded",
+}
+assert set(OUTPUT_SLUGS) == set(NUCLEAR_INVENTORIES), "every inventory needs an output slug"
+
 
 def _render_svg(payload: dict[str, object]) -> str:
     sweep = payload["sweep"]
@@ -111,9 +121,18 @@ def main() -> int:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=ROOT / "results" / "radicalpair-0001-cryptochrome-compass",
+        default=None,
+        help="defaults to results/radicalpair-0001-<inventory>, derived after parsing",
     )
     args = parser.parse_args()
+
+    # The default must follow the selected inventory, not be fixed at parser
+    # construction: otherwise `--inventory loaded` with no --output-dir would
+    # overwrite the default inventory's committed evidence bundle with results
+    # for a different model, under a directory name that still said
+    # "cryptochrome-compass".
+    if args.output_dir is None:
+        args.output_dir = ROOT / "results" / f"radicalpair-0001-{OUTPUT_SLUGS[args.inventory]}"
 
     report = run_radical_pair_forge(
         inventory=args.inventory,

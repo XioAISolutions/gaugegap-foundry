@@ -161,7 +161,6 @@
     "field_microtesla": 49.99999999999999,
     "hilbert_dimension": 24,
     "inventory": "cryptochrome-like",
-    "isotropic_control_anisotropy": 0.0,
     "maximum_yield": 0.2741949462411863,
     "mean_yield": 0.26048063434653296,
     "minimum_yield": 0.255113861274967,

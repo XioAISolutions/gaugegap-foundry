@@ -11,7 +11,9 @@ import pytest
 from gaugegap.radical_pair_forge import (
     GEOMAGNETIC_FIELD_T,
     HYPERFINE_REGISTRY,
+    NUCLEAR_INVENTORIES,
     SYMMETRY_TOLERANCE,
+    DirectionSample,
     build_hamiltonian,
     fibonacci_directions,
     hilbert_dims,
@@ -249,6 +251,39 @@ def test_anisotropy_does_not_peak_near_the_larmor_rate():
     assert slow.anisotropy >= larmor.anisotropy
 
 
+def test_no_measured_field_can_be_silently_unpopulated():
+    # Root cause of three separate review findings: a measured quantity with a
+    # scalar default can be serialized unpopulated and read as a real result.
+    # Every measurement field must be required, so a forgetful code path raises.
+    import dataclasses
+
+    from gaugegap.radical_pair_forge import DirectionSweep, RatePoint
+
+    for cls in (DirectionSample, DirectionSweep, RatePoint):
+        for field in dataclasses.fields(cls):
+            if field.name == "samples":
+                continue  # a container, not a measurement
+            assert field.default is dataclasses.MISSING, (
+                f"{cls.__name__}.{field.name} has a default; measured fields must be "
+                "required so they cannot be silently unpopulated"
+            )
+
+
+def test_sweep_does_not_publish_a_control_it_never_computed():
+    # The isotropic control is a comparison between two sweeps and belongs to the
+    # report, not to a single sweep.  A single sweep must not carry a control field.
+    sweep = sweep_field_directions(
+        couplings=resolve_inventory("cryptochrome-like"), rate_per_second=RATE, direction_count=8
+    )
+    payload = sweep.summary()
+    assert "isotropic_control_anisotropy" not in payload
+    # The real control is published once, from an actual control sweep.
+    report = run_radical_pair_forge(
+        direction_count=12, control_direction_count=8, rate_points=(1e6,)
+    )
+    assert 0.0 < report.controls["isotropic_hyperfine_anisotropy"] < SYMMETRY_TOLERANCE
+
+
 def test_unknown_inventory_fails_closed():
     with pytest.raises(ValueError, match="unknown inventory"):
         resolve_inventory("robin-eye-over-usb")
@@ -283,3 +318,22 @@ def test_runner_emits_evidence_bundle(tmp_path: Path):
     assert (output / "directions.csv").exists()
     assert (output / "rate_sweep.csv").exists()
     assert (output / "radical_pair_forge.svg").exists()
+
+
+def test_default_output_dir_follows_the_selected_inventory(tmp_path: Path):
+    # A valid CLI call must never overwrite another inventory's evidence bundle.
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "_rp_runner", ROOT / "scripts" / "run_radical_pair_forge.py"
+    )
+    runner = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(runner)
+
+    slugs = runner.OUTPUT_SLUGS
+    # Every registered inventory has its own distinct destination.
+    assert set(slugs) == set(NUCLEAR_INVENTORIES)
+    assert len(set(slugs.values())) == len(slugs)
+    # The default inventory keeps the slug its committed bundle already uses.
+    assert slugs["cryptochrome-like"] == "cryptochrome-compass"

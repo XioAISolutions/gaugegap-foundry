@@ -143,7 +143,6 @@
     "field_microtesla": 49.99999999999999,
     "hilbert_dimension": 12,
     "inventory": "spin-free-partner",
-    "isotropic_control_anisotropy": 0.0,
     "maximum_yield": 0.6567127425374687,
     "mean_yield": 0.5511336399538806,
     "minimum_yield": 0.4975501345616052,
