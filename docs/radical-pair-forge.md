@@ -183,6 +183,15 @@ temperature. `_require_finite_output` is the backstop for all of them, and the
 direction is normalized by its largest component first so the norm cannot
 overflow.
 
+Shape is checked for the same reason. A `Sequence[float]` annotation is not a
+shape check, and a four-component direction was normalized using all four
+components while the Zeeman sum read the first three — the requested field
+contribution came out a factor of `sqrt(2)` small with nothing raised. Every
+three-vector argument, including a coupling's principal values and Euler
+angles, goes through one converter that requires exactly three finite
+components at the boundary where it is declared, rather than failing later
+inside a matmul that names neither the coupling nor the field.
+
 Nine controls inherited a caller parameter at some point in this track's
 history, and each was found separately by review; two of them after a helper was
 added to make a further escape impossible, because they did not route through

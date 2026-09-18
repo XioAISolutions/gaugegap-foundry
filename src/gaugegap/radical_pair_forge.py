@@ -137,6 +137,28 @@ def _require_finite_magnitude(
     return numeric
 
 
+def _require_three_vector(name: str, value: Any) -> np.ndarray:
+    """Convert to a finite ``(3,)`` float array, or say exactly what was wrong.
+
+    A ``Sequence[float]`` annotation is not a shape check.  A four-component
+    direction was normalized using all four components while the Zeeman sum used
+    the first three, so the requested field contribution came out a factor of
+    sqrt(2) small with nothing raised; a two-component one failed later with an
+    IndexError from inside the sum; and a hyperfine tuple of the wrong length
+    could be stored in a registry and only fail when a tensor was built from it,
+    with a matmul dimension error naming neither the coupling nor the field.
+    """
+    array = np.asarray(value, dtype=float)
+    if array.shape != (3,):
+        raise ValueError(
+            f"{name} must have exactly three components; got shape "
+            f"{array.shape} from {value!r}"
+        )
+    for index, component in enumerate(array):
+        _require_finite_magnitude(f"{name}[{index}]", float(component))
+    return array
+
+
 def _require_finite_output(name: str, value: Any) -> Any:
     """Backstop: no non-finite computed quantity may be used or published.
 
@@ -196,14 +218,16 @@ class HyperfineCoupling:
             raise ValueError("radical_index must be 0 or 1")
         if self.multiplicity < 2:
             raise ValueError("multiplicity must be at least 2")
-        for index, value in enumerate(self.principal_values_mhz):
+        principal = _require_three_vector(
+            f"{self.name}.principal_values_mhz", self.principal_values_mhz
+        )
+        for index, value in enumerate(principal):
             _require_finite_magnitude(
                 f"{self.name}.principal_values_mhz[{index}]", value, MAX_HYPERFINE_MHZ
             )
-        for index, value in enumerate(self.euler_deg):
-            # No magnitude bound: any finite angle is meaningful. An infinite one
-            # gives nan through cos/sin and a silently non-finite tensor.
-            _require_finite_magnitude(f"{self.name}.euler_deg[{index}]", value)
+        # No magnitude bound on the angles: any finite angle is meaningful. An
+        # infinite one gives nan through cos/sin and a silently non-finite tensor.
+        _require_three_vector(f"{self.name}.euler_deg", self.euler_deg)
 
     @property
     def anisotropy_mhz(self) -> float:
@@ -418,9 +442,9 @@ def build_hamiltonian(
         index: [_embed(op, dims, index) for op in spin_operators(2)]
         for index in (0, 1)
     }
-    unit = np.asarray(direction, dtype=float)
-    if not np.isfinite(unit).all():
-        raise ValueError(f"direction must be finite; got {direction!r}")
+    # Shape first: the sum below reads exactly three components, so a longer
+    # vector would be normalized using components the Hamiltonian never sees.
+    unit = _require_three_vector("direction", direction)
     # Scale by the largest component before taking the norm.  For (1e308, 0, 0)
     # every component is finite but the norm overflows to inf, and dividing by
     # it gives exactly (0, 0, 0): the Zeeman term vanishes and the Hamiltonian

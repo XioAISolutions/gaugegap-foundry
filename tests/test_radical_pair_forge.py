@@ -988,6 +988,51 @@ def test_a_computed_quantity_is_checked_for_finiteness_not_just_its_inputs():
     assert zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T, 300.0) == pytest.approx(2.2416e-7, rel=1e-3)
 
 
+def test_a_three_vector_argument_must_actually_be_a_three_vector():
+    # Sequence[float] is not a shape check. A four-component direction was
+    # normalized using all four components while the Zeeman sum read the first
+    # three, so the field contribution came out a factor of sqrt(2) small with
+    # nothing raised; two components failed later with IndexError; and a
+    # hyperfine tuple of the wrong length could be constructed and stored, only
+    # failing when a tensor was built from it.
+    from gaugegap.radical_pair_forge import HyperfineCoupling
+
+    couplings = resolve_inventory("spin-free-partner")
+    for bad in ((1.0, 0.0, 0.0, 1.0), (1.0, 0.0), (1.0,), np.zeros((3, 1)), ()):
+        with pytest.raises(ValueError, match="exactly three components"):
+            build_hamiltonian(
+                field_tesla=GEOMAGNETIC_FIELD_T, direction=bad, couplings=couplings
+            )
+
+    for principal, euler in (
+        ((1.0, 2.0, 3.0, 4.0), (0.0, 0.0, 0.0)),
+        ((1.0, 2.0), (0.0, 0.0, 0.0)),
+        ((1.0, 2.0, 3.0), (0.0, 0.0)),
+        ((1.0, 2.0, 3.0), (0.0, 0.0, 0.0, 0.0)),
+    ):
+        with pytest.raises(ValueError, match="exactly three components"):
+            HyperfineCoupling(
+                name="wrong-shape",
+                radical_index=0,
+                multiplicity=2,
+                principal_values_mhz=principal,
+                euler_deg=euler,
+            )
+
+    # The shape check must not have narrowed what a legitimate direction is: a
+    # list, a tuple and an array all still describe the same Hamiltonian.
+    reference = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.3, -0.5, 0.8), couplings=couplings
+    )
+    for same in ([0.3, -0.5, 0.8], np.array([0.3, -0.5, 0.8]), (0.6, -1.0, 1.6)):
+        assert np.allclose(
+            build_hamiltonian(
+                field_tesla=GEOMAGNETIC_FIELD_T, direction=same, couplings=couplings
+            ),
+            reference,
+        )
+
+
 def test_cli_counts_are_argument_errors_not_tracebacks():
     # --rate-points 307 evaluated 10.0 ** 309 while building the argument, so it
     # raised OverflowError before the report could apply its own rate bound, and
