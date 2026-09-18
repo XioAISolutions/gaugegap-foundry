@@ -135,6 +135,19 @@ smaller fixed system and the report records which one was used
 inventory-independent, so a smaller system tests it just as well. Symmetric rates agree to `~1e-16`; asymmetric rates
 differ, and converge back as the rates are brought together.
 
+The two routes do not have the same numerical domain, and saying so is part of
+the cross-check. The direct solve tracks the closed form over twenty decades of
+rate, down to `1e-20`. The eigendecomposition route inverts the eigenvalues of a
+non-Hermitian Liouvillian whose spectrum spans `|H|` down to `k`, so its relative
+error grows as `eps * |H| / k`: at `k = 1e-10` it returned `0.1667` against a
+true `0.4958`, finite and with nothing raised. It now refuses below
+`sqrt(eps) * |H|`, where that error is at most `sqrt(eps)` — about `2.4 s^-1`
+for the spin-free-partner system at 50 µT, against the registered `1e6`. A rate
+small enough to underflow inside the decay operator itself (`k = 5e-324`
+multiplied by the projector's `0.5` entries) is refused by both routes, and each
+checks the yield it is about to return, because a Liouvillian that is singular
+to working precision makes `np.linalg.solve` produce `nan` rather than raise.
+
 Both routes are exact expressions, but their *numerical* agreement degrades with
 the energy scale, because the conditioning of the `dim^2` solve does: the
 asymmetric residual is `1.4e-16` at 50 uT, `1.1e-10` at 0.5 T and `2.0e-9` at

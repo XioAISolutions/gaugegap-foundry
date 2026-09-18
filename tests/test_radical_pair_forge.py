@@ -988,6 +988,71 @@ def test_a_computed_quantity_is_checked_for_finiteness_not_just_its_inputs():
     assert zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T, 300.0) == pytest.approx(2.2416e-7, rel=1e-3)
 
 
+def test_a_rate_that_vanishes_inside_the_decay_operator_is_refused():
+    # k = 5e-324 is positive and finite, but the singlet projector's entries are
+    # 0.5, so the product underflows to exactly zero: the singlet block drops out
+    # of the decay operator, the Liouvillian is singular, and BOTH solvers
+    # returned nan without raising. The floor is derived from the smallest
+    # nonzero entry the rate multiplies, not from a rate chosen in advance.
+    from gaugegap.radical_pair_forge import singlet_yield_liouvillian_eigen
+
+    couplings = resolve_inventory("spin-free-partner")
+    projector = singlet_projector(hilbert_dims(couplings))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 1.0), couplings=couplings
+    )
+    floor = float(np.finfo(float).tiny) / 0.5
+    for underflowing in (5e-324, 1e-320, 1e-310, floor / 2):
+        for solver in (singlet_yield_liouvillian, singlet_yield_liouvillian_eigen):
+            with pytest.raises(ValueError, match="relative coefficients"):
+                solver(hamiltonian, projector, underflowing, underflowing)
+            with pytest.raises(ValueError, match="relative coefficients"):
+                solver(hamiltonian, projector, RATE, underflowing)
+
+    # Just above the floor the rate no longer vanishes, but the Liouvillian is
+    # still singular to working precision and np.linalg.solve returns nan rather
+    # than raising -- which no input bound can predict, so the returned value is
+    # checked too.
+    with pytest.raises(ValueError, match="not finite"):
+        singlet_yield_liouvillian(hamiltonian, projector, 4.5e-308, 4.5e-308)
+
+
+def test_the_eigen_route_refuses_rates_where_it_is_silently_inaccurate():
+    # Found while checking the underflow report: at small rates the two solve
+    # routes DISAGREE, both finite, with nothing raised. Inverting eigenvalues of
+    # a Liouvillian whose spectrum spans |H| down to k carries a relative error
+    # of order eps * |H| / k, so the eigen route returned 0.1667 where the truth
+    # is 0.4958. The direct solve matches the closed form at every rate here.
+    from gaugegap.radical_pair_forge import singlet_yield_liouvillian_eigen
+
+    couplings = resolve_inventory("spin-free-partner")
+    projector = singlet_projector(hilbert_dims(couplings))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 1.0), couplings=couplings
+    )
+    floor = math.sqrt(float(np.finfo(float).eps)) * float(np.abs(hamiltonian).max())
+
+    # The direct route has no such limit: it tracks the closed form over twenty
+    # decades of rate, which is what makes it the one the report gates on.
+    for exponent in range(-20, 7, 2):
+        rate = 10.0**exponent
+        assert singlet_yield_liouvillian(
+            hamiltonian, projector, rate, rate
+        ) == pytest.approx(singlet_yield_closed_form(hamiltonian, projector, rate), abs=1e-9)
+
+    for below in (floor / 2, floor / 1e6, 1e-10):
+        with pytest.raises(ValueError, match="eigendecomposition route"):
+            singlet_yield_liouvillian_eigen(hamiltonian, projector, below, below)
+
+    # Above the floor it agrees with the closed form again, which is the regime
+    # the registered cross-check runs in.
+    for rate in (floor * 4, 1e3, RATE):
+        assert singlet_yield_liouvillian_eigen(
+            hamiltonian, projector, rate, rate
+        ) == pytest.approx(singlet_yield_closed_form(hamiltonian, projector, rate), abs=1e-9)
+    assert RATE > floor * 1e5
+
+
 def test_a_three_vector_argument_must_actually_be_a_three_vector():
     # Sequence[float] is not a shape check. A four-component direction was
     # normalized using all four components while the Zeeman sum read the first

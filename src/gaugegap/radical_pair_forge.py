@@ -93,16 +93,21 @@ MAX_HYPERFINE_MHZ = _DOUBLE_MAX / MHZ_TO_RAD_PER_S / 4.0
 
 
 def _require_positive_finite(
-    name: str, value: float, *, maximum: float | None = None
+    name: str,
+    value: float,
+    *,
+    minimum: float | None = None,
+    maximum: float | None = None,
 ) -> float:
-    """Reject non-finite, non-positive, and operator-overflowing values.
+    """Reject non-finite, non-positive, and operator-breaking values.
 
     A bare ``value <= 0.0`` test admits nan (all comparisons false) and inf.
     Either then propagates into the Hamiltonian or the Lorentzian and surfaces
     as an opaque LinAlgError or a NaN serialized into the evidence bundle.  A
     finite value above ``maximum`` does the same one step later, when the
-    operator built from it overflows.  Used at every numeric boundary rather
-    than only the one a finding names.
+    operator built from it overflows -- and one below ``minimum`` does it at the
+    other end, by underflowing to zero inside that operator.  Used at every
+    numeric boundary rather than only the one a finding names.
     """
     numeric = float(value)
     if not math.isfinite(numeric) or numeric <= 0.0:
@@ -113,6 +118,11 @@ def _require_positive_finite(
         raise ValueError(
             f"{name} must be at most {maximum:.6e} so the operators built from it "
             f"stay finite; got {value!r}"
+        )
+    if minimum is not None and numeric < minimum:
+        raise ValueError(
+            f"{name} must be at least {minimum:.6e} so the operators built from it "
+            f"keep their relative coefficients; got {value!r}"
         )
     return numeric
 
@@ -515,11 +525,25 @@ def _build_liouvillian(
     have left the other accepting a rate that overflows the decay term -- and
     the direct solve does not raise on a non-finite matrix, it returns nan.
     """
-    _require_positive_finite("singlet_rate", singlet_rate, maximum=MAX_RATE_PER_S)
-    _require_positive_finite("triplet_rate", triplet_rate, maximum=MAX_RATE_PER_S)
     dimension = hamiltonian.shape[0]
     identity = np.eye(dimension, dtype=complex)
-    decay = singlet_rate * projector + triplet_rate * (identity - projector)
+    complement = identity - projector
+    # A positive finite rate can still vanish from the decay operator.  The
+    # singlet projector's nonzero entries are 0.5, so k = 5e-324 multiplies to
+    # exactly zero: the singlet block disappears, L is singular, and BOTH
+    # solvers then return nan without raising.  The floor is derived from the
+    # smallest nonzero entry the rate actually multiplies, so it follows the
+    # projector rather than assuming this one.
+    weights = np.concatenate([np.abs(projector).ravel(), np.abs(complement).ravel()])
+    positive = weights[weights > 0.0]
+    minimum_rate = float(np.finfo(float).tiny) / float(positive.min()) if positive.size else None
+    _require_positive_finite(
+        "singlet_rate", singlet_rate, minimum=minimum_rate, maximum=MAX_RATE_PER_S
+    )
+    _require_positive_finite(
+        "triplet_rate", triplet_rate, minimum=minimum_rate, maximum=MAX_RATE_PER_S
+    )
+    decay = singlet_rate * projector + triplet_rate * complement
     liouvillian = -1j * (
         np.kron(identity, hamiltonian) - np.kron(hamiltonian.T, identity)
     ) - 0.5 * (np.kron(identity, decay) + np.kron(decay.T, identity))
@@ -544,7 +568,14 @@ def singlet_yield_liouvillian(
     initial = projector / float(np.trace(projector).real)
     integrated = np.linalg.solve(-liouvillian, initial.flatten(order="F"))
     integrated = integrated.reshape(dimension, dimension, order="F")
-    return float(singlet_rate * np.trace(projector @ integrated).real)
+    # The rate floor above cannot predict every degenerate case: at 4.5e-308 the
+    # rate is normal and the decay operator is populated, but L is singular to
+    # working precision and np.linalg.solve returns nan rather than raising.
+    return float(
+        _require_finite_output(
+            "singlet_yield_liouvillian", singlet_rate * np.trace(projector @ integrated).real
+        )
+    )
 
 
 def singlet_yield_liouvillian_eigen(
@@ -565,16 +596,47 @@ def singlet_yield_liouvillian_eigen(
     with no hyperfine coupling the Hamiltonian preserves the initial singlet and
     both symmetric and asymmetric recombination give unit yield, so the two agree
     exactly and the gate would have failed a perfectly correct calculation.
+
+    Unlike the direct solve, this route has a lower rate limit.  Inverting the
+    eigenvalues of a non-Hermitian Liouvillian whose spectrum spans ``|H|`` down
+    to ``k`` carries a relative error of order ``eps * |H| / k``, so it silently
+    loses accuracy as the rate falls: for the spin-free-partner system at 50 uT
+    it agrees with the closed form to ten digits at ``k = 1e3`` and returns
+    0.1667 against a true 0.4958 at ``k = 1e-10``, with nothing raised.  It
+    therefore refuses below ``sqrt(eps) * |H|``, where that error is at most
+    ``sqrt(eps)``.  The direct solve matches the closed form at every rate tested
+    down to 1e-20 and has no such limit.
     """
     liouvillian = _build_liouvillian(hamiltonian, projector, singlet_rate, triplet_rate)
+    # Derived from machine epsilon and the Hamiltonian's own scale, so it tracks
+    # the system rather than naming a rate.
+    conditioning_floor = math.sqrt(float(np.finfo(float).eps)) * float(
+        np.abs(hamiltonian).max()
+    )
+    for name, rate in (("singlet_rate", singlet_rate), ("triplet_rate", triplet_rate)):
+        if float(rate) < conditioning_floor:
+            raise ValueError(
+                f"{name} must be at least {conditioning_floor:.6e} for the "
+                "eigendecomposition route, whose relative error grows as "
+                "eps * |H| / k; use singlet_yield_liouvillian, which is accurate "
+                f"at any representable rate. Got {rate!r}"
+            )
     dimension = hamiltonian.shape[0]
     eigenvalues, eigenvectors = np.linalg.eig(liouvillian)
     initial = (projector / float(np.trace(projector).real)).flatten(order="F")
     coefficients = np.linalg.solve(eigenvectors, initial)
-    integrated = (eigenvectors @ (coefficients / (-eigenvalues))).reshape(
-        dimension, dimension, order="F"
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        integrated = (eigenvectors @ (coefficients / (-eigenvalues))).reshape(
+            dimension, dimension, order="F"
+        )
+    # Same backstop as the direct route: inverting an eigenvalue of a singular
+    # Liouvillian gives inf, and the trace of it nan, with nothing raised.
+    return float(
+        _require_finite_output(
+            "singlet_yield_liouvillian_eigen",
+            singlet_rate * np.trace(projector @ integrated).real,
+        )
     )
-    return float(singlet_rate * np.trace(projector @ integrated).real)
 
 
 def fibonacci_directions(count: int) -> np.ndarray:
