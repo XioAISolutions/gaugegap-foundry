@@ -1064,28 +1064,72 @@ def test_the_hyperfine_bound_scales_with_the_nuclear_spin():
 
 def test_the_operator_budget_counts_peak_simultaneous_allocations():
     # Counting ONE matrix against the budget was the same error as counting four
-    # floats per direction: at the dimension a single-matrix budget allowed, the
-    # six embedded electron operators alone were 384 MiB.
+    # floats per direction. Counting thirteen by reading the expressions was the
+    # same error again, smaller: the measured peak is 13.32, and the
+    # spin-operator count of three -- the returned (3, m, m) array -- was really
+    # 8.00, because s_z, s_plus, the conjugate copy behind s_minus, the two
+    # divided results and the stacked array all coexist during the return.
+    #
+    # So this test MEASURES both peaks rather than re-deriving them, and fails
+    # if the real allocation ever exceeds what the module declares.
+    import tracemalloc
+
     from gaugegap.radical_pair_forge import (
+        _BYTES_PER_COMPLEX,
+        _HAMILTONIAN_PEAK_MATRICES,
+        _SPIN_OPERATOR_PEAK_MATRICES,
+        HyperfineCoupling,
         MAX_HILBERT_DIMENSION,
         MAX_SPIN_MULTIPLICITY,
         OPERATOR_BUDGET_BYTES,
+        spin_operators,
     )
 
-    bytes_per_complex = 16
-    operators_at_peak = 13  # 6 electron + 3 nuclear + Hamiltonian + 3 temporaries
-    assert (
-        operators_at_peak * bytes_per_complex * MAX_HILBERT_DIMENSION**2
-        <= OPERATOR_BUDGET_BYTES
-    )
-    # One more dimension would not fit, so the cap is the budget's own answer
-    # rather than a round number underneath it.
-    assert (
-        operators_at_peak * bytes_per_complex * (MAX_HILBERT_DIMENSION + 1) ** 2
-        > OPERATOR_BUDGET_BYTES
-    )
-    # spin_operators returns (3, m, m) in one array, so its peak is its own.
-    assert 3 * bytes_per_complex * MAX_SPIN_MULTIPLICITY**2 <= OPERATOR_BUDGET_BYTES
+    def peak_matrices(call, dimension):
+        tracemalloc.start()
+        try:
+            call()
+            peak = tracemalloc.get_traced_memory()[1]
+        finally:
+            tracemalloc.stop()
+        return peak / (_BYTES_PER_COMPLEX * dimension**2)
+
+    # spin_operators, at a size where the fixed overhead is negligible.
+    measured = peak_matrices(lambda: spin_operators(256), 256)
+    assert measured <= _SPIN_OPERATOR_PEAK_MATRICES, measured
+    assert measured > 3, "the returned array alone is not the peak"
+
+    # build_hamiltonian, over inventory shapes at one dimension: the peak
+    # depends on how many couplings there are, not only on the dimension.
+    for multiplicities in ((36,), (2, 18), (2, 2, 9), (2, 2, 3, 3)):
+        couplings = tuple(
+            HyperfineCoupling(
+                name=f"n{index}",
+                radical_index=index % 2,
+                multiplicity=multiplicity,
+                principal_values_mhz=(1.0, 2.0, 3.0),
+                euler_deg=(0.0, 30.0, 0.0),
+            )
+            for index, multiplicity in enumerate(multiplicities)
+        )
+        dimension = int(np.prod(hilbert_dims(couplings)))
+        measured = peak_matrices(
+            lambda: build_hamiltonian(
+                field_tesla=GEOMAGNETIC_FIELD_T,
+                direction=(0.3, -0.5, 0.8),
+                couplings=couplings,
+            ),
+            dimension,
+        )
+        assert measured <= _HAMILTONIAN_PEAK_MATRICES, (multiplicities, measured)
+
+    # Each cap is the budget's own answer in both directions.
+    for count, cap in (
+        (_HAMILTONIAN_PEAK_MATRICES, MAX_HILBERT_DIMENSION),
+        (_SPIN_OPERATOR_PEAK_MATRICES, MAX_SPIN_MULTIPLICITY),
+    ):
+        assert count * _BYTES_PER_COMPLEX * cap**2 <= OPERATOR_BUDGET_BYTES
+        assert count * _BYTES_PER_COMPLEX * (cap + 1) ** 2 > OPERATOR_BUDGET_BYTES
 
     # Still ample for every registered inventory.
     for inventory in NUCLEAR_INVENTORIES:

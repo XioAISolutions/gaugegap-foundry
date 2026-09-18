@@ -205,12 +205,17 @@ on zero directions and died several frames later in a reduction.
 byte budget rather than chosen numbers, and the Hilbert bound is applied to the
 product of the multiplicities, not only to each one: enough individually legal
 couplings still asks for an operator no budget covers. Each bound counts the
-*peak* allocation rather than one of its terms — `build_hamiltonian` holds
-thirteen `d x d` complex matrices at once (six embedded electron operators,
-three nuclear, the accumulating Hamiltonian and three temporaries), and
-`spin_operators` returns its three in one array, so the two have different
-caps. A first version of this counted a single matrix and would have allowed a
-dimension at which the electron operators alone are 384 MiB.
+*peak* allocation rather than one of its terms, and the peak is **measured**
+rather than enumerated, because enumerating it produced two wrong answers in a
+row: a first version counted one matrix for the Hamiltonian (allowing a
+dimension at which the electron operators alone are 384 MiB), and a second
+counted thirteen by walking the expressions, against a measured 13.32.
+`spin_operators` was counted at three — the `(3, m, m)` array it returns —
+against a measured 8.00, since `s_z`, `s_plus`, the conjugate copy behind
+`s_minus`, the two divided results and the stacked array all coexist during the
+return. `test_the_operator_budget_counts_peak_simultaneous_allocations`
+re-measures both with `tracemalloc` and fails if the real peak ever exceeds
+what the module declares.
 
 The hyperfine bound scales with the nuclear spin for the same reason. The term
 that lands in the matrix is `A_ij * (S_i @ I_j)`, so the coefficient is

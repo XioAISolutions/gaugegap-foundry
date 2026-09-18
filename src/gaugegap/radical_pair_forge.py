@@ -131,22 +131,27 @@ MAX_HYPERFINE_MHZ = max_hyperfine_mhz(2)
 DIRECTION_GRID_BUDGET_BYTES = 64 * 1024 * 1024
 OPERATOR_BUDGET_BYTES = 64 * 1024 * 1024
 _BYTES_PER_COMPLEX = 16
-# Counting ONE matrix against the budget was wrong the same way the direction
-# accounting was: build_hamiltonian holds many at once.  At dimension d it has
-# six embedded electron operators, three embedded nuclear operators for the
-# coupling in hand, the accumulating Hamiltonian, and up to three temporaries
-# from `weight * (electron_ops[i] @ nuclear[j])` and the addition -- thirteen
-# d-by-d complex matrices live at peak, 384 MiB of electron operators alone at
-# the dimension a single-matrix budget would have allowed.
-_OPERATORS_HELD_AT_PEAK = 13
+# These counts are MEASURED, not enumerated by reading the code, because
+# enumerating it is how both of them came out wrong.  A first version counted
+# one matrix for the Hamiltonian; a second counted thirteen by walking the
+# expressions, against a measured 13.32; and the spin-operator count was three
+# -- the returned (3, m, m) array -- against a measured 8.00, because s_z,
+# s_plus, the conjugate copy behind s_minus, the two divided results and the
+# stacked array all coexist during the return.
+#
+# tracemalloc measurements on this host, as peak bytes over 16 * d**2:
+#   build_hamiltonian  13.32  (seven nuclei at dimension 512; 12.00 with one)
+#   spin_operators      8.00  (exact at m = 256, 512 and 724)
+# The declared numbers carry margin over those for allocator differences, and
+# test_the_operator_budget_counts_peak_simultaneous_allocations re-measures
+# both and fails if the real peak ever exceeds what is declared here.
+_HAMILTONIAN_PEAK_MATRICES = 17
 MAX_HILBERT_DIMENSION = math.isqrt(
-    OPERATOR_BUDGET_BYTES // (_OPERATORS_HELD_AT_PEAK * _BYTES_PER_COMPLEX)
+    OPERATOR_BUDGET_BYTES // (_HAMILTONIAN_PEAK_MATRICES * _BYTES_PER_COMPLEX)
 )
-# spin_operators returns its three matrices in one (3, m, m) array, so a direct
-# call has its own, looser peak.
-_SPIN_OPERATOR_COUNT = 3
+_SPIN_OPERATOR_PEAK_MATRICES = 10
 MAX_SPIN_MULTIPLICITY = math.isqrt(
-    OPERATOR_BUDGET_BYTES // (_SPIN_OPERATOR_COUNT * _BYTES_PER_COMPLEX)
+    OPERATOR_BUDGET_BYTES // (_SPIN_OPERATOR_PEAK_MATRICES * _BYTES_PER_COMPLEX)
 )
 
 
