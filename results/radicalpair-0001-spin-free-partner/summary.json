@@ -1,6 +1,6 @@
 {
   "anisotropy": 0.1591626079758635,
-  "benchmark_id": "radicalpair-0001-cryptochrome-compass",
+  "benchmark_id": "radicalpair-0001-spin-free-partner",
   "claim_boundary": "finite radical-pair spin-Hamiltonian calculation under symmetric Haberkorn recombination only; reproduces the anisotropy, the polarity degeneracy and the fast-recombination cutoff of the radical-pair compass model, but not a lifetime window, because no spin relaxation is modelled; it is not a cryptochrome measurement, not evidence that any animal uses this mechanism, and not a magnetometer or sensor design",
   "claim_level": "reproducible_finite_result",
   "controls": {
@@ -37,6 +37,91 @@
     "low_rate_per_second": 1000.0,
     "no_hyperfine_anisotropy": 3.4416913763379853e-15,
     "no_hyperfine_mean_yield": 1.0,
+    "partner_probe": [
+      {
+        "anisotropy": 0.06353569142714632,
+        "euler_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "increases_anisotropy": false,
+        "label": "axial-aligned-49mhz",
+        "principal_values_mhz": [
+          -2.79,
+          -2.79,
+          49.2
+        ],
+        "ratio_to_spin_free": 0.40189382770631166
+      },
+      {
+        "anisotropy": 0.11561019077757845,
+        "euler_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "increases_anisotropy": false,
+        "label": "axial-aligned-20mhz",
+        "principal_values_mhz": [
+          -1.0,
+          -1.0,
+          20.0
+        ],
+        "ratio_to_spin_free": 0.7312900993095369
+      },
+      {
+        "anisotropy": 0.13649059007893893,
+        "euler_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "increases_anisotropy": false,
+        "label": "axial-aligned-5mhz",
+        "principal_values_mhz": [
+          -0.3,
+          -0.3,
+          5.0
+        ],
+        "ratio_to_spin_free": 0.8633686745286698
+      },
+      {
+        "anisotropy": 0.08597403561746547,
+        "euler_deg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "increases_anisotropy": false,
+        "label": "axial-aligned-1mhz",
+        "principal_values_mhz": [
+          -0.1,
+          -0.1,
+          1.0
+        ],
+        "ratio_to_spin_free": 0.5438271541796594
+      },
+      {
+        "anisotropy": 0.04821540816840758,
+        "euler_deg": [
+          0.0,
+          90.0,
+          0.0
+        ],
+        "increases_anisotropy": false,
+        "label": "axial-perpendicular-49mhz",
+        "principal_values_mhz": [
+          -2.79,
+          -2.79,
+          49.2
+        ],
+        "ratio_to_spin_free": 0.30498566251447523
+      }
+    ],
+    "partner_probe_any_increase": false,
+    "partner_probe_directions": 120,
+    "partner_probe_note": "Synthetic axial partner tensors spanning magnitude and orientation. No probe point increases the anisotropy, but the dependence is not monotonic in partner coupling strength, so no general claim about the direction of the effect is made.",
     "polarity_residual": 3.3306690738754696e-15,
     "prompt_recombination_limit": 0.9999999999967937,
     "relaxation_note": "No spin relaxation is modelled, so the long-lifetime side of the rate window is not reproduced: anisotropy persists as k -> 0 here, whereas a real pair is limited by T2 of order microseconds.",

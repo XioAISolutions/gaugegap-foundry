@@ -501,3 +501,51 @@ def test_kill_criteria_forbidding_sensor_language_are_honoured_by_the_claim_boun
     lowered = CLAIM_BOUNDARY.lower()
     assert "sensor" in lowered  # it is disclaimed explicitly
     assert "not a magnetometer or sensor design" in lowered
+
+
+def test_partner_probe_backs_the_documented_non_monotonicity():
+    # The docs quote this probe as the reason no general claim is made about the
+    # direction of partner suppression, so the probe must be code, not pasted
+    # shell output. These assertions pin the exact statements the prose makes.
+    from gaugegap.radical_pair_forge import probe_partner_suppression
+
+    points = {p.label: p for p in probe_partner_suppression()}
+    assert len(points) == 5
+
+    # Claim 1: no probe tensor increases the anisotropy.
+    assert not any(p.increases_anisotropy for p in points.values())
+    assert all(p.ratio_to_spin_free < 1.0 for p in points.values())
+
+    # Claim 2: the dependence is NOT monotonic in partner coupling strength --
+    # 1 MHz suppresses more than 5 MHz. This is the reason the sign of the effect
+    # is not claimed to be robust.
+    assert (
+        points["axial-aligned-1mhz"].ratio_to_spin_free
+        < points["axial-aligned-5mhz"].ratio_to_spin_free
+    )
+
+
+def test_probe_is_recorded_in_the_evidence_bundle():
+    report = run_radical_pair_forge(
+        direction_count=12, control_direction_count=8, rate_points=(1e6,)
+    )
+    controls = report.controls
+    assert len(controls["partner_probe"]) == 5
+    assert controls["partner_probe_any_increase"] is False
+    # Fixed direction count, so the recorded numbers cannot drift from the prose.
+    assert controls["partner_probe_directions"] == 120
+
+
+def test_each_inventory_gets_a_distinct_benchmark_id():
+    # Guards the class that keeps recurring: a value fixed at construction where
+    # a derived one is needed. Two inventories must never be identifiable as the
+    # same run, or consumers keyed on benchmark_id conflate or overwrite them.
+    ids = {}
+    for inventory in sorted(NUCLEAR_INVENTORIES):
+        report = run_radical_pair_forge(
+            inventory=inventory, direction_count=8, control_direction_count=6, rate_points=(1e6,)
+        )
+        ids[inventory] = report.benchmark_id
+        assert report.inventory == inventory
+    assert len(set(ids.values())) == len(ids), f"benchmark_id collision: {ids}"
+    assert ids["cryptochrome-like"] == "radicalpair-0001-cryptochrome-compass"

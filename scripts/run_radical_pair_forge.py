@@ -15,20 +15,17 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from gaugegap.radical_pair_forge import (  # noqa: E402
+    INVENTORY_SLUGS,
     NUCLEAR_INVENTORIES,
     SOURCES,
     run_radical_pair_forge,
 )
 
-# Directory slug per inventory, so the default --output-dir tracks the selected
-# model.  "cryptochrome-like" keeps the "cryptochrome-compass" slug its committed
-# evidence bundle already uses rather than orphaning that directory.
-OUTPUT_SLUGS = {
-    "cryptochrome-like": "cryptochrome-compass",
-    "spin-free-partner": "spin-free-partner",
-    "loaded": "loaded",
-}
+# The slug map lives with the inventories, since benchmark_id derives from it
+# too; re-exported here under its original name for the default --output-dir.
+OUTPUT_SLUGS = INVENTORY_SLUGS
 assert set(OUTPUT_SLUGS) == set(NUCLEAR_INVENTORIES), "every inventory needs an output slug"
+assert len(set(OUTPUT_SLUGS.values())) == len(OUTPUT_SLUGS), "inventory slugs must be distinct"
 
 
 def _positive_float(raw: str) -> float:

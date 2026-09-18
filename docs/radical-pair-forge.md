@@ -84,11 +84,24 @@ An earlier draft claimed "only the sign of the effect is robust". That was also
 an over-claim and has been removed: comparing two fixed inventories, and
 observing that the difference vanishes as this particular tensor is scaled to
 zero, says nothing about whether some other partner tensor could *increase* the
-anisotropy. A probe over axial partner tensors at several magnitudes and
-orientations found no such counterexample, but it also found the dependence is
-**not monotonic** in partner coupling strength — a 1 MHz axial partner suppresses
-the compass more than a 5 MHz one. Non-monotonic behaviour over six samples is a
-reason to claim nothing general, not a reason to claim a robust sign.
+anisotropy. `probe_partner_suppression()` sweeps synthetic axial partner tensors across
+magnitude and orientation to test exactly that, and its output is recorded in
+every evidence bundle under `controls.partner_probe`, at a fixed
+`PARTNER_PROBE_DIRECTIONS` so the numbers cannot drift from this prose:
+
+| partner tensor | anisotropy | ratio to spin-free |
+|---|---|---|
+| axial aligned, 49 MHz | 0.06354 | 0.402 |
+| axial aligned, 20 MHz | 0.11561 | 0.731 |
+| axial aligned, 5 MHz | 0.13649 | 0.863 |
+| axial aligned, 1 MHz | 0.08597 | 0.544 |
+| axial perpendicular, 49 MHz | 0.04822 | 0.305 |
+
+No probe point increases the anisotropy. But the dependence is **not monotonic**
+in partner coupling strength — a 1 MHz axial partner suppresses the compass more
+than a 5 MHz one. Non-monotonic behaviour over five samples is a reason to claim
+nothing general, not a reason to claim a robust sign.
+`test_partner_probe_backs_the_documented_non_monotonicity` pins both statements.
 
 ### The energy audit
 

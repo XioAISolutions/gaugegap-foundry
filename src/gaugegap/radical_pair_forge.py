@@ -188,6 +188,14 @@ NUCLEAR_INVENTORIES: dict[str, tuple[str, ...]] = {
     "loaded": ("fad-n5", "fad-n10", "trp-hbeta"),
 }
 
+# Stable slug per inventory. Used for benchmark_id and for the runner's default
+# output directory, so a run is identified by the model it actually used.
+INVENTORY_SLUGS: dict[str, str] = {
+    "cryptochrome-like": "cryptochrome-compass",
+    "spin-free-partner": "spin-free-partner",
+    "loaded": "loaded",
+}
+
 DEFAULT_INVENTORY = "cryptochrome-like"
 DEFAULT_RATE_PER_S = 1.0e6      # ~1 us radical-pair lifetime
 FAST_RATE_PER_S = 1.0e10        # fast-recombination control
@@ -201,6 +209,19 @@ CROSS_CHECK_FALLBACK_INVENTORY = "cryptochrome-like"
 # the caller's rate_points, so the condition is always evaluated.
 LOW_RATE_PER_S = 1.0e3
 LARMOR_COMPARABLE_RATE_PER_S = 1.0e6
+
+
+PARTNER_PROBE_DIRECTIONS = 120
+# Axial partner tensors on radical 2, spanning magnitude and orientation. These
+# exist to test whether ANY partner coupling can increase the anisotropy, which
+# is what would refute a general claim about the direction of the effect.
+PARTNER_PROBE_TENSORS: tuple[tuple[str, tuple[float, float, float], tuple[float, float, float]], ...] = (
+    ("axial-aligned-49mhz", (-2.79, -2.79, 49.2), (0.0, 0.0, 0.0)),
+    ("axial-aligned-20mhz", (-1.0, -1.0, 20.0), (0.0, 0.0, 0.0)),
+    ("axial-aligned-5mhz", (-0.3, -0.3, 5.0), (0.0, 0.0, 0.0)),
+    ("axial-aligned-1mhz", (-0.1, -0.1, 1.0), (0.0, 0.0, 0.0)),
+    ("axial-perpendicular-49mhz", (-2.79, -2.79, 49.2), (0.0, 90.0, 0.0)),
+)
 
 
 def _euler_zyz(alpha_deg: float, beta_deg: float, gamma_deg: float) -> np.ndarray:
@@ -558,6 +579,81 @@ def polarity_residual(
     )
 
 
+@dataclass(frozen=True)
+class PartnerProbePoint:
+    """One axial partner tensor and the anisotropy it leaves."""
+
+    label: str
+    principal_values_mhz: tuple[float, float, float]
+    euler_deg: tuple[float, float, float]
+    anisotropy: float
+    ratio_to_spin_free: float
+    increases_anisotropy: bool
+
+    def summary(self) -> dict[str, Any]:
+        payload = asdict(self)
+        payload["principal_values_mhz"] = list(self.principal_values_mhz)
+        payload["euler_deg"] = list(self.euler_deg)
+        return payload
+
+
+def probe_partner_suppression(
+    *,
+    field_tesla: float = GEOMAGNETIC_FIELD_T,
+    rate_per_second: float = DEFAULT_RATE_PER_S,
+) -> tuple[PartnerProbePoint, ...]:
+    """Measure what a range of partner tensors does to the anisotropy.
+
+    The partner-suppression result is parameter-dependent, so the honest question
+    is whether *any* partner coupling can increase the anisotropy rather than
+    reduce it.  This probes that directly, and its output is recorded in the
+    evidence bundle so the answer is reproducible rather than asserted: a claim
+    about the direction of the effect has to be backed by the sweep that
+    produced it.
+
+    Uses a fixed direction count so the recorded numbers cannot drift from the
+    prose that quotes them.
+    """
+    flavin = HYPERFINE_REGISTRY["fad-n5"]
+    baseline = sweep_field_directions(
+        couplings=(flavin,),
+        field_tesla=field_tesla,
+        rate_per_second=rate_per_second,
+        direction_count=PARTNER_PROBE_DIRECTIONS,
+        keep_samples=False,
+        inventory="spin-free-partner",
+    ).anisotropy
+    points = []
+    for label, principal, euler in PARTNER_PROBE_TENSORS:
+        partner = HyperfineCoupling(
+            name=f"probe-{label}",
+            radical_index=1,
+            multiplicity=2,
+            principal_values_mhz=principal,
+            euler_deg=euler,
+            note="synthetic probe tensor; not a literature value",
+        )
+        anisotropy = sweep_field_directions(
+            couplings=(flavin, partner),
+            field_tesla=field_tesla,
+            rate_per_second=rate_per_second,
+            direction_count=PARTNER_PROBE_DIRECTIONS,
+            keep_samples=False,
+            inventory=f"probe/{label}",
+        ).anisotropy
+        points.append(
+            PartnerProbePoint(
+                label=label,
+                principal_values_mhz=principal,
+                euler_deg=euler,
+                anisotropy=anisotropy,
+                ratio_to_spin_free=float(anisotropy / baseline) if baseline else 0.0,
+                increases_anisotropy=anisotropy > baseline,
+            )
+        )
+    return tuple(points)
+
+
 def zeeman_thermal_ratio(field_tesla: float, temperature_k: float = 300.0) -> float:
     """Electron Zeeman quantum over ``k_B T``; ~2.2e-7 at 50 uT and 300 K."""
     energy = PLANCK_J_S * (GYROMAGNETIC_RATIO_E / (2.0 * math.pi)) * float(field_tesla)
@@ -680,6 +776,10 @@ def run_radical_pair_forge(
     )
     prompt_limit = singlet_yield_closed_form(selected_reference, projector, 1e14)
 
+    partner_probe = probe_partner_suppression(
+        field_tesla=field_tesla, rate_per_second=rate_per_second
+    )
+
     residual = polarity_residual(
         couplings=couplings,
         field_tesla=field_tesla,
@@ -775,6 +875,15 @@ def run_radical_pair_forge(
         "no_hyperfine_mean_yield": bare.mean_yield,
         "fast_recombination_rate_per_second": FAST_RATE_PER_S,
         "fast_recombination_anisotropy": fast.anisotropy,
+        "partner_probe": [point.summary() for point in partner_probe],
+        "partner_probe_directions": PARTNER_PROBE_DIRECTIONS,
+        "partner_probe_any_increase": any(p.increases_anisotropy for p in partner_probe),
+        "partner_probe_note": (
+            "Synthetic axial partner tensors spanning magnitude and orientation. No "
+            "probe point increases the anisotropy, but the dependence is not monotonic "
+            "in partner coupling strength, so no general claim about the direction of "
+            "the effect is made."
+        ),
         "spin_free_partner_anisotropy": spin_free.anisotropy,
         "loaded_partner_anisotropy": loaded_partner.anisotropy,
         "second_radical_suppression_factor": (
@@ -811,7 +920,7 @@ def run_radical_pair_forge(
 
     return RadicalPairForgeReport(
         schema="gaugegap.radical_pair_forge.v1",
-        benchmark_id="radicalpair-0001-cryptochrome-compass",
+        benchmark_id=f"radicalpair-0001-{INVENTORY_SLUGS[inventory]}",
         inventory=inventory,
         hilbert_dimension=int(np.prod(dims)),
         field_microtesla=float(field_tesla * 1e6),
