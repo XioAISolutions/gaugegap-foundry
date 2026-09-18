@@ -1,5 +1,5 @@
 {
-  "anisotropy": 0.1591626079758635,
+  "anisotropy": 0.15916260797586357,
   "benchmark_id": "radicalpair-0001-spin-free-partner",
   "claim_boundary": "finite radical-pair spin-Hamiltonian calculation under symmetric Haberkorn recombination only; reproduces the anisotropy, the polarity degeneracy and the fast-recombination cutoff of the radical-pair compass model, but not a lifetime window, because no spin relaxation is modelled; it is not a cryptochrome measurement, not evidence that any animal uses this mechanism, and not a magnetometer or sensor design",
   "claim_level": "reproducible_finite_result",
@@ -24,20 +24,21 @@
     },
     "closed_form_vs_liouvillian_residual": 2.220446049250313e-16,
     "closed_form_yield": 0.6583165330550036,
-    "control_direction_count": 60,
+    "cross_check_field_microtesla": 50.0,
     "cross_check_hilbert_dimension": 12,
     "cross_check_inventory": "spin-free-partner",
+    "cross_check_rate_per_second": 1000000.0,
     "fast_recombination_anisotropy": 2.42618369838965e-10,
     "fast_recombination_rate_per_second": 10000000000.0,
     "fridge_magnet_note": "A 5 mT magnet raises the Zeeman quantum by only two orders of magnitude and is still ~1e-5 of k_B T at 300 K.  Neither field can drive a thermal population change, and neither saturates this model, so the weak-field result is not explained by field strength alone.",
-    "geomagnetic_anisotropy": 0.1591626079758635,
+    "geomagnetic_anisotropy": 0.15916260797586357,
     "geomagnetic_direction_count": 200,
     "geomagnetic_field_microtesla": 50.0,
     "geomagnetic_rate_per_second": 1000000.0,
     "geomagnetic_sweep_reused_primary": true,
     "isotropic_hyperfine_anisotropy": 2.0539125955565396e-15,
     "isotropic_hyperfine_mean_yield": 0.3575859893392851,
-    "larmor_comparable_anisotropy": 0.1591626079758635,
+    "larmor_comparable_anisotropy": 0.15916260797586357,
     "larmor_comparable_rate_per_second": 1000000.0,
     "liouvillian_dim_limit": 32,
     "liouvillian_yield": 0.6583165330550038,
@@ -175,17 +176,26 @@
     ],
     "partner_probe_any_increase": false,
     "partner_probe_directions": 120,
+    "partner_probe_field_microtesla": 50.0,
     "partner_probe_note": "Synthetic axial partner tensors spanning magnitude and orientation. No probe point increases the anisotropy, but the dependence is not monotonic in partner coupling strength, so no general claim about the direction of the effect is made.",
-    "polarity_residual": 3.3306690738754696e-15,
+    "partner_probe_rate_per_second": 1000000.0,
+    "polarity_direction_count": 200,
+    "polarity_field_microtesla": 50.0,
+    "polarity_rate_per_second": 1000000.0,
+    "polarity_residual": 4.551914400963142e-15,
     "primary_direction_count": 200,
+    "prompt_recombination_field_microtesla": 50.0,
     "prompt_recombination_limit": 0.9999999999967937,
+    "prompt_recombination_rate_per_second": 100000000000000.0,
     "registered_direction_count": 200,
     "relaxation_note": "No spin relaxation is modelled, so the long-lifetime side of the rate window is not reproduced: anisotropy persists as k -> 0 here, whereas a real pair is limited by T2 of order microseconds.",
-    "second_radical_suppression_factor": 8.3413814391394,
-    "spin_free_partner_anisotropy": 0.1591626079758635,
+    "second_radical_suppression_factor": 8.341381439139404,
+    "spin_free_partner_anisotropy": 0.15916260797586357,
     "symmetry_tolerance": 1e-09,
+    "zeeman_gate_field_microtesla": 50.0,
     "zeeman_thermal_ratio_300k": 2.2416425328029618e-07,
-    "zeeman_thermal_ratio_300k_at_5mt": 2.2416425328029622e-05
+    "zeeman_thermal_ratio_300k_at_5mt": 2.2416425328029622e-05,
+    "zeeman_thermal_ratio_300k_at_geomagnetic_field": 2.2416425328029624e-07
   },
   "couplings": [
     {
@@ -241,19 +251,19 @@
       "rate_per_second": 100000.0
     },
     {
-      "anisotropy": 0.1591626079758635,
+      "anisotropy": 0.15916260797586357,
       "direction_count": 200,
       "mean_yield": 0.5511336399538806,
       "rate_per_second": 1000000.0
     },
     {
-      "anisotropy": 0.0710126894047517,
+      "anisotropy": 0.0710126894047518,
       "direction_count": 200,
       "mean_yield": 0.6128402325094067,
       "rate_per_second": 10000000.0
     },
     {
-      "anisotropy": 0.0011766306006376626,
+      "anisotropy": 0.0011766306006375515,
       "direction_count": 200,
       "mean_yield": 0.6932260258917848,
       "rate_per_second": 100000000.0
@@ -271,7 +281,7 @@
       "rate_per_second": 10000000000.0
     }
   ],
-  "relative_contrast": 0.2887913138257762,
+  "relative_contrast": 0.28879131382577633,
   "schema": "gaugegap.radical_pair_forge.v1",
   "sources": [
     {
@@ -294,19 +304,19 @@
     }
   ],
   "sweep": {
-    "anisotropy": 0.1591626079758635,
+    "anisotropy": 0.15916260797586357,
     "direction_count": 200,
     "field_microtesla": 49.99999999999999,
     "hilbert_dimension": 12,
     "inventory": "spin-free-partner",
     "maximum_yield": 0.6567127425374687,
     "mean_yield": 0.5511336399538806,
-    "minimum_yield": 0.4975501345616052,
+    "minimum_yield": 0.49755013456160513,
     "rate_per_second": 1000000.0,
-    "relative_contrast": 0.2887913138257762,
+    "relative_contrast": 0.28879131382577633,
     "samples": [
       {
-        "antipodal_singlet_yield": 0.656712742537466,
+        "antipodal_singlet_yield": 0.6567127425374659,
         "azimuth_deg": 291.2461179749811,
         "index": 0,
         "polar_deg": 5.731967965197727,
@@ -416,7 +426,7 @@
         "z": 0.895
       },
       {
-        "antipodal_singlet_yield": 0.6234638103908214,
+        "antipodal_singlet_yield": 0.6234638103908212,
         "azimuth_deg": 218.66071342456425,
         "index": 11,
         "polar_deg": 27.7484787006534,
@@ -456,11 +466,11 @@
         "z": 0.855
       },
       {
-        "antipodal_singlet_yield": 0.6123381815969907,
+        "antipodal_singlet_yield": 0.6123381815969906,
         "azimuth_deg": 28.629657224412306,
         "index": 15,
         "polar_deg": 32.328064122162274,
-        "singlet_yield": 0.61233818159699,
+        "singlet_yield": 0.6123381815969902,
         "x": 0.46938314425793876,
         "y": 0.25623127031361925,
         "z": 0.845
@@ -476,7 +486,7 @@
         "z": 0.835
       },
       {
-        "antipodal_singlet_yield": 0.6069683334601477,
+        "antipodal_singlet_yield": 0.6069683334601478,
         "azimuth_deg": 113.61412912433632,
         "index": 17,
         "polar_deg": 34.411508669769454,
@@ -486,7 +496,7 @@
         "z": 0.825
       },
       {
-        "antipodal_singlet_yield": 0.6043316499483529,
+        "antipodal_singlet_yield": 0.6043316499483528,
         "azimuth_deg": 336.1063650742991,
         "index": 18,
         "polar_deg": 35.41263811105957,
@@ -536,7 +546,7 @@
         "z": 0.775
       },
       {
-        "antipodal_singlet_yield": 0.5916306276787373,
+        "antipodal_singlet_yield": 0.5916306276787372,
         "azimuth_deg": 8.567544824109973,
         "index": 23,
         "polar_deg": 40.093007985129766,
@@ -590,7 +600,7 @@
         "azimuth_deg": 41.028724573919185,
         "index": 28,
         "polar_deg": 44.356800838250685,
-        "singlet_yield": 0.57973357655776,
+        "singlet_yield": 0.5797335765577599,
         "x": 0.5274059083958755,
         "y": 0.45893137590398114,
         "z": 0.7150000000000001
@@ -610,7 +620,7 @@
         "azimuth_deg": 126.01319647384483,
         "index": 30,
         "polar_deg": 45.97278279027701,
-        "singlet_yield": 0.5751998622863258,
+        "singlet_yield": 0.5751998622863257,
         "x": -0.42275728388434836,
         "y": 0.5815937404432138,
         "z": 0.6950000000000001
@@ -640,7 +650,7 @@
         "azimuth_deg": 73.48990432373002,
         "index": 33,
         "polar_deg": 48.31767460666049,
-        "singlet_yield": 0.5686404715309114,
+        "singlet_yield": 0.5686404715309115,
         "x": 0.21224114693533927,
         "y": 0.7160507632476706,
         "z": 0.665
@@ -690,7 +700,7 @@
         "azimuth_deg": 105.95108407354087,
         "index": 38,
         "polar_deg": 52.04807971075356,
-        "singlet_yield": 0.5583512912120713,
+        "singlet_yield": 0.5583512912120712,
         "x": -0.21670032626921526,
         "y": 0.7581661879791367,
         "z": 0.615
@@ -726,7 +736,7 @@
         "z": 0.585
       },
       {
-        "antipodal_singlet_yield": 0.5506987602423454,
+        "antipodal_singlet_yield": 0.5506987602423453,
         "azimuth_deg": 275.9200278733889,
         "index": 42,
         "polar_deg": 54.90036780460649,
@@ -780,13 +790,13 @@
         "azimuth_deg": 308.3812076231997,
         "index": 47,
         "polar_deg": 58.33175674645835,
-        "singlet_yield": 0.5418565993827847,
+        "singlet_yield": 0.5418565993827846,
         "x": 0.5284414607382487,
         "y": -0.6671766052349453,
         "z": 0.525
       },
       {
-        "antipodal_singlet_yield": 0.5401846330667391,
+        "antipodal_singlet_yield": 0.540184633066739,
         "azimuth_deg": 170.87344357316255,
         "index": 48,
         "polar_deg": 59.00254501371986,
@@ -830,7 +840,7 @@
         "azimuth_deg": 340.8423873730138,
         "index": 52,
         "polar_deg": 61.640649971842535,
-        "singlet_yield": 0.5338183170041647,
+        "singlet_yield": 0.5338183170041648,
         "x": 0.8312516602277,
         "y": -0.28878309744286024,
         "z": 0.47499999999999987
@@ -890,7 +900,7 @@
         "azimuth_deg": 235.79580307278422,
         "index": 58,
         "polar_deg": 65.48068351661958,
-        "singlet_yield": 0.5252334795250839,
+        "singlet_yield": 0.525233479525084,
         "x": -0.5114506110446985,
         "y": -0.7524581532962511,
         "z": 0.4150000000000001
@@ -960,7 +970,7 @@
         "azimuth_deg": 353.2414547225207,
         "index": 65,
         "polar_deg": 69.8182042331226,
-        "singlet_yield": 0.5166808447415325,
+        "singlet_yield": 0.5166808447415326,
         "x": 0.932080255949528,
         "y": -0.11045993150940478,
         "z": 0.34499999999999986
@@ -1026,7 +1036,7 @@
         "z": 0.2849999999999999
       },
       {
-        "antipodal_singlet_yield": 0.5097037325163783,
+        "antipodal_singlet_yield": 0.5097037325163785,
         "azimuth_deg": 110.68710637225067,
         "index": 72,
         "polar_deg": 74.03798583715276,
@@ -1140,7 +1150,7 @@
         "azimuth_deg": 38.101701821838425,
         "index": 83,
         "polar_deg": 80.50276553148295,
-        "singlet_yield": 0.5019228455742621,
+        "singlet_yield": 0.501922845574262,
         "x": 0.7761308731041651,
         "y": 0.6086015673776782,
         "z": 0.1650000000000001
@@ -1150,7 +1160,7 @@
         "azimuth_deg": 260.593937771798,
         "index": 84,
         "polar_deg": 81.08320374700904,
-        "singlet_yield": 0.5014084082754767,
+        "singlet_yield": 0.5014084082754766,
         "x": -0.16145520406804015,
         "y": -0.9746318366846772,
         "z": 0.15500000000000008
@@ -1266,7 +1276,7 @@
         "z": 0.04500000000000008
       },
       {
-        "antipodal_singlet_yield": 0.4977430479936073,
+        "antipodal_singlet_yield": 0.49774304799360736,
         "azimuth_deg": 50.50076917134531,
         "index": 96,
         "polar_deg": 87.99423806509017,
@@ -1276,7 +1286,7 @@
         "z": 0.034999999999999996
       },
       {
-        "antipodal_singlet_yield": 0.4976465912742536,
+        "antipodal_singlet_yield": 0.49764659127425354,
         "azimuth_deg": 272.99300512130486,
         "index": 97,
         "polar_deg": 88.5674562624335,
@@ -1310,7 +1320,7 @@
         "azimuth_deg": 220.46971297119006,
         "index": 100,
         "polar_deg": 90.2864800912409,
-        "singlet_yield": 0.4975501345616052,
+        "singlet_yield": 0.49755013456160513,
         "x": -0.7607396535975882,
         "y": -0.6490378875260069,
         "z": -0.00499999999999988
@@ -1336,7 +1346,7 @@
         "z": -0.024999999999999818
       },
       {
-        "antipodal_singlet_yield": 0.49774304799360714,
+        "antipodal_singlet_yield": 0.4977430479936073,
         "azimuth_deg": 167.9464208210753,
         "index": 103,
         "polar_deg": 92.00576193490983,
@@ -1426,7 +1436,7 @@
         "z": -0.11499999999999992
       },
       {
-        "antipodal_singlet_yield": 0.5000580112635314,
+        "antipodal_singlet_yield": 0.5000580112635316,
         "azimuth_deg": 10.376544370737392,
         "index": 112,
         "polar_deg": 97.18075578145829,
@@ -1566,7 +1576,7 @@
         "z": -0.2549999999999999
       },
       {
-        "antipodal_singlet_yield": 0.5088356149250318,
+        "antipodal_singlet_yield": 0.5088356149250319,
         "azimuth_deg": 245.26784767021036,
         "index": 126,
         "polar_deg": 105.36695279777771,
@@ -1656,7 +1666,7 @@
         "z": -0.3449999999999999
       },
       {
-        "antipodal_singlet_yield": 0.517806188567236,
+        "antipodal_singlet_yield": 0.5178061885672359,
         "azimuth_deg": 87.69797121985944,
         "index": 135,
         "polar_deg": 110.79344438054876,
@@ -1706,7 +1716,7 @@
         "z": -0.395
       },
       {
-        "antipodal_singlet_yield": 0.5239152130196605,
+        "antipodal_singlet_yield": 0.5239152130196604,
         "azimuth_deg": 120.15915096967029,
         "index": 140,
         "polar_deg": 113.8911271408089,
@@ -1836,7 +1846,7 @@
         "z": -0.5249999999999999
       },
       {
-        "antipodal_singlet_yield": 0.5435607208329017,
+        "antipodal_singlet_yield": 0.5435607208329019,
         "azimuth_deg": 132.55821831918368,
         "index": 153,
         "polar_deg": 122.34391141323343,
@@ -1936,7 +1946,7 @@
         "z": -0.625
       },
       {
-        "antipodal_singlet_yield": 0.5623704936151238,
+        "antipodal_singlet_yield": 0.5623704936151237,
         "azimuth_deg": 197.48057781880536,
         "index": 163,
         "polar_deg": 129.41998446705898,
@@ -1950,7 +1960,7 @@
         "azimuth_deg": 59.972813768764915,
         "index": 164,
         "polar_deg": 130.16567546932956,
-        "singlet_yield": 0.5644283295315228,
+        "singlet_yield": 0.5644283295315227,
         "x": 0.3824052595844573,
         "y": 0.6616201458859485,
         "z": -0.645
@@ -1966,7 +1976,7 @@
         "z": -0.655
       },
       {
-        "antipodal_singlet_yield": 0.5686404715309124,
+        "antipodal_singlet_yield": 0.5686404715309122,
         "azimuth_deg": 144.9572856686971,
         "index": 166,
         "polar_deg": 131.6823253933395,
@@ -2040,7 +2050,7 @@
         "azimuth_deg": 262.402937318427,
         "index": 173,
         "polar_deg": 137.30721610506222,
-        "singlet_yield": 0.5843959221634866,
+        "singlet_yield": 0.5843959221634865,
         "x": -0.08964425130795356,
         "y": -0.672115249200192,
         "z": -0.7350000000000001
@@ -2086,7 +2096,7 @@
         "z": -0.775
       },
       {
-        "antipodal_singlet_yield": 0.5966145585012886,
+        "antipodal_singlet_yield": 0.5966145585012887,
         "azimuth_deg": 294.8641170682379,
         "index": 178,
         "polar_deg": 141.72067826207225,
@@ -2126,7 +2136,7 @@
         "z": -0.8150000000000001
       },
       {
-        "antipodal_singlet_yield": 0.6069683334601478,
+        "antipodal_singlet_yield": 0.6069683334601479,
         "azimuth_deg": 104.83306086808916,
         "index": 182,
         "polar_deg": 145.58849133023054,
@@ -2146,7 +2156,7 @@
         "z": -0.835
       },
       {
-        "antipodal_singlet_yield": 0.6123381815969909,
+        "antipodal_singlet_yield": 0.612338181596991,
         "azimuth_deg": 189.81753276800828,
         "index": 184,
         "polar_deg": 147.67193587783774,
@@ -2166,7 +2176,7 @@
         "z": -0.855
       },
       {
-        "antipodal_singlet_yield": 0.6178366730993944,
+        "antipodal_singlet_yield": 0.6178366730993945,
         "azimuth_deg": 274.8020046679274,
         "index": 186,
         "polar_deg": 149.88270525267794,
@@ -2210,7 +2220,7 @@
         "azimuth_deg": 84.77094846777868,
         "index": 190,
         "polar_deg": 154.8232830593903,
-        "singlet_yield": 0.629219596115216,
+        "singlet_yield": 0.6292195961152162,
         "x": 0.038770957869057945,
         "y": 0.4236411368433378,
         "z": -0.905
@@ -2256,7 +2266,7 @@
         "z": -0.9450000000000001
       },
       {
-        "antipodal_singlet_yield": 0.644171917255239,
+        "antipodal_singlet_yield": 0.6441719172552389,
         "azimuth_deg": 117.23212821758953,
         "index": 195,
         "polar_deg": 162.74614688264273,
@@ -2280,7 +2290,7 @@
         "azimuth_deg": 202.2166001175217,
         "index": 197,
         "polar_deg": 167.16143185901598,
-        "singlet_yield": 0.6503779977190371,
+        "singlet_yield": 0.650377997719037,
         "x": -0.20570861055014522,
         "y": -0.08401766210463404,
         "z": -0.9750000000000001

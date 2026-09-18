@@ -224,6 +224,14 @@ REGISTERED_PARAMETER_RTOL = 1e-9
 # run and a 200-direction run do not measure the same quantity. The registered
 # conditions are therefore a field, a rate AND a resolution.
 REGISTERED_DIRECTION_COUNT = 200
+# Rate for the k -> infinity limit check.  Named rather than inlined so the
+# report can publish the rate the limit was taken at.
+PROMPT_RATE_PER_S = 1.0e14
+# Largest |omega/k| carried into the Lorentzian.  Its square, 1e300, is still
+# finite in double precision, and 1/(1 + 1e300) is below 1e-300, so clipping
+# here changes no representable yield while keeping a denormal-small rate from
+# overflowing the ratio to inf.
+LORENTZIAN_RATIO_CLIP = 1.0e150
 
 
 def _require_positive_finite(name: str, value: float) -> float:
@@ -373,7 +381,15 @@ def singlet_yield_closed_form(
     energies, vectors = np.linalg.eigh(hamiltonian)
     overlaps = vectors.conj().T @ projector @ vectors
     gaps = energies[:, None] - energies[None, :]
-    lorentzian = rate_per_second**2 / (rate_per_second**2 + gaps**2)
+    # Scaled form of k^2 / (k^2 + omega^2).  The unscaled numerator is a Python
+    # float squaring, so any rate above ~1.34e154 raises OverflowError and
+    # aborts the run instead of saturating to the k -> infinity limit; the ratio
+    # itself overflows to inf for a denormal-small rate.  Clipping the ratio
+    # magnitude removes both failure modes without changing a representable
+    # yield.
+    with np.errstate(over="ignore"):
+        ratio = np.minimum(np.abs(gaps) / rate_per_second, LORENTZIAN_RATIO_CLIP)
+    lorentzian = 1.0 / (1.0 + ratio**2)
     partition = float(np.trace(projector).real)
     return float((np.abs(overlaps) ** 2 * lorentzian).sum() / partition)
 
@@ -710,7 +726,10 @@ def probe_partner_suppression(
     produced it.
 
     Uses a fixed direction count so the recorded numbers cannot drift from the
-    prose that quotes them.
+    prose that quotes them.  Callers are expected to pass the registered field
+    and rate: the probe's non-monotonicity result is a statement about the
+    registered conditions, and at 0.5 T the same tensors give ratios an order of
+    magnitude different.
     """
     flavin = HYPERFINE_REGISTRY["fad-n5"]
     baseline = sweep_field_directions(
@@ -787,7 +806,6 @@ def run_radical_pair_forge(
     field_tesla: float = GEOMAGNETIC_FIELD_T,
     rate_per_second: float = DEFAULT_RATE_PER_S,
     direction_count: int = 200,
-    control_direction_count: int = 60,
     rate_points: Sequence[float] | None = None,
 ) -> RadicalPairForgeReport:
     # field_microtesla, larmor_frequency_mhz and zeeman_thermal_ratio are all
@@ -884,44 +902,68 @@ def run_radical_pair_forge(
     else:
         cross_check_couplings = resolve_inventory(CROSS_CHECK_FALLBACK_INVENTORY)
         cross_check_inventory = CROSS_CHECK_FALLBACK_INVENTORY
+    # Evaluated at the registered field and rate, not the caller's.  Both routes
+    # are exact expressions, but their numerical agreement degrades with the
+    # energy scale: the asymmetric residual is 1.4e-16 at 50 uT, 1.1e-10 at
+    # 0.5 T and 2.0e-9 at 5 T, so a caller's field alone would fail a registered
+    # gate on solve conditioning rather than on anything about the model.  The
+    # field dependence of the agreement is asserted in the test suite with a
+    # scale-aware tolerance instead, where it belongs.
     cross_check_projector = singlet_projector(hilbert_dims(cross_check_couplings))
     reference = build_hamiltonian(
-        field_tesla=field_tesla,
+        field_tesla=GEOMAGNETIC_FIELD_T,
         direction=(0.0, 0.0, 1.0),
         couplings=cross_check_couplings,
     )
-    closed = singlet_yield_closed_form(reference, cross_check_projector, rate_per_second)
+    closed = singlet_yield_closed_form(reference, cross_check_projector, DEFAULT_RATE_PER_S)
     liouville = singlet_yield_liouvillian(
-        reference, cross_check_projector, rate_per_second, rate_per_second
+        reference, cross_check_projector, DEFAULT_RATE_PER_S, DEFAULT_RATE_PER_S
     )
     asymmetric = singlet_yield_liouvillian(
-        reference, cross_check_projector, 2.0 * rate_per_second, rate_per_second
+        reference, cross_check_projector, 2.0 * DEFAULT_RATE_PER_S, DEFAULT_RATE_PER_S
     )
     # Independent route to the same asymmetric quantity: eigendecomposition of
     # the Liouvillian rather than a direct solve. This is what validates the
     # asymmetric path, which has no closed form to compare against.
     asymmetric_independent = singlet_yield_liouvillian_eigen(
-        reference, cross_check_projector, 2.0 * rate_per_second, rate_per_second
+        reference, cross_check_projector, 2.0 * DEFAULT_RATE_PER_S, DEFAULT_RATE_PER_S
     )
     asymmetric_residual = abs(asymmetric - asymmetric_independent)
     cross_check_residual = abs(closed - liouville)
 
     # Exact limits: instantaneous recombination traps the pair in the singlet.
     # Closed form only, so this always runs on the selected inventory.
+    # At the registered field for the same reason as the cross-check: the limit
+    # is exact for any Hamiltonian, but how close PROMPT_RATE_PER_S gets to it
+    # depends on the energy scale it is compared against (3.5e-12 short of unity
+    # at 0.5 T against 5.6e-16 at 50 uT), so a fixed tolerance evaluated at the
+    # caller's field would be a field-dependent gate.
     selected_reference = build_hamiltonian(
-        field_tesla=field_tesla, direction=(0.0, 0.0, 1.0), couplings=couplings
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 1.0), couplings=couplings
     )
-    prompt_limit = singlet_yield_closed_form(selected_reference, projector, 1e14)
+    prompt_limit = singlet_yield_closed_form(
+        selected_reference, projector, PROMPT_RATE_PER_S
+    )
 
+    # The probe's recorded conclusion ("no probe point increases the anisotropy,
+    # and the dependence is not monotonic") is a property of the registered
+    # conditions, so it is computed there rather than at the caller's field and
+    # rate.  At 0.5 T the same tensors give ratio_to_spin_free an order of
+    # magnitude different, which would leave the note describing data the bundle
+    # does not contain.
     partner_probe = probe_partner_suppression(
-        field_tesla=field_tesla, rate_per_second=rate_per_second
+        field_tesla=GEOMAGNETIC_FIELD_T, rate_per_second=DEFAULT_RATE_PER_S
     )
 
+    # Field and rate were pinned here already; the resolution was not, so the
+    # smoke command decided this registered gate from 20 directions while the
+    # hypothesis registers 200.  The residual is a sampled maximum, so the grid
+    # size is part of the quantity: all three are registered conditions.
     residual = polarity_residual(
         couplings=couplings,
         field_tesla=GEOMAGNETIC_FIELD_T,
         rate_per_second=DEFAULT_RATE_PER_S,
-        direction_count=control_direction_count,
+        direction_count=REGISTERED_DIRECTION_COUNT,
     )
 
     if rate_points is None:
@@ -1008,7 +1050,14 @@ def run_radical_pair_forge(
             asymmetric_residual < 1e-9
         ),
         "prompt_recombination_limit_equals_one": abs(prompt_limit - 1.0) < 1e-6,
-        "zeeman_thermal_ratio_recorded": 0.0 < zeeman_thermal_ratio(field_tesla) < 1e-3,
+        # At the registered field, not the caller's: field_tesla=0.5 would fail
+        # this registered condition solely because a half-tesla Zeeman quantum
+        # exceeds 1e-3 of k_B T -- a true statement about that run, but not the
+        # condition the hypothesis registers, which is about the geomagnetic
+        # field.  The caller's own ratio is recorded below either way.
+        "zeeman_thermal_ratio_recorded": (
+            0.0 < zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T) < 1e-3
+        ),
         "antipodal_yield_recorded_per_sampled_direction": bool(sweep.samples) and all(
             abs(sample.singlet_yield - sample.antipodal_singlet_yield) < SYMMETRY_TOLERANCE
             for sample in sweep.samples
@@ -1030,10 +1079,12 @@ def run_radical_pair_forge(
         "geomagnetic_rate_per_second": float(DEFAULT_RATE_PER_S),
         "geomagnetic_sweep_reused_primary": geomagnetic_reused,
         "primary_direction_count": int(direction_count),
-        "control_direction_count": int(control_direction_count),
         "isotropic_hyperfine_anisotropy": isotropic.anisotropy,
         "isotropic_hyperfine_mean_yield": isotropic.mean_yield,
         "polarity_residual": residual,
+        "polarity_direction_count": REGISTERED_DIRECTION_COUNT,
+        "polarity_field_microtesla": float(GEOMAGNETIC_FIELD_T * 1e6),
+        "polarity_rate_per_second": float(DEFAULT_RATE_PER_S),
         "no_hyperfine_anisotropy": bare.anisotropy,
         "no_hyperfine_mean_yield": bare.mean_yield,
         "no_hyperfine_control_fields_microtesla": [
@@ -1048,6 +1099,8 @@ def run_radical_pair_forge(
         "fast_recombination_anisotropy": fast.anisotropy,
         "partner_probe": [point.summary() for point in partner_probe],
         "partner_probe_directions": PARTNER_PROBE_DIRECTIONS,
+        "partner_probe_field_microtesla": float(GEOMAGNETIC_FIELD_T * 1e6),
+        "partner_probe_rate_per_second": float(DEFAULT_RATE_PER_S),
         "partner_probe_any_increase": any(p.increases_anisotropy for p in partner_probe),
         "partner_probe_note": (
             "Synthetic axial partner tensors spanning magnitude and orientation. No "
@@ -1066,6 +1119,8 @@ def run_radical_pair_forge(
         "liouvillian_yield": liouville,
         "closed_form_vs_liouvillian_residual": cross_check_residual,
         "cross_check_inventory": cross_check_inventory,
+        "cross_check_field_microtesla": float(GEOMAGNETIC_FIELD_T * 1e6),
+        "cross_check_rate_per_second": float(DEFAULT_RATE_PER_S),
         "cross_check_hilbert_dimension": int(np.prod(hilbert_dims(cross_check_couplings))),
         "liouvillian_dim_limit": LIOUVILLIAN_DIM_LIMIT,
         "asymmetric_rate_yield": asymmetric,
@@ -1078,11 +1133,17 @@ def run_radical_pair_forge(
             "both give unit yield."
         ),
         "prompt_recombination_limit": prompt_limit,
+        "prompt_recombination_rate_per_second": float(PROMPT_RATE_PER_S),
+        "prompt_recombination_field_microtesla": float(GEOMAGNETIC_FIELD_T * 1e6),
         "low_rate_per_second": LOW_RATE_PER_S,
         "low_rate_anisotropy": low_rate.anisotropy,
         "larmor_comparable_rate_per_second": LARMOR_COMPARABLE_RATE_PER_S,
         "larmor_comparable_anisotropy": larmor_rate.anisotropy,
         "zeeman_thermal_ratio_300k": zeeman_thermal_ratio(field_tesla),
+        "zeeman_thermal_ratio_300k_at_geomagnetic_field": zeeman_thermal_ratio(
+            GEOMAGNETIC_FIELD_T
+        ),
+        "zeeman_gate_field_microtesla": float(GEOMAGNETIC_FIELD_T * 1e6),
         "zeeman_thermal_ratio_300k_at_5mt": zeeman_thermal_ratio(5e-3),
         "fridge_magnet_note": (
             "A 5 mT magnet raises the Zeeman quantum by only two orders of magnitude "

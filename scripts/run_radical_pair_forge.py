@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import dataclasses
 import json
 import math
 from pathlib import Path
@@ -18,6 +19,7 @@ from gaugegap.radical_pair_forge import (  # noqa: E402
     INVENTORY_SLUGS,
     NUCLEAR_INVENTORIES,
     SOURCES,
+    RatePoint,
     run_radical_pair_forge,
 )
 
@@ -84,6 +86,17 @@ def _render_svg(payload: dict[str, object]) -> str:
     def _decade(value: float) -> str:
         return f"10^{round(math.log10(value))} s-1"
 
+    # The thermal clause is a claim about the number beside it, so it follows
+    # that number rather than being fixed prose: a run at 5 T prints a ratio of
+    # 2e-2, where "no thermal mechanism is available" would contradict the figure
+    # it is captioning.
+    thermal_ratio = float(controls["zeeman_thermal_ratio_300k"])
+    thermal_clause = (
+        "no thermal mechanism is available"
+        if thermal_ratio < 1e-3
+        else "above the registered 1e-3 bound &#183; not the geomagnetic case"
+    )
+
     rate_first = _decade(float(rate_sweep[0]["rate_per_second"]))
     rate_last = _decade(float(rate_sweep[-1]["rate_per_second"]))
 
@@ -114,7 +127,7 @@ def _render_svg(payload: dict[str, object]) -> str:
 <text x="110" y="440" fill="#7ee787" font-family="monospace" font-size="15">anisotropy = {float(payload["anisotropy"]):.4e} at {float(payload["field_microtesla"]):.0f} &#181;T ({float(payload["relative_contrast"]) * 100:.2f}% contrast)</text>
 <text x="110" y="464" fill="#8b949e" font-family="monospace" font-size="13">isotropic-hyperfine control = {float(controls["isotropic_hyperfine_anisotropy"]):.2e} &#183; polarity residual = {float(controls["polarity_residual"]):.2e}</text>
 <text x="110" y="486" fill="#8b949e" font-family="monospace" font-size="13">closed form vs Liouvillian = {float(controls["closed_form_vs_liouvillian_residual"]):.2e} (dim {controls["cross_check_hilbert_dimension"]}) &#183; spin-free partner {float(controls["second_radical_suppression_factor"]):.1f}&#215; stronger (tensor-dependent)</text>
-<text x="110" y="508" fill="#8b949e" font-family="monospace" font-size="13">Zeeman quantum / k_B T at 300 K = {float(controls["zeeman_thermal_ratio_300k"]):.3e}: no thermal mechanism is available</text>
+<text x="110" y="508" fill="#8b949e" font-family="monospace" font-size="13">Zeeman quantum / k_B T at 300 K = {thermal_ratio:.3e}: {thermal_clause}</text>
 <text x="550" y="536" fill="#777" font-family="monospace" font-size="12" text-anchor="middle">finite spin-Hamiltonian calculation only &#183; not a cryptochrome measurement and not a sensor design</text>
 </svg>'''
 
@@ -134,7 +147,6 @@ def main() -> int:
         help="field magnitude in microtesla (must be positive)",
     )
     parser.add_argument("--direction-count", type=int, default=200)
-    parser.add_argument("--control-direction-count", type=int, default=60)
     parser.add_argument("--rate-points", type=int, default=8, help="decades of recombination rate from 1e3")
     parser.add_argument(
         "--output-dir",
@@ -156,7 +168,6 @@ def main() -> int:
         inventory=args.inventory,
         field_tesla=args.field_ut * 1e-6,
         direction_count=args.direction_count,
-        control_direction_count=args.control_direction_count,
         rate_points=tuple(10.0 ** (3 + index) for index in range(max(2, args.rate_points))),
     )
     payload = report.summary(include_samples=True)
@@ -184,9 +195,12 @@ def main() -> int:
             row = sample.summary()
             writer.writerow({key: row[key] for key in fieldnames})
     with (args.output_dir / "rate_sweep.csv").open("w", newline="", encoding="utf-8") as handle:
+        # Derived from the dataclass, not repeated here: the hand-written list
+        # meant that adding direction_count to RatePoint raised ValueError
+        # halfway through writing the file, leaving a truncated CSV behind.
         writer = csv.DictWriter(
             handle,
-            fieldnames=["rate_per_second", "anisotropy", "mean_yield", "direction_count"],
+            fieldnames=[field.name for field in dataclasses.fields(RatePoint)],
         )
         writer.writeheader()
         for point in report.rate_sweep:

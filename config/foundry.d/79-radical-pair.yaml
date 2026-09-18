@@ -28,7 +28,7 @@ units:
     description: Reduced radical-pair compass smoke check.
     command:
       ["{python}", "scripts/run_radical_pair_forge.py",
-       "--direction-count", "40", "--control-direction-count", "20", "--rate-points", "4",
+       "--direction-count", "40", "--rate-points", "4",
        "--output-dir", "/tmp/radical-pair-smoke"]
 
 groups:

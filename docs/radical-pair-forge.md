@@ -87,7 +87,8 @@ zero, says nothing about whether some other partner tensor could *increase* the
 anisotropy. `probe_partner_suppression()` sweeps synthetic axial partner tensors across
 magnitude and orientation to test exactly that, and its output is recorded in
 every evidence bundle under `controls.partner_probe`, at a fixed
-`PARTNER_PROBE_DIRECTIONS` so the numbers cannot drift from this prose:
+`PARTNER_PROBE_DIRECTIONS` and at the registered field and rate, so the numbers
+cannot drift from this prose:
 
 The strength series is generated as **scalar multiples of one principal-value
 tuple**, so the transverse-to-axial ratio is held at `-0.056707` throughout and
@@ -133,6 +134,38 @@ smaller fixed system and the report records which one was used
 (`cross_check_inventory`). The expression being validated is
 inventory-independent, so a smaller system tests it just as well. Symmetric rates agree to `~1e-16`; asymmetric rates
 differ, and converge back as the rates are brought together.
+
+Both routes are exact expressions, but their *numerical* agreement degrades with
+the energy scale, because the conditioning of the `dim^2` solve does: the
+asymmetric residual is `1.4e-16` at 50 uT, `1.1e-10` at 0.5 T and `2.0e-9` at
+5 T. So the registered gate is decided at the registered field and rate, and the
+field dependence is asserted in the test suite with a scale-aware tolerance
+instead — see `test_the_two_solve_routes_agree_across_field_scales`. A flat
+tolerance evaluated at the caller's field would fail a registered condition on
+solve conditioning alone, which says nothing about the model.
+
+### Registered conditions are not the caller's conditions
+
+The hypothesis registers a field (50 uT), a rate (`1e6 s^-1`) and an angular
+resolution (200 directions). Every registered condition is therefore decided at
+those values, whatever `--field-ut`, `--direction-count` or `--rate-points` the
+run used, and each one publishes the conditions it was decided at
+(`polarity_field_microtesla`, `cross_check_rate_per_second`,
+`zeeman_gate_field_microtesla`, and so on). The caller's own configuration is
+still recorded — `field_microtesla`, `zeeman_thermal_ratio_300k`, the primary
+sweep and the rate series all describe the run that was asked for — it just does
+not decide anything the hypothesis registered.
+
+Eight controls inherited a caller parameter at some point in this track's
+history, and each was found separately by review; two of them after a helper was
+added to make a further escape impossible, because they did not route through
+it. The guard is now a property test rather than a list of mechanisms:
+`test_no_caller_parameter_can_change_a_registered_condition` runs the report at
+5 T with an odd rate and resolution and requires the entire `checks` dict, and
+the recorded evidence behind it, to be identical to a run at the registered
+conditions. Under the previous code that run failed two registered conditions —
+the Zeeman/`k_B T` ratio, on the caller's half-tesla field, and the asymmetric
+solve, on conditioning.
 
 ## Claim Boundary
 
@@ -183,7 +216,7 @@ python scripts/run_radical_pair_forge.py --inventory spin-free-partner \
 
 # reduced smoke check
 python scripts/run_radical_pair_forge.py --direction-count 40 \
-  --control-direction-count 20 --rate-points 4 --output-dir /tmp/radical-pair-smoke
+  --rate-points 4 --output-dir /tmp/radical-pair-smoke
 
 python -m pytest tests/test_radical_pair_forge.py
 ```
