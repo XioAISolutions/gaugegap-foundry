@@ -433,6 +433,10 @@ class RatePoint:
     rate_per_second: float
     anisotropy: float
     mean_yield: float
+    # Angular resolution this point was computed at. Recorded because a rate
+    # series evaluated at a different resolution from the headline sweep would
+    # otherwise put two unexplained values for the same quantity in one bundle.
+    direction_count: int
 
     def summary(self) -> dict[str, Any]:
         return asdict(self)
@@ -832,6 +836,7 @@ def run_radical_pair_forge(
             rate_per_second=float(rate),
             anisotropy=point.anisotropy,
             mean_yield=point.mean_yield,
+            direction_count=point.direction_count,
         )
         for rate, point in (
             (
@@ -840,7 +845,7 @@ def run_radical_pair_forge(
                     couplings=couplings,
                     field_tesla=field_tesla,
                     rate_per_second=rate,
-                    direction_count=control_direction_count,
+                    direction_count=direction_count,
                     keep_samples=False,
                     inventory=inventory,
                 ),
@@ -906,6 +911,8 @@ def run_radical_pair_forge(
     controls: dict[str, Any] = {
         "checks": dict(checks),
         "symmetry_tolerance": SYMMETRY_TOLERANCE,
+        "primary_direction_count": int(direction_count),
+        "control_direction_count": int(control_direction_count),
         "isotropic_hyperfine_anisotropy": isotropic.anisotropy,
         "isotropic_hyperfine_mean_yield": isotropic.mean_yield,
         "polarity_residual": residual,

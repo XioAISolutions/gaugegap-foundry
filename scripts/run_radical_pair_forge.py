@@ -182,7 +182,10 @@ def main() -> int:
             row = sample.summary()
             writer.writerow({key: row[key] for key in fieldnames})
     with (args.output_dir / "rate_sweep.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["rate_per_second", "anisotropy", "mean_yield"])
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=["rate_per_second", "anisotropy", "mean_yield", "direction_count"],
+        )
         writer.writeheader()
         for point in report.rate_sweep:
             writer.writerow(point.summary())

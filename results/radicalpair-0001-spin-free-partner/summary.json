@@ -21,6 +21,7 @@
     },
     "closed_form_vs_liouvillian_residual": 2.220446049250313e-16,
     "closed_form_yield": 0.6583165330550036,
+    "control_direction_count": 60,
     "cross_check_hilbert_dimension": 12,
     "cross_check_inventory": "spin-free-partner",
     "fast_recombination_anisotropy": 2.368981677491888e-10,
@@ -157,6 +158,7 @@
     "partner_probe_directions": 120,
     "partner_probe_note": "Synthetic axial partner tensors spanning magnitude and orientation. No probe point increases the anisotropy, but the dependence is not monotonic in partner coupling strength, so no general claim about the direction of the effect is made.",
     "polarity_residual": 3.3306690738754696e-15,
+    "primary_direction_count": 200,
     "prompt_recombination_limit": 0.9999999999967937,
     "relaxation_note": "No spin relaxation is modelled, so the long-lifetime side of the rate window is not reproduced: anisotropy persists as k -> 0 here, whereas a real pair is limited by T2 of order microseconds.",
     "second_radical_suppression_factor": 8.240824391930575,
@@ -201,43 +203,51 @@
   "passed": true,
   "rate_sweep": [
     {
-      "anisotropy": 0.15785662101595382,
-      "mean_yield": 0.3868281868906937,
+      "anisotropy": 0.1616789882881542,
+      "direction_count": 200,
+      "mean_yield": 0.3868419927278272,
       "rate_per_second": 1000.0
     },
     {
-      "anisotropy": 0.15412453697849915,
-      "mean_yield": 0.3901221525601095,
+      "anisotropy": 0.15791357324972538,
+      "direction_count": 200,
+      "mean_yield": 0.39013584933166373,
       "rate_per_second": 10000.0
     },
     {
-      "anisotropy": 0.10767241395144811,
-      "mean_yield": 0.4933487317077605,
+      "anisotropy": 0.11053133330727588,
+      "direction_count": 200,
+      "mean_yield": 0.4933591174678085,
       "rate_per_second": 100000.0
     },
     {
-      "anisotropy": 0.15541106676937838,
-      "mean_yield": 0.5511200926546167,
+      "anisotropy": 0.1591626079758635,
+      "direction_count": 200,
+      "mean_yield": 0.5511336399538806,
       "rate_per_second": 1000000.0
     },
     {
-      "anisotropy": 0.06933404233889129,
-      "mean_yield": 0.6128341695213079,
+      "anisotropy": 0.0710126894047517,
+      "direction_count": 200,
+      "mean_yield": 0.6128402325094067,
       "rate_per_second": 10000000.0
     },
     {
-      "anisotropy": 0.0011488172499100058,
-      "mean_yield": 0.6932259254348428,
+      "anisotropy": 0.0011766306006376626,
+      "direction_count": 200,
+      "mean_yield": 0.6932260258917848,
       "rate_per_second": 100000000.0
     },
     {
-      "anisotropy": 1.540359031104721e-06,
-      "mean_yield": 0.9707416131301213,
+      "anisotropy": 1.5775377905091759e-06,
+      "direction_count": 200,
+      "mean_yield": 0.9707416129958654,
       "rate_per_second": 1000000000.0
     },
     {
-      "anisotropy": 2.368981677491888e-10,
-      "mean_yield": 0.9996797145887967,
+      "anisotropy": 2.42618369838965e-10,
+      "direction_count": 200,
+      "mean_yield": 0.9996797145887758,
       "rate_per_second": 10000000000.0
     }
   ],

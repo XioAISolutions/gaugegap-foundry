@@ -567,3 +567,22 @@ def test_each_inventory_gets_a_distinct_benchmark_id():
         assert report.inventory == inventory
     assert len(set(ids.values())) == len(ids), f"benchmark_id collision: {ids}"
     assert ids["cryptochrome-like"] == "radicalpair-0001-cryptochrome-compass"
+
+
+def test_rate_sweep_is_consistent_with_the_headline_sweep():
+    # A bundle must not carry two different values for the same physical
+    # quantity. The rate series runs at the headline resolution, so the point at
+    # the report's own recombination rate is exactly the headline anisotropy --
+    # not merely close. Previously the series ran at control_direction_count and
+    # differed by 1.17% with nothing in the JSON explaining it.
+    rate = 1e6
+    report = run_radical_pair_forge(
+        direction_count=60, control_direction_count=20, rate_points=(1e3, rate, 1e10)
+    )
+    at_report_rate = [p for p in report.rate_sweep if p.rate_per_second == rate]
+    assert len(at_report_rate) == 1
+    assert at_report_rate[0].anisotropy == report.anisotropy
+    # And every point records the resolution it was computed at.
+    assert all(p.direction_count == report.sweep.direction_count for p in report.rate_sweep)
+    assert report.controls["primary_direction_count"] == 60
+    assert report.controls["control_direction_count"] == 20

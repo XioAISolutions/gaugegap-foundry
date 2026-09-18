@@ -12,7 +12,7 @@
 <text x="345" y="400" fill="#8b949e" font-family="monospace" font-size="12" text-anchor="middle">on the dashed identity line: polarity carries no information</text>
 <line x1="680" y1="360" x2="1010" y2="360" stroke="#333"/>
 <line x1="680" y1="140" x2="680" y2="360" stroke="#333"/>
-<path d="M680.00,150.00L727.14,150.00L774.29,150.40L821.43,180.60L868.57,311.72L915.71,354.30L962.86,359.99L1010.00,360.00" fill="none" stroke="#f0883e" stroke-width="2.4"/>
+<path d="M680.00,150.00L727.14,150.01L774.29,150.57L821.43,179.63L868.57,310.22L915.71,354.00L962.86,359.99L1010.00,360.00" fill="none" stroke="#f0883e" stroke-width="2.4"/>
 <text x="845" y="112" fill="#c9d1d9" font-family="monospace" font-size="14" text-anchor="middle">anisotropy vs recombination rate</text>
 <text x="680" y="382" fill="#666" font-family="monospace" font-size="12">10^3 s-1</text>
 <text x="945" y="382" fill="#666" font-family="monospace" font-size="12">10^10 s-1</text>
