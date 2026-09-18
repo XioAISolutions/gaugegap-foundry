@@ -52,7 +52,8 @@ evidence bundle therefore records each direction's antipodal yield alongside its
 own (`antipodal_singlet_yield` in `directions.csv`), and the figure plots one
 against the other so the degeneracy is demonstrated rather than asserted.
 
-This is an inclination sensor. It cannot tell North from South. A term odd under
+The model therefore carries inclination but no polarity information: it cannot
+distinguish North from South. A term odd under
 `Theta`, such as a chirality-induced spin selectivity term, would be required to
 break the degeneracy, and none is modelled here.
 

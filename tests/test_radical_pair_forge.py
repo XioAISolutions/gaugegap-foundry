@@ -383,3 +383,121 @@ def test_non_positive_field_is_rejected_because_magnitudes_are_published():
             run_radical_pair_forge(
                 field_tesla=bad, direction_count=8, control_direction_count=6, rate_points=(1e6,)
             )
+
+
+# Every phrase this track has retracted across review rounds. Each is
+# affirmative by construction, so a legitimate negated mention ("not a lifetime
+# window") does not match, while a reinstated claim does. The repo-level
+# claim_boundary_audit passed with zero high findings while two of these were
+# live in the artifacts, so track-specific prohibitions need a track-specific
+# guard.
+RETRACTED_PHRASES = (
+    "inclination sensor",          # own avoided-language list bans affirmative "sensor"
+    "is a sensor",
+    "window sits near",            # no lifetime window: no relaxation is modelled
+    "microsecond optimum",
+    "symmetric about 90",          # the figure plots antipodal pairs, not mirrored polar angles
+    "sign of the effect is robust",
+    "sign of that effect is robust",
+    "Three of the four",           # only three results are structural; the fourth is not
+)
+
+GUARDED_ARTIFACTS = (
+    "src/gaugegap/radical_pair_forge.py",
+    "scripts/run_radical_pair_forge.py",
+    "tests/test_radical_pair_forge.py",
+    "docs/radical-pair-forge.md",
+    "hypotheses/radicalpair-0001.yaml",
+)
+
+
+# A retracted phrase may legitimately appear inside its own prohibition ("Do not
+# read a microsecond optimum out of this"), inside a kill criterion, or inside a
+# recorded retraction quoting the old wording. Those are the artifact working as
+# intended, so an occurrence only counts as a violation when nothing in its
+# immediate context negates or forbids it.
+NEGATION_MARKERS = (
+    "not ",
+    "no ",
+    "never",
+    "avoid",
+    "forbid",
+    "removed",
+    "retract",
+    "earlier draft",
+    "output claims",
+    "over-claim",
+    "overstate",
+)
+
+
+# A phrase can also be legitimised by the block it sits in rather than by its own
+# sentence: an entry in an "Avoided language" list or under kill_criteria is a
+# prohibition even though the bullet itself reads affirmatively.
+PROHIBITION_SECTIONS = (
+    "avoided language",
+    "avoided:",
+    "kill_criteria",
+    "exclusions",
+    "must not",
+    "do not",
+)
+PROHIBITION_LOOKBACK = 14
+
+
+def _is_negated(context: str) -> bool:
+    lowered = context.lower()
+    return any(marker in lowered for marker in NEGATION_MARKERS)
+
+
+def _in_prohibition_block(lines: list[str], number: int) -> bool:
+    start = max(0, number - PROHIBITION_LOOKBACK)
+    window = " ".join(lines[start:number]).lower()
+    return any(marker in window for marker in PROHIBITION_SECTIONS)
+
+
+def test_no_retracted_claim_reappears_in_the_tracks_own_artifacts():
+    offenders = []
+    for relative in GUARDED_ARTIFACTS:
+        if relative.endswith("test_radical_pair_forge.py"):
+            continue  # this file necessarily holds the phrases as data
+        lines = (ROOT / relative).read_text(encoding="utf-8").splitlines()
+        for number, line in enumerate(lines):
+            for phrase in RETRACTED_PHRASES:
+                if phrase.lower() not in line.lower():
+                    continue
+                # Include the previous line: this prose is hard-wrapped, so a
+                # negation can sit just above the phrase it negates.
+                context = (lines[number - 1] if number else "") + " " + line
+                if not _is_negated(context) and not _in_prohibition_block(lines, number):
+                    offenders.append(f"{relative}:{number + 1}: {phrase!r}")
+    assert not offenders, "retracted claims reappeared unnegated: " + "; ".join(offenders)
+
+
+def test_the_retracted_claim_guard_actually_catches_an_affirmative_claim(tmp_path: Path):
+    # A guard that never fires is worthless, and this one was written after it
+    # over-triggered on legitimate negations, so prove both directions.
+    affirmative = tmp_path / "affirmative.md"
+    affirmative.write_text("The model is an inclination sensor.\n", encoding="utf-8")
+    lines = affirmative.read_text(encoding="utf-8").splitlines()
+    assert not _is_negated(lines[0])
+
+    negated = tmp_path / "negated.md"
+    negated.write_text("This is not an inclination sensor.\n", encoding="utf-8")
+    assert _is_negated(negated.read_text(encoding="utf-8").splitlines()[0])
+
+    # A bullet under an "Avoided language" heading is a prohibition even though
+    # the bullet itself reads affirmatively.
+    block = ["Avoided language:", "", "- a microsecond optimum"]
+    assert _in_prohibition_block(block, 2)
+    assert not _in_prohibition_block(["Results:", "", "- a microsecond optimum"], 2)
+
+
+def test_kill_criteria_forbidding_sensor_language_are_honoured_by_the_claim_boundary():
+    # The registry forbids describing the result as a sensor; the module's own
+    # CLAIM_BOUNDARY must therefore only ever mention "sensor" in the negative.
+    from gaugegap.radical_pair_forge import CLAIM_BOUNDARY
+
+    lowered = CLAIM_BOUNDARY.lower()
+    assert "sensor" in lowered  # it is disclaimed explicitly
+    assert "not a magnetometer or sensor design" in lowered

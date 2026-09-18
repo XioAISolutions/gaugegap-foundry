@@ -100,9 +100,12 @@ notes:
     Hyperfine values are literature-style order-of-magnitude model inputs and the
     relative Euler orientations are illustrative. The structural results do not
     depend on them. The recorded numerical yields do, and so does the
-    partner-suppression factor: scaling the partner tensor continuously to zero
-    makes the loaded and spin-free yields coincide, so only the sign of that
-    effect is robust.
+    partner-suppression factor. The code compares exactly two inventories, so it
+    establishes neither the magnitude nor the sign of that effect for any other
+    partner tensor, magnitude or orientation, and no theorem is offered. A probe
+    over axial partner tensors found no counterexample but did find the
+    dependence is not monotonic in partner coupling strength, which is a reason
+    to claim nothing general.
   - >
     The antipode of a direction (theta, phi) is (180 - theta, phi + 180). For a
     rhombic tensor the yield depends on azimuth as well as polar angle, so

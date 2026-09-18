@@ -19,7 +19,7 @@ hold for any hyperfine values.
    hyperfine term is bilinear in spin and therefore even under ``Theta``, and
    the singlet projector is rotationally invariant, so ``Theta H(B) Theta^-1 =
    H(-B)`` leaves both the spectrum and ``|<m|P_S|n>|^2`` unchanged.  The
-   mechanism is an inclination sensor and cannot resolve field polarity.  Note
+   mechanism carries inclination but no polarity information.  Note
    the antipode of a direction is ``(180 - theta, phi + 180)``: for a rhombic
    tensor the yield depends on azimuth too, so this is not a symmetry of the
    polar angle alone.
