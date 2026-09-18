@@ -209,6 +209,10 @@ CROSS_CHECK_FALLBACK_INVENTORY = "cryptochrome-like"
 # the caller's rate_points, so the condition is always evaluated.
 LOW_RATE_PER_S = 1.0e3
 LARMOR_COMPARABLE_RATE_PER_S = 1.0e6
+# Field magnitudes for the no-hyperfine control. The registered condition claims
+# the yield is FIELD-independent, which cannot be shown from a single magnitude
+# however many directions it sweeps, so the control is evaluated at two decades.
+NO_HYPERFINE_CONTROL_FIELDS_T = (GEOMAGNETIC_FIELD_T, 5.0e-3)
 
 
 PARTNER_PROBE_DIRECTIONS = 120
@@ -742,14 +746,20 @@ def run_radical_pair_forge(
 
     # Control 2 - no hyperfine coupling at all: H commutes with P_S, so the pair
     # never leaves the singlet and the yield is exactly one in every direction.
-    bare = sweep_field_directions(
-        couplings=(),
-        field_tesla=field_tesla,
-        rate_per_second=rate_per_second,
-        direction_count=max(8, control_direction_count // 4),
-        keep_samples=False,
-        inventory="no-hyperfine-control",
+    # Evaluated at two field magnitudes, because the registered condition claims
+    # field-independence and one magnitude cannot establish that.
+    bare_sweeps = tuple(
+        sweep_field_directions(
+            couplings=(),
+            field_tesla=control_field,
+            rate_per_second=rate_per_second,
+            direction_count=max(8, control_direction_count // 4),
+            keep_samples=False,
+            inventory="no-hyperfine-control",
+        )
+        for control_field in NO_HYPERFINE_CONTROL_FIELDS_T
     )
+    bare = bare_sweeps[0]
 
     # Control 3 - recombination far faster than precession erases the compass.
     fast = sweep_field_directions(
@@ -902,10 +912,14 @@ def run_radical_pair_forge(
             isotropic.anisotropy < SYMMETRY_TOLERANCE
         ),
         "polarity_residual_below_tolerance": residual < SYMMETRY_TOLERANCE,
-        "no_hyperfine_control_yield_is_unity_and_field_independent": (
-            bare.anisotropy < SYMMETRY_TOLERANCE
-            and abs(bare.mean_yield - 1.0) < SYMMETRY_TOLERANCE
-        ),
+        "no_hyperfine_control_yield_is_unity_and_field_independent": all(
+            point.anisotropy < SYMMETRY_TOLERANCE
+            and abs(point.mean_yield - 1.0) < SYMMETRY_TOLERANCE
+            for point in bare_sweeps
+        )
+        and max(point.mean_yield for point in bare_sweeps)
+        - min(point.mean_yield for point in bare_sweeps)
+        < SYMMETRY_TOLERANCE,
         "fast_recombination_control_anisotropy_below_tolerance": fast.anisotropy < 1e-6,
         "spin_free_partner_anisotropy_exceeds_loaded_partner_anisotropy": (
             spin_free.anisotropy > loaded_partner.anisotropy
@@ -938,6 +952,14 @@ def run_radical_pair_forge(
         "polarity_residual": residual,
         "no_hyperfine_anisotropy": bare.anisotropy,
         "no_hyperfine_mean_yield": bare.mean_yield,
+        "no_hyperfine_control_fields_microtesla": [
+            float(value * 1e6) for value in NO_HYPERFINE_CONTROL_FIELDS_T
+        ],
+        "no_hyperfine_mean_yield_per_field": [point.mean_yield for point in bare_sweeps],
+        "no_hyperfine_field_spread": float(
+            max(point.mean_yield for point in bare_sweeps)
+            - min(point.mean_yield for point in bare_sweeps)
+        ),
         "fast_recombination_rate_per_second": FAST_RATE_PER_S,
         "fast_recombination_anisotropy": fast.anisotropy,
         "partner_probe": [point.summary() for point in partner_probe],

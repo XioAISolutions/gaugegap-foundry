@@ -610,3 +610,27 @@ def test_geomagnetic_condition_is_evaluated_at_the_registered_field():
     )
     assert default.controls["geomagnetic_sweep_reused_primary"] is True
     assert default.controls["geomagnetic_anisotropy"] == default.anisotropy
+
+
+def test_no_hyperfine_control_really_tests_field_independence():
+    # Found by auditing every check name against what it computes, after the
+    # geomagnetic finding showed that renaming keys to match the registry aligned
+    # labels without aligning evaluations. This condition claims the yield is
+    # FIELD-independent, which a single magnitude cannot establish however many
+    # directions it sweeps.
+    from gaugegap.radical_pair_forge import NO_HYPERFINE_CONTROL_FIELDS_T
+
+    assert len(NO_HYPERFINE_CONTROL_FIELDS_T) >= 2
+    assert len(set(NO_HYPERFINE_CONTROL_FIELDS_T)) == len(NO_HYPERFINE_CONTROL_FIELDS_T)
+    # Spanning at least a decade, so "independent" means something.
+    assert max(NO_HYPERFINE_CONTROL_FIELDS_T) / min(NO_HYPERFINE_CONTROL_FIELDS_T) >= 10.0
+
+    report = run_radical_pair_forge(
+        direction_count=12, control_direction_count=8, rate_points=(1e6,)
+    )
+    controls = report.controls
+    yields = controls["no_hyperfine_mean_yield_per_field"]
+    assert len(yields) == len(NO_HYPERFINE_CONTROL_FIELDS_T)
+    assert all(abs(value - 1.0) < SYMMETRY_TOLERANCE for value in yields)
+    assert controls["no_hyperfine_field_spread"] < SYMMETRY_TOLERANCE
+    assert controls["checks"]["no_hyperfine_control_yield_is_unity_and_field_independent"]
