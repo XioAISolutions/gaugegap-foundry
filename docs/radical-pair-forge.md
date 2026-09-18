@@ -156,7 +156,22 @@ still recorded — `field_microtesla`, `zeeman_thermal_ratio_300k`, the primary
 sweep and the rate series all describe the run that was asked for — it just does
 not decide anything the hypothesis registered.
 
-Eight controls inherited a caller parameter at some point in this track's
+The antipodal-degeneracy condition is decided the same way: it reads the
+registered 200-direction sweep, and the primary sweep's residual is recorded
+beside it as caller-specific output rather than gating anything. A 12-direction
+run would otherwise certify that registered condition from 12 samples.
+
+Accepted inputs are bounded as well as finite, because finiteness of the input
+is not the property that matters -- finiteness of the operator built from it is.
+`k = 1e308` is positive and finite, and the direct Liouvillian solve returned
+`nan` for it instead of raising, which would have serialized as a measured
+yield. `MAX_FIELD_TESLA`, `MAX_RATE_PER_S` and `MAX_HYPERFINE_MHZ` are derived
+from the largest finite double and the factor each input is multiplied by before
+it reaches a matrix, so they are not opinions about what a large field is; they
+are published in every bundle. A finiteness check on each constructed operator
+backs them up, for combinations of inputs no per-input bound can see.
+
+Nine controls inherited a caller parameter at some point in this track's
 history, and each was found separately by review; two of them after a helper was
 added to make a further escape impossible, because they did not route through
 it. The guard is now a property test rather than a list of mechanisms:

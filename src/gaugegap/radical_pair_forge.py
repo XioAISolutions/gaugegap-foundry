@@ -75,6 +75,84 @@ PLANCK_J_S = 6.62607015e-34
 BOLTZMANN_J_PER_K = 1.380649e-23
 MHZ_TO_RAD_PER_S = 2.0 * math.pi * 1e6
 
+# Bounds on accepted numeric inputs, DERIVED from the largest finite double and
+# the factor each input is multiplied by before it reaches an operator, not
+# chosen.  Finiteness of the input is not enough: a positive finite value can
+# overflow the operator built from it, and that overflow does not always raise.
+# At k = 1e308 the direct Liouvillian solve returned nan, which would serialize
+# as a measured yield; at B = 1e308 T the Hamiltonian went non-finite and died
+# inside eigh.  The registry's kill criteria cover both cases.
+#
+# The factor of 4 is headroom for the terms that land in the same matrix entry:
+# the Zeeman and hyperfine terms add into one Hamiltonian, and the two decay
+# Kronecker terms add into one Liouvillian.
+_DOUBLE_MAX = float(np.finfo(float).max)
+MAX_FIELD_TESLA = _DOUBLE_MAX / GYROMAGNETIC_RATIO_E / 4.0
+MAX_RATE_PER_S = _DOUBLE_MAX / 4.0
+MAX_HYPERFINE_MHZ = _DOUBLE_MAX / MHZ_TO_RAD_PER_S / 4.0
+
+
+def _require_positive_finite(
+    name: str, value: float, *, maximum: float | None = None
+) -> float:
+    """Reject non-finite, non-positive, and operator-overflowing values.
+
+    A bare ``value <= 0.0`` test admits nan (all comparisons false) and inf.
+    Either then propagates into the Hamiltonian or the Lorentzian and surfaces
+    as an opaque LinAlgError or a NaN serialized into the evidence bundle.  A
+    finite value above ``maximum`` does the same one step later, when the
+    operator built from it overflows.  Used at every numeric boundary rather
+    than only the one a finding names.
+    """
+    numeric = float(value)
+    if not math.isfinite(numeric) or numeric <= 0.0:
+        raise ValueError(
+            f"{name} must be a positive finite value; got {value!r}"
+        )
+    if maximum is not None and numeric > maximum:
+        raise ValueError(
+            f"{name} must be at most {maximum:.6e} so the operators built from it "
+            f"stay finite; got {value!r}"
+        )
+    return numeric
+
+
+def _require_finite_magnitude(
+    name: str, value: float, maximum: float | None = None
+) -> float:
+    """Same guard for a signed quantity, where zero and negatives are legitimate.
+
+    Hyperfine principal values are routinely negative, so they cannot go through
+    the positivity check, but they reach the same matrices and overflow them the
+    same way.
+    """
+    numeric = float(value)
+    if not math.isfinite(numeric):
+        raise ValueError(f"{name} must be finite; got {value!r}")
+    if maximum is not None and abs(numeric) > maximum:
+        raise ValueError(
+            f"{name} must have magnitude at most {maximum:.6e} so the operators "
+            f"built from it stay finite; got {value!r}"
+        )
+    return numeric
+
+
+def _require_finite_operator(name: str, operator: np.ndarray) -> np.ndarray:
+    """Backstop: no non-finite operator may reach a solver.
+
+    The per-input bounds above give a clear error naming the offending input.
+    This catches whatever they do not -- a combination of inputs, or a term
+    added later -- because np.linalg.solve returns nan rather than raising, and
+    a nan yield is fabricated evidence, not a crash.
+    """
+    if not np.isfinite(operator).all():
+        raise ValueError(
+            f"{name} is not finite; the inputs are within their individual bounds "
+            "but overflow in combination"
+        )
+    return operator
+
+
 SOURCES = (
     {
         "kind": "literature_reference",
@@ -116,6 +194,14 @@ class HyperfineCoupling:
             raise ValueError("radical_index must be 0 or 1")
         if self.multiplicity < 2:
             raise ValueError("multiplicity must be at least 2")
+        for index, value in enumerate(self.principal_values_mhz):
+            _require_finite_magnitude(
+                f"{self.name}.principal_values_mhz[{index}]", value, MAX_HYPERFINE_MHZ
+            )
+        for index, value in enumerate(self.euler_deg):
+            # No magnitude bound: any finite angle is meaningful. An infinite one
+            # gives nan through cos/sin and a silently non-finite tensor.
+            _require_finite_magnitude(f"{self.name}.euler_deg[{index}]", value)
 
     @property
     def anisotropy_mhz(self) -> float:
@@ -234,22 +320,6 @@ PROMPT_RATE_PER_S = 1.0e14
 LORENTZIAN_RATIO_CLIP = 1.0e150
 
 
-def _require_positive_finite(name: str, value: float) -> float:
-    """Reject non-finite as well as non-positive values.
-
-    A bare ``value <= 0.0`` test admits nan (all comparisons false) and inf.
-    Either then propagates into the Hamiltonian or the Lorentzian and surfaces
-    as an opaque LinAlgError or a NaN serialized into the evidence bundle. Used
-    for every numeric input rather than only the one a finding names.
-    """
-    numeric = float(value)
-    if not math.isfinite(numeric) or numeric <= 0.0:
-        raise ValueError(
-            f"{name} must be a positive finite value; got {value!r}"
-        )
-    return numeric
-
-
 def _at_registered_conditions(
     field_tesla: float, rate_per_second: float, direction_count: int
 ) -> bool:
@@ -350,7 +420,13 @@ def build_hamiltonian(
     norm = float(np.linalg.norm(unit))
     if norm == 0.0:
         raise ValueError("direction must be a non-zero vector")
+    if not np.isfinite(unit).all():
+        raise ValueError(f"direction must be finite; got {direction!r}")
     unit = unit / norm
+    # Bounded, not merely finite: 1e308 T is a positive finite input whose
+    # Larmor term overflows, and the non-finite Hamiltonian then dies inside
+    # eigh with "Eigenvalues did not converge".
+    _require_positive_finite("field_tesla", field_tesla, maximum=MAX_FIELD_TESLA)
     larmor = GYROMAGNETIC_RATIO_E * float(field_tesla)
     hamiltonian = larmor * sum(
         unit[axis] * (electron[0][axis] + electron[1][axis]) for axis in range(3)
@@ -364,7 +440,7 @@ def build_hamiltonian(
                 weight = tensor[i, j]
                 if weight != 0.0:
                     hamiltonian = hamiltonian + weight * (electron_ops[i] @ nuclear[j])
-    return hamiltonian
+    return _require_finite_operator("hamiltonian", hamiltonian)
 
 
 def singlet_yield_closed_form(
@@ -377,7 +453,7 @@ def singlet_yield_closed_form(
     ``Phi_S = (1/Z) sum_mn |<m|P_S|n>|^2 k^2 / (k^2 + omega_mn^2)``, with
     ``Z = Tr P_S`` and ``omega_mn = E_m - E_n``.
     """
-    _require_positive_finite("rate_per_second", rate_per_second)
+    _require_positive_finite("rate_per_second", rate_per_second, maximum=MAX_RATE_PER_S)
     energies, vectors = np.linalg.eigh(hamiltonian)
     overlaps = vectors.conj().T @ projector @ vectors
     gaps = energies[:, None] - energies[None, :]
@@ -394,6 +470,29 @@ def singlet_yield_closed_form(
     return float((np.abs(overlaps) ** 2 * lorentzian).sum() / partition)
 
 
+def _build_liouvillian(
+    hamiltonian: np.ndarray,
+    projector: np.ndarray,
+    singlet_rate: float,
+    triplet_rate: float,
+) -> np.ndarray:
+    """``L`` for ``drho/dt = -i[H, rho] - (1/2){k_S P_S + k_T P_T, rho}``.
+
+    Shared by both solvers.  They had a copy each, so a bound added to one would
+    have left the other accepting a rate that overflows the decay term -- and
+    the direct solve does not raise on a non-finite matrix, it returns nan.
+    """
+    _require_positive_finite("singlet_rate", singlet_rate, maximum=MAX_RATE_PER_S)
+    _require_positive_finite("triplet_rate", triplet_rate, maximum=MAX_RATE_PER_S)
+    dimension = hamiltonian.shape[0]
+    identity = np.eye(dimension, dtype=complex)
+    decay = singlet_rate * projector + triplet_rate * (identity - projector)
+    liouvillian = -1j * (
+        np.kron(identity, hamiltonian) - np.kron(hamiltonian.T, identity)
+    ) - 0.5 * (np.kron(identity, decay) + np.kron(decay.T, identity))
+    return _require_finite_operator("liouvillian", liouvillian)
+
+
 def singlet_yield_liouvillian(
     hamiltonian: np.ndarray,
     projector: np.ndarray,
@@ -407,14 +506,8 @@ def singlet_yield_liouvillian(
     needs no time stepping and is exact up to the linear solve.  No closed form
     exists for asymmetric rates, which is what makes it a real cross-check.
     """
-    _require_positive_finite("singlet_rate", singlet_rate)
-    _require_positive_finite("triplet_rate", triplet_rate)
+    liouvillian = _build_liouvillian(hamiltonian, projector, singlet_rate, triplet_rate)
     dimension = hamiltonian.shape[0]
-    identity = np.eye(dimension, dtype=complex)
-    decay = singlet_rate * projector + triplet_rate * (identity - projector)
-    liouvillian = -1j * (
-        np.kron(identity, hamiltonian) - np.kron(hamiltonian.T, identity)
-    ) - 0.5 * (np.kron(identity, decay) + np.kron(decay.T, identity))
     initial = projector / float(np.trace(projector).real)
     integrated = np.linalg.solve(-liouvillian, initial.flatten(order="F"))
     integrated = integrated.reshape(dimension, dimension, order="F")
@@ -440,14 +533,8 @@ def singlet_yield_liouvillian_eigen(
     both symmetric and asymmetric recombination give unit yield, so the two agree
     exactly and the gate would have failed a perfectly correct calculation.
     """
-    _require_positive_finite("singlet_rate", singlet_rate)
-    _require_positive_finite("triplet_rate", triplet_rate)
+    liouvillian = _build_liouvillian(hamiltonian, projector, singlet_rate, triplet_rate)
     dimension = hamiltonian.shape[0]
-    identity = np.eye(dimension, dtype=complex)
-    decay = singlet_rate * projector + triplet_rate * (identity - projector)
-    liouvillian = -1j * (
-        np.kron(identity, hamiltonian) - np.kron(hamiltonian.T, identity)
-    ) - 0.5 * (np.kron(identity, decay) + np.kron(decay.T, identity))
     eigenvalues, eigenvectors = np.linalg.eig(liouvillian)
     initial = (projector / float(np.trace(projector).real)).flatten(order="F")
     coefficients = np.linalg.solve(eigenvectors, initial)
@@ -796,6 +883,10 @@ def probe_partner_suppression(
 
 def zeeman_thermal_ratio(field_tesla: float, temperature_k: float = 300.0) -> float:
     """Electron Zeeman quantum over ``k_B T``; ~2.2e-7 at 50 uT and 300 K."""
+    # temperature_k reaches a division: 0.0 raised ZeroDivisionError and a
+    # negative value returned a negative "ratio" that the gate reads as failing.
+    _require_positive_finite("field_tesla", field_tesla, maximum=MAX_FIELD_TESLA)
+    _require_positive_finite("temperature_k", temperature_k)
     energy = PLANCK_J_S * (GYROMAGNETIC_RATIO_E / (2.0 * math.pi)) * float(field_tesla)
     return float(energy / (BOLTZMANN_J_PER_K * float(temperature_k)))
 
@@ -814,8 +905,8 @@ def run_radical_pair_forge(
     # by construction). Non-finite values pass a bare positivity test and then
     # fail opaquely inside eigh, so every numeric input goes through the shared
     # validator rather than an inline comparison against zero.
-    _require_positive_finite("field_tesla", field_tesla)
-    _require_positive_finite("rate_per_second", rate_per_second)
+    _require_positive_finite("field_tesla", field_tesla, maximum=MAX_FIELD_TESLA)
+    _require_positive_finite("rate_per_second", rate_per_second, maximum=MAX_RATE_PER_S)
     couplings = resolve_inventory(inventory)
     dims = hilbert_dims(couplings)
     projector = singlet_projector(dims)
@@ -838,6 +929,7 @@ def run_radical_pair_forge(
         control_field: float = GEOMAGNETIC_FIELD_T,
         control_rate: float = DEFAULT_RATE_PER_S,
         isotropic_tensors: bool = False,
+        keep_samples: bool = False,
         label: str = inventory,
     ) -> DirectionSweep:
         return sweep_field_directions(
@@ -846,7 +938,7 @@ def run_radical_pair_forge(
             rate_per_second=control_rate,
             direction_count=REGISTERED_DIRECTION_COUNT,
             isotropic=isotropic_tensors,
-            keep_samples=False,
+            keep_samples=keep_samples,
             inventory=label,
         )
 
@@ -972,7 +1064,7 @@ def run_radical_pair_forge(
     # inf/inf in the Lorentzian and serializes NaN into the bundle, and `passed`
     # does not inspect rate_sweep.
     rate_points = tuple(
-        _require_positive_finite(f"rate_points[{index}]", rate)
+        _require_positive_finite(f"rate_points[{index}]", rate, maximum=MAX_RATE_PER_S)
         for index, rate in enumerate(rate_points)
     )
     rate_sweep = tuple(
@@ -1011,7 +1103,27 @@ def run_radical_pair_forge(
     if geomagnetic_reused:
         geomagnetic = sweep
     else:
-        geomagnetic = registered_sweep()
+        # Samples kept: the antipodal condition below is decided from this
+        # sweep's per-direction pairs, and it is registered at 200 directions.
+        geomagnetic = registered_sweep(keep_samples=True)
+
+    def antipodal_residual(target: DirectionSweep) -> float:
+        """``max |Phi(B) - Phi(-B)|`` over a sweep's own recorded samples."""
+        if not target.samples:
+            return math.inf
+        return max(
+            abs(sample.singlet_yield - sample.antipodal_singlet_yield)
+            for sample in target.samples
+        )
+
+    # The gate reads the registered sweep; the primary sweep's residual is
+    # recorded beside it as caller-specific output. Gating on the primary sweep
+    # would decide a registered condition from the caller's field, rate and
+    # resolution -- a 12-direction run would certify it from 12 samples -- which
+    # is the kill criterion this track already registers. The primary residual
+    # is asserted in the test suite instead, where it runs on every commit.
+    registered_antipodal_residual = antipodal_residual(geomagnetic)
+    primary_antipodal_residual = antipodal_residual(sweep)
 
     # The low-rate comparison is computed here, from its own rate points, rather
     # than read out of `rate_sweep`.  A caller passing rate_points=(1e6,) would
@@ -1058,9 +1170,9 @@ def run_radical_pair_forge(
         "zeeman_thermal_ratio_recorded": (
             0.0 < zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T) < 1e-3
         ),
-        "antipodal_yield_recorded_per_sampled_direction": bool(sweep.samples) and all(
-            abs(sample.singlet_yield - sample.antipodal_singlet_yield) < SYMMETRY_TOLERANCE
-            for sample in sweep.samples
+        "antipodal_yield_recorded_per_sampled_direction": (
+            bool(geomagnetic.samples)
+            and registered_antipodal_residual < SYMMETRY_TOLERANCE
         ),
         "anisotropy_at_low_rate_is_not_suppressed_relative_to_the_larmor_rate": (
             low_rate.anisotropy >= larmor_rate.anisotropy
@@ -1070,12 +1182,17 @@ def run_radical_pair_forge(
     controls: dict[str, Any] = {
         "checks": dict(checks),
         "symmetry_tolerance": SYMMETRY_TOLERANCE,
+        "max_field_tesla": MAX_FIELD_TESLA,
+        "max_rate_per_second": MAX_RATE_PER_S,
+        "max_hyperfine_mhz": MAX_HYPERFINE_MHZ,
         "registered_direction_count": REGISTERED_DIRECTION_COUNT,
         "geomagnetic_field_microtesla": float(GEOMAGNETIC_FIELD_T * 1e6),
         "geomagnetic_direction_count": geomagnetic.direction_count,
         "low_rate_field_microtesla": float(GEOMAGNETIC_FIELD_T * 1e6),
         "low_rate_direction_count": low_rate.direction_count,
         "geomagnetic_anisotropy": geomagnetic.anisotropy,
+        "registered_antipodal_residual": registered_antipodal_residual,
+        "primary_antipodal_residual": primary_antipodal_residual,
         "geomagnetic_rate_per_second": float(DEFAULT_RATE_PER_S),
         "geomagnetic_sweep_reused_primary": geomagnetic_reused,
         "primary_direction_count": int(direction_count),

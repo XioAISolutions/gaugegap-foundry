@@ -17,11 +17,15 @@ if str(SRC) not in sys.path:
 
 from gaugegap.radical_pair_forge import (  # noqa: E402
     INVENTORY_SLUGS,
+    MAX_FIELD_TESLA,
     NUCLEAR_INVENTORIES,
     SOURCES,
     RatePoint,
     run_radical_pair_forge,
 )
+
+# The CLI takes microtesla, so the module's tesla bound converts once here.
+MAX_FIELD_UT = MAX_FIELD_TESLA * 1e6
 
 # The slug map lives with the inventories, since benchmark_id derives from it
 # too; re-exported here under its original name for the default --output-dir.
@@ -43,6 +47,15 @@ def _positive_float(raw: str) -> float:
     # numpy's eigensolver with an opaque LinAlgError, so check finiteness too.
     if not math.isfinite(value) or value <= 0.0:
         raise argparse.ArgumentTypeError(f"must be a positive finite magnitude, got {value}")
+    # And finite is still not enough: --field-ut 1e308 overflows the Larmor term
+    # and the run dies with "Eigenvalues did not converge" instead of a message
+    # naming the argument.  The bound is the module's, converted, not a second
+    # opinion about what a large field is.
+    if value > MAX_FIELD_UT:
+        raise argparse.ArgumentTypeError(
+            f"must be at most {MAX_FIELD_UT:.6e} uT so the Hamiltonian stays finite, "
+            f"got {value}"
+        )
     return value
 
 

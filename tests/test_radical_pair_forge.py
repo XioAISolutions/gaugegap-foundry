@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 import subprocess
 import sys
@@ -799,9 +800,16 @@ def test_no_caller_parameter_can_change_a_registered_condition():
         "asymmetric_solve_residual",
         "prompt_recombination_limit",
         "zeeman_thermal_ratio_300k_at_geomagnetic_field",
+        "registered_antipodal_residual",
         "partner_probe",
     ):
         assert hostile.controls[key] == registered.controls[key], key
+
+    # The primary sweep's antipodal residual is caller-specific, so it is
+    # recorded rather than gated -- and asserted here, because the degeneracy is
+    # exact for every field and must hold in the serialized samples too.
+    assert hostile.controls["primary_antipodal_residual"] < SYMMETRY_TOLERANCE
+    assert registered.controls["primary_antipodal_residual"] < SYMMETRY_TOLERANCE
 
     # The conditions each one was decided at are published, so a reader does not
     # have to read the source to find out.
@@ -856,6 +864,115 @@ def test_extreme_recombination_rates_do_not_overflow_the_closed_form():
         direction_count=8, rate_points=(1e-300, 1e200), inventory="spin-free-partner"
     )
     assert "NaN" not in json.dumps(report.summary(include_samples=True))
+
+
+def test_an_input_that_would_overflow_an_operator_is_rejected_not_silently_nan():
+    # Finiteness of the input is not the property that matters -- finiteness of
+    # the OPERATOR built from it is. k = 1e308 is positive and finite, and the
+    # direct Liouvillian solve returned nan for it rather than raising, which
+    # would have serialized as a measured yield. Every numeric boundary that
+    # feeds a matrix is checked here, not only the one a finding named.
+    from gaugegap.radical_pair_forge import (
+        MAX_FIELD_TESLA,
+        MAX_HYPERFINE_MHZ,
+        MAX_RATE_PER_S,
+        HyperfineCoupling,
+        singlet_yield_liouvillian_eigen,
+        zeeman_thermal_ratio,
+    )
+
+    couplings = resolve_inventory("spin-free-partner")
+    projector = singlet_projector(hilbert_dims(couplings))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 1.0), couplings=couplings
+    )
+
+    for bad_field in (1e308, MAX_FIELD_TESLA * 1.01):
+        with pytest.raises(ValueError, match="stay finite"):
+            build_hamiltonian(
+                field_tesla=bad_field, direction=(0.0, 0.0, 1.0), couplings=couplings
+            )
+        with pytest.raises(ValueError, match="stay finite"):
+            run_radical_pair_forge(
+                field_tesla=bad_field, direction_count=8, rate_points=(1e6,)
+            )
+        with pytest.raises(ValueError, match="stay finite"):
+            zeeman_thermal_ratio(bad_field)
+
+    for bad_rate in (1e308, MAX_RATE_PER_S * 1.01):
+        for solver in (singlet_yield_liouvillian, singlet_yield_liouvillian_eigen):
+            with pytest.raises(ValueError, match="stay finite"):
+                solver(hamiltonian, projector, bad_rate, 1e6)
+            with pytest.raises(ValueError, match="stay finite"):
+                solver(hamiltonian, projector, 1e6, bad_rate)
+        with pytest.raises(ValueError, match="stay finite"):
+            singlet_yield_closed_form(hamiltonian, projector, bad_rate)
+        with pytest.raises(ValueError, match="stay finite"):
+            run_radical_pair_forge(direction_count=8, rate_points=(1e6, bad_rate))
+
+    # Hyperfine values reach the same matrices and are routinely negative, so the
+    # bound is on magnitude.
+    for bad_coupling in (1e308, -MAX_HYPERFINE_MHZ * 1.01):
+        with pytest.raises(ValueError, match="stay finite"):
+            HyperfineCoupling(
+                name="overflowing",
+                radical_index=0,
+                multiplicity=2,
+                principal_values_mhz=(0.0, 0.0, bad_coupling),
+            )
+    with pytest.raises(ValueError, match="must be finite"):
+        HyperfineCoupling(
+            name="infinite-orientation",
+            radical_index=0,
+            multiplicity=2,
+            principal_values_mhz=(1.0, 1.0, 1.0),
+            euler_deg=(0.0, float("inf"), 0.0),
+        )
+    with pytest.raises(ValueError, match="must be finite"):
+        build_hamiltonian(
+            field_tesla=GEOMAGNETIC_FIELD_T,
+            direction=(0.0, float("nan"), 1.0),
+            couplings=couplings,
+        )
+
+    # The energy audit divides by the temperature.
+    for bad_temperature in (0.0, -300.0, float("nan")):
+        with pytest.raises(ValueError, match="positive finite"):
+            zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T, bad_temperature)
+
+    # Just inside every bound, the calculation still runs and stays finite.
+    assert math.isfinite(
+        singlet_yield_liouvillian(hamiltonian, projector, MAX_RATE_PER_S, 1e6)
+    )
+    assert math.isfinite(
+        singlet_yield_closed_form(hamiltonian, projector, MAX_RATE_PER_S)
+    )
+    assert math.isfinite(zeeman_thermal_ratio(MAX_FIELD_TESLA))
+
+
+def test_the_antipodal_gate_is_decided_at_the_registered_resolution():
+    # A 12-direction run would otherwise certify a registered condition from 12
+    # samples. The gate reads the registered 200-direction sweep; the primary
+    # sweep's residual is recorded as caller-specific output, exactly as the
+    # samples it describes are.
+    from gaugegap.radical_pair_forge import REGISTERED_DIRECTION_COUNT
+
+    small = run_radical_pair_forge(
+        field_tesla=200e-6, rate_per_second=1e5, direction_count=12, rate_points=(1e5,)
+    )
+    assert small.controls["geomagnetic_direction_count"] == REGISTERED_DIRECTION_COUNT
+    assert len(small.sweep.samples) == 12
+    assert small.controls["checks"]["antipodal_yield_recorded_per_sampled_direction"]
+    assert small.controls["registered_antipodal_residual"] < SYMMETRY_TOLERANCE
+    assert small.controls["primary_antipodal_residual"] < SYMMETRY_TOLERANCE
+
+    registered = run_radical_pair_forge(
+        direction_count=REGISTERED_DIRECTION_COUNT, rate_points=(1e6,)
+    )
+    assert (
+        small.controls["registered_antipodal_residual"]
+        == registered.controls["registered_antipodal_residual"]
+    )
 
 
 def test_the_two_solve_routes_agree_across_field_scales():
