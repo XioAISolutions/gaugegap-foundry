@@ -219,14 +219,23 @@ NO_HYPERFINE_CONTROL_FIELDS_T = (GEOMAGNETIC_FIELD_T, 5.0e-3)
 # the default path down the recompute branch and puts two values for the same
 # quantity in one bundle.
 REGISTERED_PARAMETER_RTOL = 1e-9
+# Angular resolution the hypothesis registers. Anisotropy is the sampled maximum
+# minus minimum, so the grid size is part of the measured value: a 40-direction
+# run and a 200-direction run do not measure the same quantity. The registered
+# conditions are therefore a field, a rate AND a resolution.
+REGISTERED_DIRECTION_COUNT = 200
 
 
-def _at_registered_conditions(field_tesla: float, rate_per_second: float) -> bool:
-    """True when both field and rate already match the registered conditions."""
-    return math.isclose(
-        field_tesla, GEOMAGNETIC_FIELD_T, rel_tol=REGISTERED_PARAMETER_RTOL
-    ) and math.isclose(
-        rate_per_second, DEFAULT_RATE_PER_S, rel_tol=REGISTERED_PARAMETER_RTOL
+def _at_registered_conditions(
+    field_tesla: float, rate_per_second: float, direction_count: int
+) -> bool:
+    """True when field, rate and resolution all match the registered conditions."""
+    return (
+        math.isclose(field_tesla, GEOMAGNETIC_FIELD_T, rel_tol=REGISTERED_PARAMETER_RTOL)
+        and math.isclose(
+            rate_per_second, DEFAULT_RATE_PER_S, rel_tol=REGISTERED_PARAMETER_RTOL
+        )
+        and int(direction_count) == REGISTERED_DIRECTION_COUNT
     )
 
 
@@ -378,6 +387,42 @@ def singlet_yield_liouvillian(
     initial = projector / float(np.trace(projector).real)
     integrated = np.linalg.solve(-liouvillian, initial.flatten(order="F"))
     integrated = integrated.reshape(dimension, dimension, order="F")
+    return float(singlet_rate * np.trace(projector @ integrated).real)
+
+
+def singlet_yield_liouvillian_eigen(
+    hamiltonian: np.ndarray,
+    projector: np.ndarray,
+    singlet_rate: float,
+    triplet_rate: float,
+) -> float:
+    """Same yield as ``singlet_yield_liouvillian`` by an independent algorithm.
+
+    Both compute ``int rho dt = (-L)^-1 rho(0)``, but this one diagonalizes the
+    Liouvillian and inverts its eigenvalues rather than running a direct LU solve
+    on ``L``.  That makes it a real cross-check of the asymmetric-rate
+    calculation, which has no closed form to compare against.
+
+    It replaces an earlier gate that merely required the asymmetric yield to
+    DIFFER from the symmetric closed form.  That requirement is false in general:
+    with no hyperfine coupling the Hamiltonian preserves the initial singlet and
+    both symmetric and asymmetric recombination give unit yield, so the two agree
+    exactly and the gate would have failed a perfectly correct calculation.
+    """
+    if singlet_rate <= 0.0 or triplet_rate <= 0.0:
+        raise ValueError("recombination rates must be positive")
+    dimension = hamiltonian.shape[0]
+    identity = np.eye(dimension, dtype=complex)
+    decay = singlet_rate * projector + triplet_rate * (identity - projector)
+    liouvillian = -1j * (
+        np.kron(identity, hamiltonian) - np.kron(hamiltonian.T, identity)
+    ) - 0.5 * (np.kron(identity, decay) + np.kron(decay.T, identity))
+    eigenvalues, eigenvectors = np.linalg.eig(liouvillian)
+    initial = (projector / float(np.trace(projector).real)).flatten(order="F")
+    coefficients = np.linalg.solve(eigenvectors, initial)
+    integrated = (eigenvectors @ (coefficients / (-eigenvalues))).reshape(
+        dimension, dimension, order="F"
+    )
     return float(singlet_rate * np.trace(projector @ integrated).real)
 
 
@@ -730,12 +775,16 @@ def run_radical_pair_forge(
     control_direction_count: int = 60,
     rate_points: Sequence[float] | None = None,
 ) -> RadicalPairForgeReport:
-    if field_tesla <= 0.0:
+    if not math.isfinite(field_tesla) or field_tesla <= 0.0:
         # field_microtesla, larmor_frequency_mhz and zeeman_thermal_ratio are all
         # published as magnitudes.  A negative field would serialize all three
         # negative while still passing every check, because the model is
         # polarity-invariant by construction.
-        raise ValueError("field_tesla must be positive; it is reported as a magnitude")
+        raise ValueError(
+            "field_tesla must be a positive finite magnitude; "
+            f"got {field_tesla!r}. A non-finite value passes a bare positivity "
+            "test and then fails opaquely inside eigh."
+        )
     couplings = resolve_inventory(inventory)
     dims = hilbert_dims(couplings)
     projector = singlet_projector(dims)
@@ -834,6 +883,13 @@ def run_radical_pair_forge(
     asymmetric = singlet_yield_liouvillian(
         reference, cross_check_projector, 2.0 * rate_per_second, rate_per_second
     )
+    # Independent route to the same asymmetric quantity: eigendecomposition of
+    # the Liouvillian rather than a direct solve. This is what validates the
+    # asymmetric path, which has no closed form to compare against.
+    asymmetric_independent = singlet_yield_liouvillian_eigen(
+        reference, cross_check_projector, 2.0 * rate_per_second, rate_per_second
+    )
+    asymmetric_residual = abs(asymmetric - asymmetric_independent)
     cross_check_residual = abs(closed - liouville)
 
     # Exact limits: instantaneous recombination traps the pair in the singlet.
@@ -886,7 +942,9 @@ def run_radical_pair_forge(
     # the caller is already at the registered field.
     # The condition is registered at BOTH a field and a rate, so both must be
     # honoured: a custom-rate run would otherwise decide it from the wrong rate.
-    geomagnetic_reused = _at_registered_conditions(field_tesla, rate_per_second)
+    geomagnetic_reused = _at_registered_conditions(
+        field_tesla, rate_per_second, direction_count
+    )
     if geomagnetic_reused:
         geomagnetic = sweep
     else:
@@ -894,7 +952,7 @@ def run_radical_pair_forge(
             couplings=couplings,
             field_tesla=GEOMAGNETIC_FIELD_T,
             rate_per_second=DEFAULT_RATE_PER_S,
-            direction_count=control_direction_count,
+            direction_count=REGISTERED_DIRECTION_COUNT,
             keep_samples=False,
             inventory=inventory,
         )
@@ -903,19 +961,22 @@ def run_radical_pair_forge(
     # than read out of `rate_sweep`.  A caller passing rate_points=(1e6,) would
     # otherwise leave this registered condition unevaluated while the report
     # still reported passed.
+    # Both sides at the registered field and resolution: the inequality is
+    # field-dependent, so a custom-field run would otherwise decide the
+    # registered condition without ever evaluating it there.
     low_rate = sweep_field_directions(
         couplings=couplings,
-        field_tesla=field_tesla,
+        field_tesla=GEOMAGNETIC_FIELD_T,
         rate_per_second=LOW_RATE_PER_S,
-        direction_count=control_direction_count,
+        direction_count=REGISTERED_DIRECTION_COUNT,
         keep_samples=False,
         inventory=inventory,
     )
     larmor_rate = sweep_field_directions(
         couplings=couplings,
-        field_tesla=field_tesla,
+        field_tesla=GEOMAGNETIC_FIELD_T,
         rate_per_second=LARMOR_COMPARABLE_RATE_PER_S,
-        direction_count=control_direction_count,
+        direction_count=REGISTERED_DIRECTION_COUNT,
         keep_samples=False,
         inventory=inventory,
     )
@@ -943,8 +1004,8 @@ def run_radical_pair_forge(
             spin_free.anisotropy > loaded_partner.anisotropy
         ),
         "closed_form_and_liouvillian_yields_agree": cross_check_residual < 1e-9,
-        "asymmetric_rates_have_no_closed_form_and_must_differ": (
-            abs(asymmetric - closed) > 1e-6
+        "asymmetric_liouvillian_agrees_with_an_independent_solve": (
+            asymmetric_residual < 1e-9
         ),
         "prompt_recombination_limit_equals_one": abs(prompt_limit - 1.0) < 1e-6,
         "zeeman_thermal_ratio_recorded": 0.0 < zeeman_thermal_ratio(field_tesla) < 1e-3,
@@ -960,7 +1021,11 @@ def run_radical_pair_forge(
     controls: dict[str, Any] = {
         "checks": dict(checks),
         "symmetry_tolerance": SYMMETRY_TOLERANCE,
+        "registered_direction_count": REGISTERED_DIRECTION_COUNT,
         "geomagnetic_field_microtesla": float(GEOMAGNETIC_FIELD_T * 1e6),
+        "geomagnetic_direction_count": geomagnetic.direction_count,
+        "low_rate_field_microtesla": float(GEOMAGNETIC_FIELD_T * 1e6),
+        "low_rate_direction_count": low_rate.direction_count,
         "geomagnetic_anisotropy": geomagnetic.anisotropy,
         "geomagnetic_rate_per_second": float(DEFAULT_RATE_PER_S),
         "geomagnetic_sweep_reused_primary": geomagnetic_reused,
@@ -1004,6 +1069,14 @@ def run_radical_pair_forge(
         "cross_check_hilbert_dimension": int(np.prod(hilbert_dims(cross_check_couplings))),
         "liouvillian_dim_limit": LIOUVILLIAN_DIM_LIMIT,
         "asymmetric_rate_yield": asymmetric,
+        "asymmetric_rate_yield_independent": asymmetric_independent,
+        "asymmetric_solve_residual": asymmetric_residual,
+        "asymmetric_gate_note": (
+            "Validated against an independent eigendecomposition route, not against "
+            "the symmetric closed form. Requiring the asymmetric yield to DIFFER "
+            "from the symmetric one is false in general: with no hyperfine coupling "
+            "both give unit yield."
+        ),
         "prompt_recombination_limit": prompt_limit,
         "low_rate_per_second": LOW_RATE_PER_S,
         "low_rate_anisotropy": low_rate.anisotropy,

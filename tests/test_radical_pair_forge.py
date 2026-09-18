@@ -113,11 +113,11 @@ def test_closed_form_matches_exact_liouvillian_solve():
     assert closed == pytest.approx(
         singlet_yield_liouvillian(hamiltonian, projector, RATE, RATE), abs=1e-10
     )
-    # Asymmetric rates have no closed form, so they must genuinely differ, and
-    # must converge back to it as the rates are brought together.
-    assert singlet_yield_liouvillian(hamiltonian, projector, 2.0 * RATE, RATE) != pytest.approx(
-        closed, abs=1e-6
-    )
+    # Asymmetric rates have no closed form. Do NOT assert they must differ from
+    # the symmetric result -- that is false in general (see
+    # test_asymmetric_gate_is_an_independent_solve_not_a_difference_requirement).
+    # What is required is that they converge back to it as the rates are brought
+    # together, which is a genuine limit.
     assert singlet_yield_liouvillian(
         hamiltonian, projector, RATE * (1.0 + 1e-9), RATE
     ) == pytest.approx(closed, abs=1e-8)
@@ -379,7 +379,7 @@ def test_low_rate_condition_is_evaluated_even_when_the_caller_skips_that_rate():
 
 def test_non_positive_field_is_rejected_because_magnitudes_are_published():
     for bad in (0.0, -50e-6):
-        with pytest.raises(ValueError, match="must be positive"):
+        with pytest.raises(ValueError, match="must be a positive finite magnitude"):
             run_radical_pair_forge(
                 field_tesla=bad, direction_count=8, control_direction_count=6, rate_points=(1e6,)
             )
@@ -597,6 +597,7 @@ def test_geomagnetic_condition_is_evaluated_at_the_registered_field():
     custom = run_radical_pair_forge(
         field_tesla=500e-6, direction_count=16, control_direction_count=10, rate_points=(1e6,)
     )
+    from gaugegap.radical_pair_forge import REGISTERED_DIRECTION_COUNT
     assert custom.field_microtesla == pytest.approx(500.0)
     assert custom.controls["geomagnetic_field_microtesla"] == pytest.approx(50.0)
     # A dedicated sweep was run, not the 500 uT one.
@@ -604,9 +605,16 @@ def test_geomagnetic_condition_is_evaluated_at_the_registered_field():
     assert custom.controls["geomagnetic_anisotropy"] != custom.anisotropy
     assert custom.controls["checks"][key] is (custom.controls["geomagnetic_anisotropy"] > 1e-6)
 
-    # At the registered field the primary sweep is reused rather than duplicated.
+    # The gate always runs at the REGISTERED resolution, so a reduced run does
+    # not reuse the primary sweep -- anisotropy is max-minus-min over the grid,
+    # so a 16-direction sweep does not measure the registered quantity.
+    assert custom.controls["geomagnetic_direction_count"] == REGISTERED_DIRECTION_COUNT
+
+    # At the registered field, rate AND resolution the primary sweep is reused.
     default = run_radical_pair_forge(
-        direction_count=16, control_direction_count=10, rate_points=(1e6,)
+        direction_count=REGISTERED_DIRECTION_COUNT,
+        control_direction_count=10,
+        rate_points=(1e6,),
     )
     assert default.controls["geomagnetic_sweep_reused_primary"] is True
     assert default.controls["geomagnetic_anisotropy"] == default.anisotropy
@@ -640,22 +648,33 @@ def test_registered_conditions_are_matched_tolerantly_not_by_float_equality():
     # The CLI computes 50.0 * 1e-6 = 4.9999999999999996e-05, which is NOT == 50e-6.
     # An exact comparison sent the default path down the recompute branch and put
     # two values for 50 uT in one bundle, regressing the rate-sweep consistency fix.
-    from gaugegap.radical_pair_forge import _at_registered_conditions
+    from gaugegap.radical_pair_forge import (
+        REGISTERED_DIRECTION_COUNT,
+        _at_registered_conditions,
+    )
 
+    n = REGISTERED_DIRECTION_COUNT
     cli_value = 50.0 * 1e-6
     assert cli_value != GEOMAGNETIC_FIELD_T  # the trap itself
-    assert _at_registered_conditions(cli_value, 1e6)
-    assert not _at_registered_conditions(60e-6, 1e6)
-    assert not _at_registered_conditions(GEOMAGNETIC_FIELD_T, 1e4)
+    assert _at_registered_conditions(cli_value, 1e6, n)
+    assert not _at_registered_conditions(60e-6, 1e6, n)
+    assert not _at_registered_conditions(GEOMAGNETIC_FIELD_T, 1e4, n)
+    # Resolution is part of the registered conditions too: anisotropy is the
+    # sampled max minus min, so a coarser grid measures a different quantity.
+    assert not _at_registered_conditions(GEOMAGNETIC_FIELD_T, 1e6, 40)
 
 
 def test_no_bundle_holds_two_values_for_the_registered_conditions():
     # The invariant that matters, stated once: whenever a run IS at the registered
     # conditions -- however its field was arithmetically produced -- the
     # geomagnetic condition must be the headline number, not a second opinion.
+    from gaugegap.radical_pair_forge import REGISTERED_DIRECTION_COUNT
+
     for field in (GEOMAGNETIC_FIELD_T, 50.0 * 1e-6, 50 * 1e-6):
         report = run_radical_pair_forge(
-            field_tesla=field, direction_count=24, control_direction_count=10,
+            field_tesla=field,
+            direction_count=REGISTERED_DIRECTION_COUNT,
+            control_direction_count=10,
             rate_points=(1e6,),
         )
         controls = report.controls
@@ -675,3 +694,54 @@ def test_geomagnetic_condition_uses_the_registered_rate_not_the_caller_rate():
     assert controls["geomagnetic_sweep_reused_primary"] is False
     # Decided from its own sweep, not the caller's 1e4 one.
     assert controls["geomagnetic_anisotropy"] != report.anisotropy
+
+
+def test_asymmetric_gate_is_an_independent_solve_not_a_difference_requirement():
+    # The old gate required the asymmetric yield to DIFFER from the symmetric
+    # closed form. That is false in general: with no hyperfine coupling the
+    # Hamiltonian preserves the singlet and both give unit yield, so the gate
+    # would have failed a correct calculation. Validate against an independent
+    # algorithm instead.
+    from gaugegap.radical_pair_forge import (
+        singlet_yield_liouvillian,
+        singlet_yield_liouvillian_eigen,
+    )
+
+    for couplings in (resolve_inventory("cryptochrome-like"), ()):
+        projector = singlet_projector(hilbert_dims(couplings))
+        hamiltonian = build_hamiltonian(
+            field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.3, 0.4, 0.87), couplings=couplings
+        )
+        by_solve = singlet_yield_liouvillian(hamiltonian, projector, 2e6, 1e6)
+        by_eigen = singlet_yield_liouvillian_eigen(hamiltonian, projector, 2e6, 1e6)
+        assert abs(by_solve - by_eigen) < 1e-9
+
+    # The specific counterexample: no hyperfine -> symmetric and asymmetric agree.
+    projector = singlet_projector(hilbert_dims(()))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.3, 0.4, 0.87), couplings=()
+    )
+    symmetric = singlet_yield_liouvillian(hamiltonian, projector, 1e6, 1e6)
+    asymmetric = singlet_yield_liouvillian(hamiltonian, projector, 2e6, 1e6)
+    assert abs(asymmetric - symmetric) < 1e-12  # the old gate demanded > 1e-6
+
+
+def test_low_rate_condition_is_evaluated_at_the_registered_field():
+    from gaugegap.radical_pair_forge import REGISTERED_DIRECTION_COUNT
+
+    report = run_radical_pair_forge(
+        field_tesla=500e-6, direction_count=16, control_direction_count=10,
+        rate_points=(1e6,),
+    )
+    controls = report.controls
+    assert controls["low_rate_field_microtesla"] == pytest.approx(50.0)
+    assert controls["low_rate_direction_count"] == REGISTERED_DIRECTION_COUNT
+
+
+def test_non_finite_field_is_rejected_before_it_reaches_the_eigensolver():
+    for bad in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError, match="positive finite magnitude"):
+            run_radical_pair_forge(
+                field_tesla=bad, direction_count=8, control_direction_count=6,
+                rate_points=(1e6,),
+            )

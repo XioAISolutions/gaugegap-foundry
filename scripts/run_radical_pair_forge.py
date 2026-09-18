@@ -37,8 +37,10 @@ def _positive_float(raw: str) -> float:
     to completion and pass every check while serializing all three negative.
     """
     value = float(raw)
-    if value <= 0.0:
-        raise argparse.ArgumentTypeError(f"must be positive, got {value}")
+    # nan and inf both slip past a bare `value <= 0.0` test and then die inside
+    # numpy's eigensolver with an opaque LinAlgError, so check finiteness too.
+    if not math.isfinite(value) or value <= 0.0:
+        raise argparse.ArgumentTypeError(f"must be a positive finite magnitude, got {value}")
     return value
 
 
