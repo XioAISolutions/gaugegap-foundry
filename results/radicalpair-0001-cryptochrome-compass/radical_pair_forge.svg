@@ -18,8 +18,8 @@
 <text x="945" y="382" fill="#666" font-family="monospace" font-size="12">10^10 s-1</text>
 <text x="845" y="400" fill="#8b949e" font-family="monospace" font-size="12" text-anchor="middle">upper cutoff only &#183; no relaxation, so no long-lifetime side</text>
 <text x="110" y="440" fill="#7ee787" font-family="monospace" font-size="15">anisotropy = 1.9081e-02 at 50 &#181;T (7.33% contrast)</text>
-<text x="110" y="464" fill="#8b949e" font-family="monospace" font-size="13">isotropic-hyperfine control = 1.61e-15 &#183; polarity residual = 7.77e-16</text>
-<text x="110" y="486" fill="#8b949e" font-family="monospace" font-size="13">closed form vs Liouvillian = 1.11e-16 (dim 24) &#183; spin-free partner 8.2&#215; stronger (tensor-dependent)</text>
+<text x="110" y="464" fill="#8b949e" font-family="monospace" font-size="13">isotropic-hyperfine control = 2.33e-15 &#183; polarity residual = 7.77e-16</text>
+<text x="110" y="486" fill="#8b949e" font-family="monospace" font-size="13">closed form vs Liouvillian = 1.11e-16 (dim 24) &#183; spin-free partner 8.3&#215; stronger (tensor-dependent)</text>
 <text x="110" y="508" fill="#8b949e" font-family="monospace" font-size="13">Zeeman quantum / k_B T at 300 K = 2.242e-07: no thermal mechanism is available</text>
 <text x="550" y="536" fill="#777" font-family="monospace" font-size="12" text-anchor="middle">finite spin-Hamiltonian calculation only &#183; not a cryptochrome measurement and not a sensor design</text>
 </svg>

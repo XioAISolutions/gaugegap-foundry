@@ -379,7 +379,7 @@ def test_low_rate_condition_is_evaluated_even_when_the_caller_skips_that_rate():
 
 def test_non_positive_field_is_rejected_because_magnitudes_are_published():
     for bad in (0.0, -50e-6):
-        with pytest.raises(ValueError, match="must be a positive finite magnitude"):
+        with pytest.raises(ValueError, match="positive finite"):
             run_radical_pair_forge(
                 field_tesla=bad, direction_count=8, control_direction_count=6, rate_points=(1e6,)
             )
@@ -740,8 +740,78 @@ def test_low_rate_condition_is_evaluated_at_the_registered_field():
 
 def test_non_finite_field_is_rejected_before_it_reaches_the_eigensolver():
     for bad in (float("nan"), float("inf"), float("-inf")):
-        with pytest.raises(ValueError, match="positive finite magnitude"):
+        with pytest.raises(ValueError, match="positive finite"):
             run_radical_pair_forge(
                 field_tesla=bad, direction_count=8, control_direction_count=6,
                 rate_points=(1e6,),
             )
+
+
+def test_every_registered_control_runs_at_the_registered_conditions():
+    # Five registered controls silently inherited the caller's field, rate or
+    # resolution, and each was found separately by review. This asserts the
+    # property for ALL of them at once: a run with deliberately odd caller
+    # parameters must still decide every registered condition identically to a
+    # run at the registered conditions.
+    from gaugegap.radical_pair_forge import REGISTERED_DIRECTION_COUNT
+
+    odd = run_radical_pair_forge(
+        field_tesla=500e-6, rate_per_second=1e4,
+        direction_count=16, control_direction_count=9, rate_points=(1e4,),
+    )
+    registered = run_radical_pair_forge(
+        field_tesla=GEOMAGNETIC_FIELD_T, rate_per_second=1e6,
+        direction_count=REGISTERED_DIRECTION_COUNT,
+        control_direction_count=9, rate_points=(1e6,),
+    )
+    for key in (
+        "isotropic_hyperfine_anisotropy",
+        "no_hyperfine_field_spread",
+        "fast_recombination_anisotropy",
+        "spin_free_partner_anisotropy",
+        "loaded_partner_anisotropy",
+        "geomagnetic_anisotropy",
+        "low_rate_anisotropy",
+        "larmor_comparable_anisotropy",
+        "polarity_residual",
+    ):
+        assert odd.controls[key] == registered.controls[key], key
+
+
+def test_non_finite_rates_are_rejected_everywhere():
+    # nan and inf both pass a bare positivity test. An infinite rate gives
+    # inf/inf in the Lorentzian and serializes NaN into the bundle, and `passed`
+    # never inspects rate_sweep.
+    from gaugegap.radical_pair_forge import (
+        singlet_yield_closed_form,
+        singlet_yield_liouvillian,
+    )
+
+    couplings = resolve_inventory("cryptochrome-like")
+    projector = singlet_projector(hilbert_dims(couplings))
+    hamiltonian = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 1.0), couplings=couplings
+    )
+    for bad in (float("nan"), float("inf"), 0.0, -1.0):
+        with pytest.raises(ValueError, match="positive finite"):
+            singlet_yield_closed_form(hamiltonian, projector, bad)
+        with pytest.raises(ValueError, match="positive finite"):
+            singlet_yield_liouvillian(hamiltonian, projector, bad, 1e6)
+        with pytest.raises(ValueError, match="positive finite"):
+            run_radical_pair_forge(
+                rate_per_second=bad, direction_count=8,
+                control_direction_count=6, rate_points=(1e6,),
+            )
+        # And every entry of rate_points, not just the primary rate.
+        with pytest.raises(ValueError, match="positive finite"):
+            run_radical_pair_forge(
+                direction_count=8, control_direction_count=6, rate_points=(1e6, bad),
+            )
+
+
+def test_no_nan_reaches_the_evidence_bundle():
+    report = run_radical_pair_forge(
+        direction_count=12, control_direction_count=8, rate_points=(1e3, 1e6)
+    )
+    payload = json.dumps(report.summary(include_samples=True))
+    assert "NaN" not in payload and "Infinity" not in payload

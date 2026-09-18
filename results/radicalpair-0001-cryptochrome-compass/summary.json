@@ -27,7 +27,7 @@
     "control_direction_count": 60,
     "cross_check_hilbert_dimension": 24,
     "cross_check_inventory": "cryptochrome-like",
-    "fast_recombination_anisotropy": 2.3416524275177153e-10,
+    "fast_recombination_anisotropy": 2.445945668227978e-10,
     "fast_recombination_rate_per_second": 10000000000.0,
     "fridge_magnet_note": "A 5 mT magnet raises the Zeeman quantum by only two orders of magnitude and is still ~1e-5 of k_B T at 300 K.  Neither field can drive a thermal population change, and neither saturates this model, so the weak-field result is not explained by field strength alone.",
     "geomagnetic_anisotropy": 0.019081084966219297,
@@ -35,27 +35,27 @@
     "geomagnetic_field_microtesla": 50.0,
     "geomagnetic_rate_per_second": 1000000.0,
     "geomagnetic_sweep_reused_primary": true,
-    "isotropic_hyperfine_anisotropy": 1.609823385706477e-15,
+    "isotropic_hyperfine_anisotropy": 2.3314683517128287e-15,
     "isotropic_hyperfine_mean_yield": 0.3319429874581843,
     "larmor_comparable_anisotropy": 0.019081084966219297,
     "larmor_comparable_rate_per_second": 1000000.0,
     "liouvillian_dim_limit": 32,
     "liouvillian_yield": 0.2573674714941416,
-    "loaded_partner_anisotropy": 0.018858679590546434,
+    "loaded_partner_anisotropy": 0.019081084966219297,
     "low_rate_anisotropy": 0.02221560633430708,
     "low_rate_direction_count": 200,
     "low_rate_field_microtesla": 50.0,
     "low_rate_per_second": 1000.0,
-    "no_hyperfine_anisotropy": 3.4416913763379853e-15,
+    "no_hyperfine_anisotropy": 4.884981308350689e-15,
     "no_hyperfine_control_fields_microtesla": [
       50.0,
       5000.0
     ],
-    "no_hyperfine_field_spread": 1.1102230246251565e-16,
-    "no_hyperfine_mean_yield": 1.0,
+    "no_hyperfine_field_spread": 0.0,
+    "no_hyperfine_mean_yield": 0.9999999999999997,
     "no_hyperfine_mean_yield_per_field": [
-      1.0,
-      0.9999999999999999
+      0.9999999999999997,
+      0.9999999999999997
     ],
     "partner_probe": [
       {
@@ -181,8 +181,8 @@
     "prompt_recombination_limit": 0.9999999999965107,
     "registered_direction_count": 200,
     "relaxation_note": "No spin relaxation is modelled, so the long-lifetime side of the rate window is not reproduced: anisotropy persists as k -> 0 here, whereas a real pair is limited by T2 of order microseconds.",
-    "second_radical_suppression_factor": 8.240824391930575,
-    "spin_free_partner_anisotropy": 0.15541106676937838,
+    "second_radical_suppression_factor": 8.3413814391394,
+    "spin_free_partner_anisotropy": 0.1591626079758635,
     "symmetry_tolerance": 1e-09,
     "zeeman_thermal_ratio_300k": 2.2416425328029618e-07,
     "zeeman_thermal_ratio_300k_at_5mt": 2.2416425328029622e-05

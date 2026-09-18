@@ -226,6 +226,22 @@ REGISTERED_PARAMETER_RTOL = 1e-9
 REGISTERED_DIRECTION_COUNT = 200
 
 
+def _require_positive_finite(name: str, value: float) -> float:
+    """Reject non-finite as well as non-positive values.
+
+    A bare ``value <= 0.0`` test admits nan (all comparisons false) and inf.
+    Either then propagates into the Hamiltonian or the Lorentzian and surfaces
+    as an opaque LinAlgError or a NaN serialized into the evidence bundle. Used
+    for every numeric input rather than only the one a finding names.
+    """
+    numeric = float(value)
+    if not math.isfinite(numeric) or numeric <= 0.0:
+        raise ValueError(
+            f"{name} must be a positive finite value; got {value!r}"
+        )
+    return numeric
+
+
 def _at_registered_conditions(
     field_tesla: float, rate_per_second: float, direction_count: int
 ) -> bool:
@@ -353,8 +369,7 @@ def singlet_yield_closed_form(
     ``Phi_S = (1/Z) sum_mn |<m|P_S|n>|^2 k^2 / (k^2 + omega_mn^2)``, with
     ``Z = Tr P_S`` and ``omega_mn = E_m - E_n``.
     """
-    if rate_per_second <= 0.0:
-        raise ValueError("rate_per_second must be positive")
+    _require_positive_finite("rate_per_second", rate_per_second)
     energies, vectors = np.linalg.eigh(hamiltonian)
     overlaps = vectors.conj().T @ projector @ vectors
     gaps = energies[:, None] - energies[None, :]
@@ -376,8 +391,8 @@ def singlet_yield_liouvillian(
     needs no time stepping and is exact up to the linear solve.  No closed form
     exists for asymmetric rates, which is what makes it a real cross-check.
     """
-    if singlet_rate <= 0.0 or triplet_rate <= 0.0:
-        raise ValueError("recombination rates must be positive")
+    _require_positive_finite("singlet_rate", singlet_rate)
+    _require_positive_finite("triplet_rate", triplet_rate)
     dimension = hamiltonian.shape[0]
     identity = np.eye(dimension, dtype=complex)
     decay = singlet_rate * projector + triplet_rate * (identity - projector)
@@ -409,8 +424,8 @@ def singlet_yield_liouvillian_eigen(
     both symmetric and asymmetric recombination give unit yield, so the two agree
     exactly and the gate would have failed a perfectly correct calculation.
     """
-    if singlet_rate <= 0.0 or triplet_rate <= 0.0:
-        raise ValueError("recombination rates must be positive")
+    _require_positive_finite("singlet_rate", singlet_rate)
+    _require_positive_finite("triplet_rate", triplet_rate)
     dimension = hamiltonian.shape[0]
     identity = np.eye(dimension, dtype=complex)
     decay = singlet_rate * projector + triplet_rate * (identity - projector)
@@ -775,16 +790,14 @@ def run_radical_pair_forge(
     control_direction_count: int = 60,
     rate_points: Sequence[float] | None = None,
 ) -> RadicalPairForgeReport:
-    if not math.isfinite(field_tesla) or field_tesla <= 0.0:
-        # field_microtesla, larmor_frequency_mhz and zeeman_thermal_ratio are all
-        # published as magnitudes.  A negative field would serialize all three
-        # negative while still passing every check, because the model is
-        # polarity-invariant by construction.
-        raise ValueError(
-            "field_tesla must be a positive finite magnitude; "
-            f"got {field_tesla!r}. A non-finite value passes a bare positivity "
-            "test and then fails opaquely inside eigh."
-        )
+    # field_microtesla, larmor_frequency_mhz and zeeman_thermal_ratio are all
+    # published as magnitudes, so a negative field would serialize all three
+    # negative while still passing every check (the model is polarity-invariant
+    # by construction). Non-finite values pass a bare positivity test and then
+    # fail opaquely inside eigh, so every numeric input goes through the shared
+    # validator rather than an inline comparison against zero.
+    _require_positive_finite("field_tesla", field_tesla)
+    _require_positive_finite("rate_per_second", rate_per_second)
     couplings = resolve_inventory(inventory)
     dims = hilbert_dims(couplings)
     projector = singlet_projector(dims)
@@ -797,15 +810,31 @@ def run_radical_pair_forge(
         inventory=inventory,
     )
 
+    # Every registered control below goes through this helper, so a control can
+    # never silently inherit a caller's field, rate or resolution. Five of them
+    # did, and each was found separately by review; the helper exists so there
+    # is no sixth.
+    def registered_sweep(
+        *,
+        control_couplings: Sequence[HyperfineCoupling] = couplings,
+        control_field: float = GEOMAGNETIC_FIELD_T,
+        control_rate: float = DEFAULT_RATE_PER_S,
+        isotropic_tensors: bool = False,
+        label: str = inventory,
+    ) -> DirectionSweep:
+        return sweep_field_directions(
+            couplings=control_couplings,
+            field_tesla=control_field,
+            rate_per_second=control_rate,
+            direction_count=REGISTERED_DIRECTION_COUNT,
+            isotropic=isotropic_tensors,
+            keep_samples=False,
+            inventory=label,
+        )
+
     # Control 1 - isotropic hyperfine tensors must remove the compass entirely.
-    isotropic = sweep_field_directions(
-        couplings=couplings,
-        field_tesla=field_tesla,
-        rate_per_second=rate_per_second,
-        direction_count=control_direction_count,
-        isotropic=True,
-        keep_samples=False,
-        inventory=f"{inventory}/isotropic-control",
+    isotropic = registered_sweep(
+        isotropic_tensors=True, label=f"{inventory}/isotropic-control"
     )
 
     # Control 2 - no hyperfine coupling at all: H commutes with P_S, so the pair
@@ -813,46 +842,31 @@ def run_radical_pair_forge(
     # Evaluated at two field magnitudes, because the registered condition claims
     # field-independence and one magnitude cannot establish that.
     bare_sweeps = tuple(
-        sweep_field_directions(
-            couplings=(),
-            field_tesla=control_field,
-            rate_per_second=rate_per_second,
-            direction_count=max(8, control_direction_count // 4),
-            keep_samples=False,
-            inventory="no-hyperfine-control",
+        registered_sweep(
+            control_couplings=(),
+            control_field=control_field,
+            label="no-hyperfine-control",
         )
         for control_field in NO_HYPERFINE_CONTROL_FIELDS_T
     )
     bare = bare_sweeps[0]
 
     # Control 3 - recombination far faster than precession erases the compass.
-    fast = sweep_field_directions(
-        couplings=couplings,
-        field_tesla=field_tesla,
-        rate_per_second=FAST_RATE_PER_S,
-        direction_count=control_direction_count,
-        keep_samples=False,
-        inventory=f"{inventory}/fast-recombination-control",
+    fast = registered_sweep(
+        control_rate=FAST_RATE_PER_S,
+        label=f"{inventory}/fast-recombination-control",
     )
 
     # Control 4 - the cost of loading the partner radical.  This compares two
     # fixed inventories rather than the one under test, so the comparison stays
     # meaningful whichever inventory the caller selected.
-    spin_free = sweep_field_directions(
-        couplings=resolve_inventory("spin-free-partner"),
-        field_tesla=field_tesla,
-        rate_per_second=rate_per_second,
-        direction_count=control_direction_count,
-        keep_samples=False,
-        inventory="spin-free-partner",
+    spin_free = registered_sweep(
+        control_couplings=resolve_inventory("spin-free-partner"),
+        label="spin-free-partner",
     )
-    loaded_partner = sweep_field_directions(
-        couplings=resolve_inventory("cryptochrome-like"),
-        field_tesla=field_tesla,
-        rate_per_second=rate_per_second,
-        direction_count=control_direction_count,
-        keep_samples=False,
-        inventory="cryptochrome-like",
+    loaded_partner = registered_sweep(
+        control_couplings=resolve_inventory("cryptochrome-like"),
+        label="cryptochrome-like",
     )
 
     # Cross-check - closed form against the exact Liouvillian solve, including an
@@ -905,13 +919,20 @@ def run_radical_pair_forge(
 
     residual = polarity_residual(
         couplings=couplings,
-        field_tesla=field_tesla,
-        rate_per_second=rate_per_second,
+        field_tesla=GEOMAGNETIC_FIELD_T,
+        rate_per_second=DEFAULT_RATE_PER_S,
         direction_count=control_direction_count,
     )
 
     if rate_points is None:
         rate_points = tuple(10.0**exponent for exponent in range(3, 11))
+    # Every rate in the sweep, not just the primary one: an inf rate yields
+    # inf/inf in the Lorentzian and serializes NaN into the bundle, and `passed`
+    # does not inspect rate_sweep.
+    rate_points = tuple(
+        _require_positive_finite(f"rate_points[{index}]", rate)
+        for index, rate in enumerate(rate_points)
+    )
     rate_sweep = tuple(
         RatePoint(
             rate_per_second=float(rate),
@@ -948,14 +969,7 @@ def run_radical_pair_forge(
     if geomagnetic_reused:
         geomagnetic = sweep
     else:
-        geomagnetic = sweep_field_directions(
-            couplings=couplings,
-            field_tesla=GEOMAGNETIC_FIELD_T,
-            rate_per_second=DEFAULT_RATE_PER_S,
-            direction_count=REGISTERED_DIRECTION_COUNT,
-            keep_samples=False,
-            inventory=inventory,
-        )
+        geomagnetic = registered_sweep()
 
     # The low-rate comparison is computed here, from its own rate points, rather
     # than read out of `rate_sweep`.  A caller passing rate_points=(1e6,) would
@@ -964,22 +978,8 @@ def run_radical_pair_forge(
     # Both sides at the registered field and resolution: the inequality is
     # field-dependent, so a custom-field run would otherwise decide the
     # registered condition without ever evaluating it there.
-    low_rate = sweep_field_directions(
-        couplings=couplings,
-        field_tesla=GEOMAGNETIC_FIELD_T,
-        rate_per_second=LOW_RATE_PER_S,
-        direction_count=REGISTERED_DIRECTION_COUNT,
-        keep_samples=False,
-        inventory=inventory,
-    )
-    larmor_rate = sweep_field_directions(
-        couplings=couplings,
-        field_tesla=GEOMAGNETIC_FIELD_T,
-        rate_per_second=LARMOR_COMPARABLE_RATE_PER_S,
-        direction_count=REGISTERED_DIRECTION_COUNT,
-        keep_samples=False,
-        inventory=inventory,
-    )
+    low_rate = registered_sweep(control_rate=LOW_RATE_PER_S)
+    larmor_rate = registered_sweep(control_rate=LARMOR_COMPARABLE_RATE_PER_S)
 
     # Keys here MUST match hypotheses/radicalpair-0001.yaml validation.required
     # exactly.  test_every_declared_validation_is_implemented asserts set
