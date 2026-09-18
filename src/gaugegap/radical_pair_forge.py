@@ -31,10 +31,12 @@ One result is PARAMETER-DEPENDENT and is reported as a measurement of this
 registry, not as a property of the mechanism:
 
 4. Hyperfine coupling on the *second* radical suppresses the direction
-   dependence, by ~8x for the illustrative ``trp-hbeta`` tensor used here.  The
-   factor is a function of that tensor: scale the partner coupling continuously
-   to zero and the loaded and spin-free yields coincide.  Only the sign of the
-   effect is robust; the magnitude is not.
+   dependence, by ~8x for the illustrative ``trp-hbeta`` tensor used here.  This
+   is a measurement of THIS registry and nothing more.  The code compares exactly
+   two inventories, so it establishes neither the magnitude nor the sign for
+   other partner tensors, magnitudes or orientations.  No theorem is offered, and
+   the dependence is not even monotonic in the partner coupling strength, so do
+   not generalize the direction of the effect either.
 
 This model contains NO spin relaxation, so it establishes only the upper-rate
 cutoff in (3).  It does not produce a lifetime window: the anisotropy is flat
@@ -195,6 +197,10 @@ SYMMETRY_TOLERANCE = 1e-9
 # smaller fixed system rather than allocating gigabytes.
 LIOUVILLIAN_DIM_LIMIT = 32
 CROSS_CHECK_FALLBACK_INVENTORY = "cryptochrome-like"
+# Rate points for the registered low-rate condition.  Held here, not taken from
+# the caller's rate_points, so the condition is always evaluated.
+LOW_RATE_PER_S = 1.0e3
+LARMOR_COMPARABLE_RATE_PER_S = 1.0e6
 
 
 def _euler_zyz(alpha_deg: float, beta_deg: float, gamma_deg: float) -> np.ndarray:
@@ -567,6 +573,12 @@ def run_radical_pair_forge(
     control_direction_count: int = 60,
     rate_points: Sequence[float] | None = None,
 ) -> RadicalPairForgeReport:
+    if field_tesla <= 0.0:
+        # field_microtesla, larmor_frequency_mhz and zeeman_thermal_ratio are all
+        # published as magnitudes.  A negative field would serialize all three
+        # negative while still passing every check, because the model is
+        # polarity-invariant by construction.
+        raise ValueError("field_tesla must be positive; it is reported as a magnitude")
     couplings = resolve_inventory(inventory)
     dims = hilbert_dims(couplings)
     projector = singlet_projector(dims)
@@ -699,19 +711,58 @@ def run_radical_pair_forge(
         )
     )
 
+    # The low-rate comparison is computed here, from its own rate points, rather
+    # than read out of `rate_sweep`.  A caller passing rate_points=(1e6,) would
+    # otherwise leave this registered condition unevaluated while the report
+    # still reported passed.
+    low_rate = sweep_field_directions(
+        couplings=couplings,
+        field_tesla=field_tesla,
+        rate_per_second=LOW_RATE_PER_S,
+        direction_count=control_direction_count,
+        keep_samples=False,
+        inventory=inventory,
+    )
+    larmor_rate = sweep_field_directions(
+        couplings=couplings,
+        field_tesla=field_tesla,
+        rate_per_second=LARMOR_COMPARABLE_RATE_PER_S,
+        direction_count=control_direction_count,
+        keep_samples=False,
+        inventory=inventory,
+    )
+
+    # Keys here MUST match hypotheses/radicalpair-0001.yaml validation.required
+    # exactly.  test_every_declared_validation_is_implemented asserts set
+    # equality in both directions, so the registry cannot claim a condition the
+    # code never evaluates, and the code cannot gate on an unregistered one.
     checks = {
-        "anisotropy_positive": sweep.anisotropy > 1e-6,
-        "isotropic_hyperfine_control_vanishes": isotropic.anisotropy < SYMMETRY_TOLERANCE,
-        "polarity_degeneracy_holds": residual < SYMMETRY_TOLERANCE,
-        "no_hyperfine_control_is_field_independent": (
+        "singlet_yield_anisotropy_positive_at_geomagnetic_field": sweep.anisotropy > 1e-6,
+        "isotropic_hyperfine_control_anisotropy_below_tolerance": (
+            isotropic.anisotropy < SYMMETRY_TOLERANCE
+        ),
+        "polarity_residual_below_tolerance": residual < SYMMETRY_TOLERANCE,
+        "no_hyperfine_control_yield_is_unity_and_field_independent": (
             bare.anisotropy < SYMMETRY_TOLERANCE
             and abs(bare.mean_yield - 1.0) < SYMMETRY_TOLERANCE
         ),
-        "fast_recombination_control_collapses": fast.anisotropy < 1e-6,
-        "spin_free_partner_compass_is_stronger": spin_free.anisotropy > loaded_partner.anisotropy,
-        "closed_form_matches_liouvillian": cross_check_residual < 1e-9,
-        "asymmetric_rates_differ_from_symmetric": abs(asymmetric - closed) > 1e-6,
-        "prompt_recombination_limit_is_unity": abs(prompt_limit - 1.0) < 1e-6,
+        "fast_recombination_control_anisotropy_below_tolerance": fast.anisotropy < 1e-6,
+        "spin_free_partner_anisotropy_exceeds_loaded_partner_anisotropy": (
+            spin_free.anisotropy > loaded_partner.anisotropy
+        ),
+        "closed_form_and_liouvillian_yields_agree": cross_check_residual < 1e-9,
+        "asymmetric_rates_have_no_closed_form_and_must_differ": (
+            abs(asymmetric - closed) > 1e-6
+        ),
+        "prompt_recombination_limit_equals_one": abs(prompt_limit - 1.0) < 1e-6,
+        "zeeman_thermal_ratio_recorded": 0.0 < zeeman_thermal_ratio(field_tesla) < 1e-3,
+        "antipodal_yield_recorded_per_sampled_direction": bool(sweep.samples) and all(
+            abs(sample.singlet_yield - sample.antipodal_singlet_yield) < SYMMETRY_TOLERANCE
+            for sample in sweep.samples
+        ),
+        "anisotropy_at_low_rate_is_not_suppressed_relative_to_the_larmor_rate": (
+            low_rate.anisotropy >= larmor_rate.anisotropy
+        ),
     }
 
     controls: dict[str, Any] = {
@@ -739,6 +790,10 @@ def run_radical_pair_forge(
         "liouvillian_dim_limit": LIOUVILLIAN_DIM_LIMIT,
         "asymmetric_rate_yield": asymmetric,
         "prompt_recombination_limit": prompt_limit,
+        "low_rate_per_second": LOW_RATE_PER_S,
+        "low_rate_anisotropy": low_rate.anisotropy,
+        "larmor_comparable_rate_per_second": LARMOR_COMPARABLE_RATE_PER_S,
+        "larmor_comparable_anisotropy": larmor_rate.anisotropy,
         "zeeman_thermal_ratio_300k": zeeman_thermal_ratio(field_tesla),
         "zeeman_thermal_ratio_300k_at_5mt": zeeman_thermal_ratio(5e-3),
         "fridge_magnet_note": (

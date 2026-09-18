@@ -218,9 +218,9 @@ def test_loaded_inventory_avoids_the_dense_liouvillian_blowup():
     assert report.hilbert_dimension == 72
     assert controls["cross_check_hilbert_dimension"] <= controls["liouvillian_dim_limit"]
     assert controls["cross_check_inventory"] == "cryptochrome-like"
-    assert controls["checks"]["closed_form_matches_liouvillian"]
+    assert controls["checks"]["closed_form_and_liouvillian_yields_agree"]
     # The prompt-recombination limit still uses the selected inventory.
-    assert controls["checks"]["prompt_recombination_limit_is_unity"]
+    assert controls["checks"]["prompt_recombination_limit_equals_one"]
 
 
 def test_small_inventory_cross_checks_against_itself():
@@ -337,3 +337,49 @@ def test_default_output_dir_follows_the_selected_inventory(tmp_path: Path):
     assert len(set(slugs.values())) == len(slugs)
     # The default inventory keeps the slug its committed bundle already uses.
     assert slugs["cryptochrome-like"] == "cryptochrome-compass"
+
+
+def test_every_declared_validation_is_implemented_and_vice_versa():
+    # Root cause of the registry-drift finding: validation.required in the
+    # hypothesis YAML and the checks dict in code were related only by intent,
+    # so the registry could declare a condition the code never evaluated. This
+    # reconciles them exactly, in both directions.
+    import yaml
+
+    hypothesis = yaml.safe_load(
+        (ROOT / "hypotheses" / "radicalpair-0001.yaml").read_text(encoding="utf-8")
+    )
+    declared = set(hypothesis["validation"]["required"])
+    report = run_radical_pair_forge(
+        direction_count=12, control_direction_count=8, rate_points=(1e6,)
+    )
+    implemented = set(report.controls["checks"])
+
+    assert declared == implemented, (
+        f"declared but not implemented: {sorted(declared - implemented)}; "
+        f"implemented but not declared: {sorted(implemented - declared)}"
+    )
+
+
+def test_low_rate_condition_is_evaluated_even_when_the_caller_skips_that_rate():
+    # A caller passing a single high rate must not be able to leave the
+    # registered low-rate condition unevaluated while the report reads passed.
+    report = run_radical_pair_forge(
+        direction_count=12, control_direction_count=8, rate_points=(1e6,)
+    )
+    controls = report.controls
+    assert len(report.rate_sweep) == 1  # caller's sweep really is a single point
+    # ...yet the condition was still computed, from its own rate points.
+    assert controls["low_rate_per_second"] < controls["larmor_comparable_rate_per_second"]
+    assert controls["low_rate_anisotropy"] >= controls["larmor_comparable_anisotropy"]
+    assert controls["checks"][
+        "anisotropy_at_low_rate_is_not_suppressed_relative_to_the_larmor_rate"
+    ]
+
+
+def test_non_positive_field_is_rejected_because_magnitudes_are_published():
+    for bad in (0.0, -50e-6):
+        with pytest.raises(ValueError, match="must be positive"):
+            run_radical_pair_forge(
+                field_tesla=bad, direction_count=8, control_direction_count=6, rate_points=(1e6,)
+            )

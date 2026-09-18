@@ -31,6 +31,20 @@ OUTPUT_SLUGS = {
 assert set(OUTPUT_SLUGS) == set(NUCLEAR_INVENTORIES), "every inventory needs an output slug"
 
 
+def _positive_float(raw: str) -> float:
+    """Reject non-positive field magnitudes at the CLI boundary.
+
+    --field-ut is documented as a magnitude, and the report publishes
+    field_microtesla, larmor_frequency_mhz and the Zeeman/thermal ratio as
+    magnitudes.  The model is polarity-invariant, so a negative value would run
+    to completion and pass every check while serializing all three negative.
+    """
+    value = float(raw)
+    if value <= 0.0:
+        raise argparse.ArgumentTypeError(f"must be positive, got {value}")
+    return value
+
+
 def _render_svg(payload: dict[str, object]) -> str:
     sweep = payload["sweep"]
     assert isinstance(sweep, dict)
@@ -114,7 +128,12 @@ def main() -> int:
         default="cryptochrome-like",
         help="declared nuclear inventory for the radical pair",
     )
-    parser.add_argument("--field-ut", type=float, default=50.0, help="field magnitude in microtesla")
+    parser.add_argument(
+        "--field-ut",
+        type=_positive_float,
+        default=50.0,
+        help="field magnitude in microtesla (must be positive)",
+    )
     parser.add_argument("--direction-count", type=int, default=200)
     parser.add_argument("--control-direction-count", type=int, default=60)
     parser.add_argument("--rate-points", type=int, default=8, help="decades of recombination rate from 1e3")

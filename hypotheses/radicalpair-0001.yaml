@@ -59,6 +59,7 @@ validation:
     - zeeman_thermal_ratio_recorded
     - antipodal_yield_recorded_per_sampled_direction
     - anisotropy_at_low_rate_is_not_suppressed_relative_to_the_larmor_rate
+    - asymmetric_rates_have_no_closed_form_and_must_differ
 kill_criteria:
   - output describes the result as a magnetometer, sensor, or device design
   - output quotes a sensitivity figure in tesla per root hertz
@@ -72,6 +73,9 @@ kill_criteria:
   - anisotropy fails to vanish in the isotropic-hyperfine control
   - output claims a recombination-lifetime window or a microsecond optimum
   - output presents the partner-suppression factor as structural or mechanism-level
+  - output claims a robust sign or magnitude for partner suppression beyond this registry
+  - validation.required and the implemented checks dict diverge in either direction
+  - a field magnitude argument accepts a non-positive value
   - figure or caption presents mirrored polar angles as evidence of the polarity degeneracy
   - figure axis labels are not derived from the sweep that actually ran
 status: active

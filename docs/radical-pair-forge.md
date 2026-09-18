@@ -75,10 +75,19 @@ the anisotropy is large. Add a single tryptophan beta-proton to the partner
 radical and it falls by about `8x`.
 
 This one is **not** structural, and is reported as a measurement of this
-registry rather than a property of the mechanism. Scale the partner tensor
-continuously to zero and the loaded and spin-free yields coincide, so the factor
-is a function of the illustrative `trp-hbeta` values. Only the sign of the
-effect is robust; the magnitude is not.
+registry rather than a property of the mechanism. The code compares exactly two
+inventories, so it establishes neither the magnitude nor the sign of the effect
+for any other partner tensor, magnitude or orientation. No theorem is offered.
+
+An earlier draft claimed "only the sign of the effect is robust". That was also
+an over-claim and has been removed: comparing two fixed inventories, and
+observing that the difference vanishes as this particular tensor is scaled to
+zero, says nothing about whether some other partner tensor could *increase* the
+anisotropy. A probe over axial partner tensors at several magnitudes and
+orientations found no such counterexample, but it also found the dependence is
+**not monotonic** in partner coupling strength — a 1 MHz axial partner suppresses
+the compass more than a 5 MHz one. Non-monotonic behaviour over six samples is a
+reason to claim nothing general, not a reason to claim a robust sign.
 
 ### The energy audit
 
@@ -121,6 +130,7 @@ Avoided language:
 - entanglement carrying information, or acting at a distance
 - a recombination-lifetime window or a microsecond optimum
 - the partner-suppression factor as a structural or mechanism-level result
+- any general claim about the sign or magnitude of partner suppression beyond this registry
 
 What this track does **not** model, and would need before any of it bore on a
 real organism or instrument: spin relaxation (so the long-lifetime side of the
