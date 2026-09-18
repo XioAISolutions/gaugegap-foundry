@@ -950,6 +950,92 @@ def test_an_input_that_would_overflow_an_operator_is_rejected_not_silently_nan()
     assert math.isfinite(zeeman_thermal_ratio(MAX_FIELD_TESLA))
 
 
+def test_a_computed_quantity_is_checked_for_finiteness_not_just_its_inputs():
+    # Bounding the inputs is not the whole property. Three ways a run with
+    # in-bounds inputs still went wrong: a direction whose components are finite
+    # but whose NORM overflows, so the unit vector came out (0, 0, 0) and the
+    # Zeeman term silently vanished from a Hamiltonian that stayed finite; a
+    # temperature whose product with k_B underflows to zero; and a ratio that
+    # overflows from a legal field and a legal temperature.
+    from gaugegap.radical_pair_forge import zeeman_thermal_ratio
+
+    couplings = resolve_inventory("spin-free-partner")
+    huge = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(1e308, 0.0, 0.0), couplings=couplings
+    )
+    unit = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(1.0, 0.0, 0.0), couplings=couplings
+    )
+    assert np.allclose(huge, unit)
+    # Tiny components normalize the same way, from the other end.
+    tiny = build_hamiltonian(
+        field_tesla=GEOMAGNETIC_FIELD_T, direction=(1e-320, 0.0, 0.0), couplings=couplings
+    )
+    assert np.allclose(tiny, unit)
+    with pytest.raises(ValueError, match="non-zero"):
+        build_hamiltonian(
+            field_tesla=GEOMAGNETIC_FIELD_T, direction=(0.0, 0.0, 0.0), couplings=couplings
+        )
+
+    # k_B * T underflows to exactly zero here, so the division would raise
+    # ZeroDivisionError rather than report anything.
+    for underflowing in (1e-310, 1e-320, 5e-324):
+        with pytest.raises(ValueError, match="representable"):
+            zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T, underflowing)
+    # Both in bounds individually, non-finite in combination.
+    with pytest.raises(ValueError, match="not finite"):
+        zeeman_thermal_ratio(1e290, 1e-300)
+    assert zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T, 300.0) == pytest.approx(2.2416e-7, rel=1e-3)
+
+
+def test_cli_counts_are_argument_errors_not_tracebacks():
+    # --rate-points 307 evaluated 10.0 ** 309 while building the argument, so it
+    # raised OverflowError before the report could apply its own rate bound, and
+    # --direction-count 1 died inside fibonacci_directions. Both are argument
+    # errors and must read as argument errors.
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "_rp_runner_counts", ROOT / "scripts" / "run_radical_pair_forge.py"
+    )
+    assert spec is not None and spec.loader is not None
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+
+    # The upper bound is derived from the module's rate bound, not chosen here.
+    from gaugegap.radical_pair_forge import MAX_RATE_PER_S
+
+    assert 10.0 ** (runner.RATE_SWEEP_BASE_DECADE + runner.MAX_RATE_POINTS - 1) <= MAX_RATE_PER_S
+    with pytest.raises(OverflowError):
+        10.0 ** (runner.RATE_SWEEP_BASE_DECADE + runner.MAX_RATE_POINTS + 2)
+
+    for argument, value in (
+        ("--rate-points", str(runner.MAX_RATE_POINTS + 2)),
+        ("--rate-points", "1"),
+        ("--direction-count", "1"),
+        ("--direction-count", "0"),
+        ("--field-ut", "1e308"),
+        ("--field-ut", "-1"),
+    ):
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "run_radical_pair_forge.py"),
+                argument,
+                value,
+                "--output-dir",
+                "/tmp/radical-pair-should-not-exist",
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert completed.returncode == 2, (argument, value, completed.stdout + completed.stderr)
+        assert f"argument {argument}" in completed.stderr
+        assert "Traceback" not in completed.stderr
+
+
 def test_the_antipodal_gate_is_decided_at_the_registered_resolution():
     # A 12-direction run would otherwise certify a registered condition from 12
     # samples. The gate reads the registered 200-direction sweep; the primary

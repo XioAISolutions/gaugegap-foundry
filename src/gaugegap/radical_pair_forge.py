@@ -137,20 +137,22 @@ def _require_finite_magnitude(
     return numeric
 
 
-def _require_finite_operator(name: str, operator: np.ndarray) -> np.ndarray:
-    """Backstop: no non-finite operator may reach a solver.
+def _require_finite_output(name: str, value: Any) -> Any:
+    """Backstop: no non-finite computed quantity may be used or published.
 
     The per-input bounds above give a clear error naming the offending input.
-    This catches whatever they do not -- a combination of inputs, or a term
-    added later -- because np.linalg.solve returns nan rather than raising, and
-    a nan yield is fabricated evidence, not a crash.
+    This catches whatever they do not -- a combination of inputs, an
+    intermediate that underflows, or a term added later -- because
+    np.linalg.solve returns nan rather than raising, and a nan yield is
+    fabricated evidence, not a crash.  Applies to scalars as well as operators:
+    the same defect shows up as an inf ratio as readily as an inf matrix.
     """
-    if not np.isfinite(operator).all():
+    if not np.isfinite(value).all():
         raise ValueError(
             f"{name} is not finite; the inputs are within their individual bounds "
-            "but overflow in combination"
+            "but overflow or underflow in combination"
         )
-    return operator
+    return value
 
 
 SOURCES = (
@@ -417,12 +419,19 @@ def build_hamiltonian(
         for index in (0, 1)
     }
     unit = np.asarray(direction, dtype=float)
-    norm = float(np.linalg.norm(unit))
-    if norm == 0.0:
-        raise ValueError("direction must be a non-zero vector")
     if not np.isfinite(unit).all():
         raise ValueError(f"direction must be finite; got {direction!r}")
-    unit = unit / norm
+    # Scale by the largest component before taking the norm.  For (1e308, 0, 0)
+    # every component is finite but the norm overflows to inf, and dividing by
+    # it gives exactly (0, 0, 0): the Zeeman term vanishes and the Hamiltonian
+    # stays finite, so nothing downstream notices that the requested direction
+    # was silently discarded.  After scaling, no component exceeds 1 and the
+    # norm lies in [1, sqrt(3)].
+    largest = float(np.abs(unit).max())
+    if largest == 0.0:
+        raise ValueError("direction must be a non-zero vector")
+    unit = unit / largest
+    unit = _require_finite_output("direction", unit / float(np.linalg.norm(unit)))
     # Bounded, not merely finite: 1e308 T is a positive finite input whose
     # Larmor term overflows, and the non-finite Hamiltonian then dies inside
     # eigh with "Eigenvalues did not converge".
@@ -440,7 +449,7 @@ def build_hamiltonian(
                 weight = tensor[i, j]
                 if weight != 0.0:
                     hamiltonian = hamiltonian + weight * (electron_ops[i] @ nuclear[j])
-    return _require_finite_operator("hamiltonian", hamiltonian)
+    return _require_finite_output("hamiltonian", hamiltonian)
 
 
 def singlet_yield_closed_form(
@@ -490,7 +499,7 @@ def _build_liouvillian(
     liouvillian = -1j * (
         np.kron(identity, hamiltonian) - np.kron(hamiltonian.T, identity)
     ) - 0.5 * (np.kron(identity, decay) + np.kron(decay.T, identity))
-    return _require_finite_operator("liouvillian", liouvillian)
+    return _require_finite_output("liouvillian", liouvillian)
 
 
 def singlet_yield_liouvillian(
@@ -888,7 +897,18 @@ def zeeman_thermal_ratio(field_tesla: float, temperature_k: float = 300.0) -> fl
     _require_positive_finite("field_tesla", field_tesla, maximum=MAX_FIELD_TESLA)
     _require_positive_finite("temperature_k", temperature_k)
     energy = PLANCK_J_S * (GYROMAGNETIC_RATIO_E / (2.0 * math.pi)) * float(field_tesla)
-    return float(energy / (BOLTZMANN_J_PER_K * float(temperature_k)))
+    # Positive and finite is not enough at the bottom either: k_B * 1e-320
+    # underflows to exactly zero and the division raises ZeroDivisionError, and
+    # a denominator one decade larger returns a ratio of 1e295 that means
+    # nothing.  The bound that matters is on the computed denominator, not on a
+    # temperature picked in advance.
+    denominator = BOLTZMANN_J_PER_K * float(temperature_k)
+    if denominator <= 0.0:
+        raise ValueError(
+            "temperature_k must be large enough that k_B * T is representable; "
+            f"got {temperature_k!r}"
+        )
+    return float(_require_finite_output("zeeman_thermal_ratio", energy / denominator))
 
 
 def run_radical_pair_forge(

@@ -18,6 +18,7 @@ if str(SRC) not in sys.path:
 from gaugegap.radical_pair_forge import (  # noqa: E402
     INVENTORY_SLUGS,
     MAX_FIELD_TESLA,
+    MAX_RATE_PER_S,
     NUCLEAR_INVENTORIES,
     SOURCES,
     RatePoint,
@@ -26,6 +27,15 @@ from gaugegap.radical_pair_forge import (  # noqa: E402
 
 # The CLI takes microtesla, so the module's tesla bound converts once here.
 MAX_FIELD_UT = MAX_FIELD_TESLA * 1e6
+# The rate sweep is one point per decade from 1e3, so the count is bounded by
+# the largest decade the module will accept -- derived from that bound, not a
+# number chosen here. Beyond it, 10.0 ** (3 + index) raises OverflowError while
+# building the argument, before the report can validate anything or emit
+# evidence.
+RATE_SWEEP_BASE_DECADE = 3
+MAX_RATE_POINTS = int(math.floor(math.log10(MAX_RATE_PER_S))) - RATE_SWEEP_BASE_DECADE + 1
+MIN_RATE_POINTS = 2
+MIN_DIRECTION_COUNT = 2
 
 # The slug map lives with the inventories, since benchmark_id derives from it
 # too; re-exported here under its original name for the default --output-dir.
@@ -57,6 +67,26 @@ def _positive_float(raw: str) -> float:
             f"got {value}"
         )
     return value
+
+
+def _bounded_int(name: str, minimum: int, maximum: int | None = None):
+    """argparse type for a count with a real lower (and sometimes upper) bound.
+
+    A bare `type=int` accepted --direction-count 1, which died inside
+    fibonacci_directions with a traceback, and --rate-points 307, which raised
+    OverflowError while constructing the argument. Both are argument errors and
+    should read as argument errors.
+    """
+
+    def parse(raw: str) -> int:
+        value = int(raw)
+        if value < minimum:
+            raise argparse.ArgumentTypeError(f"{name} must be at least {minimum}, got {value}")
+        if maximum is not None and value > maximum:
+            raise argparse.ArgumentTypeError(f"{name} must be at most {maximum}, got {value}")
+        return value
+
+    return parse
 
 
 def _render_svg(payload: dict[str, object]) -> str:
@@ -159,8 +189,17 @@ def main() -> int:
         default=50.0,
         help="field magnitude in microtesla (must be positive)",
     )
-    parser.add_argument("--direction-count", type=int, default=200)
-    parser.add_argument("--rate-points", type=int, default=8, help="decades of recombination rate from 1e3")
+    parser.add_argument(
+        "--direction-count",
+        type=_bounded_int("--direction-count", MIN_DIRECTION_COUNT),
+        default=200,
+    )
+    parser.add_argument(
+        "--rate-points",
+        type=_bounded_int("--rate-points", MIN_RATE_POINTS, MAX_RATE_POINTS),
+        default=8,
+        help=f"decades of recombination rate from 1e3 (at most {MAX_RATE_POINTS})",
+    )
     parser.add_argument(
         "--output-dir",
         type=Path,
@@ -181,7 +220,9 @@ def main() -> int:
         inventory=args.inventory,
         field_tesla=args.field_ut * 1e-6,
         direction_count=args.direction_count,
-        rate_points=tuple(10.0 ** (3 + index) for index in range(max(2, args.rate_points))),
+        rate_points=tuple(
+            10.0 ** (RATE_SWEEP_BASE_DECADE + index) for index in range(args.rate_points)
+        ),
     )
     payload = report.summary(include_samples=True)
     payload["sources"] = list(SOURCES)

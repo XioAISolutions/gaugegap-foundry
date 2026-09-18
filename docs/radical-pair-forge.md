@@ -168,8 +168,20 @@ is not the property that matters -- finiteness of the operator built from it is.
 yield. `MAX_FIELD_TESLA`, `MAX_RATE_PER_S` and `MAX_HYPERFINE_MHZ` are derived
 from the largest finite double and the factor each input is multiplied by before
 it reaches a matrix, so they are not opinions about what a large field is; they
-are published in every bundle. A finiteness check on each constructed operator
-backs them up, for combinations of inputs no per-input bound can see.
+are published in every bundle. The CLI's own counts are bounded from the same
+constants rather than separately: `--rate-points` is capped at the largest
+decade the module will accept.
+
+Bounding the inputs is not the whole property, so every computed quantity is
+checked before it is used or published. Three defects had in-bounds inputs: a
+direction whose components are finite but whose norm overflows, which
+normalized to exactly `(0, 0, 0)` and silently dropped the Zeeman term from a
+Hamiltonian that stayed finite; a temperature whose product with `k_B`
+underflows to zero, which raised `ZeroDivisionError` inside the energy audit;
+and a Zeeman/`k_B T` ratio that overflows from a legal field and a legal
+temperature. `_require_finite_output` is the backstop for all of them, and the
+direction is normalized by its largest component first so the norm cannot
+overflow.
 
 Nine controls inherited a caller parameter at some point in this track's
 history, and each was found separately by review; two of them after a helper was
