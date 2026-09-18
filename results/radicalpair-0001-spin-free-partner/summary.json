@@ -198,7 +198,7 @@
     "spin_free_partner_anisotropy": 0.1591626079758619,
     "symmetry_tolerance": 1e-09,
     "zeeman_gate_field_microtesla": 50.0,
-    "zeeman_thermal_ratio_300k": 2.2416425328029618e-07,
+    "zeeman_thermal_ratio_300k": 2.241642532802962e-07,
     "zeeman_thermal_ratio_300k_at_5mt": 2.2416425328029622e-05,
     "zeeman_thermal_ratio_300k_at_geomagnetic_field": 2.2416425328029624e-07
   },

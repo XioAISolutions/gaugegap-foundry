@@ -18,16 +18,17 @@ if str(SRC) not in sys.path:
 from gaugegap.radical_pair_forge import (  # noqa: E402
     INVENTORY_SLUGS,
     MAX_DIRECTION_COUNT,
-    MAX_FIELD_TESLA,
     MAX_RATE_PER_S,
     NUCLEAR_INVENTORIES,
     SOURCES,
     RatePoint,
     run_radical_pair_forge,
+    validate_field_tesla,
 )
 
-# The CLI takes microtesla, so the module's tesla bound converts once here.
-MAX_FIELD_UT = MAX_FIELD_TESLA * 1e6
+# The CLI takes microtesla; the tesla value it will actually pass is what has to
+# be valid, so the conversion is validated rather than a converted bound.
+MICROTESLA_TO_TESLA = 1e-6
 # The rate sweep is one point per decade from 1e3, so the count is bounded by
 # the largest decade the module will accept -- derived from that bound, not a
 # number chosen here. Beyond it, 10.0 ** (3 + index) raises OverflowError while
@@ -61,15 +62,16 @@ def _positive_float(raw: str) -> float:
     # numpy's eigensolver with an opaque LinAlgError, so check finiteness too.
     if not math.isfinite(value) or value <= 0.0:
         raise argparse.ArgumentTypeError(f"must be a positive finite magnitude, got {value}")
-    # And finite is still not enough: --field-ut 1e308 overflows the Larmor term
-    # and the run dies with "Eigenvalues did not converge" instead of a message
-    # naming the argument.  The bound is the module's, converted, not a second
-    # opinion about what a large field is.
-    if value > MAX_FIELD_UT:
-        raise argparse.ArgumentTypeError(
-            f"must be at most {MAX_FIELD_UT:.6e} uT so the Hamiltonian stays finite, "
-            f"got {value}"
-        )
+    # The argument is in microtesla but the calculation runs in tesla, and the
+    # conversion is not order-preserving at the bottom: 5e-324 uT is a positive
+    # finite argument whose tesla value is exactly 0.0, which the module then
+    # rejects with an uncaught ValueError rather than an argument error. So the
+    # CONVERTED value goes through the module's own validator -- which also
+    # applies its upper bound, instead of restating it here as a second number.
+    try:
+        validate_field_tesla("--field-ut (converted to tesla)", value * MICROTESLA_TO_TESLA)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
     return value
 
 
@@ -222,7 +224,7 @@ def main() -> int:
 
     report = run_radical_pair_forge(
         inventory=args.inventory,
-        field_tesla=args.field_ut * 1e-6,
+        field_tesla=args.field_ut * MICROTESLA_TO_TESLA,
         direction_count=args.direction_count,
         rate_points=tuple(
             10.0 ** (RATE_SWEEP_BASE_DECADE + index) for index in range(args.rate_points)

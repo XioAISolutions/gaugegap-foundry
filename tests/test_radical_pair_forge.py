@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import json
 import math
 from pathlib import Path
@@ -1017,6 +1018,65 @@ def test_a_rate_that_vanishes_inside_the_decay_operator_is_refused():
         singlet_yield_liouvillian(hamiltonian, projector, 4.5e-308, 4.5e-308)
 
 
+def test_the_energy_audit_survives_a_field_small_enough_to_underflow():
+    # The constants were multiplied out before dividing, so the NUMERATOR
+    # underflowed first: at 1e-310 T the energy rounded to zero and the function
+    # published 0.0 as a measured ratio, although 4.48e-313 is representable.
+    # A fabricated zero is worse than an error.
+    from gaugegap.radical_pair_forge import (
+        BOLTZMANN_J_PER_K,
+        GYROMAGNETIC_RATIO_E,
+        PLANCK_J_S,
+        zeeman_thermal_ratio,
+    )
+
+    tiny = 1e-310
+    naive = PLANCK_J_S * (GYROMAGNETIC_RATIO_E / (2.0 * math.pi)) * tiny
+    assert naive == 0.0, "the ordering this test guards against must still underflow"
+    assert zeeman_thermal_ratio(tiny) == pytest.approx(4.4832850656e-313, rel=1e-6)
+    assert zeeman_thermal_ratio(tiny) > 0.0
+
+    # Below that, no ordering saves it, so it raises rather than publishing zero.
+    for unrepresentable in (5e-324, 1e-322):
+        with pytest.raises(ValueError, match="representable"):
+            zeeman_thermal_ratio(unrepresentable)
+
+    # The registered value is unchanged by the reordering.
+    assert zeeman_thermal_ratio(GEOMAGNETIC_FIELD_T) == pytest.approx(2.2416e-7, rel=1e-3)
+
+
+def test_the_direction_budget_counts_what_a_direction_actually_costs():
+    # The first version of this accounting counted four float64 values per
+    # direction, 32 bytes, against a retained DirectionSample that really costs
+    # ~556: the cap advertised as fitting 64 MiB would have needed about 1.1 GiB.
+    import sys as _sys
+
+    from gaugegap.radical_pair_forge import (
+        BYTES_PER_DIRECTION,
+        DIRECTION_GRID_BUDGET_BYTES,
+        MAX_DIRECTION_COUNT,
+        REGISTERED_DIRECTION_COUNT,
+    )
+
+    sample = DirectionSample(
+        index=0,
+        x=0.0,
+        y=0.0,
+        z=1.0,
+        polar_deg=0.0,
+        azimuth_deg=0.0,
+        singlet_yield=0.0,
+        antipodal_singlet_yield=0.0,
+    )
+    # The accounting must cover the retained object itself, not just its numbers.
+    assert BYTES_PER_DIRECTION >= _sys.getsizeof(sample)
+    assert BYTES_PER_DIRECTION > 8 * len(dataclasses.fields(DirectionSample))
+    # And the cap must actually fit the budget it is derived from.
+    assert MAX_DIRECTION_COUNT * BYTES_PER_DIRECTION <= DIRECTION_GRID_BUDGET_BYTES
+    # Still generous: the registered resolution is 200.
+    assert MAX_DIRECTION_COUNT > 100 * REGISTERED_DIRECTION_COUNT
+
+
 def test_a_count_that_cannot_be_allocated_is_refused_at_its_boundary():
     # An accepted count that dies in an allocation is the same defect as an
     # accepted rate that dies in a solve, and it need not be loud: on numpy 2.4.6
@@ -1178,8 +1238,12 @@ def test_cli_counts_are_argument_errors_not_tracebacks():
         ("--rate-points", "1"),
         ("--direction-count", "1"),
         ("--direction-count", "0"),
+        ("--direction-count", "9223372036854775808"),
         ("--field-ut", "1e308"),
         ("--field-ut", "-1"),
+        # Positive and finite in microtesla, exactly 0.0 once converted to
+        # tesla: the argument is fine and the value it produces is not.
+        ("--field-ut", "5e-324"),
     ):
         completed = subprocess.run(
             [

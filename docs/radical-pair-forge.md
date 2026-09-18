@@ -204,7 +204,19 @@ on zero directions and died several frames later in a reduction.
 `MAX_DIRECTION_COUNT` and `MAX_HILBERT_DIMENSION` are arithmetic on a declared
 byte budget rather than chosen numbers, and the Hilbert bound is applied to the
 product of the multiplicities, not only to each one: enough individually legal
-couplings still asks for an operator no budget covers.
+couplings still asks for an operator no budget covers. The direction accounting
+measures what a retained `DirectionSample` actually costs — object, `__dict__`
+and boxed floats, about 556 bytes — instead of counting its numbers: the first
+version of the cap counted 32 bytes per direction and so advertised a 64 MiB
+budget that would really have needed about 1.1 GiB.
+
+Unit conversion and operand order belong to the same class. `--field-ut 5e-324`
+is a positive finite argument whose tesla value is exactly `0.0`, so the CLI
+validates the value it will actually pass rather than the one it was given. And
+the Zeeman/`k_B T` ratio multiplies its constants together *before* the field:
+the other order underflows the numerator at `1e-310` T and published `0.0` for a
+ratio whose true value, `4.48e-313`, is representable. A fabricated zero is
+worse than an error, so a field too small for any representable ratio raises.
 
 Shape is checked for the same reason. A `Sequence[float]` annotation is not a
 shape check, and a four-component direction was normalized using all four

@@ -52,8 +52,9 @@ magnetometer design.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field as dataclass_field
+from dataclasses import asdict, dataclass, field as dataclass_field, fields
 import math
+import sys
 from typing import Any, Iterable, Sequence
 
 import numpy as np
@@ -104,8 +105,6 @@ MAX_HYPERFINE_MHZ = _DOUBLE_MAX / MHZ_TO_RAD_PER_S / 4.0
 # magnitude past any meaningful angular resolution on a sphere, and dimension
 # 2048 is nearly thirty times the largest registered inventory.
 DIRECTION_GRID_BUDGET_BYTES = 64 * 1024 * 1024
-_BYTES_PER_DIRECTION = 4 * 8  # x, y, z and the yield, float64
-MAX_DIRECTION_COUNT = DIRECTION_GRID_BUDGET_BYTES // _BYTES_PER_DIRECTION
 OPERATOR_BUDGET_BYTES = 64 * 1024 * 1024
 _BYTES_PER_COMPLEX = 16
 MAX_HILBERT_DIMENSION = math.isqrt(OPERATOR_BUDGET_BYTES // _BYTES_PER_COMPLEX)
@@ -186,6 +185,16 @@ def _require_three_vector(name: str, value: Any) -> np.ndarray:
     for index, component in enumerate(array):
         _require_finite_magnitude(f"{name}[{index}]", float(component))
     return array
+
+
+def validate_field_tesla(name: str, field_tesla: float) -> float:
+    """Public form of the field check, so callers apply it rather than copy it.
+
+    The CLI takes microtesla and has to validate the value it will actually
+    pass: the conversion is not order-preserving at the bottom, where 5e-324 uT
+    becomes exactly 0.0 tesla.
+    """
+    return _require_positive_finite(name, field_tesla, maximum=MAX_FIELD_TESLA)
 
 
 def _require_finite_output(name: str, value: Any) -> Any:
@@ -726,6 +735,37 @@ class DirectionSample:
         return asdict(self)
 
 
+# Per direction, at peak, the sweep holds:
+#   - the (count, 3) grid and its construction temporaries -- index, polar,
+#     azimuth, three coordinate arrays and the stacked result -- which is nine
+#     float64 values;
+#   - one retained DirectionSample when samples are kept, whose real cost is the
+#     object, its __dict__ and its boxed floats, MEASURED here from an instance
+#     rather than assumed.  The first version of this constant counted four
+#     float64 values, 32 bytes, against an actual 556: a cap advertised as
+#     fitting a 64 MiB budget would have needed about 1.1 GiB.
+_GRID_BYTES_PER_DIRECTION = 9 * 8
+_SAMPLE_TEMPLATE = DirectionSample(
+    index=0,
+    x=0.0,
+    y=0.0,
+    z=1.0,
+    polar_deg=0.0,
+    azimuth_deg=0.0,
+    singlet_yield=0.0,
+    antipodal_singlet_yield=0.0,
+)
+_SAMPLE_DICT = getattr(_SAMPLE_TEMPLATE, "__dict__", None)
+_SAMPLE_BYTES = (
+    sys.getsizeof(_SAMPLE_TEMPLATE)
+    + (sys.getsizeof(_SAMPLE_DICT) if _SAMPLE_DICT is not None else 0)
+    + len(fields(_SAMPLE_TEMPLATE)) * sys.getsizeof(0.5)
+    + 8  # the list slot that holds it
+)
+BYTES_PER_DIRECTION = _GRID_BYTES_PER_DIRECTION + _SAMPLE_BYTES
+MAX_DIRECTION_COUNT = DIRECTION_GRID_BUDGET_BYTES // BYTES_PER_DIRECTION
+
+
 @dataclass(frozen=True)
 class DirectionSweep:
     inventory: str
@@ -1033,7 +1073,6 @@ def zeeman_thermal_ratio(field_tesla: float, temperature_k: float = 300.0) -> fl
     # negative value returned a negative "ratio" that the gate reads as failing.
     _require_positive_finite("field_tesla", field_tesla, maximum=MAX_FIELD_TESLA)
     _require_positive_finite("temperature_k", temperature_k)
-    energy = PLANCK_J_S * (GYROMAGNETIC_RATIO_E / (2.0 * math.pi)) * float(field_tesla)
     # Positive and finite is not enough at the bottom either: k_B * 1e-320
     # underflows to exactly zero and the division raises ZeroDivisionError, and
     # a denominator one decade larger returns a ratio of 1e295 that means
@@ -1045,7 +1084,19 @@ def zeeman_thermal_ratio(field_tesla: float, temperature_k: float = 300.0) -> fl
             "temperature_k must be large enough that k_B * T is representable; "
             f"got {temperature_k!r}"
         )
-    return float(_require_finite_output("zeeman_thermal_ratio", energy / denominator))
+    # Constants first, field last.  Multiplying the energy out before dividing
+    # underflows the NUMERATOR for a small field -- at 1e-310 T the energy
+    # rounds to zero and the function published 0.0, although the ratio itself,
+    # 4.48e-313, is perfectly representable.  A fabricated zero is worse than an
+    # error, so the reordered result is also required to be non-zero.
+    coefficient = PLANCK_J_S * (GYROMAGNETIC_RATIO_E / (2.0 * math.pi)) / denominator
+    ratio = coefficient * float(field_tesla)
+    if ratio <= 0.0:
+        raise ValueError(
+            "field_tesla is too small for a representable Zeeman/kT ratio at "
+            f"{temperature_k!r} K; got {field_tesla!r}"
+        )
+    return float(_require_finite_output("zeeman_thermal_ratio", ratio))
 
 
 def run_radical_pair_forge(
