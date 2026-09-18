@@ -91,6 +91,25 @@ MAX_FIELD_TESLA = _DOUBLE_MAX / GYROMAGNETIC_RATIO_E / 4.0
 MAX_RATE_PER_S = _DOUBLE_MAX / 4.0
 MAX_HYPERFINE_MHZ = _DOUBLE_MAX / MHZ_TO_RAD_PER_S / 4.0
 
+# Counts are bounded by what they allocate, for the same reason magnitudes are
+# bounded by what they overflow.  An accepted count that dies in an allocation
+# is the same defect as an accepted rate that dies in a solve -- and it need not
+# even be loud: on numpy 2.4.6, `--direction-count 9223372036854775808`
+# overflows int64 inside np.arange and returns an EMPTY grid, so the sweep ran
+# on zero directions and failed later in a reduction, several frames from the
+# argument that caused it.
+#
+# Both caps are arithmetic on a declared budget rather than chosen numbers. The
+# budgets are deliberately generous: 2.1e6 directions is four orders of
+# magnitude past any meaningful angular resolution on a sphere, and dimension
+# 2048 is nearly thirty times the largest registered inventory.
+DIRECTION_GRID_BUDGET_BYTES = 64 * 1024 * 1024
+_BYTES_PER_DIRECTION = 4 * 8  # x, y, z and the yield, float64
+MAX_DIRECTION_COUNT = DIRECTION_GRID_BUDGET_BYTES // _BYTES_PER_DIRECTION
+OPERATOR_BUDGET_BYTES = 64 * 1024 * 1024
+_BYTES_PER_COMPLEX = 16
+MAX_HILBERT_DIMENSION = math.isqrt(OPERATOR_BUDGET_BYTES // _BYTES_PER_COMPLEX)
+
 
 def _require_positive_finite(
     name: str,
@@ -228,6 +247,11 @@ class HyperfineCoupling:
             raise ValueError("radical_index must be 0 or 1")
         if self.multiplicity < 2:
             raise ValueError("multiplicity must be at least 2")
+        if self.multiplicity > MAX_HILBERT_DIMENSION:
+            raise ValueError(
+                f"{self.name}.multiplicity must be at most {MAX_HILBERT_DIMENSION}; "
+                f"got {self.multiplicity}"
+            )
         principal = _require_three_vector(
             f"{self.name}.principal_values_mhz", self.principal_values_mhz
         )
@@ -408,6 +432,13 @@ def spin_operators(multiplicity: int) -> np.ndarray:
     """``(3, m, m)`` array of ``Sx, Sy, Sz`` for a spin of the given multiplicity."""
     if multiplicity < 2:
         raise ValueError("multiplicity must be at least 2")
+    # Bounded as well as positive: multiplicity 2**20 asks for an 8 TiB operator
+    # and dies in numpy's allocator, with nothing naming the multiplicity.
+    if multiplicity > MAX_HILBERT_DIMENSION:
+        raise ValueError(
+            f"multiplicity must be at most {MAX_HILBERT_DIMENSION} so its "
+            f"operators fit the declared budget; got {multiplicity}"
+        )
     spin = (multiplicity - 1) / 2
     projections = np.arange(spin, -spin - 1, -1)
     s_z = np.diag(projections).astype(complex)
@@ -428,7 +459,19 @@ def _embed(operator: np.ndarray, dims: Sequence[int], site: int) -> np.ndarray:
 
 def hilbert_dims(couplings: Sequence[HyperfineCoupling]) -> tuple[int, ...]:
     """Two electron spins first, then one factor per nucleus."""
-    return (2, 2, *(coupling.multiplicity for coupling in couplings))
+    dims = (2, 2, *(coupling.multiplicity for coupling in couplings))
+    # Each multiplicity is bounded on its own, but the Hilbert space is their
+    # PRODUCT: enough legal couplings still asks for an operator no budget
+    # covers, and the failure would land in an allocator rather than here.
+    dimension = 1
+    for factor in dims:
+        dimension *= int(factor)
+    if dimension > MAX_HILBERT_DIMENSION:
+        raise ValueError(
+            f"nuclear inventory gives Hilbert dimension {dimension}, above the "
+            f"declared budget of {MAX_HILBERT_DIMENSION}"
+        )
+    return dims
 
 
 def singlet_projector(dims: Sequence[int]) -> np.ndarray:
@@ -643,6 +686,14 @@ def fibonacci_directions(count: int) -> np.ndarray:
     """Deterministic, near-uniform unit vectors on the sphere."""
     if count < 2:
         raise ValueError("count must be at least 2")
+    # Upper bound too, and for a reason worse than cost: 2**63 overflows int64
+    # inside np.arange, which returns an EMPTY grid rather than raising, so the
+    # sweep silently ran on zero directions.
+    if count > MAX_DIRECTION_COUNT:
+        raise ValueError(
+            f"count must be at most {MAX_DIRECTION_COUNT} so the direction grid "
+            f"fits the declared budget; got {count}"
+        )
     index = np.arange(count) + 0.5
     polar = np.arccos(1.0 - 2.0 * index / count)
     azimuth = math.pi * (1.0 + 5.0**0.5) * index

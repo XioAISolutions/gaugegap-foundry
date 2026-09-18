@@ -196,6 +196,16 @@ temperature. `_require_finite_output` is the backstop for all of them, and the
 direction is normalized by its largest component first so the norm cannot
 overflow.
 
+Counts are bounded by what they allocate, for the same reason magnitudes are
+bounded by what they overflow — and the failure is not always loud. On numpy
+2.4.6, `--direction-count 9223372036854775808` overflows int64 inside
+`np.arange`, which returns an *empty* grid rather than raising, so the sweep ran
+on zero directions and died several frames later in a reduction.
+`MAX_DIRECTION_COUNT` and `MAX_HILBERT_DIMENSION` are arithmetic on a declared
+byte budget rather than chosen numbers, and the Hilbert bound is applied to the
+product of the multiplicities, not only to each one: enough individually legal
+couplings still asks for an operator no budget covers.
+
 Shape is checked for the same reason. A `Sequence[float]` annotation is not a
 shape check, and a four-component direction was normalized using all four
 components while the Zeeman sum read the first three — the requested field

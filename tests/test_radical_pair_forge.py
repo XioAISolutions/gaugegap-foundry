@@ -1017,6 +1017,60 @@ def test_a_rate_that_vanishes_inside_the_decay_operator_is_refused():
         singlet_yield_liouvillian(hamiltonian, projector, 4.5e-308, 4.5e-308)
 
 
+def test_a_count_that_cannot_be_allocated_is_refused_at_its_boundary():
+    # An accepted count that dies in an allocation is the same defect as an
+    # accepted rate that dies in a solve, and it need not be loud: on numpy 2.4.6
+    # a direction count of 2**63 overflows int64 inside np.arange and returns an
+    # EMPTY grid, so the sweep ran on zero directions and failed later in a
+    # reduction. Both caps are arithmetic on a declared budget.
+    from gaugegap.radical_pair_forge import (
+        MAX_DIRECTION_COUNT,
+        MAX_HILBERT_DIMENSION,
+        HyperfineCoupling,
+        fibonacci_directions,
+        spin_operators,
+    )
+
+    assert fibonacci_directions(MAX_DIRECTION_COUNT // 1024).shape == (
+        MAX_DIRECTION_COUNT // 1024,
+        3,
+    )
+    for oversized in (2**63, MAX_DIRECTION_COUNT + 1, 2**40):
+        with pytest.raises(ValueError, match="at most"):
+            fibonacci_directions(oversized)
+        with pytest.raises(ValueError, match="at most"):
+            run_radical_pair_forge(direction_count=oversized, rate_points=(1e6,))
+
+    for oversized in (2**20, MAX_HILBERT_DIMENSION + 1):
+        with pytest.raises(ValueError, match="at most"):
+            spin_operators(oversized)
+        with pytest.raises(ValueError, match="at most"):
+            HyperfineCoupling(
+                name="oversized",
+                radical_index=0,
+                multiplicity=oversized,
+                principal_values_mhz=(1.0, 1.0, 1.0),
+            )
+
+    # Each multiplicity can be legal while their PRODUCT is not.
+    many = tuple(
+        HyperfineCoupling(
+            name=f"n{index}",
+            radical_index=index % 2,
+            multiplicity=3,
+            principal_values_mhz=(1.0, 1.0, 1.0),
+        )
+        for index in range(8)
+    )
+    with pytest.raises(ValueError, match="Hilbert dimension"):
+        hilbert_dims(many)
+
+    # Every registered inventory stays well inside both budgets.
+    for inventory in NUCLEAR_INVENTORIES:
+        dims = hilbert_dims(resolve_inventory(inventory))
+        assert int(np.prod(dims)) <= MAX_HILBERT_DIMENSION
+
+
 def test_the_eigen_route_refuses_rates_where_it_is_silently_inaccurate():
     # Found while checking the underflow report: at small rates the two solve
     # routes DISAGREE, both finite, with nothing raised. Inverting eigenvalues of

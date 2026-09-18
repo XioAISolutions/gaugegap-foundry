@@ -17,6 +17,7 @@ if str(SRC) not in sys.path:
 
 from gaugegap.radical_pair_forge import (  # noqa: E402
     INVENTORY_SLUGS,
+    MAX_DIRECTION_COUNT,
     MAX_FIELD_TESLA,
     MAX_RATE_PER_S,
     NUCLEAR_INVENTORIES,
@@ -36,6 +37,9 @@ RATE_SWEEP_BASE_DECADE = 3
 MAX_RATE_POINTS = int(math.floor(math.log10(MAX_RATE_PER_S))) - RATE_SWEEP_BASE_DECADE + 1
 MIN_RATE_POINTS = 2
 MIN_DIRECTION_COUNT = 2
+# Upper bound from the module, not a second opinion: without it, a count above
+# 2**63 overflows int64 inside np.arange, which returns an empty grid instead of
+# raising, and the run dies in a reduction several frames away.
 
 # The slug map lives with the inventories, since benchmark_id derives from it
 # too; re-exported here under its original name for the default --output-dir.
@@ -191,7 +195,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--direction-count",
-        type=_bounded_int("--direction-count", MIN_DIRECTION_COUNT),
+        type=_bounded_int("--direction-count", MIN_DIRECTION_COUNT, MAX_DIRECTION_COUNT),
         default=200,
     )
     parser.add_argument(
