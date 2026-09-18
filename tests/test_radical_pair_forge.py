@@ -586,3 +586,27 @@ def test_rate_sweep_is_consistent_with_the_headline_sweep():
     assert all(p.direction_count == report.sweep.direction_count for p in report.rate_sweep)
     assert report.controls["primary_direction_count"] == 60
     assert report.controls["control_direction_count"] == 20
+
+
+def test_geomagnetic_condition_is_evaluated_at_the_registered_field():
+    # The registered condition names the geomagnetic field, so it must be
+    # computed there regardless of --field-ut. Previously a run at 60 uT read
+    # passed=True with the geomagnetic condition never evaluated at 50 uT.
+    key = "singlet_yield_anisotropy_positive_at_geomagnetic_field"
+
+    custom = run_radical_pair_forge(
+        field_tesla=500e-6, direction_count=16, control_direction_count=10, rate_points=(1e6,)
+    )
+    assert custom.field_microtesla == pytest.approx(500.0)
+    assert custom.controls["geomagnetic_field_microtesla"] == pytest.approx(50.0)
+    # A dedicated sweep was run, not the 500 uT one.
+    assert custom.controls["geomagnetic_sweep_reused_primary"] is False
+    assert custom.controls["geomagnetic_anisotropy"] != custom.anisotropy
+    assert custom.controls["checks"][key] is (custom.controls["geomagnetic_anisotropy"] > 1e-6)
+
+    # At the registered field the primary sweep is reused rather than duplicated.
+    default = run_radical_pair_forge(
+        direction_count=16, control_direction_count=10, rate_points=(1e6,)
+    )
+    assert default.controls["geomagnetic_sweep_reused_primary"] is True
+    assert default.controls["geomagnetic_anisotropy"] == default.anisotropy

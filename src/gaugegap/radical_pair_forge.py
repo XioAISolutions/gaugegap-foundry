@@ -854,6 +854,23 @@ def run_radical_pair_forge(
         )
     )
 
+    # The registered condition is stated at the geomagnetic field, so it must be
+    # evaluated there whatever field the caller asked for. Otherwise a run at, say,
+    # 60 uT reports the geomagnetic condition true -- and `passed` certifies it --
+    # without any 50 uT sweep having been computed. Reuse the primary sweep when
+    # the caller is already at the registered field.
+    if field_tesla == GEOMAGNETIC_FIELD_T:
+        geomagnetic = sweep
+    else:
+        geomagnetic = sweep_field_directions(
+            couplings=couplings,
+            field_tesla=GEOMAGNETIC_FIELD_T,
+            rate_per_second=rate_per_second,
+            direction_count=control_direction_count,
+            keep_samples=False,
+            inventory=inventory,
+        )
+
     # The low-rate comparison is computed here, from its own rate points, rather
     # than read out of `rate_sweep`.  A caller passing rate_points=(1e6,) would
     # otherwise leave this registered condition unevaluated while the report
@@ -880,7 +897,7 @@ def run_radical_pair_forge(
     # equality in both directions, so the registry cannot claim a condition the
     # code never evaluates, and the code cannot gate on an unregistered one.
     checks = {
-        "singlet_yield_anisotropy_positive_at_geomagnetic_field": sweep.anisotropy > 1e-6,
+        "singlet_yield_anisotropy_positive_at_geomagnetic_field": geomagnetic.anisotropy > 1e-6,
         "isotropic_hyperfine_control_anisotropy_below_tolerance": (
             isotropic.anisotropy < SYMMETRY_TOLERANCE
         ),
@@ -911,6 +928,9 @@ def run_radical_pair_forge(
     controls: dict[str, Any] = {
         "checks": dict(checks),
         "symmetry_tolerance": SYMMETRY_TOLERANCE,
+        "geomagnetic_field_microtesla": float(GEOMAGNETIC_FIELD_T * 1e6),
+        "geomagnetic_anisotropy": geomagnetic.anisotropy,
+        "geomagnetic_sweep_reused_primary": field_tesla == GEOMAGNETIC_FIELD_T,
         "primary_direction_count": int(direction_count),
         "control_direction_count": int(control_direction_count),
         "isotropic_hyperfine_anisotropy": isotropic.anisotropy,
