@@ -5,12 +5,15 @@ scope: >
   two-electron plus declared-nuclear-inventory spin Hamiltonian, singlet
   recombination yield swept over field direction at geomagnetic field strength
 claim: >
-  A finite radical-pair spin Hamiltonian reproduces the three structural
-  features that the radical-pair magnetoreception hypothesis requires: the
-  singlet yield depends on field direction only when a hyperfine tensor is
-  anisotropic, the yield is exactly invariant under field reversal so the
-  mechanism carries inclination but not polarity information, and the direction
-  dependence vanishes when recombination outruns electron precession.
+  A finite radical-pair spin Hamiltonian reproduces three structural features of
+  the radical-pair magnetoreception hypothesis, each independent of the hyperfine
+  values chosen: the singlet yield depends on field direction only when a
+  hyperfine tensor is anisotropic, the yield is exactly invariant under field
+  reversal so the mechanism carries inclination but not polarity information,
+  and the direction dependence vanishes when recombination outruns electron
+  precession. The suppression of the compass by coupling on the second radical
+  is recorded separately as a parameter-dependent measurement of this registry,
+  not as a structural result.
 formula: >
   H = gamma_e B.(S1 + S2) + sum_n S_(radical n) . A_n . I_n, with
   Phi_S = (1/Z) sum_mn |<m|P_S|n>|^2 k^2 / (k^2 + omega_mn^2),
@@ -32,9 +35,12 @@ controls:
     - recombination_at_1e10_per_second_collapses_the_anisotropy
   partner_radical_control:
     - spin_free_partner_inventory_gives_a_stronger_compass_than_a_loaded_partner
+    - suppression_factor_is_parameter_dependent_and_not_reported_as_structural
   cross_check:
     - closed_form_matches_exact_liouvillian_solve_for_symmetric_rates
     - asymmetric_rates_have_no_closed_form_and_must_differ
+    - dense_liouvillian_falls_back_to_a_smaller_system_above_the_dimension_limit
+    - cross_check_inventory_and_dimension_are_recorded_in_the_report
   energy_audit:
     - zeeman_quantum_over_kT_at_300K_recorded_for_50uT_and_5mT
   analogy_boundary:
@@ -51,6 +57,8 @@ validation:
     - closed_form_and_liouvillian_yields_agree
     - prompt_recombination_limit_equals_one
     - zeeman_thermal_ratio_recorded
+    - antipodal_yield_recorded_per_sampled_direction
+    - anisotropy_at_low_rate_is_not_suppressed_relative_to_the_larmor_rate
 kill_criteria:
   - output describes the result as a magnetometer, sensor, or device design
   - output quotes a sensitivity figure in tesla per root hertz
@@ -62,14 +70,20 @@ kill_criteria:
   - artifact hides the symmetric-recombination or truncated-nuclear-inventory assumptions
   - artifact hides that no spin relaxation and no protein orientational ordering are modelled
   - anisotropy fails to vanish in the isotropic-hyperfine control
+  - output claims a recombination-lifetime window or a microsecond optimum
+  - output presents the partner-suppression factor as structural or mechanism-level
+  - figure or caption presents mirrored polar angles as evidence of the polarity degeneracy
+  - figure axis labels are not derived from the sweep that actually ran
 status: active
 claim_boundary: >
   Finite radical-pair spin-Hamiltonian calculation under symmetric Haberkorn
   recombination only. It reproduces the anisotropy, the polarity degeneracy and
-  the lifetime window of the radical-pair compass model. It is not a
-  cryptochrome measurement, not evidence that any animal uses this mechanism,
-  not a demonstration of coherence in living tissue, and not a magnetometer or
-  sensor design.
+  the fast-recombination cutoff of the radical-pair compass model, but NOT a
+  lifetime window: no spin relaxation is modelled, so the long-lifetime side of
+  the rate axis is absent and the anisotropy is flat or larger as k -> 0. It is
+  not a cryptochrome measurement, not evidence that any animal uses this
+  mechanism, not a demonstration of coherence in living tissue, and not a
+  magnetometer or sensor design.
 notes:
   - >
     The polarity degeneracy is exact rather than approximate. Spin time reversal
@@ -81,7 +95,16 @@ notes:
   - >
     Hyperfine values are literature-style order-of-magnitude model inputs and the
     relative Euler orientations are illustrative. The structural results do not
-    depend on them; the recorded numerical yields do.
+    depend on them. The recorded numerical yields do, and so does the
+    partner-suppression factor: scaling the partner tensor continuously to zero
+    makes the loaded and spin-free yields coincide, so only the sign of that
+    effect is robust.
+  - >
+    The antipode of a direction (theta, phi) is (180 - theta, phi + 180). For a
+    rhombic tensor the yield depends on azimuth as well as polar angle, so
+    samples at mirrored polar angles are not antipodal pairs and must not be
+    presented as evidence of the degeneracy. Each sample therefore records its
+    own antipodal yield.
   - >
     Anisotropy persists as the recombination rate goes to zero because no spin
     relaxation is modelled. A real pair is bounded at long lifetimes by T2 of

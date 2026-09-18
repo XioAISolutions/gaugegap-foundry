@@ -6,9 +6,10 @@ the spin-chemistry core of the cryptochrome magnetoreception hypothesis, reduced
 to an exactly diagonalizable finite Hilbert space of two electron spins plus a
 small, declared nuclear inventory.
 
-It is deliberately hostile to the "quantum eye" reading of the mechanism.  Four
-results are certified here, and three of them are structural rather than
-numerical, so they do not depend on the hyperfine values chosen:
+It is deliberately hostile to the "quantum eye" reading of the mechanism.
+
+Three results are STRUCTURAL: they follow from the form of the Hamiltonian and
+hold for any hyperfine values.
 
 1. The direction dependence vanishes identically when every hyperfine tensor is
    isotropic.  The compass comes from the anisotropy of a coupling tensor, not
@@ -18,13 +19,27 @@ numerical, so they do not depend on the hyperfine values chosen:
    hyperfine term is bilinear in spin and therefore even under ``Theta``, and
    the singlet projector is rotationally invariant, so ``Theta H(B) Theta^-1 =
    H(-B)`` leaves both the spectrum and ``|<m|P_S|n>|^2`` unchanged.  The
-   mechanism is an inclination sensor and cannot resolve field polarity.
-3. Hyperfine coupling on the *second* radical suppresses the direction
-   dependence by an order of magnitude, which is why an anisotropically coupled
-   radical paired with a nearly spin-free partner is the favourable geometry.
-4. The recombination rate must sit near the electron Larmor frequency.  A pair
-   that recombines much faster than it precesses has no direction dependence at
-   all.
+   mechanism is an inclination sensor and cannot resolve field polarity.  Note
+   the antipode of a direction is ``(180 - theta, phi + 180)``: for a rhombic
+   tensor the yield depends on azimuth too, so this is not a symmetry of the
+   polar angle alone.
+3. Fast recombination destroys the compass.  As ``k -> infinity`` the pair has no
+   time to leave the singlet, the yield tends to one in every direction, and the
+   anisotropy tends to zero.
+
+One result is PARAMETER-DEPENDENT and is reported as a measurement of this
+registry, not as a property of the mechanism:
+
+4. Hyperfine coupling on the *second* radical suppresses the direction
+   dependence, by ~8x for the illustrative ``trp-hbeta`` tensor used here.  The
+   factor is a function of that tensor: scale the partner coupling continuously
+   to zero and the loaded and spin-free yields coincide.  Only the sign of the
+   effect is robust; the magnitude is not.
+
+This model contains NO spin relaxation, so it establishes only the upper-rate
+cutoff in (3).  It does not produce a lifetime window: the anisotropy is flat
+or rising as ``k -> 0`` here, whereas a real pair is bounded at long lifetimes
+by ``T2``.  Do not read a microsecond optimum out of this.
 
 The Zeeman energy involved is recorded against ``k_B T`` at 300 K so no reader
 can mistake the result for a thermal effect.
@@ -45,7 +60,8 @@ import numpy as np
 CLAIM_BOUNDARY = (
     "finite radical-pair spin-Hamiltonian calculation under symmetric Haberkorn "
     "recombination only; reproduces the anisotropy, the polarity degeneracy and "
-    "the lifetime window of the radical-pair compass model, and is not a "
+    "the fast-recombination cutoff of the radical-pair compass model, but not a "
+    "lifetime window, because no spin relaxation is modelled; it is not a "
     "cryptochrome measurement, not evidence that any animal uses this mechanism, "
     "and not a magnetometer or sensor design"
 )
@@ -129,8 +145,10 @@ class HyperfineCoupling:
 # Literature-style hyperfine values.  These are order-of-magnitude model inputs,
 # not measurements reproduced by this repository, and the relative Euler
 # orientations are illustrative.  The certified structural results (isotropy
-# control, polarity degeneracy, spin-free-partner comparison) do not depend on
-# them; the recorded numerical yields do.
+# control, polarity degeneracy, fast-recombination collapse) do not depend on
+# them.  The recorded numerical yields do, and so does the partner-suppression
+# factor, which is a property of the trp-hbeta tensor below rather than of the
+# mechanism.
 HYPERFINE_REGISTRY: dict[str, HyperfineCoupling] = {
     "fad-n5": HyperfineCoupling(
         name="fad-n5",
@@ -172,6 +190,11 @@ DEFAULT_INVENTORY = "cryptochrome-like"
 DEFAULT_RATE_PER_S = 1.0e6      # ~1 us radical-pair lifetime
 FAST_RATE_PER_S = 1.0e10        # fast-recombination control
 SYMMETRY_TOLERANCE = 1e-9
+# The dense Liouvillian has side dim^2, so its memory and solve cost grow as
+# dim^4 and dim^6.  Above this Hilbert dimension the cross-check falls back to a
+# smaller fixed system rather than allocating gigabytes.
+LIOUVILLIAN_DIM_LIMIT = 32
+CROSS_CHECK_FALLBACK_INVENTORY = "cryptochrome-like"
 
 
 def _euler_zyz(alpha_deg: float, beta_deg: float, gamma_deg: float) -> np.ndarray:
@@ -325,6 +348,10 @@ class DirectionSample:
     polar_deg: float
     azimuth_deg: float
     singlet_yield: float
+    # Yield at the true antipode (180 - theta, phi + 180).  Carried per sample so
+    # the evidence bundle demonstrates the polarity degeneracy instead of merely
+    # asserting it: the polar angle alone does not determine the yield.
+    antipodal_singlet_yield: float = 0.0
 
     def summary(self) -> dict[str, Any]:
         return asdict(self)
@@ -442,6 +469,21 @@ def sweep_field_directions(
     )
     samples: tuple[DirectionSample, ...] = ()
     if keep_samples:
+        antipodal = np.array(
+            [
+                singlet_yield_closed_form(
+                    build_hamiltonian(
+                        field_tesla=field_tesla,
+                        direction=-direction,
+                        couplings=couplings,
+                        isotropic=isotropic,
+                    ),
+                    projector,
+                    rate_per_second,
+                )
+                for direction in directions
+            ]
+        )
         samples = tuple(
             DirectionSample(
                 index=index,
@@ -451,8 +493,11 @@ def sweep_field_directions(
                 polar_deg=float(math.degrees(math.acos(max(-1.0, min(1.0, direction[2]))))),
                 azimuth_deg=float(math.degrees(math.atan2(direction[1], direction[0])) % 360.0),
                 singlet_yield=float(value),
+                antipodal_singlet_yield=float(mirrored),
             )
-            for index, (direction, value) in enumerate(zip(directions, yields))
+            for index, (direction, value, mirrored) in enumerate(
+                zip(directions, yields, antipodal)
+            )
         )
     mean_yield = float(yields.mean())
     anisotropy = float(yields.max() - yields.min())
@@ -578,18 +623,40 @@ def run_radical_pair_forge(
 
     # Cross-check - closed form against the exact Liouvillian solve, including an
     # asymmetric-rate point where the closed form does not apply.
+    #
+    # The Liouvillian is dense and of side dim^2, so its cost grows as dim^6: the
+    # dim-72 "loaded" inventory would need ~1.6 GiB of temporaries and a
+    # 5184-square LU solve.  Above the threshold the cross-check runs on a fixed
+    # smaller reference system instead, and the report records which was used --
+    # the cross-check validates the closed-form expression, which is
+    # inventory-independent, so a smaller system tests it just as well.
+    if int(np.prod(dims)) <= LIOUVILLIAN_DIM_LIMIT:
+        cross_check_couplings = couplings
+        cross_check_inventory = inventory
+    else:
+        cross_check_couplings = resolve_inventory(CROSS_CHECK_FALLBACK_INVENTORY)
+        cross_check_inventory = CROSS_CHECK_FALLBACK_INVENTORY
+    cross_check_projector = singlet_projector(hilbert_dims(cross_check_couplings))
     reference = build_hamiltonian(
-        field_tesla=field_tesla, direction=(0.0, 0.0, 1.0), couplings=couplings
+        field_tesla=field_tesla,
+        direction=(0.0, 0.0, 1.0),
+        couplings=cross_check_couplings,
     )
-    closed = singlet_yield_closed_form(reference, projector, rate_per_second)
-    liouville = singlet_yield_liouvillian(reference, projector, rate_per_second, rate_per_second)
+    closed = singlet_yield_closed_form(reference, cross_check_projector, rate_per_second)
+    liouville = singlet_yield_liouvillian(
+        reference, cross_check_projector, rate_per_second, rate_per_second
+    )
     asymmetric = singlet_yield_liouvillian(
-        reference, projector, 2.0 * rate_per_second, rate_per_second
+        reference, cross_check_projector, 2.0 * rate_per_second, rate_per_second
     )
     cross_check_residual = abs(closed - liouville)
 
     # Exact limits: instantaneous recombination traps the pair in the singlet.
-    prompt_limit = singlet_yield_closed_form(reference, projector, 1e14)
+    # Closed form only, so this always runs on the selected inventory.
+    selected_reference = build_hamiltonian(
+        field_tesla=field_tesla, direction=(0.0, 0.0, 1.0), couplings=couplings
+    )
+    prompt_limit = singlet_yield_closed_form(selected_reference, projector, 1e14)
 
     residual = polarity_residual(
         couplings=couplings,
@@ -657,6 +724,9 @@ def run_radical_pair_forge(
         "closed_form_yield": closed,
         "liouvillian_yield": liouville,
         "closed_form_vs_liouvillian_residual": cross_check_residual,
+        "cross_check_inventory": cross_check_inventory,
+        "cross_check_hilbert_dimension": int(np.prod(hilbert_dims(cross_check_couplings))),
+        "liouvillian_dim_limit": LIOUVILLIAN_DIM_LIMIT,
         "asymmetric_rate_yield": asymmetric,
         "prompt_recombination_limit": prompt_limit,
         "zeeman_thermal_ratio_300k": zeeman_thermal_ratio(field_tesla),

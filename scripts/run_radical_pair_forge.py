@@ -33,13 +33,17 @@ def _render_svg(payload: dict[str, object]) -> str:
     high = float(sweep["maximum_yield"])
     span = max(high - low, 1e-12)
 
-    # Main panel: yield against field inclination.  The curve is symmetric about
-    # 90 degrees because Phi_S(B) = Phi_S(-B) exactly.
+    # Main panel: each direction's yield against the yield at its TRUE antipode,
+    # (180-theta, phi+180).  Points land on the identity line because
+    # Phi_S(B) = Phi_S(-B) exactly, which is what makes this a demonstration
+    # rather than an assertion.  Plotting against polar angle would NOT show the
+    # symmetry: for a rhombic tensor the yield depends on azimuth too, so
+    # samples at mirrored polar angles are not antipodal pairs.
     points = []
     for sample in samples:
         assert isinstance(sample, dict)
-        x = 110 + (float(sample["polar_deg"]) / 180.0) * 470
-        y = 360 - ((float(sample["singlet_yield"]) - low) / span) * 210
+        x = 110 + ((float(sample["singlet_yield"]) - low) / span) * 235
+        y = 360 - ((float(sample["antipodal_singlet_yield"]) - low) / span) * 210
         points.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="2.6" fill="#7ee787" opacity="0.85"/>')
 
     rate_sweep = payload["rate_sweep"]
@@ -51,6 +55,14 @@ def _render_svg(payload: dict[str, object]) -> str:
         x = 680 + index * (330 / max(len(rate_sweep) - 1, 1))
         y = 360 - (float(point["anisotropy"]) / peak) * 210
         rate_path.append(f"{'M' if index == 0 else 'L'}{x:.2f},{y:.2f}")
+
+    # Axis endpoints must come from the sweep that actually ran, not a literal:
+    # --rate-points 4 sweeps 1e3..1e6, not 1e3..1e10.
+    def _decade(value: float) -> str:
+        return f"10^{round(math.log10(value))} s-1"
+
+    rate_first = _decade(float(rate_sweep[0]["rate_per_second"]))
+    rate_last = _decade(float(rate_sweep[-1]["rate_per_second"]))
 
     grid = "".join(
         f'<line x1="110" y1="{360 - i * 52.5:.1f}" x2="580" y2="{360 - i * 52.5:.1f}" stroke="#1d1d1d"/>'
@@ -64,23 +76,21 @@ def _render_svg(payload: dict[str, object]) -> str:
 {grid}
 <line x1="110" y1="360" x2="580" y2="360" stroke="#333"/>
 <line x1="110" y1="140" x2="110" y2="360" stroke="#333"/>
-<line x1="345" y1="140" x2="345" y2="360" stroke="#3a3a3a" stroke-dasharray="4 4"/>
+<line x1="110" y1="360" x2="345" y2="150" stroke="#3a3a3a" stroke-dasharray="4 4"/>
 {''.join(points)}
-<text x="345" y="112" fill="#c9d1d9" font-family="monospace" font-size="14" text-anchor="middle">singlet yield vs field inclination</text>
-<text x="110" y="382" fill="#666" font-family="monospace" font-size="12">0&#176;</text>
-<text x="337" y="382" fill="#666" font-family="monospace" font-size="12">90&#176;</text>
-<text x="562" y="382" fill="#666" font-family="monospace" font-size="12">180&#176;</text>
-<text x="345" y="400" fill="#8b949e" font-family="monospace" font-size="12" text-anchor="middle">symmetric about 90&#176;: no polarity information</text>
+<text x="345" y="112" fill="#c9d1d9" font-family="monospace" font-size="14" text-anchor="middle">yield at B vs yield at the antipode &#8722;B</text>
+<text x="110" y="382" fill="#666" font-family="monospace" font-size="12">&#934;(B) &#8594;</text>
+<text x="345" y="400" fill="#8b949e" font-family="monospace" font-size="12" text-anchor="middle">on the dashed identity line: polarity carries no information</text>
 <line x1="680" y1="360" x2="1010" y2="360" stroke="#333"/>
 <line x1="680" y1="140" x2="680" y2="360" stroke="#333"/>
 <path d="{''.join(rate_path)}" fill="none" stroke="#f0883e" stroke-width="2.4"/>
 <text x="845" y="112" fill="#c9d1d9" font-family="monospace" font-size="14" text-anchor="middle">anisotropy vs recombination rate</text>
-<text x="680" y="382" fill="#666" font-family="monospace" font-size="12">10&#179; s&#8315;&#185;</text>
-<text x="962" y="382" fill="#666" font-family="monospace" font-size="12">10&#185;&#8304; s&#8315;&#185;</text>
-<text x="845" y="400" fill="#8b949e" font-family="monospace" font-size="12" text-anchor="middle">compass dies when recombination outruns precession</text>
+<text x="680" y="382" fill="#666" font-family="monospace" font-size="12">{rate_first}</text>
+<text x="945" y="382" fill="#666" font-family="monospace" font-size="12">{rate_last}</text>
+<text x="845" y="400" fill="#8b949e" font-family="monospace" font-size="12" text-anchor="middle">upper cutoff only &#183; no relaxation, so no long-lifetime side</text>
 <text x="110" y="440" fill="#7ee787" font-family="monospace" font-size="15">anisotropy = {float(payload["anisotropy"]):.4e} at {float(payload["field_microtesla"]):.0f} &#181;T ({float(payload["relative_contrast"]) * 100:.2f}% contrast)</text>
 <text x="110" y="464" fill="#8b949e" font-family="monospace" font-size="13">isotropic-hyperfine control = {float(controls["isotropic_hyperfine_anisotropy"]):.2e} &#183; polarity residual = {float(controls["polarity_residual"]):.2e}</text>
-<text x="110" y="486" fill="#8b949e" font-family="monospace" font-size="13">closed form vs Liouvillian = {float(controls["closed_form_vs_liouvillian_residual"]):.2e} &#183; spin-free partner is {float(controls["second_radical_suppression_factor"]):.1f}&#215; stronger</text>
+<text x="110" y="486" fill="#8b949e" font-family="monospace" font-size="13">closed form vs Liouvillian = {float(controls["closed_form_vs_liouvillian_residual"]):.2e} (dim {controls["cross_check_hilbert_dimension"]}) &#183; spin-free partner {float(controls["second_radical_suppression_factor"]):.1f}&#215; stronger (tensor-dependent)</text>
 <text x="110" y="508" fill="#8b949e" font-family="monospace" font-size="13">Zeeman quantum / k_B T at 300 K = {float(controls["zeeman_thermal_ratio_300k"]):.3e}: no thermal mechanism is available</text>
 <text x="550" y="536" fill="#777" font-family="monospace" font-size="12" text-anchor="middle">finite spin-Hamiltonian calculation only &#183; not a cryptochrome measurement and not a sensor design</text>
 </svg>'''
@@ -121,7 +131,16 @@ def main() -> int:
         encoding="utf-8",
     )
     with (args.output_dir / "directions.csv").open("w", newline="", encoding="utf-8") as handle:
-        fieldnames = ["index", "x", "y", "z", "polar_deg", "azimuth_deg", "singlet_yield"]
+        fieldnames = [
+            "index",
+            "x",
+            "y",
+            "z",
+            "polar_deg",
+            "azimuth_deg",
+            "singlet_yield",
+            "antipodal_singlet_yield",
+        ]
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
         for sample in report.sweep.samples:

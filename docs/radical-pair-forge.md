@@ -26,8 +26,9 @@ Phi_S = (1/Z) sum_mn |<m|P_S|n>|^2 k^2 / (k^2 + omega_mn^2)
 and swept over a deterministic Fibonacci sphere of field directions at 50 uT,
 where the electron Larmor frequency is 1.401 MHz.
 
-Three of the four results are structural: they follow from the form of the
-Hamiltonian and do not depend on the hyperfine values chosen.
+Three results are structural: they follow from the form of the Hamiltonian and
+hold for any hyperfine values. A fourth is parameter-dependent and is labelled
+as such, because presenting it alongside the exact ones would overstate it.
 
 ### 1. The anisotropy of a coupling tensor is the compass, not entanglement
 
@@ -44,23 +45,40 @@ therefore even under `Theta`; the singlet projector is rotationally invariant.
 So `Theta H(B) Theta^-1 = H(-B)` preserves both the spectrum and every
 `|<m|P_S|n>|^2`, and the yield cannot depend on the sign of the field.
 
+The antipode of `(theta, phi)` is `(180 - theta, phi + 180)`, **not** a mirrored
+polar angle: for a rhombic tensor the yield depends on azimuth as well, so two
+samples at `theta` and `180 - theta` with unrelated azimuths need not agree. The
+evidence bundle therefore records each direction's antipodal yield alongside its
+own (`antipodal_singlet_yield` in `directions.csv`), and the figure plots one
+against the other so the degeneracy is demonstrated rather than asserted.
+
 This is an inclination sensor. It cannot tell North from South. A term odd under
 `Theta`, such as a chirality-induced spin selectivity term, would be required to
 break the degeneracy, and none is modelled here.
 
-### 3. Loading the partner radical costs you the compass
+### 3. Fast recombination destroys the compass (structural)
+
+As `k -> infinity` the pair has no time to leave the singlet: the yield tends to
+one in every direction and the anisotropy tends to zero. Sweeping `1e3` to
+`1e10` per second shows the collapse.
+
+This is an **upper cutoff only**, not a lifetime window. Because no spin
+relaxation is modelled, the anisotropy here is flat or slightly larger as
+`k -> 0` — in the committed sweep it is larger at `1e3` than at `1e6`. A real
+pair is bounded at long lifetimes by `T2` of order microseconds, which this
+model does not contain. Do not read a microsecond optimum out of it.
+
+### 4. Loading the partner radical costs you the compass (parameter-dependent)
 
 With one anisotropically coupled nucleus on the flavin and a spin-free partner,
 the anisotropy is large. Add a single tryptophan beta-proton to the partner
-radical and it falls by close to an order of magnitude. This is why an
-anisotropically coupled radical paired with a nearly spin-free partner is the
-favourable geometry for the hypothesis.
+radical and it falls by about `8x`.
 
-### 4. The pair has to live about as long as it precesses
-
-Sweeping the recombination rate from `1e3` to `1e10` per second collapses the
-anisotropy once recombination outruns precession. The window sits near
-`k ~ omega`, a lifetime of order a microsecond.
+This one is **not** structural, and is reported as a measurement of this
+registry rather than a property of the mechanism. Scale the partner tensor
+continuously to zero and the loaded and spin-free yields coincide, so the factor
+is a function of the illustrative `trp-hbeta` values. Only the sign of the
+effect is robust; the magnitude is not.
 
 ### The energy audit
 
@@ -74,7 +92,11 @@ else.
 
 The closed form is checked against an exact solve of the Haberkorn master
 equation, `int rho dt = (-L)^-1 rho(0)`, which also runs with `k_S != k_T` where
-no closed form exists. Symmetric rates agree to `~1e-16`; asymmetric rates
+no closed form exists. The Liouvillian is dense with side `dim^2`, so its cost
+grows as `dim^6`; above `LIOUVILLIAN_DIM_LIMIT` the cross-check runs on a
+smaller fixed system and the report records which one was used
+(`cross_check_inventory`). The expression being validated is
+inventory-independent, so a smaller system tests it just as well. Symmetric rates agree to `~1e-16`; asymmetric rates
 differ, and converge back as the rates are brought together.
 
 ## Claim Boundary
@@ -85,7 +107,7 @@ Allowed language:
 - singlet-yield anisotropy over field direction
 - exact polarity degeneracy of the model Hamiltonian
 - isotropic-hyperfine negative control
-- recombination-lifetime window
+- fast-recombination cutoff
 - reproducible finite result
 
 Avoided language:
@@ -97,6 +119,8 @@ Avoided language:
 - evidence that a bird, insect, or any animal uses this mechanism
 - quantum coherence observed in living tissue
 - entanglement carrying information, or acting at a distance
+- a recombination-lifetime window or a microsecond optimum
+- the partner-suppression factor as a structural or mechanism-level result
 
 What this track does **not** model, and would need before any of it bore on a
 real organism or instrument: spin relaxation (so the long-lifetime side of the

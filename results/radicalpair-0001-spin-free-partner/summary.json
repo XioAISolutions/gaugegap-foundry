@@ -1,7 +1,7 @@
 {
   "anisotropy": 0.1591626079758635,
   "benchmark_id": "radicalpair-0001-cryptochrome-compass",
-  "claim_boundary": "finite radical-pair spin-Hamiltonian calculation under symmetric Haberkorn recombination only; reproduces the anisotropy, the polarity degeneracy and the lifetime window of the radical-pair compass model, and is not a cryptochrome measurement, not evidence that any animal uses this mechanism, and not a magnetometer or sensor design",
+  "claim_boundary": "finite radical-pair spin-Hamiltonian calculation under symmetric Haberkorn recombination only; reproduces the anisotropy, the polarity degeneracy and the fast-recombination cutoff of the radical-pair compass model, but not a lifetime window, because no spin relaxation is modelled; it is not a cryptochrome measurement, not evidence that any animal uses this mechanism, and not a magnetometer or sensor design",
   "claim_level": "reproducible_finite_result",
   "controls": {
     "asymmetric_rate_yield": 0.771591439525035,
@@ -18,11 +18,14 @@
     },
     "closed_form_vs_liouvillian_residual": 2.220446049250313e-16,
     "closed_form_yield": 0.6583165330550036,
+    "cross_check_hilbert_dimension": 12,
+    "cross_check_inventory": "spin-free-partner",
     "fast_recombination_anisotropy": 2.368981677491888e-10,
     "fast_recombination_rate_per_second": 10000000000.0,
     "fridge_magnet_note": "A 5 mT magnet raises the Zeeman quantum by only two orders of magnitude and is still ~1e-5 of k_B T at 300 K.  Neither field can drive a thermal population change, and neither saturates this model, so the weak-field result is not explained by field strength alone.",
     "isotropic_hyperfine_anisotropy": 1.9984014443252818e-15,
     "isotropic_hyperfine_mean_yield": 0.35758598933928504,
+    "liouvillian_dim_limit": 32,
     "liouvillian_yield": 0.6583165330550038,
     "loaded_partner_anisotropy": 0.018858679590546434,
     "no_hyperfine_anisotropy": 3.4416913763379853e-15,
@@ -148,6 +151,7 @@
     "relative_contrast": 0.2887913138257762,
     "samples": [
       {
+        "antipodal_singlet_yield": 0.656712742537466,
         "azimuth_deg": 291.2461179749811,
         "index": 0,
         "polar_deg": 5.731967965197727,
@@ -157,6 +161,7 @@
         "z": 0.995
       },
       {
+        "antipodal_singlet_yield": 0.6535292868140554,
         "azimuth_deg": 153.73835392494323,
         "index": 1,
         "polar_deg": 9.936367072140724,
@@ -166,6 +171,7 @@
         "z": 0.985
       },
       {
+        "antipodal_singlet_yield": 0.6503779977190385,
         "azimuth_deg": 16.230589874905217,
         "index": 2,
         "polar_deg": 12.838568140984059,
@@ -175,6 +181,7 @@
         "z": 0.975
       },
       {
+        "antipodal_singlet_yield": 0.6472588747101651,
         "azimuth_deg": 238.7228258248674,
         "index": 3,
         "polar_deg": 15.203604093293013,
@@ -184,6 +191,7 @@
         "z": 0.965
       },
       {
+        "antipodal_singlet_yield": 0.6441719172552427,
         "azimuth_deg": 101.21506177482944,
         "index": 4,
         "polar_deg": 17.253853117357284,
@@ -193,6 +201,7 @@
         "z": 0.955
       },
       {
+        "antipodal_singlet_yield": 0.6411171248396219,
         "azimuth_deg": 323.70729772479143,
         "index": 5,
         "polar_deg": 19.09105251286037,
@@ -202,6 +211,7 @@
         "z": 0.945
       },
       {
+        "antipodal_singlet_yield": 0.6380944969714779,
         "azimuth_deg": 186.19953367475344,
         "index": 6,
         "polar_deg": 20.771855045328252,
@@ -211,6 +221,7 @@
         "z": 0.935
       },
       {
+        "antipodal_singlet_yield": 0.6351040331843655,
         "azimuth_deg": 48.69176962471545,
         "index": 7,
         "polar_deg": 22.331645009221504,
@@ -220,6 +231,7 @@
         "z": 0.925
       },
       {
+        "antipodal_singlet_yield": 0.6321457330376198,
         "azimuth_deg": 271.1840055746783,
         "index": 8,
         "polar_deg": 23.794272950536634,
@@ -229,6 +241,7 @@
         "z": 0.915
       },
       {
+        "antipodal_singlet_yield": 0.629219596115217,
         "azimuth_deg": 133.6762415246403,
         "index": 9,
         "polar_deg": 25.176716940609722,
@@ -238,6 +251,7 @@
         "z": 0.905
       },
       {
+        "antipodal_singlet_yield": 0.6263256220238567,
         "azimuth_deg": 356.1684774746023,
         "index": 10,
         "polar_deg": 26.49157020035607,
@@ -247,6 +261,7 @@
         "z": 0.895
       },
       {
+        "antipodal_singlet_yield": 0.6234638103908214,
         "azimuth_deg": 218.66071342456425,
         "index": 11,
         "polar_deg": 27.7484787006534,
@@ -256,6 +271,7 @@
         "z": 0.885
       },
       {
+        "antipodal_singlet_yield": 0.6206341608618794,
         "azimuth_deg": 81.15294937452629,
         "index": 12,
         "polar_deg": 28.95502437185985,
@@ -265,6 +281,7 @@
         "z": 0.875
       },
       {
+        "antipodal_singlet_yield": 0.617836673099398,
         "azimuth_deg": 303.6451853244883,
         "index": 13,
         "polar_deg": 30.117294747322063,
@@ -274,6 +291,7 @@
         "z": 0.865
       },
       {
+        "antipodal_singlet_yield": 0.6150713467807489,
         "azimuth_deg": 166.1374212744511,
         "index": 14,
         "polar_deg": 31.240265216181673,
@@ -283,6 +301,7 @@
         "z": 0.855
       },
       {
+        "antipodal_singlet_yield": 0.6123381815969907,
         "azimuth_deg": 28.629657224412306,
         "index": 15,
         "polar_deg": 32.328064122162274,
@@ -292,6 +311,7 @@
         "z": 0.845
       },
       {
+        "antipodal_singlet_yield": 0.6096371772517137,
         "azimuth_deg": 251.12189317437512,
         "index": 16,
         "polar_deg": 33.38416180634828,
@@ -301,6 +321,7 @@
         "z": 0.835
       },
       {
+        "antipodal_singlet_yield": 0.6069683334601477,
         "azimuth_deg": 113.61412912433632,
         "index": 17,
         "polar_deg": 34.411508669769454,
@@ -310,6 +331,7 @@
         "z": 0.825
       },
       {
+        "antipodal_singlet_yield": 0.6043316499483529,
         "azimuth_deg": 336.1063650742991,
         "index": 18,
         "polar_deg": 35.41263811105957,
@@ -319,6 +341,7 @@
         "z": 0.815
       },
       {
+        "antipodal_singlet_yield": 0.6017271264525617,
         "azimuth_deg": 198.59860102426032,
         "index": 19,
         "polar_deg": 36.38974467753356,
@@ -328,6 +351,7 @@
         "z": 0.8049999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5991547627185834,
         "azimuth_deg": 61.09083697422315,
         "index": 20,
         "polar_deg": 37.34474435401478,
@@ -337,6 +361,7 @@
         "z": 0.795
       },
       {
+        "antipodal_singlet_yield": 0.5966145585012865,
         "azimuth_deg": 283.58307292418596,
         "index": 21,
         "polar_deg": 38.27932173792774,
@@ -346,6 +371,7 @@
         "z": 0.785
       },
       {
+        "antipodal_singlet_yield": 0.5941065135641337,
         "azimuth_deg": 146.07530887414714,
         "index": 22,
         "polar_deg": 39.194967425982945,
@@ -355,6 +381,7 @@
         "z": 0.775
       },
       {
+        "antipodal_singlet_yield": 0.5916306276787373,
         "azimuth_deg": 8.567544824109973,
         "index": 23,
         "polar_deg": 40.093007985129766,
@@ -364,6 +391,7 @@
         "z": 0.765
       },
       {
+        "antipodal_singlet_yield": 0.5891869006244816,
         "azimuth_deg": 231.05978077407116,
         "index": 24,
         "polar_deg": 40.974630229445324,
@@ -373,6 +401,7 @@
         "z": 0.755
       },
       {
+        "antipodal_singlet_yield": 0.58677533218813,
         "azimuth_deg": 93.55201672403399,
         "index": 25,
         "polar_deg": 41.84090107138922,
@@ -382,6 +411,7 @@
         "z": 0.745
       },
       {
+        "antipodal_singlet_yield": 0.584395922163488,
         "azimuth_deg": 316.0442526739968,
         "index": 26,
         "polar_deg": 42.692783894937804,
@@ -391,6 +421,7 @@
         "z": 0.735
       },
       {
+        "antipodal_singlet_yield": 0.5820486703510622,
         "azimuth_deg": 178.5364886239564,
         "index": 27,
         "polar_deg": 43.531152167372454,
@@ -400,6 +431,7 @@
         "z": 0.725
       },
       {
+        "antipodal_singlet_yield": 0.579733576557759,
         "azimuth_deg": 41.028724573919185,
         "index": 28,
         "polar_deg": 44.356800838250685,
@@ -409,6 +441,7 @@
         "z": 0.7150000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5774506405965754,
         "azimuth_deg": 263.52096052388197,
         "index": 29,
         "polar_deg": 45.17045594982263,
@@ -418,6 +451,7 @@
         "z": 0.7050000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5751998622863261,
         "azimuth_deg": 126.01319647384483,
         "index": 30,
         "polar_deg": 45.97278279027701,
@@ -427,6 +461,7 @@
         "z": 0.6950000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5729812414513624,
         "azimuth_deg": 348.50543242380763,
         "index": 31,
         "polar_deg": 46.76439285101782,
@@ -436,6 +471,7 @@
         "z": 0.685
       },
       {
+        "antipodal_singlet_yield": 0.5707947779213274,
         "azimuth_deg": 210.9976683737672,
         "index": 32,
         "polar_deg": 47.54584979559906,
@@ -445,6 +481,7 @@
         "z": 0.675
       },
       {
+        "antipodal_singlet_yield": 0.5686404715309143,
         "azimuth_deg": 73.48990432373002,
         "index": 33,
         "polar_deg": 48.31767460666049,
@@ -454,6 +491,7 @@
         "z": 0.665
       },
       {
+        "antipodal_singlet_yield": 0.5665183221196113,
         "azimuth_deg": 295.98214027369283,
         "index": 34,
         "polar_deg": 49.08035004511349,
@@ -463,6 +501,7 @@
         "z": 0.655
       },
       {
+        "antipodal_singlet_yield": 0.5644283295315238,
         "azimuth_deg": 158.47437622365567,
         "index": 35,
         "polar_deg": 49.83432453067044,
@@ -472,6 +511,7 @@
         "z": 0.645
       },
       {
+        "antipodal_singlet_yield": 0.5623704936151227,
         "azimuth_deg": 20.966612173618483,
         "index": 36,
         "polar_deg": 50.580015532941005,
@@ -481,6 +521,7 @@
         "z": 0.635
       },
       {
+        "antipodal_singlet_yield": 0.5603448142230817,
         "azimuth_deg": 243.45884812357804,
         "index": 37,
         "polar_deg": 51.31781254651057,
@@ -490,6 +531,7 @@
         "z": 0.625
       },
       {
+        "antipodal_singlet_yield": 0.5583512912120733,
         "azimuth_deg": 105.95108407354087,
         "index": 38,
         "polar_deg": 52.04807971075356,
@@ -499,6 +541,7 @@
         "z": 0.615
       },
       {
+        "antipodal_singlet_yield": 0.5563899244425908,
         "azimuth_deg": 328.4433200235037,
         "index": 39,
         "polar_deg": 52.77115812492646,
@@ -508,6 +551,7 @@
         "z": 0.605
       },
       {
+        "antipodal_singlet_yield": 0.5544607137788055,
         "azimuth_deg": 190.9355559734665,
         "index": 40,
         "polar_deg": 53.48736790080602,
@@ -517,6 +561,7 @@
         "z": 0.595
       },
       {
+        "antipodal_singlet_yield": 0.5525636590883788,
         "azimuth_deg": 53.427791923426064,
         "index": 41,
         "polar_deg": 54.197009988385915,
@@ -526,6 +571,7 @@
         "z": 0.585
       },
       {
+        "antipodal_singlet_yield": 0.5506987602423454,
         "azimuth_deg": 275.9200278733889,
         "index": 42,
         "polar_deg": 54.90036780460649,
@@ -535,6 +581,7 @@
         "z": 0.575
       },
       {
+        "antipodal_singlet_yield": 0.5488660171149545,
         "azimuth_deg": 138.41226382335174,
         "index": 43,
         "polar_deg": 55.597708690527696,
@@ -544,6 +591,7 @@
         "z": 0.565
       },
       {
+        "antipodal_singlet_yield": 0.5470654295835563,
         "azimuth_deg": 0.904499773314524,
         "index": 44,
         "polar_deg": 56.28928521857407,
@@ -553,6 +601,7 @@
         "z": 0.5549999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5452969975284766,
         "azimuth_deg": 223.39673572327735,
         "index": 45,
         "polar_deg": 56.97533636833415,
@@ -562,6 +611,7 @@
         "z": 0.5449999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5435607208329006,
         "azimuth_deg": 85.88897167323691,
         "index": 46,
         "polar_deg": 57.65608858676658,
@@ -571,6 +621,7 @@
         "z": 0.535
       },
       {
+        "antipodal_singlet_yield": 0.5418565993827836,
         "azimuth_deg": 308.3812076231997,
         "index": 47,
         "polar_deg": 58.33175674645835,
@@ -580,6 +631,7 @@
         "z": 0.525
       },
       {
+        "antipodal_singlet_yield": 0.5401846330667391,
         "azimuth_deg": 170.87344357316255,
         "index": 48,
         "polar_deg": 59.00254501371986,
@@ -589,6 +641,7 @@
         "z": 0.515
       },
       {
+        "antipodal_singlet_yield": 0.5385448217759606,
         "azimuth_deg": 33.365679523125365,
         "index": 49,
         "polar_deg": 59.66864763672861,
@@ -598,6 +651,7 @@
         "z": 0.505
       },
       {
+        "antipodal_singlet_yield": 0.5369371654041407,
         "azimuth_deg": 255.85791547308818,
         "index": 50,
         "polar_deg": 60.3302496625971,
@@ -607,6 +661,7 @@
         "z": 0.49499999999999994
       },
       {
+        "antipodal_singlet_yield": 0.5353616638473854,
         "azimuth_deg": 118.35015142304775,
         "index": 51,
         "polar_deg": 60.98752759110246,
@@ -616,6 +671,7 @@
         "z": 0.485
       },
       {
+        "antipodal_singlet_yield": 0.5338183170041643,
         "azimuth_deg": 340.8423873730138,
         "index": 52,
         "polar_deg": 61.640649971842535,
@@ -625,6 +681,7 @@
         "z": 0.47499999999999987
       },
       {
+        "antipodal_singlet_yield": 0.5323071247752296,
         "azimuth_deg": 203.33462332297339,
         "index": 53,
         "polar_deg": 62.289777950748444,
@@ -634,6 +691,7 @@
         "z": 0.4649999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5308280870635724,
         "azimuth_deg": 65.82685927293295,
         "index": 54,
         "polar_deg": 62.935065771166634,
@@ -643,6 +701,7 @@
         "z": 0.45499999999999985
       },
       {
+        "antipodal_singlet_yield": 0.5293812037743694,
         "azimuth_deg": 288.319095222899,
         "index": 55,
         "polar_deg": 63.57666123410324,
@@ -652,6 +711,7 @@
         "z": 0.44499999999999995
       },
       {
+        "antipodal_singlet_yield": 0.5279664748149336,
         "azimuth_deg": 150.8113311728586,
         "index": 56,
         "polar_deg": 64.21470612168888,
@@ -661,6 +721,7 @@
         "z": 0.43500000000000005
       },
       {
+        "antipodal_singlet_yield": 0.5265839000946803,
         "azimuth_deg": 13.30356712281815,
         "index": 57,
         "polar_deg": 64.84933658745629,
@@ -670,6 +731,7 @@
         "z": 0.425
       },
       {
+        "antipodal_singlet_yield": 0.5252334795250834,
         "azimuth_deg": 235.79580307278422,
         "index": 58,
         "polar_deg": 65.48068351661958,
@@ -679,6 +741,7 @@
         "z": 0.4150000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5239152130196572,
         "azimuth_deg": 98.28803902274379,
         "index": 59,
         "polar_deg": 66.10887285919111,
@@ -688,6 +751,7 @@
         "z": 0.40499999999999997
       },
       {
+        "antipodal_singlet_yield": 0.5226291004939221,
         "azimuth_deg": 320.78027497270983,
         "index": 60,
         "polar_deg": 66.7340259384635,
@@ -697,6 +761,7 @@
         "z": 0.39499999999999996
       },
       {
+        "antipodal_singlet_yield": 0.5213751418653704,
         "azimuth_deg": 183.27251092266943,
         "index": 61,
         "polar_deg": 67.3562597371149,
@@ -706,6 +771,7 @@
         "z": 0.38500000000000006
       },
       {
+        "antipodal_singlet_yield": 0.520153337053472,
         "azimuth_deg": 45.764746872629,
         "index": 62,
         "polar_deg": 67.97568716295784,
@@ -715,6 +781,7 @@
         "z": 0.3749999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5189636859796436,
         "azimuth_deg": 268.2569828225951,
         "index": 63,
         "polar_deg": 68.5924172961438,
@@ -724,6 +791,7 @@
         "z": 0.36499999999999994
       },
       {
+        "antipodal_singlet_yield": 0.5178061885672364,
         "azimuth_deg": 130.74921877255463,
         "index": 64,
         "polar_deg": 69.20655561945125,
@@ -733,6 +801,7 @@
         "z": 0.3549999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5166808447415322,
         "azimuth_deg": 353.2414547225207,
         "index": 65,
         "polar_deg": 69.8182042331226,
@@ -742,6 +811,7 @@
         "z": 0.34499999999999986
       },
       {
+        "antipodal_singlet_yield": 0.5155876544297355,
         "azimuth_deg": 215.73369067248026,
         "index": 66,
         "polar_deg": 70.42746205557108,
@@ -751,6 +821,7 @@
         "z": 0.3349999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5145266175609721,
         "azimuth_deg": 78.22592662243983,
         "index": 67,
         "polar_deg": 71.03442501115143,
@@ -760,6 +831,7 @@
         "z": 0.3249999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5134977340662811,
         "azimuth_deg": 300.7181625724059,
         "index": 68,
         "polar_deg": 71.63918620607416,
@@ -769,6 +841,7 @@
         "z": 0.3149999999999999
       },
       {
+        "antipodal_singlet_yield": 0.512501003878629,
         "azimuth_deg": 163.21039852236547,
         "index": 69,
         "polar_deg": 72.24183609344259,
@@ -778,6 +851,7 @@
         "z": 0.30500000000000005
       },
       {
+        "antipodal_singlet_yield": 0.5115364269328951,
         "azimuth_deg": 25.702634472331546,
         "index": 70,
         "polar_deg": 72.8424626283018,
@@ -787,6 +861,7 @@
         "z": 0.2950000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5106040031658963,
         "azimuth_deg": 248.1948704222911,
         "index": 71,
         "polar_deg": 73.44115141350761,
@@ -796,6 +871,7 @@
         "z": 0.2849999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5097037325163783,
         "azimuth_deg": 110.68710637225067,
         "index": 72,
         "polar_deg": 74.03798583715276,
@@ -805,6 +881,7 @@
         "z": 0.2750000000000001
       },
       {
+        "antipodal_singlet_yield": 0.508835614925033,
         "azimuth_deg": 333.1793423222167,
         "index": 73,
         "polar_deg": 74.63304720222229,
@@ -814,6 +891,7 @@
         "z": 0.2650000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5079996503345027,
         "azimuth_deg": 195.6715782721763,
         "index": 74,
         "polar_deg": 75.22641484909252,
@@ -823,6 +901,7 @@
         "z": 0.255
       },
       {
+        "antipodal_singlet_yield": 0.5071958386893921,
         "azimuth_deg": 58.16381422213588,
         "index": 75,
         "polar_deg": 75.81816627143655,
@@ -832,6 +911,7 @@
         "z": 0.24500000000000005
       },
       {
+        "antipodal_singlet_yield": 0.5064241799362869,
         "azimuth_deg": 280.6560501721019,
         "index": 76,
         "polar_deg": 76.40837722605214,
@@ -841,6 +921,7 @@
         "z": 0.23499999999999996
       },
       {
+        "antipodal_singlet_yield": 0.5056846740237549,
         "azimuth_deg": 143.1482861220615,
         "index": 77,
         "polar_deg": 76.99712183708606,
@@ -850,6 +931,7 @@
         "z": 0.22499999999999998
       },
       {
+        "antipodal_singlet_yield": 0.5049773209023624,
         "azimuth_deg": 5.640522072027586,
         "index": 78,
         "polar_deg": 77.58447269509153,
@@ -859,6 +941,7 @@
         "z": 0.2149999999999999
       },
       {
+        "antipodal_singlet_yield": 0.504302120524698,
         "azimuth_deg": 228.13275802198714,
         "index": 79,
         "polar_deg": 78.1705009513206,
@@ -868,6 +951,7 @@
         "z": 0.20499999999999996
       },
       {
+        "antipodal_singlet_yield": 0.5036590728453699,
         "azimuth_deg": 90.62499397194672,
         "index": 80,
         "polar_deg": 78.75527640762357,
@@ -877,6 +961,7 @@
         "z": 0.19499999999999995
       },
       {
+        "antipodal_singlet_yield": 0.503048177821036,
         "azimuth_deg": 313.1172299219128,
         "index": 81,
         "polar_deg": 79.33886760229882,
@@ -886,6 +971,7 @@
         "z": 0.18499999999999997
       },
       {
+        "antipodal_singlet_yield": 0.5024694354104061,
         "azimuth_deg": 175.60946587187237,
         "index": 82,
         "polar_deg": 79.92134189221234,
@@ -895,6 +981,7 @@
         "z": 0.17499999999999993
       },
       {
+        "antipodal_singlet_yield": 0.5019228455742623,
         "azimuth_deg": 38.101701821838425,
         "index": 83,
         "polar_deg": 80.50276553148295,
@@ -904,6 +991,7 @@
         "z": 0.1650000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5014084082754743,
         "azimuth_deg": 260.593937771798,
         "index": 84,
         "polar_deg": 81.08320374700904,
@@ -913,6 +1001,7 @@
         "z": 0.15500000000000008
       },
       {
+        "antipodal_singlet_yield": 0.500926123479016,
         "azimuth_deg": 123.08617372175756,
         "index": 85,
         "polar_deg": 81.6627208110943,
@@ -922,6 +1011,7 @@
         "z": 0.1450000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5004759911519633,
         "azimuth_deg": 345.57840967172365,
         "index": 86,
         "polar_deg": 82.24138011141319,
@@ -931,6 +1021,7 @@
         "z": 0.135
       },
       {
+        "antipodal_singlet_yield": 0.500058011263531,
         "azimuth_deg": 208.07064562168318,
         "index": 87,
         "polar_deg": 82.81924421854171,
@@ -940,6 +1031,7 @@
         "z": 0.1250000000000001
       },
       {
+        "antipodal_singlet_yield": 0.49967218378506884,
         "azimuth_deg": 70.56288157164927,
         "index": 88,
         "polar_deg": 83.3963749512661,
@@ -949,6 +1041,7 @@
         "z": 0.11500000000000003
       },
       {
+        "antipodal_singlet_yield": 0.499318508690076,
         "azimuth_deg": 293.05511752160885,
         "index": 89,
         "polar_deg": 83.97283343986891,
@@ -958,6 +1051,7 @@
         "z": 0.10499999999999995
       },
       {
+        "antipodal_singlet_yield": 0.49899698595422554,
         "azimuth_deg": 155.54735347156839,
         "index": 90,
         "polar_deg": 84.54868018758222,
@@ -967,6 +1061,7 @@
         "z": 0.09499999999999988
       },
       {
+        "antipodal_singlet_yield": 0.4987076155553513,
         "azimuth_deg": 18.039589421534465,
         "index": 91,
         "polar_deg": 85.12397513038705,
@@ -976,6 +1071,7 @@
         "z": 0.08499999999999994
       },
       {
+        "antipodal_singlet_yield": 0.49845039747348774,
         "azimuth_deg": 240.53182537149402,
         "index": 92,
         "polar_deg": 85.69877769532964,
@@ -985,6 +1081,7 @@
         "z": 0.07499999999999989
       },
       {
+        "antipodal_singlet_yield": 0.49822533169085176,
         "azimuth_deg": 103.02406132146011,
         "index": 93,
         "polar_deg": 86.27314685751786,
@@ -994,6 +1091,7 @@
         "z": 0.06499999999999988
       },
       {
+        "antipodal_singlet_yield": 0.4980324181918676,
         "azimuth_deg": 325.51629727141966,
         "index": 94,
         "polar_deg": 86.84714119595358,
@@ -1003,6 +1101,7 @@
         "z": 0.054999999999999966
       },
       {
+        "antipodal_singlet_yield": 0.49787165696316893,
         "azimuth_deg": 188.00853322137922,
         "index": 95,
         "polar_deg": 87.42081894835162,
@@ -1012,6 +1111,7 @@
         "z": 0.04500000000000008
       },
       {
+        "antipodal_singlet_yield": 0.4977430479936073,
         "azimuth_deg": 50.50076917134531,
         "index": 96,
         "polar_deg": 87.99423806509017,
@@ -1021,6 +1121,7 @@
         "z": 0.034999999999999996
       },
       {
+        "antipodal_singlet_yield": 0.4976465912742536,
         "azimuth_deg": 272.99300512130486,
         "index": 97,
         "polar_deg": 88.5674562624335,
@@ -1030,6 +1131,7 @@
         "z": 0.02499999999999994
       },
       {
+        "antipodal_singlet_yield": 0.4975822867984105,
         "azimuth_deg": 135.48524107126443,
         "index": 98,
         "polar_deg": 89.14053107516418,
@@ -1039,6 +1141,7 @@
         "z": 0.015000000000000003
       },
       {
+        "antipodal_singlet_yield": 0.497550134561606,
         "azimuth_deg": 357.9774770212305,
         "index": 99,
         "polar_deg": 89.7135199087591,
@@ -1048,6 +1151,7 @@
         "z": 0.005000000000000003
       },
       {
+        "antipodal_singlet_yield": 0.4975501345616063,
         "azimuth_deg": 220.46971297119006,
         "index": 100,
         "polar_deg": 90.2864800912409,
@@ -1057,6 +1161,7 @@
         "z": -0.00499999999999988
       },
       {
+        "antipodal_singlet_yield": 0.49758228679841016,
         "azimuth_deg": 82.96194892115615,
         "index": 101,
         "polar_deg": 90.85946892483582,
@@ -1066,6 +1171,7 @@
         "z": -0.01499999999999988
       },
       {
+        "antipodal_singlet_yield": 0.49764659127425465,
         "azimuth_deg": 305.45418487111573,
         "index": 102,
         "polar_deg": 91.4325437375665,
@@ -1075,6 +1181,7 @@
         "z": -0.024999999999999818
       },
       {
+        "antipodal_singlet_yield": 0.49774304799360714,
         "azimuth_deg": 167.9464208210753,
         "index": 103,
         "polar_deg": 92.00576193490983,
@@ -1084,6 +1191,7 @@
         "z": -0.03499999999999987
       },
       {
+        "antipodal_singlet_yield": 0.4978716569631696,
         "azimuth_deg": 30.438656771034843,
         "index": 104,
         "polar_deg": 92.57918105164838,
@@ -1093,6 +1201,7 @@
         "z": -0.044999999999999964
       },
       {
+        "antipodal_singlet_yield": 0.4980324181918682,
         "azimuth_deg": 252.9308927210074,
         "index": 105,
         "polar_deg": 93.15285880404642,
@@ -1102,6 +1211,7 @@
         "z": -0.05499999999999985
       },
       {
+        "antipodal_singlet_yield": 0.49822533169085154,
         "azimuth_deg": 115.42312867096699,
         "index": 106,
         "polar_deg": 93.72685314248216,
@@ -1111,6 +1221,7 @@
         "z": -0.06499999999999997
       },
       {
+        "antipodal_singlet_yield": 0.49845039747348713,
         "azimuth_deg": 337.91536462092654,
         "index": 107,
         "polar_deg": 94.30122230467036,
@@ -1120,6 +1231,7 @@
         "z": -0.075
       },
       {
+        "antipodal_singlet_yield": 0.49870761555535353,
         "azimuth_deg": 200.4076005708861,
         "index": 108,
         "polar_deg": 94.87602486961296,
@@ -1129,6 +1241,7 @@
         "z": -0.08500000000000003
       },
       {
+        "antipodal_singlet_yield": 0.49899698595422565,
         "azimuth_deg": 62.89983652084568,
         "index": 109,
         "polar_deg": 95.4513198124178,
@@ -1138,6 +1251,7 @@
         "z": -0.09499999999999997
       },
       {
+        "antipodal_singlet_yield": 0.49931850869007616,
         "azimuth_deg": 285.3920724708183,
         "index": 110,
         "polar_deg": 96.0271665601311,
@@ -1147,6 +1261,7 @@
         "z": -0.10500000000000005
       },
       {
+        "antipodal_singlet_yield": 0.49967218378506734,
         "azimuth_deg": 147.88430842077784,
         "index": 111,
         "polar_deg": 96.6036250487339,
@@ -1156,6 +1271,7 @@
         "z": -0.11499999999999992
       },
       {
+        "antipodal_singlet_yield": 0.5000580112635314,
         "azimuth_deg": 10.376544370737392,
         "index": 112,
         "polar_deg": 97.18075578145829,
@@ -1165,6 +1281,7 @@
         "z": -0.12499999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5004759911519627,
         "azimuth_deg": 232.86878032069694,
         "index": 113,
         "polar_deg": 97.75861988858681,
@@ -1174,6 +1291,7 @@
         "z": -0.1349999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5009261234790158,
         "azimuth_deg": 95.36101627065652,
         "index": 114,
         "polar_deg": 98.3372791889057,
@@ -1183,6 +1301,7 @@
         "z": -0.145
       },
       {
+        "antipodal_singlet_yield": 0.5014084082754754,
         "azimuth_deg": 317.8532522206291,
         "index": 115,
         "polar_deg": 98.91679625299096,
@@ -1192,6 +1311,7 @@
         "z": -0.15499999999999994
       },
       {
+        "antipodal_singlet_yield": 0.5019228455742618,
         "azimuth_deg": 180.34548817058868,
         "index": 116,
         "polar_deg": 99.49723446851705,
@@ -1201,6 +1321,7 @@
         "z": -0.16499999999999998
       },
       {
+        "antipodal_singlet_yield": 0.5024694354104055,
         "azimuth_deg": 42.83772412054824,
         "index": 117,
         "polar_deg": 100.07865810778767,
@@ -1210,6 +1331,7 @@
         "z": -0.17500000000000004
       },
       {
+        "antipodal_singlet_yield": 0.5030481778210353,
         "azimuth_deg": 265.3299600705078,
         "index": 118,
         "polar_deg": 100.6611323977012,
@@ -1219,6 +1341,7 @@
         "z": -0.18500000000000008
       },
       {
+        "antipodal_singlet_yield": 0.5036590728453703,
         "azimuth_deg": 127.82219602046735,
         "index": 119,
         "polar_deg": 101.24472359237643,
@@ -1228,6 +1351,7 @@
         "z": -0.19500000000000006
       },
       {
+        "antipodal_singlet_yield": 0.5043021205246985,
         "azimuth_deg": 350.31443197043995,
         "index": 120,
         "polar_deg": 101.8294990486794,
@@ -1237,6 +1361,7 @@
         "z": -0.20500000000000004
       },
       {
+        "antipodal_singlet_yield": 0.5049773209023639,
         "azimuth_deg": 212.8066679203995,
         "index": 121,
         "polar_deg": 102.41552730490848,
@@ -1246,6 +1371,7 @@
         "z": -0.215
       },
       {
+        "antipodal_singlet_yield": 0.5056846740237553,
         "azimuth_deg": 75.29890387035908,
         "index": 122,
         "polar_deg": 103.00287816291394,
@@ -1255,6 +1381,7 @@
         "z": -0.22500000000000006
       },
       {
+        "antipodal_singlet_yield": 0.5064241799362875,
         "azimuth_deg": 297.7911398203186,
         "index": 123,
         "polar_deg": 103.59162277394788,
@@ -1264,6 +1391,7 @@
         "z": -0.23500000000000004
       },
       {
+        "antipodal_singlet_yield": 0.5071958386893934,
         "azimuth_deg": 160.2833757702782,
         "index": 124,
         "polar_deg": 104.18183372856346,
@@ -1273,6 +1401,7 @@
         "z": -0.24500000000000013
       },
       {
+        "antipodal_singlet_yield": 0.5079996503345012,
         "azimuth_deg": 22.775611720250787,
         "index": 125,
         "polar_deg": 104.77358515090748,
@@ -1282,6 +1411,7 @@
         "z": -0.2549999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5088356149250318,
         "azimuth_deg": 245.26784767021036,
         "index": 126,
         "polar_deg": 105.36695279777771,
@@ -1291,6 +1421,7 @@
         "z": -0.265
       },
       {
+        "antipodal_singlet_yield": 0.5097037325163779,
         "azimuth_deg": 107.76008362016992,
         "index": 127,
         "polar_deg": 105.96201416284724,
@@ -1300,6 +1431,7 @@
         "z": -0.27499999999999997
       },
       {
+        "antipodal_singlet_yield": 0.5106040031658968,
         "azimuth_deg": 330.2523195701295,
         "index": 128,
         "polar_deg": 106.55884858649239,
@@ -1309,6 +1441,7 @@
         "z": -0.2849999999999998
       },
       {
+        "antipodal_singlet_yield": 0.5115364269328966,
         "azimuth_deg": 192.74455552008902,
         "index": 129,
         "polar_deg": 107.1575373716982,
@@ -1318,6 +1451,7 @@
         "z": -0.295
       },
       {
+        "antipodal_singlet_yield": 0.5125010038786274,
         "azimuth_deg": 55.23679147004861,
         "index": 130,
         "polar_deg": 107.75816390655741,
@@ -1327,6 +1461,7 @@
         "z": -0.30499999999999994
       },
       {
+        "antipodal_singlet_yield": 0.5134977340662821,
         "azimuth_deg": 277.72902742002117,
         "index": 131,
         "polar_deg": 108.36081379392586,
@@ -1336,6 +1471,7 @@
         "z": -0.31499999999999995
       },
       {
+        "antipodal_singlet_yield": 0.5145266175609741,
         "azimuth_deg": 140.22126336998076,
         "index": 132,
         "polar_deg": 108.96557498884859,
@@ -1345,6 +1481,7 @@
         "z": -0.325
       },
       {
+        "antipodal_singlet_yield": 0.5155876544297372,
         "azimuth_deg": 2.713499319940315,
         "index": 133,
         "polar_deg": 109.57253794442893,
@@ -1354,6 +1491,7 @@
         "z": -0.335
       },
       {
+        "antipodal_singlet_yield": 0.5166808447415322,
         "azimuth_deg": 225.2057352698999,
         "index": 134,
         "polar_deg": 110.18179576687741,
@@ -1363,6 +1501,7 @@
         "z": -0.3449999999999999
       },
       {
+        "antipodal_singlet_yield": 0.517806188567236,
         "azimuth_deg": 87.69797121985944,
         "index": 135,
         "polar_deg": 110.79344438054876,
@@ -1372,6 +1511,7 @@
         "z": -0.35500000000000004
       },
       {
+        "antipodal_singlet_yield": 0.5189636859796435,
         "azimuth_deg": 310.19020716983204,
         "index": 136,
         "polar_deg": 111.40758270385622,
@@ -1381,6 +1521,7 @@
         "z": -0.36500000000000005
       },
       {
+        "antipodal_singlet_yield": 0.5201533370534736,
         "azimuth_deg": 172.6824431197916,
         "index": 137,
         "polar_deg": 112.02431283704216,
@@ -1390,6 +1531,7 @@
         "z": -0.375
       },
       {
+        "antipodal_singlet_yield": 0.5213751418653695,
         "azimuth_deg": 35.17467906975116,
         "index": 138,
         "polar_deg": 112.6437402628851,
@@ -1399,6 +1541,7 @@
         "z": -0.38499999999999995
       },
       {
+        "antipodal_singlet_yield": 0.5226291004939219,
         "azimuth_deg": 257.6669150197107,
         "index": 139,
         "polar_deg": 113.26597406153651,
@@ -1408,6 +1551,7 @@
         "z": -0.395
       },
       {
+        "antipodal_singlet_yield": 0.5239152130196605,
         "azimuth_deg": 120.15915096967029,
         "index": 140,
         "polar_deg": 113.8911271408089,
@@ -1417,6 +1561,7 @@
         "z": -0.4050000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5252334795250825,
         "azimuth_deg": 342.65138691964285,
         "index": 141,
         "polar_deg": 114.51931648338041,
@@ -1426,6 +1571,7 @@
         "z": -0.415
       },
       {
+        "antipodal_singlet_yield": 0.5265839000946795,
         "azimuth_deg": 205.14362286960244,
         "index": 142,
         "polar_deg": 115.15066341254371,
@@ -1435,6 +1581,7 @@
         "z": -0.4249999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5279664748149334,
         "azimuth_deg": 67.635858819562,
         "index": 143,
         "polar_deg": 115.78529387831112,
@@ -1444,6 +1591,7 @@
         "z": -0.43500000000000016
       },
       {
+        "antipodal_singlet_yield": 0.5293812037743688,
         "azimuth_deg": 290.12809476952157,
         "index": 144,
         "polar_deg": 116.42333876589676,
@@ -1453,6 +1601,7 @@
         "z": -0.44499999999999984
       },
       {
+        "antipodal_singlet_yield": 0.5308280870635743,
         "azimuth_deg": 152.6203307194811,
         "index": 145,
         "polar_deg": 117.0649342288334,
@@ -1462,6 +1611,7 @@
         "z": -0.4550000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5323071247752288,
         "azimuth_deg": 15.11256666945371,
         "index": 146,
         "polar_deg": 117.71022204925157,
@@ -1471,6 +1621,7 @@
         "z": -0.465
       },
       {
+        "antipodal_singlet_yield": 0.5338183170041647,
         "azimuth_deg": 237.60480261941325,
         "index": 147,
         "polar_deg": 118.3593500281575,
@@ -1480,6 +1631,7 @@
         "z": -0.47500000000000014
       },
       {
+        "antipodal_singlet_yield": 0.535361663847386,
         "azimuth_deg": 100.09703856937284,
         "index": 148,
         "polar_deg": 119.01247240889754,
@@ -1489,6 +1641,7 @@
         "z": -0.4849999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5369371654041404,
         "azimuth_deg": 322.5892745193324,
         "index": 149,
         "polar_deg": 119.66975033740293,
@@ -1498,6 +1651,7 @@
         "z": -0.4950000000000003
       },
       {
+        "antipodal_singlet_yield": 0.538544821775962,
         "azimuth_deg": 185.08151046929194,
         "index": 150,
         "polar_deg": 120.3313523632714,
@@ -1507,6 +1661,7 @@
         "z": -0.5050000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5401846330667405,
         "azimuth_deg": 47.57374641926455,
         "index": 151,
         "polar_deg": 120.99745498628015,
@@ -1516,6 +1671,7 @@
         "z": -0.5150000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5418565993827829,
         "azimuth_deg": 270.0659823692241,
         "index": 152,
         "polar_deg": 121.66824325354165,
@@ -1525,6 +1681,7 @@
         "z": -0.5249999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5435607208329017,
         "azimuth_deg": 132.55821831918368,
         "index": 153,
         "polar_deg": 122.34391141323343,
@@ -1534,6 +1691,7 @@
         "z": -0.535
       },
       {
+        "antipodal_singlet_yield": 0.5452969975284763,
         "azimuth_deg": 355.05045426914324,
         "index": 154,
         "polar_deg": 123.02466363166586,
@@ -1543,6 +1701,7 @@
         "z": -0.545
       },
       {
+        "antipodal_singlet_yield": 0.5470654295835563,
         "azimuth_deg": 217.5426902191028,
         "index": 155,
         "polar_deg": 123.71071478142593,
@@ -1552,6 +1711,7 @@
         "z": -0.555
       },
       {
+        "antipodal_singlet_yield": 0.5488660171149532,
         "azimuth_deg": 80.03492616907539,
         "index": 156,
         "polar_deg": 124.40229130947232,
@@ -1561,6 +1721,7 @@
         "z": -0.5650000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5506987602423439,
         "azimuth_deg": 302.527162119035,
         "index": 157,
         "polar_deg": 125.09963219539351,
@@ -1570,6 +1731,7 @@
         "z": -0.5749999999999998
       },
       {
+        "antipodal_singlet_yield": 0.5525636590883792,
         "azimuth_deg": 165.01939806899452,
         "index": 158,
         "polar_deg": 125.80299001161409,
@@ -1579,6 +1741,7 @@
         "z": -0.585
       },
       {
+        "antipodal_singlet_yield": 0.5544607137788029,
         "azimuth_deg": 27.511634018954076,
         "index": 159,
         "polar_deg": 126.512632099194,
@@ -1588,6 +1751,7 @@
         "z": -0.595
       },
       {
+        "antipodal_singlet_yield": 0.55638992444259,
         "azimuth_deg": 250.00386996891365,
         "index": 160,
         "polar_deg": 127.22884187507354,
@@ -1597,6 +1761,7 @@
         "z": -0.6049999999999998
       },
       {
+        "antipodal_singlet_yield": 0.5583512912120717,
         "azimuth_deg": 112.49610591888623,
         "index": 161,
         "polar_deg": 127.95192028924644,
@@ -1606,6 +1771,7 @@
         "z": -0.6150000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5603448142230817,
         "azimuth_deg": 334.9883418688458,
         "index": 162,
         "polar_deg": 128.68218745348943,
@@ -1615,6 +1781,7 @@
         "z": -0.625
       },
       {
+        "antipodal_singlet_yield": 0.5623704936151238,
         "azimuth_deg": 197.48057781880536,
         "index": 163,
         "polar_deg": 129.41998446705898,
@@ -1624,6 +1791,7 @@
         "z": -0.6349999999999998
       },
       {
+        "antipodal_singlet_yield": 0.5644283295315233,
         "azimuth_deg": 59.972813768764915,
         "index": 164,
         "polar_deg": 130.16567546932956,
@@ -1633,6 +1801,7 @@
         "z": -0.645
       },
       {
+        "antipodal_singlet_yield": 0.566518322119614,
         "azimuth_deg": 282.46504971872446,
         "index": 165,
         "polar_deg": 130.91964995488652,
@@ -1642,6 +1811,7 @@
         "z": -0.655
       },
       {
+        "antipodal_singlet_yield": 0.5686404715309124,
         "azimuth_deg": 144.9572856686971,
         "index": 166,
         "polar_deg": 131.6823253933395,
@@ -1651,6 +1821,7 @@
         "z": -0.665
       },
       {
+        "antipodal_singlet_yield": 0.5707947779213297,
         "azimuth_deg": 7.449521618656635,
         "index": 167,
         "polar_deg": 132.45415020440095,
@@ -1660,6 +1831,7 @@
         "z": -0.675
       },
       {
+        "antipodal_singlet_yield": 0.5729812414513619,
         "azimuth_deg": 229.94175756861617,
         "index": 168,
         "polar_deg": 133.23560714898218,
@@ -1669,6 +1841,7 @@
         "z": -0.6849999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5751998622863257,
         "azimuth_deg": 92.43399351857576,
         "index": 169,
         "polar_deg": 134.027217209723,
@@ -1678,6 +1851,7 @@
         "z": -0.6950000000000001
       },
       {
+        "antipodal_singlet_yield": 0.577450640596576,
         "azimuth_deg": 314.9262294685353,
         "index": 170,
         "polar_deg": 134.8295440501774,
@@ -1687,6 +1861,7 @@
         "z": -0.7050000000000002
       },
       {
+        "antipodal_singlet_yield": 0.57973357655776,
         "azimuth_deg": 177.4184654184949,
         "index": 171,
         "polar_deg": 135.64319916174932,
@@ -1696,6 +1871,7 @@
         "z": -0.7150000000000002
       },
       {
+        "antipodal_singlet_yield": 0.5820486703510627,
         "azimuth_deg": 39.91070136846747,
         "index": 172,
         "polar_deg": 136.46884783262755,
@@ -1705,6 +1881,7 @@
         "z": -0.725
       },
       {
+        "antipodal_singlet_yield": 0.5843959221634902,
         "azimuth_deg": 262.402937318427,
         "index": 173,
         "polar_deg": 137.30721610506222,
@@ -1714,6 +1891,7 @@
         "z": -0.7350000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5867753321881342,
         "azimuth_deg": 124.89517326838659,
         "index": 174,
         "polar_deg": 138.1590989286108,
@@ -1723,6 +1901,7 @@
         "z": -0.7450000000000001
       },
       {
+        "antipodal_singlet_yield": 0.5891869006244821,
         "azimuth_deg": 347.38740921834614,
         "index": 175,
         "polar_deg": 139.02536977055468,
@@ -1732,6 +1911,7 @@
         "z": -0.755
       },
       {
+        "antipodal_singlet_yield": 0.5916306276787382,
         "azimuth_deg": 209.8796451683057,
         "index": 176,
         "polar_deg": 139.9069920148702,
@@ -1741,6 +1921,7 @@
         "z": -0.7649999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5941065135641328,
         "azimuth_deg": 72.37188111827831,
         "index": 177,
         "polar_deg": 140.80503257401708,
@@ -1750,6 +1931,7 @@
         "z": -0.775
       },
       {
+        "antipodal_singlet_yield": 0.5966145585012886,
         "azimuth_deg": 294.8641170682379,
         "index": 178,
         "polar_deg": 141.72067826207225,
@@ -1759,6 +1941,7 @@
         "z": -0.7849999999999999
       },
       {
+        "antipodal_singlet_yield": 0.5991547627185828,
         "azimuth_deg": 157.35635301819744,
         "index": 179,
         "polar_deg": 142.65525564598522,
@@ -1768,6 +1951,7 @@
         "z": -0.795
       },
       {
+        "antipodal_singlet_yield": 0.6017271264525619,
         "azimuth_deg": 19.848588968157,
         "index": 180,
         "polar_deg": 143.61025532246646,
@@ -1777,6 +1961,7 @@
         "z": -0.805
       },
       {
+        "antipodal_singlet_yield": 0.6043316499483538,
         "azimuth_deg": 242.34082491811657,
         "index": 181,
         "polar_deg": 144.58736188894045,
@@ -1786,6 +1971,7 @@
         "z": -0.8150000000000001
       },
       {
+        "antipodal_singlet_yield": 0.6069683334601478,
         "azimuth_deg": 104.83306086808916,
         "index": 182,
         "polar_deg": 145.58849133023054,
@@ -1795,6 +1981,7 @@
         "z": -0.8249999999999998
       },
       {
+        "antipodal_singlet_yield": 0.6096371772517142,
         "azimuth_deg": 327.32529681804874,
         "index": 183,
         "polar_deg": 146.61583819365174,
@@ -1804,6 +1991,7 @@
         "z": -0.835
       },
       {
+        "antipodal_singlet_yield": 0.6123381815969909,
         "azimuth_deg": 189.81753276800828,
         "index": 184,
         "polar_deg": 147.67193587783774,
@@ -1813,6 +2001,7 @@
         "z": -0.845
       },
       {
+        "antipodal_singlet_yield": 0.6150713467807488,
         "azimuth_deg": 52.30976871796784,
         "index": 185,
         "polar_deg": 148.75973478381835,
@@ -1822,6 +2011,7 @@
         "z": -0.855
       },
       {
+        "antipodal_singlet_yield": 0.6178366730993944,
         "azimuth_deg": 274.8020046679274,
         "index": 186,
         "polar_deg": 149.88270525267794,
@@ -1831,6 +2021,7 @@
         "z": -0.865
       },
       {
+        "antipodal_singlet_yield": 0.6206341608618791,
         "azimuth_deg": 137.29424061790002,
         "index": 187,
         "polar_deg": 151.04497562814015,
@@ -1840,6 +2031,7 @@
         "z": -0.875
       },
       {
+        "antipodal_singlet_yield": 0.6234638103908225,
         "azimuth_deg": 359.78647656785955,
         "index": 188,
         "polar_deg": 152.25152129934662,
@@ -1849,6 +2041,7 @@
         "z": -0.885
       },
       {
+        "antipodal_singlet_yield": 0.6263256220238549,
         "azimuth_deg": 222.27871251781912,
         "index": 189,
         "polar_deg": 153.50842979964392,
@@ -1858,6 +2051,7 @@
         "z": -0.895
       },
       {
+        "antipodal_singlet_yield": 0.6292195961152168,
         "azimuth_deg": 84.77094846777868,
         "index": 190,
         "polar_deg": 154.8232830593903,
@@ -1867,6 +2061,7 @@
         "z": -0.905
       },
       {
+        "antipodal_singlet_yield": 0.6321457330376192,
         "azimuth_deg": 307.2631844177382,
         "index": 191,
         "polar_deg": 156.20572704946338,
@@ -1876,6 +2071,7 @@
         "z": -0.915
       },
       {
+        "antipodal_singlet_yield": 0.6351040331843665,
         "azimuth_deg": 169.75542036771085,
         "index": 192,
         "polar_deg": 157.6683549907785,
@@ -1885,6 +2081,7 @@
         "z": -0.925
       },
       {
+        "antipodal_singlet_yield": 0.6380944969714761,
         "azimuth_deg": 32.247656317670405,
         "index": 193,
         "polar_deg": 159.22814495467176,
@@ -1894,6 +2091,7 @@
         "z": -0.9350000000000002
       },
       {
+        "antipodal_singlet_yield": 0.6411171248396242,
         "azimuth_deg": 254.73989226762995,
         "index": 194,
         "polar_deg": 160.90894748713967,
@@ -1903,6 +2101,7 @@
         "z": -0.9450000000000001
       },
       {
+        "antipodal_singlet_yield": 0.644171917255239,
         "azimuth_deg": 117.23212821758953,
         "index": 195,
         "polar_deg": 162.74614688264273,
@@ -1912,6 +2111,7 @@
         "z": -0.955
       },
       {
+        "antipodal_singlet_yield": 0.647258874710164,
         "azimuth_deg": 339.7243641675491,
         "index": 196,
         "polar_deg": 164.79639590670703,
@@ -1921,6 +2121,7 @@
         "z": -0.9650000000000001
       },
       {
+        "antipodal_singlet_yield": 0.6503779977190373,
         "azimuth_deg": 202.2166001175217,
         "index": 197,
         "polar_deg": 167.16143185901598,
@@ -1930,6 +2131,7 @@
         "z": -0.9750000000000001
       },
       {
+        "antipodal_singlet_yield": 0.6535292868140528,
         "azimuth_deg": 64.70883606748124,
         "index": 198,
         "polar_deg": 170.06363292785932,
@@ -1939,6 +2141,7 @@
         "z": -0.9850000000000001
       },
       {
+        "antipodal_singlet_yield": 0.6567127425374677,
         "azimuth_deg": 287.2010720174408,
         "index": 199,
         "polar_deg": 174.26803203480233,

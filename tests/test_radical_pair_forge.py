@@ -181,6 +181,74 @@ def test_report_passes_every_registered_check():
     assert "samples" in report.summary(include_samples=True)["sweep"]
 
 
+def test_samples_carry_antipodal_yields_that_demonstrate_the_degeneracy():
+    couplings = resolve_inventory("cryptochrome-like")
+    sweep = sweep_field_directions(couplings=couplings, rate_per_second=RATE, direction_count=40)
+    pairs = [(s.singlet_yield, s.antipodal_singlet_yield) for s in sweep.samples]
+    assert pairs
+    # Every direction agrees with its true antipode to machine precision.
+    assert max(abs(a - b) for a, b in pairs) < SYMMETRY_TOLERANCE
+
+
+def test_mirrored_polar_angle_is_not_the_antipode_for_a_rhombic_tensor():
+    # Guards the figure's honesty: the yield depends on azimuth too, so samples
+    # at mirrored polar angles are NOT antipodal pairs and must not be presented
+    # as evidence of the polarity degeneracy.
+    couplings = resolve_inventory("cryptochrome-like")
+    sweep = sweep_field_directions(couplings=couplings, rate_per_second=RATE, direction_count=120)
+    by_polar = sorted(sweep.samples, key=lambda s: s.polar_deg)
+    count = len(by_polar)
+    mirrored_gap = max(
+        abs(by_polar[i].singlet_yield - by_polar[count - 1 - i].singlet_yield)
+        for i in range(count // 2)
+    )
+    # The mirrored-index discrepancy is a large fraction of the whole signal.
+    assert mirrored_gap > 0.1 * sweep.anisotropy
+
+
+def test_loaded_inventory_avoids_the_dense_liouvillian_blowup():
+    # dim 72 would need a 5184-square dense Liouvillian (~1.6 GiB of temporaries
+    # and a cubic solve), so the cross-check must fall back and say so.
+    report = run_radical_pair_forge(
+        inventory="loaded", direction_count=12, control_direction_count=8, rate_points=(1e6,)
+    )
+    controls = report.controls
+    assert report.hilbert_dimension == 72
+    assert controls["cross_check_hilbert_dimension"] <= controls["liouvillian_dim_limit"]
+    assert controls["cross_check_inventory"] == "cryptochrome-like"
+    assert controls["checks"]["closed_form_matches_liouvillian"]
+    # The prompt-recombination limit still uses the selected inventory.
+    assert controls["checks"]["prompt_recombination_limit_is_unity"]
+
+
+def test_small_inventory_cross_checks_against_itself():
+    report = run_radical_pair_forge(
+        inventory="cryptochrome-like",
+        direction_count=12,
+        control_direction_count=8,
+        rate_points=(1e6,),
+    )
+    assert report.controls["cross_check_inventory"] == "cryptochrome-like"
+    assert report.controls["cross_check_hilbert_dimension"] == 24
+
+
+def test_claim_boundary_does_not_promise_a_lifetime_window():
+    from gaugegap.radical_pair_forge import CLAIM_BOUNDARY
+
+    assert "fast-recombination cutoff" in CLAIM_BOUNDARY
+    assert "lifetime window" in CLAIM_BOUNDARY  # only to disclaim it
+    assert "not a lifetime window" in CLAIM_BOUNDARY
+
+
+def test_anisotropy_does_not_peak_near_the_larmor_rate():
+    # Without relaxation there is no window: the low-rate end is not suppressed.
+    # This pins the honest claim so nobody re-adds a microsecond optimum.
+    couplings = resolve_inventory("cryptochrome-like")
+    slow = sweep_field_directions(couplings=couplings, rate_per_second=1e3, direction_count=40)
+    larmor = sweep_field_directions(couplings=couplings, rate_per_second=1e6, direction_count=40)
+    assert slow.anisotropy >= larmor.anisotropy
+
+
 def test_unknown_inventory_fails_closed():
     with pytest.raises(ValueError, match="unknown inventory"):
         resolve_inventory("robin-eye-over-usb")
