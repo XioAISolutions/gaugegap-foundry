@@ -53,6 +53,20 @@ Avoid:
 - AI found the Hilbert-Polya operator
 - quantum computer verifies RH
 
+### StyleGap (human vs AI text)
+
+Use precise language:
+
+- finite linguistic-screening benchmark
+- proxy-feature comparison (open lexicons; LIWC dictionaries not shipped)
+- corpus-local screening protocol with deterministic splits
+
+Avoid:
+
+- AI detector product claims
+- "proves machine text is identifiable"
+- generalizable detection-accuracy claims
+
 ## Development flow
 
 - Keep provider credentials out of source.

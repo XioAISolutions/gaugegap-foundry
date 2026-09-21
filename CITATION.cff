@@ -7,3 +7,17 @@ authors:
 repository-code: https://github.com/XioAISolutions/gaugegap-foundry
 license: Apache-2.0
 date-released: 2026-05-24
+references:
+  - type: article
+    title: "A linguistic comparison between human- and AI-generated content"
+    authors:
+      - family-names: Rodrigues
+      - family-names: Sturm
+      - family-names: Pinheiro
+    journal: iScience
+    volume: 29
+    year: 2026
+    doi: 10.1016/j.isci.2026.114976
+    notes: >-
+      Source protocol for the StyleGap finite linguistic-screening track
+      (see docs/stylegap.md).
