@@ -1,0 +1,17 @@
+{
+  "1": {"class_type": "Gielis3DBatchRenderer", "inputs": {"frames": 1, "resolution": 256, "img_size": 1024,
+        "m1_start": 5.0, "m1_end": 5.0, "m2_start": 0.0, "m2_end": 0.0, "n1_1": 1.0, "n1_2": 1.0,
+        "n1_3": 1.0, "yaw_start": 35.0, "yaw_end": 35.0, "pitch": 32.0}},
+  "2": {"class_type": "ImageScale", "inputs": {"image": ["1", 0], "upscale_method": "bilinear",
+        "width": 768, "height": 1344, "crop": "disabled"}},
+  "3": {"class_type": "CheckpointLoaderSimple", "inputs": {"ckpt_name": "flux1-dev-fp8.safetensors"}},
+  "4": {"class_type": "CLIPTextEncode", "inputs": {"text": "A monumental translucent bismuth crystal sculpture with five soft lobes, standing on a dark gallery pedestal, iridescent teal and amber reflections, cinematic studio lighting, glossy surface, hyper-detailed, product photography.", "clip": ["3", 1]}},
+  "5": {"class_type": "FluxGuidance", "inputs": {"conditioning": ["4", 0], "guidance": 3.5}},
+  "6": {"class_type": "CLIPTextEncode", "inputs": {"text": "", "clip": ["3", 1]}},
+  "7": {"class_type": "ControlNetLoader", "inputs": {"control_net_name": "flux-depth-controlnet-v3.safetensors"}},
+  "8": {"class_type": "ControlNetApplyAdvanced", "inputs": {"positive": ["5", 0], "negative": ["6", 0], "control_net": ["7", 0], "image": ["2", 0], "strength": 0.75, "start_percent": 0.0, "end_percent": 1.0}},
+  "9": {"class_type": "EmptyLatentImage", "inputs": {"width": 768, "height": 1344, "batch_size": 1}},
+  "10": {"class_type": "KSampler", "inputs": {"model": ["3", 0], "positive": ["8", 0], "negative": ["8", 1], "latent_image": ["9", 0], "seed": 9901, "steps": 20, "cfg": 1.0, "sampler_name": "euler", "scheduler": "simple", "denoise": 1.0}},
+  "11": {"class_type": "VAEDecode", "inputs": {"samples": ["10", 0], "vae": ["3", 2]}},
+  "12": {"class_type": "SaveImage", "inputs": {"images": ["11", 0], "filename_prefix": "gielis-flux/test"}}
+}
