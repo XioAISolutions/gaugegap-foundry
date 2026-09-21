@@ -65,6 +65,7 @@ GaugeGap Foundry is a single laboratory for several kinds of finite scientific e
 - **GaugeGap** — finite lattice-gauge benchmarks from Z₂ through bounded SU(3) scaffolds.
 - **FlowGap** — finite PDE surrogates and nonlinear systems, including Rössler, Lorenz, and Thomas dynamics.
 - **CurveRank** — certified screening of finite operator truncations against zeta-zero-inspired targets.
+- **Superformula** — parametric Gielis depth conditioning: formula → z-buffer depth map → FLUX stills → Wan drift loops, with example artifacts ([`superformula/`](superformula/README.md)).
 - **NetGap** — the exact unitary core of a photonic quantum switch: non-blocking routing, encoding conversion, and certified coherence preservation.
 - **Physical limits** — familiar physics claims reduced to their exact, bounded computational core.
 - **Spectra and Verdict DSLs** — small languages where certification and evidence are part of program semantics.
@@ -1205,6 +1206,16 @@ The project becomes more credible by making the evidence **more explorable witho
 
 ---
 
+## 🪞 Superformula track — parametric depth conditioning
+
+A finite, reproducible pipeline from **Gielis superformula parameters** to generative imagery: the formula is rasterized to a vectorized z-buffer **depth map**, which conditions **FLUX.1 [dev]** through a depth ControlNet, and the resulting stills seed **Wan 2.2 i2v** drift loops. The track ships the ComfyUI node, single-shape and batch runners (with a self-healing remote-tunnel client), the ComfyUI graph, and example artifacts — four sculptures with still + motion, plus a combined reel.
+
+Everything lives in [`superformula/`](superformula/README.md); example outputs are **research/demo artifacts** produced with FLUX.1 [dev] (non-commercial license).
+
+> 🧪 **Track claim boundary:** a parametric-conditioning pipeline demonstration. No claims about aesthetic quality, system comparison, or benchmark superiority.
+
+---
+
 ## 📚 Documentation index
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — unified Foundry architecture
@@ -1238,6 +1249,7 @@ The project becomes more credible by making the evidence **more explorable witho
 - [`docs/blueprint-variational-bound.md`](docs/blueprint-variational-bound.md) — the assumption removed from the bracket certificates
 - [`docs/blueprint-reversibility-lean.md`](docs/blueprint-reversibility-lean.md) — what Landauer's bound is applied to, and three bridges that do not hold
 - [`formal/lean/README.md`](formal/lean/README.md) — the Lean project, its pinned toolchain, and its gate
+- [`superformula/README.md`](superformula/README.md) — Gielis superformula depth-conditioning pipeline, runners, and examples
 - [`docs/spectra-language.md`](docs/spectra-language.md) and [`docs/verdict-language.md`](docs/verdict-language.md)
 
 ## License
