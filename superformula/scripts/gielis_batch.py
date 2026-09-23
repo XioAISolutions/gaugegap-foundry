@@ -22,17 +22,23 @@ def flux_graph(name, yaw, pitch, m1, n1, seed):
               "gallery pedestal, iridescent teal and amber reflections, cinematic studio lighting, "
               "glossy surface, hyper-detailed, product photography.")
     return {
+        # Render the depth map at the latent's own 768x1344. This graph used to
+        # render 1024x1024 and ImageScale it to 768x1344 with crop disabled,
+        # which squashed every shape to 0.571x its width before FLUX saw it.
+        # mode="batch" also fills the silhouette: at resolution=256 on a 1024
+        # canvas the original renderer put depth on only ~8% of it.
+        # To reproduce the published examples exactly, check out the previous
+        # revision of this file and set mode="legacy".
         "1": n("Gielis3DBatchRenderer", frames=1, resolution=256, img_size=1024,
                m1_start=m1, m1_end=m1, m2_start=0.0, m2_end=0.0, n1_1=n1, n1_2=1.0, n1_3=1.0,
-               yaw_start=yaw, yaw_end=yaw, pitch=pitch),
-        "2": n("ImageScale", image=["1", 0], upscale_method="bilinear", width=768, height=1344, crop="disabled"),
+               yaw_start=yaw, yaw_end=yaw, pitch=pitch, mode="batch", width=768, height=1344),
         "3": n("CheckpointLoaderSimple", ckpt_name="flux1-dev-fp8.safetensors"),
         "4": n("CLIPTextEncode", text=prompt, clip=["3", 1]),
         "5": n("FluxGuidance", conditioning=["4", 0], guidance=3.5),
         "6": n("CLIPTextEncode", text="", clip=["3", 1]),
         "7": n("ControlNetLoader", control_net_name="flux-depth-controlnet-v3.safetensors"),
         "8": n("ControlNetApplyAdvanced", positive=["5", 0], negative=["6", 0], control_net=["7", 0],
-               image=["2", 0], strength=0.75, start_percent=0.0, end_percent=1.0),
+               image=["1", 0], strength=0.75, start_percent=0.0, end_percent=1.0),
         "9": n("EmptyLatentImage", width=768, height=1344, batch_size=1),
         "10": n("KSampler", model=["3", 0], positive=["8", 0], negative=["8", 1], latent_image=["9", 0],
                 seed=seed, steps=20, cfg=1.0, sampler_name="euler", scheduler="simple", denoise=1.0),
