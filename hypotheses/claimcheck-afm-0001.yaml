@@ -1,0 +1,30 @@
+id: claimcheck-afm-0001
+track: ClaimCheck
+model: literature_review
+scope: public science-explainer claim about atomic force microscope probe size
+claim: A standard atomic force microscope probe tip is thinner than an atom.
+prediction:
+  observable: tip_apex_radius_nm
+  expected_shape: less_than_0.3_nm
+controls:
+  sources:
+    - springer_metrology_2022
+    - nci_nanotech_assay_protocol
+    - uw_intro_sfm_lab_manual
+    - uiuc_phys403_afm_lecture_2025
+    - rubicon_afm_overview
+validation:
+  required:
+    - independent_literature_sources
+  future:
+    - manufacturer_datasheet_crosscheck
+kill_criteria:
+  - reported tip radius exceeds atomic diameter (~0.1-0.3 nm) in standard commercial probes
+status: falsified
+notes:
+  - Standard silicon/silicon-nitride probes report tip radius 5-10 nm: tens of atoms wide.
+  - This is not a specialized instrument. CO-functionalized tips in ultrahigh-vacuum
+    non-contact AFM can approach single-molecule apex sharpness; the reel shows and
+    describes a standard AFM, not that instrument.
+  - Corrected claim: the tip is a few nanometers wide (tens of atoms across) and the
+    instrument resolves sub-nanometer height changes via cantilever deflection.
