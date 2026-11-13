@@ -1,0 +1,50 @@
+{
+  "claim_boundary": "A prospective prediction is evidence only if it was sealed before the target draw, the protocol and model parameters were fixed in advance, and a pre-declared checkpoint passes its family-wise corrected threshold. Individual hits, near-misses, interim p-values, or anti-crowd rankings do not establish predictive power.",
+  "game": {
+    "name": "lotto-6of49",
+    "pick_count": 6,
+    "pool_size": 49
+  },
+  "predicted_numbers": [
+    9,
+    28,
+    30,
+    37,
+    42,
+    45
+  ],
+  "prediction_hash": "51b4fdcd76d67d4cba22532f73e717692710a6d3611d0ee255361dfa28e13b78",
+  "prediction_rule": {
+    "model": "hybrid",
+    "window": 104
+  },
+  "protocol_id": "lottery-forge-0002-prospective-v1",
+  "protocol_sha256": "455faee857ef9f4b5bd7984e06b336ec878d54e047f5d8c78051be4cbbbe4045",
+  "schema": "gaugegap.lottery_forge.prospective_prediction.v1",
+  "sealed_on_date": "2026-11-13",
+  "source_snapshot": {
+    "kind": "official-wclc-merged",
+    "records_selected": 4420,
+    "sources": [
+      {
+        "bytes": 356107,
+        "sha256": "bbd252197f2dea525862bab481a3ef7bc25e9f65618720a343d97a7d9dc67153",
+        "url": "https://www.wclc.com/display-on/display-on-downloads/lotto-649-since-inception.htm?channel=print"
+      },
+      {
+        "bytes": 76686,
+        "sha256": "dc8ba1c90184994694b639708a7323731397c3ddec43bf5db114ad27ba175bee",
+        "url": "https://www.wclc.com/winning-numbers/lotto-649-extra.htm"
+      }
+    ]
+  },
+  "target_draw_date": "2026-11-14",
+  "training": {
+    "all_draw_count": 4420,
+    "all_draws_sha256": "14a635bbfd45eb91a25f6284b6c4a24729b0f8a458cae249484539c2f26a4890",
+    "latest_draw_date": "2026-11-11",
+    "window_draw_count": 104,
+    "window_draws_sha256": "c6a68a1107d0d16fd7b181214f8ecee3d0c03b7984ddbec9987307daabc7fe7b",
+    "window_first_draw_date": "2025-11-15"
+  }
+}
